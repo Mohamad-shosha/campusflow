@@ -89,14 +89,14 @@ jobs:
         run: docker compose config
 
       - name: Build Backend Docker Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           push: false
           tags: fbsu-campus-backend:test
 
       - name: Build Frontend Docker Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           push: false
