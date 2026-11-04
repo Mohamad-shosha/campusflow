@@ -1,0 +1,103 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # ============================================================================
+  # 1. Frontend Verification (Lint, Typecheck, Test, Build)
+  # ============================================================================
+  frontend-ci:
+    name: Frontend Quality & Test Checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript Strict Typecheck
+        run: npm run typecheck
+
+      - name: Run Vitest Unit Tests
+        run: npm run test
+
+      - name: Build Frontend Production Artifact
+        run: npm run build
+
+  # ============================================================================
+  # 2. Backend Verification (Java 21, ArchUnit, Unit & Integration Tests, Build)
+  # ============================================================================
+  backend-ci:
+    name: Backend Quality & Architecture Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21 LTS
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Grant Execute Permissions to Maven Wrapper
+        run: chmod +x ./mvnw
+
+      - name: Run Backend Architecture & Unit Tests
+        run: ./mvnw test
+
+      - name: Package Backend Application JAR
+        run: ./mvnw package -DskipTests
+
+  # ============================================================================
+  # 3. Docker Verification (Dockerfiles Build & Compose Orchestration Check)
+  # ============================================================================
+  docker-smoke-ci:
+    name: Docker Build & Compose Smoke Test
+    runs-on: ubuntu-latest
+    needs: [frontend-ci, backend-ci]
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Docker Compose Configuration
+        run: docker compose config
+
+      - name: Build Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          tags: fbsu-campus-backend:test
+
+      - name: Build Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: false
+          tags: fbsu-campus-frontend:test
