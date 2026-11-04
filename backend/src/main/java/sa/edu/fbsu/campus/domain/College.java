@@ -72,3 +72,4 @@ public class College extends BaseTenantEntity {
         this.active = active;
     }
 }
+

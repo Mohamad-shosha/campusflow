@@ -114,3 +114,4 @@ VALUES (
     '2027-01-15',
     true
 ) ON CONFLICT (university_id, code) DO NOTHING;
+

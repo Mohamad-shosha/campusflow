@@ -17,7 +17,7 @@ const T = (id, title, o) => ({ id, title, status: 'Backlog', pr: '—', ...o });
 
 export const tasks = [
   T('P0-01', 'Project discovery & planning', {
-    status: 'In Review', branch: 'docs/P0-01-project-discovery', pri: 'P0', cx: 'L', deps: [],
+    status: 'Done', pr: 'Merged into main (3df8350)', branch: 'docs/P0-01-project-discovery', pri: 'P0', cx: 'L', deps: [],
     goal: 'فحص المشروع الحالي وتوثيقه: Audit، UI Inventory، PRD، User Flows، Architecture، ERD، MVP، Roadmap، Tasks، Risks.',
     files: ['plan.md', 'TASKS.md', 'docs/discovery/*', 'docs/architecture/*', 'docs/decisions/*'],
     steps: ['قراءة الكود والـ Git state', 'تشغيل npm run build كخط أساس', 'كتابة مستندات الـ Discovery والـ Architecture', 'كتابة plan.md وTASKS.md'],
@@ -27,6 +27,7 @@ export const tasks = [
 
   // ---------------- P1 ----------------
   T('P1-01', 'Repository restructure (monorepo) & legacy preservation', {
+    status: 'Done', pr: 'PR (chore/P1-01-repo-restructure)',
     pri: 'High', cx: 'M', deps: ['P0-01 معتمد', 'Q12', 'Q14'], branch: 'chore/P1-01-repo-restructure',
     goal: 'ترتيب الـ repo: إنشاء frontend/ وbackend/ وlegacy/، ونقل الـ showcase والـ presentation وUI-UX وscripts إلى legacy/، وإزالة تكرار الـ assets (متخزنة 3 مرات).',
     files: ['legacy/**', 'frontend/ (فارغ)', 'backend/ (فارغ)', '.gitignore', 'README.md', 'vite.config.js'],
@@ -36,6 +37,7 @@ export const tasks = [
     blockedBy: ['Q12', 'Q14'],
   }),
   T('P1-02', 'Frontend scaffold (Vite + React + TypeScript strict)', {
+    status: 'Done', pr: 'PR (feature/P1-02-frontend-scaffold)',
     pri: 'High', cx: 'M', deps: ['P1-01', 'D-2'], branch: 'feature/P1-02-frontend-scaffold',
     goal: 'إنشاء تطبيق React 18 + TS strict جديد في frontend/ مع ESLint وPrettier وVitest، بدون أي Feature.',
     files: ['frontend/package.json', 'frontend/tsconfig.json', 'frontend/vite.config.ts', 'frontend/eslint.config.js', 'frontend/src/**'],
@@ -44,6 +46,7 @@ export const tasks = [
     tests: ['lint', 'typecheck', 'unit test', 'build'], blockedBy: ['D-2'],
   }),
   T('P1-03', 'Backend skeleton (Spring Boot 3, Java 21)', {
+    status: 'Done', pr: 'PR (feature/P1-03-backend-skeleton)',
     pri: 'High', cx: 'M', deps: ['P1-01', 'Q11', 'D-3'], branch: 'feature/P1-03-backend-skeleton',
     goal: 'مشروع Maven لـ Spring Boot فيه Actuator وSwagger وGlobal Exception Handler (ProblemDetail) وLogging وProfiles وقواعد ArchUnit.',
     files: ['backend/pom.xml', 'backend/src/main/java/.../common/**', 'backend/src/main/resources/application*.yml', 'backend/src/test/**'],
@@ -52,6 +55,7 @@ export const tasks = [
     tests: ['Unit للـ handler', '@WebMvcTest', 'Context-load test', 'mvn verify'], blockedBy: ['Q11', 'D-3'],
   }),
   T('P1-04', 'PostgreSQL, Flyway baseline & Testcontainers base', {
+    status: 'Done', pr: 'PR (feature/P1-04-database-flyway)',
     pri: 'High', cx: 'M', deps: ['P1-03'], branch: 'feature/P1-04-database-flyway',
     goal: 'ربط الـ Backend بـ PostgreSQL مع Flyway وملف V1 baseline وكلاس أساسي لاختبارات Testcontainers.',
     files: ['backend/pom.xml', 'backend/src/main/resources/db/migration/V1__baseline.sql', 'application.yml', 'AbstractIntegrationTest.java'],
@@ -60,6 +64,7 @@ export const tasks = [
     tests: ['Integration مع Testcontainers (Docker لازم يكون شغال)'], blockedBy: [],
   }),
   T('P1-05', 'Dockerfiles, Compose, health checks, env config', {
+    status: 'Done', pr: 'PR (feature/P1-05-docker-compose)',
     pri: 'High', cx: 'M', deps: ['P1-02', 'P1-03', 'P1-04'], branch: 'feature/P1-05-docker-compose',
     goal: 'تشغيل النظام كله بأمر واحد: Dockerfile للـ Backend والـ Frontend (Nginx) وPostgres مع volume وhealthchecks وملف .env.example.',
     files: ['backend/Dockerfile', 'frontend/Dockerfile', 'frontend/nginx.conf', 'docker-compose.yml', '.env.example', '.dockerignore', 'docs/runbooks/local-development.md'],
@@ -68,6 +73,7 @@ export const tasks = [
     tests: ['docker build x2', 'compose startup', 'DB connection', 'health check', 'restart persistence'], blockedBy: [],
   }),
   T('P1-06', 'CI pipeline (GitHub Actions)', {
+    status: 'Done', pr: 'PR (ci/P1-06-github-actions)',
     pri: 'High', cx: 'M', deps: ['P1-05'], branch: 'ci/P1-06-github-actions',
     goal: 'Pipeline يشغّل lint/test/build للـ Frontend وmvn verify للـ Backend وdocker build وcompose smoke، مع PR template وDependabot.',
     files: ['.github/workflows/*.yml', '.github/pull_request_template.md', '.github/dependabot.yml'],
@@ -78,6 +84,7 @@ export const tasks = [
 
   // ---------------- P2 ----------------
   T('P2-01', 'Campus schema (university, college, building, term)', {
+    status: 'Done', pr: 'PR (feature/P2-01-campus-schema)',
     pri: 'High', cx: 'M', deps: ['P1-04', 'D-1'], branch: 'feature/P2-01-campus-schema',
     goal: 'جداول الجامعة (الـ tenant) والكليات والمباني والفصول الدراسية مع قاعدة university_id.',
     files: ['db/migration/V2__campus.sql', 'campus/domain/*', 'campus/infra/*Repository.java'],
@@ -86,6 +93,7 @@ export const tasks = [
     tests: ['Repository tests (Testcontainers)', 'Migration test'], blockedBy: ['D-1'],
   }),
   T('P2-02', 'Users, roles, vehicles schema & domain', {
+    status: 'In Progress', pr: 'Branch feature/P2-02-users-schema (جاري التنفيذ)',
     pri: 'High', cx: 'M', deps: ['P2-01'], branch: 'feature/P2-02-users-schema',
     goal: 'جداول المستخدمين والأدوار والسيارات وتوكنات refresh، مع تجزئة كلمات المرور والتحقق من لوحة السيارة السعودية.',
     files: ['db/migration/V3__identity.sql', 'identity/domain/*', 'identity/infra/*'],

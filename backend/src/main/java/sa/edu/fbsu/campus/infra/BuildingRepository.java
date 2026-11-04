@@ -17,3 +17,4 @@ public interface BuildingRepository extends JpaRepository<Building, UUID> {
 
     boolean existsByUniversityIdAndCode(UUID universityId, String code);
 }
+

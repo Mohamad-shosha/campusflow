@@ -86,3 +86,4 @@ public class University extends BaseEntity {
         this.active = active;
     }
 }
+

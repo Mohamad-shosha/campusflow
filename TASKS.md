@@ -1,35 +1,45 @@
-# TASKS.md
+# TASKS.md — سجل متابعة تنفيذ المشروع
 
-> هذا الملف **مولَّد** من `docs/tasks/tasks-data.mjs` بالأمر `node docs/tasks/build.mjs` — عدّل ملف البيانات وليس هذا الملف.
-> ملفات PDF لكل Task: `docs/tasks/pdf/` (وملف مجمّع `ALL-TASKS.pdf`).
+> هذا الملف **مولَّد آلياً** من `docs/tasks/tasks-data.mjs` بالأمر `node docs/tasks/build.mjs`.
+> ملف الـ PDF المجمع الرئيسي: [`docs/tasks/pdf/ALL-TASKS.pdf`](file:///d:/Rakan/docs/tasks/pdf/ALL-TASKS.pdf)
+> ملفات PDF المستقلة لكل تاسك: `docs/tasks/pdf/`
 
-الحالات: `Backlog` · `Ready` · `In Progress` · `In Review` · `Blocked` · `Done`
-التعقيد: S (≤ نصف يوم) · M (يوم) · L (2–3 أيام) · XL (يُقسَّم)
+---
 
-## Dashboard
-| Phase | الاسم | عدد التاسكات | Done | In Review |
-|---|---|---|---|---|
-| P0 | Discovery & Planning | 1 | 0 | 1 |
-| P1 | Foundation & DevOps | 6 | 0 | 0 |
-| P2 | Identity & Campus Core | 5 | 0 | 0 |
-| P3 | Frontend Foundation (React) | 5 | 0 | 0 |
-| P4 | Wallet & Tuition | 5 | 0 | 0 |
-| P5 | Parking | 9 | 0 | 0 |
-| P6 | Campus Services | 7 | 0 | 0 |
-| P7 | Notifications, Admin, Analytics | 6 | 0 | 0 |
-| P8 | Hardening & QA | 5 | 0 | 0 |
-| P9 | Release & Operations | 4 | 0 | 0 |
-| **الإجمالي** | | **53** | 0 | 1 |
+## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
+- **إجمالي المهام المخططة:** 53 تاسك
+- **المنجز بالكامل (Done):** 8 تاسك ✅
+- **قيد العمل حالياً (In Progress):** 1 تاسك ⏳
+- **المتبقي للبدء (Backlog):** 44 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **15%**
+
+> 📌 **التاسك الشغالين عليه دلوقتي:** **`P2-02` — Users, roles, vehicles schema & domain** (الفرع: `feature/P2-02-users-schema`)
+
+| Phase | الاسم | إجمالي | منجز (Done) ✅ | قيد التنفيذ ⏳ | متبقي 📋 |
+|---|---|---|---|---|---|
+| P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
+| P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
+| P2 | Identity & Campus Core | 5 | 1 | 1 | 3 |
+| P3 | Frontend Foundation (React) | 5 | 0 | 0 | 5 |
+| P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
+| P5 | Parking | 9 | 0 | 0 | 9 |
+| P6 | Campus Services | 7 | 0 | 0 | 7 |
+| P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
+| P8 | Hardening & QA | 5 | 0 | 0 | 5 |
+| P9 | Release & Operations | 4 | 0 | 0 | 4 |
+| **الإجمالي** | | **53** | **8** | **1** | **44** |
+
+---
 
 ---
 # Phase P0 — Discovery & Planning
 
 ### P0-01 — Project discovery & planning
 - **ماذا سيعمل:** فحص المشروع الحالي وتوثيقه: Audit، UI Inventory، PRD، User Flows، Architecture، ERD، MVP، Roadmap، Tasks، Risks.
-- **Priority:** P0 · **Complexity:** L · **Status:** In Review
+- **Priority:** P0 · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** لا يوجد
-- **Git Branch:** `docs/P0-01-project-discovery` · **Pull Request:** —
+- **Git Branch:** `docs/P0-01-project-discovery` · **Pull Request:** Merged into main (3df8350)
 - **الملفات المتوقعة:** `plan.md`، `TASKS.md`، `docs/discovery/*`، `docs/architecture/*`، `docs/decisions/*`
 - **Implementation Steps:** 1) قراءة الكود والـ Git state 2) تشغيل npm run build كخط أساس 3) كتابة مستندات الـ Discovery والـ Architecture 4) كتابة plan.md وTASKS.md
 - **Acceptance Criteria:** كل المستندات موجودة ومتسقة · التقرير اتعرض على المالك
@@ -41,9 +51,9 @@
 
 ### P1-01 — Repository restructure (monorepo) & legacy preservation
 - **ماذا سيعمل:** ترتيب الـ repo: إنشاء frontend/ وbackend/ وlegacy/، ونقل الـ showcase والـ presentation وUI-UX وscripts إلى legacy/، وإزالة تكرار الـ assets (متخزنة 3 مرات).
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P0-01 معتمد، Q12، Q14
-- **Git Branch:** `chore/P1-01-repo-restructure` · **Pull Request:** —
+- **Git Branch:** `chore/P1-01-repo-restructure` · **Pull Request:** PR (chore/P1-01-repo-restructure)
 - **الملفات المتوقعة:** `legacy/**`، `frontend/ (فارغ)`، `backend/ (فارغ)`، `.gitignore`، `README.md`، `vite.config.js`
 - **Implementation Steps:** 1) git mv للملفات (للحفاظ على التاريخ) 2) إصلاح المسارات النسبية 3) إصلاح/حذف configureServer الميت في vite.config.js 4) تحديث .gitignore وREADME 5) التأكد إن legacy بيبني
 - **Acceptance Criteria:** مفيش ملف ضاع · صفحات legacy بتفتح وتبني · الجذر فيه ملفات الإدارة والمجلدات فقط · تكرار الـ assets اتشال
@@ -52,9 +62,9 @@
 
 ### P1-02 — Frontend scaffold (Vite + React + TypeScript strict)
 - **ماذا سيعمل:** إنشاء تطبيق React 18 + TS strict جديد في frontend/ مع ESLint وPrettier وVitest، بدون أي Feature.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P1-01، D-2
-- **Git Branch:** `feature/P1-02-frontend-scaffold` · **Pull Request:** —
+- **Git Branch:** `feature/P1-02-frontend-scaffold` · **Pull Request:** PR (feature/P1-02-frontend-scaffold)
 - **الملفات المتوقعة:** `frontend/package.json`، `frontend/tsconfig.json`، `frontend/vite.config.ts`، `frontend/eslint.config.js`، `frontend/src/**`
 - **Implementation Steps:** 1) Scaffold بـ Vite 2) ضبط ESLint/Prettier/Typecheck 3) إعداد Vitest + Testing Library 4) هيكل المجلدات (app/features/shared) 5) scripts: dev/build/lint/test
 - **Acceptance Criteria:** npm run dev/build/lint/test تنجح · اختبار مكوّن تجريبي ينجح · TypeScript بدون أخطاء
@@ -63,9 +73,9 @@
 
 ### P1-03 — Backend skeleton (Spring Boot 3, Java 21)
 - **ماذا سيعمل:** مشروع Maven لـ Spring Boot فيه Actuator وSwagger وGlobal Exception Handler (ProblemDetail) وLogging وProfiles وقواعد ArchUnit.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P1-01، Q11، D-3
-- **Git Branch:** `feature/P1-03-backend-skeleton` · **Pull Request:** —
+- **Git Branch:** `feature/P1-03-backend-skeleton` · **Pull Request:** PR (feature/P1-03-backend-skeleton)
 - **الملفات المتوقعة:** `backend/pom.xml`، `backend/src/main/java/.../common/**`، `backend/src/main/resources/application*.yml`، `backend/src/test/**`
 - **Implementation Steps:** 1) إنشاء المشروع والـ base package 2) GlobalExceptionHandler + اختباراته 3) إعداد springdoc-openapi 4) Profiles: dev/test/prod 5) ArchUnit لحدود الـ modules 6) Spotless
 - **Acceptance Criteria:** التطبيق يقوم · /actuator/health = UP · /swagger-ui يفتح · مسار غير موجود يرجع RFC7807 · خطأ validation يرجع 400 ProblemDetail
@@ -74,9 +84,9 @@
 
 ### P1-04 — PostgreSQL, Flyway baseline & Testcontainers base
 - **ماذا سيعمل:** ربط الـ Backend بـ PostgreSQL مع Flyway وملف V1 baseline وكلاس أساسي لاختبارات Testcontainers.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P1-03
-- **Git Branch:** `feature/P1-04-database-flyway` · **Pull Request:** —
+- **Git Branch:** `feature/P1-04-database-flyway` · **Pull Request:** PR (feature/P1-04-database-flyway)
 - **الملفات المتوقعة:** `backend/pom.xml`، `backend/src/main/resources/db/migration/V1__baseline.sql`، `application.yml`، `AbstractIntegrationTest.java`
 - **Implementation Steps:** 1) إضافة JPA + Postgres + Flyway 2) ضبط الاتصال عبر env vars 3) V1 (pgcrypto, btree_gist) 4) ddl-auto=validate 5) AbstractIntegrationTest + repository test تجريبي
 - **Acceptance Criteria:** Migration على DB فاضية تنجح · إعادة التشغيل لا تغيّر شيء · migration فاشلة توقف التشغيل · IT يشغّل Postgres حقيقي
@@ -85,9 +95,9 @@
 
 ### P1-05 — Dockerfiles, Compose, health checks, env config
 - **ماذا سيعمل:** تشغيل النظام كله بأمر واحد: Dockerfile للـ Backend والـ Frontend (Nginx) وPostgres مع volume وhealthchecks وملف .env.example.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P1-02، P1-03، P1-04
-- **Git Branch:** `feature/P1-05-docker-compose` · **Pull Request:** —
+- **Git Branch:** `feature/P1-05-docker-compose` · **Pull Request:** PR (feature/P1-05-docker-compose)
 - **الملفات المتوقعة:** `backend/Dockerfile`، `frontend/Dockerfile`، `frontend/nginx.conf`، `docker-compose.yml`، `.env.example`، `.dockerignore`، `docs/runbooks/local-development.md`
 - **Implementation Steps:** 1) Backend multi-stage non-root 2) Frontend build -> Nginx مع proxy لـ /api 3) Compose: db/backend/frontend/network/volume 4) Healthchecks + depends_on 5) توثيق التشغيل المحلي
 - **Acceptance Criteria:** docker compose up --build يخلّي الثلاث خدمات healthy · الواجهة تفتح · /api/actuator/health = UP · البيانات تفضل بعد restart · لا Secrets في Git
@@ -96,34 +106,34 @@
 
 ### P1-06 — CI pipeline (GitHub Actions)
 - **ماذا سيعمل:** Pipeline يشغّل lint/test/build للـ Frontend وmvn verify للـ Backend وdocker build وcompose smoke، مع PR template وDependabot.
-- **Priority:** High · **Complexity:** M · **Status:** Done
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P1-05
-- **Git Branch:** ci/P1-06-github-actions · **Pull Request:** https://github.com/Mohamad-shosha/smart-campus/pull/new/ci/P1-06-github-actions
-- **الملفات المتوقعة:** .github/workflows/*.yml، .github/pull_request_template.md، .github/dependabot.yml
+- **Git Branch:** `ci/P1-06-github-actions` · **Pull Request:** PR (ci/P1-06-github-actions)
+- **الملفات المتوقعة:** `.github/workflows/*.yml`، `.github/pull_request_template.md`، `.github/dependabot.yml`
 - **Implementation Steps:** 1) Workflow للـ Frontend 2) Workflow للـ Backend 3) Docker build + compose smoke 4) PR template + Dependabot 5) حصر الـ Pages deploy على legacy
 - **Acceptance Criteria:** كل الـ jobs خضراء · فشل اختبار يفشّل الـ pipeline (يتم إثباته) · الـ required checks موثقة
-- **Testing Requirements:** تشغيل فعلي على branch (تم الإنشاء والـ push بنجاح)
-- **ينتظر قرارات:** لا يوجد (مكتملة ومرفوعة)
+- **Testing Requirements:** تشغيل فعلي على branch (يحتاج push بإذنك)
+- **ينتظر قرارات:** إذن push
 
 ---
 # Phase P2 — Identity & Campus Core
 
 ### P2-01 — Campus schema (university, college, building, term)
 - **ماذا سيعمل:** جداول الجامعة (الـ tenant) والكليات والمباني والفصول الدراسية مع قاعدة university_id.
-- **Priority:** High · **Complexity:** M · **Status:** Done
-- **Dependencies:** P1-04, D-1
-- **Git Branch:** eature/P2-01-campus-schema · **Pull Request:** https://github.com/Mohamad-shosha/smart-campus/pull/new/feature/P2-01-campus-schema
-- **الملفات المتوقعة:** db/migration/V2__campus.sql، campus/domain/*، campus/infra/*Repository.java
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
+- **Dependencies:** P1-04، D-1
+- **Git Branch:** `feature/P2-01-campus-schema` · **Pull Request:** PR (feature/P2-01-campus-schema)
+- **الملفات المتوقعة:** `db/migration/V2__campus.sql`، `campus/domain/*`، `campus/infra/*Repository.java`
 - **Implementation Steps:** 1) Migration 2) Entities + Repositories 3) Base tenant entity 4) اختبارات
-- **Acceptance Criteria:** الجداول والقيود موجودة · unique codes لكل tenant · Repository tests تنجح (10/10 اختبارات نجحت بنسبة 100%)
-- **Testing Requirements:** Repository tests (CampusRepositoryIntegrationTest) · Migration test
-- **ينتظر قرارات:** لا يوجد (مكتملة ومرفوعة)
+- **Acceptance Criteria:** الجداول والقيود موجودة · unique codes لكل tenant · Repository tests تنجح
+- **Testing Requirements:** Repository tests (Testcontainers) · Migration test
+- **ينتظر قرارات:** D-1
 
 ### P2-02 — Users, roles, vehicles schema & domain
 - **ماذا سيعمل:** جداول المستخدمين والأدوار والسيارات وتوكنات refresh، مع تجزئة كلمات المرور والتحقق من لوحة السيارة السعودية.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ⏳ In Progress (جاري العمل)
 - **Dependencies:** P2-01
-- **Git Branch:** `feature/P2-02-users-schema` · **Pull Request:** —
+- **Git Branch:** `feature/P2-02-users-schema` · **Pull Request:** Branch feature/P2-02-users-schema (جاري التنفيذ)
 - **الملفات المتوقعة:** `db/migration/V3__identity.sql`، `identity/domain/*`، `identity/infra/*`
 - **Implementation Steps:** 1) Migration 2) Entities 3) Value object للوحة (3 حروف عربية + أرقام) 4) BCrypt strength 12 5) اختبارات
 - **Acceptance Criteria:** الرقم الجامعي unique لكل tenant · اللوحة unique لكل tenant · كلمات المرور BCrypt

@@ -17,3 +17,4 @@ public interface CollegeRepository extends JpaRepository<College, UUID> {
 
     boolean existsByUniversityIdAndCode(UUID universityId, String code);
 }
+

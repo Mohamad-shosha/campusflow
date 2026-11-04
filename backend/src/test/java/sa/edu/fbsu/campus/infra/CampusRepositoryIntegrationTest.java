@@ -136,3 +136,4 @@ class CampusRepositoryIntegrationTest extends AbstractPostgresIntegrationTest {
         assertThat(currentTerm.get().isCurrent()).isTrue();
     }
 }
+

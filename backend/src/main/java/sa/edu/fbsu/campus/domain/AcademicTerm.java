@@ -97,3 +97,4 @@ public class AcademicTerm extends BaseTenantEntity {
         this.current = current;
     }
 }
+

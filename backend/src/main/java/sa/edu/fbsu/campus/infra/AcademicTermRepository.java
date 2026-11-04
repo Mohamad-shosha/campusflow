@@ -19,3 +19,4 @@ public interface AcademicTermRepository extends JpaRepository<AcademicTerm, UUID
 
     boolean existsByUniversityIdAndCode(UUID universityId, String code);
 }
+

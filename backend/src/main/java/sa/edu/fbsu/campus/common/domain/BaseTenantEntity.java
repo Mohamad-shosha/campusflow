@@ -18,3 +18,4 @@ public abstract class BaseTenantEntity extends BaseEntity {
         this.universityId = universityId;
     }
 }
+
