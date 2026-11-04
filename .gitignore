@@ -31,3 +31,8 @@ docs/tasks/html/
 
 backend/target/
 frontend/dist/
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example

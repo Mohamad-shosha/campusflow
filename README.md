@@ -291,7 +291,7 @@ The repository adheres to a clean, standardized monorepo layout:
 
 ## 🎨 Design System & Showcase Portal
 
-Located under [`design-system/`](file:///d:/Rakan/design-system/), the master design system provides an interactive Figma-grade experience across 18 specialized sections:
+Located under [`design-system/`](./design-system/), the master design system provides an interactive Figma-grade experience across 18 specialized sections:
 
 | # | Section Name | Description & Visual Capabilities |
 | :-: | :--- | :--- |
@@ -366,7 +366,7 @@ To recompile the 18 design sections into a unified HTML showcase file:
 ```bash
 npm run build:showcase
 ```
-*Output generated at:* [`design-system/showcase.html`](file:///d:/Rakan/design-system/showcase.html)
+*Output generated at:* [`design-system/showcase.html`](./design-system/showcase.html)
 
 ### 4. Create Production Distribution Build
 Generate clean, minified, and optimized assets for production deployment:
@@ -432,19 +432,19 @@ When running the local server (`npm run dev`), you can directly access any of th
 
 | Document | File Path | Focus Area |
 | :--- | :--- | :--- |
-| **System Architecture Specification** | [`docs/architecture/01-system-architecture.md`](file:///d:/Rakan/docs/architecture/01-system-architecture.md) | Modular monolith architecture, module boundaries, and API conventions. |
-| **Database Entity Relationship Diagram** | [`docs/architecture/02-database-erd.md`](file:///d:/Rakan/docs/architecture/02-database-erd.md) | PostgreSQL schemas, ledger tables, foreign keys, and constraints. |
-| **Modular Monolith Decision Record** | [`docs/decisions/ADR-0001-modular-monolith.md`](file:///d:/Rakan/docs/decisions/ADR-0001-modular-monolith.md) | Strategic rationale for selecting a Modular Monolith over Microservices. |
-| **UI Design System Retention Record** | [`docs/decisions/ADR-0002-preserve-ui-react-plain-css.md`](file:///d:/Rakan/docs/decisions/ADR-0002-preserve-ui-react-plain-css.md) | Strategy for migrating tokenized styles into React without CSS regressions. |
-| **Engineering Task Backlog & PDFs** | [`docs/tasks/pdf/ALL-TASKS.pdf`](file:///d:/Rakan/docs/tasks/pdf/ALL-TASKS.pdf) | Consolidated implementation specification from Phase P0 to Phase P9. |
-| **Design System Technical Guide** | [`design-system/README.md`](file:///d:/Rakan/design-system/README.md) | Figma section mapping, color tokens, and script build procedures. |
-| **Master Delivery Plan** | [`plan.md`](file:///d:/Rakan/plan.md) | Strategic engineering roadmap and project timeline. |
+| **System Architecture Specification** | [`docs/architecture/01-system-architecture.md`](./docs/architecture/01-system-architecture.md) | Modular monolith architecture, module boundaries, and API conventions. |
+| **Database Entity Relationship Diagram** | [`docs/architecture/02-database-erd.md`](./docs/architecture/02-database-erd.md) | PostgreSQL schemas, ledger tables, foreign keys, and constraints. |
+| **Modular Monolith Decision Record** | [`docs/decisions/ADR-0001-modular-monolith.md`](./docs/decisions/ADR-0001-modular-monolith.md) | Strategic rationale for selecting a Modular Monolith over Microservices. |
+| **UI Design System Retention Record** | [`docs/decisions/ADR-0002-preserve-ui-react-plain-css.md`](./docs/decisions/ADR-0002-preserve-ui-react-plain-css.md) | Strategy for migrating tokenized styles into React without CSS regressions. |
+| **Engineering Task Backlog & PDFs** | [`docs/tasks/pdf/ALL-TASKS.pdf`](./docs/tasks/pdf/ALL-TASKS.pdf) | Consolidated implementation specification from Phase P0 to Phase P9. |
+| **Design System Technical Guide** | [`design-system/README.md`](./design-system/README.md) | Figma section mapping, color tokens, and script build procedures. |
+| **Master Delivery Plan** | [`plan.md`](./plan.md) | Strategic engineering roadmap and project timeline. |
 
 ---
 
 ## 🤝 Contributing & Development Workflow
 
-1. Review the contribution guidelines in [`CONTRIBUTING.md`](file:///d:/Rakan/CONTRIBUTING.md).
+1. Review the contribution guidelines in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 2. Branch naming convention: `feature/P<Phase>-<TaskID>-short-title` (e.g., `feature/P1-02-frontend-scaffold`).
 3. Ensure all tests and static analysis checks pass before submitting a pull request:
    ```bash
