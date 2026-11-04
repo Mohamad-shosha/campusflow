@@ -110,14 +110,14 @@
 
 ### P2-01 — Campus schema (university, college, building, term)
 - **ماذا سيعمل:** جداول الجامعة (الـ tenant) والكليات والمباني والفصول الدراسية مع قاعدة university_id.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
-- **Dependencies:** P1-04، D-1
-- **Git Branch:** `feature/P2-01-campus-schema` · **Pull Request:** —
-- **الملفات المتوقعة:** `db/migration/V2__campus.sql`، `campus/domain/*`، `campus/infra/*Repository.java`
+- **Priority:** High · **Complexity:** M · **Status:** Done
+- **Dependencies:** P1-04, D-1
+- **Git Branch:** eature/P2-01-campus-schema · **Pull Request:** https://github.com/Mohamad-shosha/smart-campus/pull/new/feature/P2-01-campus-schema
+- **الملفات المتوقعة:** db/migration/V2__campus.sql، campus/domain/*، campus/infra/*Repository.java
 - **Implementation Steps:** 1) Migration 2) Entities + Repositories 3) Base tenant entity 4) اختبارات
-- **Acceptance Criteria:** الجداول والقيود موجودة · unique codes لكل tenant · Repository tests تنجح
-- **Testing Requirements:** Repository tests (Testcontainers) · Migration test
-- **ينتظر قرارات:** D-1
+- **Acceptance Criteria:** الجداول والقيود موجودة · unique codes لكل tenant · Repository tests تنجح (10/10 اختبارات نجحت بنسبة 100%)
+- **Testing Requirements:** Repository tests (CampusRepositoryIntegrationTest) · Migration test
+- **ينتظر قرارات:** لا يوجد (مكتملة ومرفوعة)
 
 ### P2-02 — Users, roles, vehicles schema & domain
 - **ماذا سيعمل:** جداول المستخدمين والأدوار والسيارات وتوكنات refresh، مع تجزئة كلمات المرور والتحقق من لوحة السيارة السعودية.
