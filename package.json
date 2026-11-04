@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:showcase": "python scripts/build/master_assembler.py",
+    "build:showcase": "python legacy/scripts/build/master_assembler.py",
     "preview": "vite preview"
   },
   "devDependencies": {

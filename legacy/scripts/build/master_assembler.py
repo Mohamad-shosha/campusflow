@@ -1409,7 +1409,7 @@ def assemble_master_showcase():
     # Write to root index.html
     script_dir = os.path.dirname(os.path.abspath(__file__))
     root_dir = os.path.dirname(os.path.dirname(script_dir))
-    output_path = os.path.join(root_dir, "index.html")
+    output_path = os.path.join(root_dir, "showcase.html")
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(combined)
