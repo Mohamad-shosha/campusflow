@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    sa.edu.fbsu.campus: INFO
+    org.springframework.web: WARN
+

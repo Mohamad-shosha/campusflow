@@ -28,3 +28,6 @@ __pycache__/
 
 # generated task HTML (PDFs are kept)
 docs/tasks/html/
+
+backend/target/
+frontend/dist/

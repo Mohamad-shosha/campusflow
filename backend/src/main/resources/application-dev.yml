@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    sa.edu.fbsu.campus: DEBUG
+    org.springframework.web: INFO
+
