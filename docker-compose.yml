@@ -1,0 +1,89 @@
+services:
+  # ============================================================================
+  # 1. PostgreSQL Database Service with Persistent Volume and Health Check
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: fbsu-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fbsu_campus_db}
+      POSTGRES_USER: ${POSTGRES_USER:-fbsu_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fbsu_secret_password_2026}
+      TZ: Asia/Riyadh
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fbsu_admin} -d ${POSTGRES_DB:-fbsu_campus_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - fbsu-network
+
+  # ============================================================================
+  # 2. Spring Boot Backend Modular Monolith
+  # ============================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fbsu-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fbsu_campus_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-fbsu_admin}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-fbsu_secret_password_2026}
+      TZ: Asia/Riyadh
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 35s
+    networks:
+      - fbsu-network
+
+  # ============================================================================
+  # 3. React Frontend SPA served via Nginx Reverse Proxy
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fbsu-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - fbsu-network
+
+# ==============================================================================
+# Persistent Volumes & Networks
+# ==============================================================================
+volumes:
+  postgres_data:
+    name: fbsu_postgres_data
+
+networks:
+  fbsu-network:
+    name: fbsu-campus-network
+    driver: bridge
