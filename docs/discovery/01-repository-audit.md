@@ -58,3 +58,4 @@
 1. The **UI/design (CSS tokens, layout, copy, assets) is the valuable part** and is reusable almost verbatim.
 2. **All business logic must be (re)designed**, because current logic is demo-grade and in places self-contradictory.
 3. Showcase/presentation pages are documentation artefacts; they should be kept but moved out of the product path (decision D-12).
+

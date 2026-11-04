@@ -82,3 +82,4 @@ Spring Security stateless; access JWT (15 min) + rotating refresh token (stored 
 /backend  /frontend  /legacy (showcase, presentation, scripts)  /docs  /.github
 docker-compose.yml  .env.example  plan.md  TASKS.md  CHANGELOG.md  CONTRIBUTING.md  README.md
 ```
+

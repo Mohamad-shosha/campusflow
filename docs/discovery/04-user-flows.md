@@ -69,3 +69,4 @@ Wallet → view balance & history → Pay tuition → choose amount ≤ balance 
 
 ## UF-9 Notifications
 Event (booking/payment) → notification row for target → bell badge → drawer → mark read.
+

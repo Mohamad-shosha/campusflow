@@ -24,3 +24,4 @@ Real payment gateway (Mada/Apple Pay/STC Pay) · registrar/SIS integration · Un
 
 ## Simulator & presentation
 Kept as a demo route / legacy assets; not part of production correctness.
+

@@ -73,3 +73,4 @@ Arabic-first RTL + English; responsive; accessibility baseline (WCAG AA target);
 ## 5. Open Questions (blocking)
 
 See `docs/discovery/07-open-questions.md`.
+

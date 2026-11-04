@@ -29,3 +29,4 @@ Answers are needed before the dependent task starts. "Recommended" = my engineer
 | Q15 | Notifications channels beyond in-app (email/SMS)? | P7 |
 | Q16 | Deployment target for real use (VPS, cloud, university data-centre)? Keep GitHub Pages for legacy showcase? Data residency (KSA) requirements? | P9 |
 | Q17 | Real-looking personal data in source (names, IDs, plates): may it ship as demo seed, or must it be anonymised? | P2-05 |
+

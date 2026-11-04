@@ -55,3 +55,4 @@ Header (logo, nav with 2 dropdown groups: *Parking* = map/booking/simulator/gate
 ## 6. React component map (proposed)
 
 `AppShell`, `Header`, `NavDropdown`, `Hero`, `SubNav`, `Footer`, `ThemeToggle`, `LangToggle`, `Modal`, `Toast`, `Badge`, `Button`, `FormField`, `SaudiPlate`, `QrPass`, `Car icon`; feature views: `ParkingMap`, `SpotCard`, `ParkingBooking`, `FlexShare`, `Simulator`, `GateScanner`, `TutoringHub`, `OfficeHours`, `Rooms`, `Analytics`, `WalletModal`, `TuitionModal`, `NotificationsDrawer`, `AuthModal`.
+

@@ -12,3 +12,10 @@ Append one entry per working session. Keep entries short; never re-audit the who
 **Not verified:** browser runtime/visual check of the app; Java/Maven absent locally.
 **Findings to remember:** `plan.md` was missing; product = FBSU Smart Campus (parking/tutoring/office hours/rooms/wallet); business-logic inconsistencies F4–F7 in audit.
 **Handoff / next step:** Owner answers `docs/discovery/07-open-questions.md` (esp. Q1, Q2, Q11, Q12, D-1…D-3), approves plan → then start **P1-01**.
+
+
+---
+## Session 2 - 2026-11-04 - Tasks PDFs
+**Done:** TASKS.md now generated from docs/tasks/tasks-data.mjs (all 53 tasks in the full template, Arabic goals); one PDF per task + ALL-TASKS.pdf in docs/tasks/pdf/ (Edge headless; layout checked visually on P5-03).
+**Regenerate:** node docs/tasks/build.mjs
+**Not changed:** no repo restructure (awaiting Q12/Q14), nothing pushed.

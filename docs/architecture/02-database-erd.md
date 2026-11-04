@@ -87,3 +87,4 @@ erDiagram
 
 Indexes: FK columns, `(university_id, …)` composites, GiST on ranges, partial indexes on active statuses.
 Seed data (dev profile only): demo users/spots/rooms derived from the current UI, anonymised per Q17.
+

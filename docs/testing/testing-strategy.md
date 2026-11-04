@@ -21,3 +21,4 @@ CI green (build, tests, lint, format) Â· coverage thresholds (target: backend â‰
 
 ## Per-feature rule
 Every task in `TASKS.md` lists its Testing Requirements; the PR cannot be opened without executing them.
+

@@ -19,3 +19,4 @@ Likelihood (L) / Impact (I): 1 low – 5 high. Score = L×I.
 | R-13 | Time zone/date bugs (free-form strings today) | 3 | 3 | 9 | `timestamptz` + `Asia/Riyadh` display, tests with fixed clock | Full-stack |
 | R-14 | CI/CD secrets leakage | 2 | 5 | 10 | `.env.example` only, GitHub Secrets, secret scanning, `.gitignore` | DevOps |
 | R-15 | Hardware (ALPR) integration unknown | 3 | 3 | 9 | Port/adapter interface; simulated adapter in MVP | Architect |
+
