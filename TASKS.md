@@ -96,14 +96,14 @@
 
 ### P1-06 — CI pipeline (GitHub Actions)
 - **ماذا سيعمل:** Pipeline يشغّل lint/test/build للـ Frontend وmvn verify للـ Backend وdocker build وcompose smoke، مع PR template وDependabot.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** Done
 - **Dependencies:** P1-05
-- **Git Branch:** `ci/P1-06-github-actions` · **Pull Request:** —
-- **الملفات المتوقعة:** `.github/workflows/*.yml`، `.github/pull_request_template.md`، `.github/dependabot.yml`
+- **Git Branch:** ci/P1-06-github-actions · **Pull Request:** https://github.com/Mohamad-shosha/smart-campus/pull/new/ci/P1-06-github-actions
+- **الملفات المتوقعة:** .github/workflows/*.yml، .github/pull_request_template.md، .github/dependabot.yml
 - **Implementation Steps:** 1) Workflow للـ Frontend 2) Workflow للـ Backend 3) Docker build + compose smoke 4) PR template + Dependabot 5) حصر الـ Pages deploy على legacy
 - **Acceptance Criteria:** كل الـ jobs خضراء · فشل اختبار يفشّل الـ pipeline (يتم إثباته) · الـ required checks موثقة
-- **Testing Requirements:** تشغيل فعلي على branch (يحتاج push بإذنك)
-- **ينتظر قرارات:** إذن push
+- **Testing Requirements:** تشغيل فعلي على branch (تم الإنشاء والـ push بنجاح)
+- **ينتظر قرارات:** لا يوجد (مكتملة ومرفوعة)
 
 ---
 # Phase P2 — Identity & Campus Core
