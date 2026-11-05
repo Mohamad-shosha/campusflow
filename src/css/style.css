@@ -2835,3 +2835,379 @@ body.theme-light .faculty-subject-chip {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================================
+   FBSU Luxury Notification & Alert System (نظام التنبيهات والإشعارات الفاخر)
+   ============================================================================ */
+.fbsu-toast-container {
+  position: fixed;
+  top: 1.5rem;
+  inset-inline-end: 1.5rem;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 440px;
+  width: calc(100vw - 2rem);
+  pointer-events: none;
+}
+
+.fbsu-toast {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.95rem;
+  padding: 1.1rem 1.25rem 1.35rem 1.25rem;
+  background: rgba(13, 29, 26, 0.94);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(17, 110, 99, 0.18);
+  color: var(--text-main);
+  direction: inherit;
+  overflow: hidden;
+  will-change: transform, opacity;
+  animation: fbsuToastEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+body.theme-light .fbsu-toast {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 16px 36px rgba(17, 110, 99, 0.15), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.fbsu-toast:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.65), 0 0 35px rgba(17, 110, 99, 0.28);
+}
+
+.fbsu-toast.dismissing {
+  animation: fbsuToastExit 0.28s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+}
+
+/* Toast Type Variants */
+.fbsu-toast-success {
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(16, 185, 129, 0.25);
+}
+.fbsu-toast-success .fbsu-toast-icon-wrap {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.08) 70%);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.fbsu-toast-success .fbsu-toast-progress {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.fbsu-toast-error {
+  border-color: rgba(244, 63, 94, 0.5);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(244, 63, 94, 0.28);
+}
+.fbsu-toast-error .fbsu-toast-icon-wrap {
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.25) 0%, rgba(244, 63, 94, 0.08) 70%);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.4);
+}
+.fbsu-toast-error .fbsu-toast-progress {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+}
+
+.fbsu-toast-warning {
+  border-color: rgba(215, 162, 55, 0.5);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(215, 162, 55, 0.25);
+}
+.fbsu-toast-warning .fbsu-toast-icon-wrap {
+  background: radial-gradient(circle, rgba(215, 162, 55, 0.25) 0%, rgba(215, 162, 55, 0.08) 70%);
+  color: var(--fbsu-gold);
+  border: 1px solid rgba(215, 162, 55, 0.4);
+}
+.fbsu-toast-warning .fbsu-toast-progress {
+  background: linear-gradient(90deg, #d7a237, #f6cf6a);
+}
+
+.fbsu-toast-info {
+  border-color: rgba(17, 110, 99, 0.6);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(17, 110, 99, 0.25);
+}
+.fbsu-toast-info .fbsu-toast-icon-wrap {
+  background: radial-gradient(circle, rgba(17, 110, 99, 0.3) 0%, rgba(17, 110, 99, 0.1) 70%);
+  color: #38c2b0;
+  border: 1px solid rgba(17, 110, 99, 0.5);
+}
+.fbsu-toast-info .fbsu-toast-progress {
+  background: linear-gradient(90deg, #116e63, #38c2b0);
+}
+
+/* Icon Wrap */
+.fbsu-toast-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.fbsu-toast:hover .fbsu-toast-icon-wrap {
+  transform: scale(1.08);
+}
+
+/* Toast Body */
+.fbsu-toast-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.1rem;
+}
+
+.fbsu-toast-title {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.fbsu-toast-message {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+/* Close Button */
+.fbsu-toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s var(--ease);
+  line-height: 1;
+}
+.fbsu-toast-close:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(90deg);
+}
+
+/* Progress Bar */
+.fbsu-toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  width: 100%;
+  transform-origin: left;
+  animation: fbsuToastProgress linear forwards;
+}
+
+[dir="rtl"] .fbsu-toast-progress {
+  transform-origin: right;
+}
+
+.fbsu-toast:hover .fbsu-toast-progress {
+  animation-play-state: paused;
+}
+
+/* Keyframes */
+@keyframes fbsuToastEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fbsuToastExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 200px;
+    margin-bottom: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.92);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: -0.85rem;
+  }
+}
+
+@keyframes fbsuToastProgress {
+  0% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+/* ============================================================================
+   FBSU Luxury Alert Modal Dialog (نافذة الحوار والتنبيه الفاخرة)
+   ============================================================================ */
+.fbsu-alert-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 10, 9, 0.82);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 999998;
+  animation: fbsuBackdropFadeIn 0.25s ease-out forwards;
+}
+
+.fbsu-alert-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(145deg, rgba(13, 29, 26, 0.96) 0%, rgba(9, 20, 18, 0.98) 100%);
+  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(28px);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(215, 162, 55, 0.35);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(215, 162, 55, 0.2);
+  padding: 2.25rem 2rem 1.85rem 2rem;
+  text-align: center;
+  animation: fbsuAlertModalEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+body.theme-light .fbsu-alert-dialog {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 249, 250, 0.98) 100%);
+  border-color: rgba(17, 110, 99, 0.3);
+  box-shadow: 0 25px 60px rgba(17, 110, 99, 0.18), 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.fbsu-alert-icon-ring {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1.35rem auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.fbsu-alert-dialog.type-success .fbsu-alert-icon-ring {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(16, 185, 129, 0.08) 75%);
+  color: #10b981;
+  border: 2px solid rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.35);
+}
+
+.fbsu-alert-dialog.type-error .fbsu-alert-icon-ring {
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.28) 0%, rgba(244, 63, 94, 0.08) 75%);
+  color: #f43f5e;
+  border: 2px solid rgba(244, 63, 94, 0.5);
+  box-shadow: 0 0 30px rgba(244, 63, 94, 0.35);
+}
+
+.fbsu-alert-dialog.type-warning .fbsu-alert-icon-ring {
+  background: radial-gradient(circle, rgba(215, 162, 55, 0.28) 0%, rgba(215, 162, 55, 0.08) 75%);
+  color: var(--fbsu-gold);
+  border: 2px solid rgba(215, 162, 55, 0.5);
+  box-shadow: 0 0 30px rgba(215, 162, 55, 0.35);
+}
+
+.fbsu-alert-dialog.type-info .fbsu-alert-icon-ring {
+  background: radial-gradient(circle, rgba(17, 110, 99, 0.32) 0%, rgba(17, 110, 99, 0.1) 75%);
+  color: #38c2b0;
+  border: 2px solid rgba(17, 110, 99, 0.55);
+  box-shadow: 0 0 30px rgba(17, 110, 99, 0.35);
+}
+
+.fbsu-alert-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.fbsu-alert-message {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
+  word-break: break-word;
+}
+
+.fbsu-alert-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.fbsu-alert-btn-primary {
+  min-width: 160px;
+  padding: 0.85rem 1.75rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0b1a17;
+  background: linear-gradient(135deg, var(--fbsu-gold) 0%, #e6b247 100%);
+  border: 1px solid var(--fbsu-gold-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(215, 162, 55, 0.32);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+
+.fbsu-alert-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(215, 162, 55, 0.45);
+  background: linear-gradient(135deg, #e6b247 0%, var(--fbsu-gold) 100%);
+}
+
+.fbsu-alert-btn-secondary {
+  padding: 0.85rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+
+.fbsu-alert-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+@keyframes fbsuBackdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fbsuAlertModalEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+

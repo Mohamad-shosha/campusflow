@@ -9,26 +9,26 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 10 تاسك ✅
+- **المنجز بالكامل (Done):** 12 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 1 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 42 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **19%**
+- **المتبقي للبدء (Backlog):** 40 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **23%**
 
-> 📌 **التاسك الشغالين عليه دلوقتي:** **`P2-04` — Profile & vehicle API** (الفرع: `feature/P2-04-profile-vehicles-api`)
+> 📌 **التاسك الشغالين عليه دلوقتي:** **`P3-01` — Design tokens, global styles & app shell** (الفرع: `feature/P3-01-app-shell`)
 
 | Phase | الاسم | إجمالي | منجز (Done) ✅ | قيد التنفيذ ⏳ | متبقي 📋 |
 |---|---|---|---|---|---|
 | P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
-| P2 | Identity & Campus Core | 5 | 3 | 1 | 1 |
-| P3 | Frontend Foundation (React) | 5 | 0 | 0 | 5 |
+| P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
+| P3 | Frontend Foundation (React) | 5 | 0 | 1 | 4 |
 | P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **10** | **1** | **42** |
+| **الإجمالي** | | **53** | **12** | **1** | **40** |
 
 ---
 
@@ -153,9 +153,9 @@
 
 ### P2-04 — Profile & vehicle API
 - **ماذا سيعمل:** عرض وتعديل الملف الشخصي وإدارة السيارات (بياناتك أنت فقط).
-- **Priority:** Medium · **Complexity:** M · **Status:** ⏳ In Progress (جاري العمل)
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P2-03
-- **Git Branch:** `feature/P2-04-profile-vehicles-api` · **Pull Request:** Branch feature/P2-04-profile-vehicles-api (جاري البدء)
+- **Git Branch:** `feature/P2-04-profile-vehicles-api` · **Pull Request:** PR (feature/P2-04-profile-vehicles-api)
 - **الملفات المتوقعة:** `identity/api/MeController.java`، `identity/application/*`، `DTOs`، `tests`
 - **Implementation Steps:** 1) Services 2) Controllers + DTOs 3) اختبارات IDOR
 - **Acceptance Criteria:** المستخدم لا يصل إلا لبياناته · أخطاء validation بصيغة ProblemDetail
@@ -164,9 +164,9 @@
 
 ### P2-05 — Dev/demo seed data
 - **ماذا سيعمل:** بيانات تجريبية للتطوير فقط (مستخدمون/كليات/مبانٍ) مشتقة من الواجهة الحالية وبعد إخفاء الهوية.
-- **Priority:** Low · **Complexity:** S · **Status:** Backlog
+- **Priority:** Low · **Complexity:** S · **Status:** ✅ Done
 - **Dependencies:** P2-03، Q17
-- **Git Branch:** `feature/P2-05-dev-seed` · **Pull Request:** —
+- **Git Branch:** `feature/P2-05-dev-seed` · **Pull Request:** PR (feature/P2-04-profile-vehicles-api)
 - **الملفات المتوقعة:** `backend/.../DevSeeder.java`، `seed resources`
 - **Implementation Steps:** 1) Seeder محصور على profile=dev 2) Idempotent 3) اختبار
 - **Acceptance Criteria:** يعمل في dev فقط · تكراره لا يضاعف البيانات · غائب في prod
@@ -178,9 +178,9 @@
 
 ### P3-01 — Design tokens, global styles & app shell
 - **ماذا سيعمل:** نقل style.css والخطوط وبناء الـ Header والـ Navigation والـ Footer والـ Router بحيث يطابق التصميم الحالي.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ⏳ In Progress (جاري العمل)
 - **Dependencies:** P1-02
-- **Git Branch:** `feature/P3-01-app-shell` · **Pull Request:** —
+- **Git Branch:** `feature/P3-01-app-shell` · **Pull Request:** Branch feature/P3-01-app-shell (جاري البدء)
 - **الملفات المتوقعة:** `frontend/src/styles/*`، `frontend/src/app/*`، `frontend/src/shared/layout/*`
 - **Implementation Steps:** 1) نسخ CSS والخطوط 2) AppShell/Header/NavDropdown/Footer 3) Router skeleton 4) Screenshot baseline
 - **Acceptance Criteria:** مطابقة بصرية (dark+light, RTL, 3 مقاسات)

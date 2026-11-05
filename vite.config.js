@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
+        main: resolve(import.meta.dirname, 'index.html'),
         app: resolve(import.meta.dirname, 'app.html'),
         showcase: resolve(import.meta.dirname, 'legacy/showcase.html'),
         presentation: resolve(import.meta.dirname, 'legacy/presentation.html'),

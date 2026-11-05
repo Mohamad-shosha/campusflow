@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Authentication & Identity", description = "بوابة تسجيل الدخول والهوية الجامعية وإدارة التوكنات")
+@Tag(name = "Authentication & Identity", description = "Institutional Single Sign-On, Authentication & JWT Lifecycle Management")
 public class AuthController {
 
     private final AuthService authService;
@@ -27,38 +27,38 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "تسجيل مستخدم جديد", description = "إنشاء حساب طالب أو عضو هيئة تدريس مع إمكانية تسجيل سيارة")
+    @Operation(summary = "Register New User", description = "Create a new student or faculty profile with optional campus vehicle registration")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    @Operation(summary = "تسجيل الدخول", description = "تسجيل الدخول بالرقم الجامعي أو البريد الإلكتروني وإصدار JWT")
+    @Operation(summary = "User Authentication", description = "Authenticate with university ID or email and issue access/refresh JWT tokens")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "تجديد التوكن", description = "تدوير رمز التجديد وإصدار Access Token جديد")
+    @Operation(summary = "Rotate & Refresh JWT Token", description = "Rotate refresh token and issue a new 15-minute access token")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         AuthResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "تسجيل الخروج", description = "إبطال جميع رموز التجديد للمستخدم الحالي")
+    @Operation(summary = "User Logout", description = "Revoke and invalidate all active refresh tokens for current authenticated session")
     public ResponseEntity<Map<String, String>> logout(@AuthenticationPrincipal UserPrincipal principal) {
         if (principal != null) {
             authService.logout(principal.getUserId());
         }
-        return ResponseEntity.ok(Map.of("message", "تم تسجيل الخروج بنجاح وإبطال الجلسة."));
+        return ResponseEntity.ok(Map.of("message", "User session successfully terminated and tokens revoked."));
     }
 
     @GetMapping("/me")
     @SecurityRequirement(name = "BearerAuth")
-    @Operation(summary = "بيانات الجلسة الحالية", description = "إرجاع بيانات ومعرفات المستخدم المسجل حالياً من واقع الـ JWT")
+    @Operation(summary = "Get Current Session Profile", description = "Retrieve identity, university ID, and authorities of the authenticated session from JWT")
     public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(Map.of(
                 "userId", principal.getUserId(),
@@ -71,7 +71,7 @@ public class AuthController {
     @GetMapping("/admin-check")
     @PreAuthorize("hasRole('CAMPUS_ADMIN')")
     @SecurityRequirement(name = "BearerAuth")
-    @Operation(summary = "فحص صلاحية المدير", description = "محمي بدور CAMPUS_ADMIN للتأكد من عمل الـ RBAC")
+    @Operation(summary = "Admin Authority Verification", description = "Privileged endpoint guarded by CAMPUS_ADMIN authority to verify RBAC rules")
     public ResponseEntity<Map<String, String>> adminOnlyEndpoint() {
         return ResponseEntity.ok(Map.of("status", "ACCESS_GRANTED", "scope", "CAMPUS_ADMIN_PANEL"));
     }

@@ -12,11 +12,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/health-check")
-@Tag(name = "Health Check", description = "فحص حالة الخدمة وتوافر الـ API")
+@Tag(name = "Health Check", description = "Service Health Status & Telemetry API")
 public class HealthCheckController {
 
     @GetMapping
-    @Operation(summary = "فحص جاهزية الخادم", description = "يرجع حالة الخادم والوقت الحالي لمنظومة جامعة فهد بن سلطان")
+    @Operation(summary = "Check Server Readiness", description = "Returns operational health status, version, and server timestamp")
     public ResponseEntity<Map<String, Object>> checkHealth() {
         return ResponseEntity.ok(Map.of(
                 "status", "UP",
@@ -26,4 +26,3 @@ public class HealthCheckController {
         ));
     }
 }
-

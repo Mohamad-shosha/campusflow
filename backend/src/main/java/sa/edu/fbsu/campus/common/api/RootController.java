@@ -10,11 +10,11 @@ import java.time.Instant;
 import java.util.Map;
 
 @RestController
-@Tag(name = "Root Index", description = "نقطة البداية لمنظومة جامعة فهد بن سلطان")
+@Tag(name = "Root Index", description = "System Entry Point & Service Discovery")
 public class RootController {
 
     @GetMapping("/")
-    @Operation(summary = "نقطة البداية للمنظومة", description = "يرجع معلومات تعريفية وروابط الـ Swagger والخدمات")
+    @Operation(summary = "Root Service Overview", description = "Returns platform metadata, Swagger UI reference, and core service links")
     public ResponseEntity<Map<String, Object>> root() {
         return ResponseEntity.ok(Map.of(
                 "service", "FBSU Smart Campus & Parking Platform Backend",
@@ -27,4 +27,3 @@ public class RootController {
         ));
     }
 }
-
