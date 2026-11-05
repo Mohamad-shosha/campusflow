@@ -50,9 +50,9 @@ export interface TopUpRequest {
 }
 
 export interface TransferRequest {
-  recipientUniversityNumber: string;
+  recipientIdentifier: string;
   amount: number;
-  note?: string | undefined;
+  description?: string | undefined;
   idempotencyKey: string;
 }
 

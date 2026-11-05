@@ -74,7 +74,7 @@ describe('TransferModal Component', () => {
     await waitFor(() => {
       expect(walletApi.transfer).toHaveBeenCalledWith(
         expect.objectContaining({
-          recipientUniversityNumber: 'STD-202410102',
+          recipientIdentifier: 'STD-202410102',
           amount: 50,
         })
       );

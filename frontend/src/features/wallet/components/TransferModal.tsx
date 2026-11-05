@@ -67,9 +67,9 @@ export const TransferModal: FC<TransferModalProps> = ({
 
     try {
       const updated = await walletApi.transfer({
-        recipientUniversityNumber: recipient.trim(),
+        recipientIdentifier: recipient.trim(),
         amount: numAmount,
-        note: note.trim() || undefined,
+        description: note.trim() || undefined,
         idempotencyKey,
       });
       onSuccess(updated);
