@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 14 تاسك ✅
+- **المنجز بالكامل (Done):** 15 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 39 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **26%**
+- **المتبقي للبدء (Backlog):** 38 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **28%**
 
 
 
@@ -21,14 +21,14 @@
 | P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
-| P3 | Frontend Foundation (React) | 5 | 2 | 0 | 3 |
+| P3 | Frontend Foundation (React) | 5 | 3 | 0 | 2 |
 | P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **14** | **0** | **39** |
+| **الإجمالي** | | **53** | **15** | **0** | **38** |
 
 ---
 
@@ -200,9 +200,9 @@
 
 ### P3-03 — API client, auth context & route guards
 - **ماذا سيعمل:** عميل HTTP typed وTanStack Query وAuth Provider وتجديد التوكن وحماية المسارات.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P3-01، P2-03
-- **Git Branch:** `feature/P3-03-api-client-auth-context` · **Pull Request:** —
+- **Git Branch:** `feature/P3-03-api-client-auth-context` · **Pull Request:** PR (feature/P3-03-api-client-auth-context)
 - **الملفات المتوقعة:** `frontend/src/shared/http/*`، `frontend/src/features/auth/*`
 - **Implementation Steps:** 1) Client + interceptors 2) Auth provider 3) Route guards 4) Toast للأخطاء 5) اختبارات MSW
 - **Acceptance Criteria:** 401 يجدد مرة ثم يخرج · المسار المحمي يعيد التوجيه · الأخطاء بتظهر مترجمة

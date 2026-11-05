@@ -149,6 +149,7 @@ export const tasks = [
     tests: ['Component', 'Playwright AR↔EN'], blockedBy: [],
   }),
   T('P3-03', 'API client, auth context & route guards', {
+    status: 'Done', pr: 'PR (feature/P3-03-api-client-auth-context)',
     pri: 'High', cx: 'M', deps: ['P3-01', 'P2-03'], branch: 'feature/P3-03-api-client-auth-context',
     goal: 'عميل HTTP typed وTanStack Query وAuth Provider وتجديد التوكن وحماية المسارات.',
     files: ['frontend/src/shared/http/*', 'frontend/src/features/auth/*'],

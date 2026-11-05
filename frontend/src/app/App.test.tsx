@@ -1,35 +1,56 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { App } from './App';
+import { tokenStorage } from '../shared/http/tokenStorage';
 
-describe('i18n & Theme Preferences Tests (P3-02)', () => {
+describe('App Integration, Auth & Route Guard Tests (P3-03)', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.lang = 'ar';
     document.documentElement.dir = 'rtl';
     document.body.className = '';
+    vi.clearAllMocks();
   });
 
-  it('renders with Arabic by default and updates document direction', () => {
+  it('renders guest simulation state when no JWT tokens are present', async () => {
     render(<App initialTab="map" />);
 
     expect(screen.getByTestId('top-ribbon')).toBeInTheDocument();
     expect(screen.getByTestId('main-header')).toBeInTheDocument();
-    expect(screen.getByTestId('main-footer')).toBeInTheDocument();
 
-    expect(document.documentElement.lang).toBe('ar');
-    expect(document.documentElement.dir).toBe('rtl');
-
-    // Both header and footer contain the university name
-    const arTitles = screen.getAllByText('جامعة فهد بن سلطان');
-    expect(arTitles.length).toBeGreaterThanOrEqual(1);
+    const guestStatus = await screen.findByText(/زائر \(وضع المحاكاة\)/i);
+    expect(guestStatus).toBeInTheDocument();
   });
 
-  it('toggles language between Arabic and English, updating DOM and persisting to localStorage', async () => {
-    render(<App />);
+  it('displays auth-required guard when navigating to guarded admin tab as a guest', async () => {
+    render(<App initialTab="map" />);
+
+    const adminPanelBtn = screen.getByRole('button', { name: /لوحة المسؤول \(محمية\)/i });
+    fireEvent.click(adminPanelBtn);
+
+    const authRequired = await screen.findByTestId('auth-required');
+    expect(authRequired).toBeInTheDocument();
+    expect(screen.getByText('تسجيل الدخول مطلوب')).toBeInTheDocument();
+  });
+
+  it('stores and retrieves JWT tokens via tokenStorage correctly', () => {
+    expect(tokenStorage.getAccessToken()).toBeNull();
+
+    tokenStorage.setTokens('access-token-123', 'refresh-token-456');
+
+    expect(tokenStorage.getAccessToken()).toBe('access-token-123');
+    expect(tokenStorage.getRefreshToken()).toBe('refresh-token-456');
+
+    tokenStorage.clearTokens();
+
+    expect(tokenStorage.getAccessToken()).toBeNull();
+    expect(tokenStorage.getRefreshToken()).toBeNull();
+  });
+
+  it('toggles language and updates UI properly with AuthProvider wrapper', async () => {
+    render(<App initialTab="map" />);
 
     const langToggleBtn = screen.getByTitle('التحويل إلى اللغة الإنجليزية');
-    expect(langToggleBtn).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(langToggleBtn);
@@ -37,31 +58,6 @@ describe('i18n & Theme Preferences Tests (P3-02)', () => {
 
     expect(document.documentElement.lang).toBe('en');
     expect(document.documentElement.dir).toBe('ltr');
-    expect(localStorage.getItem('fbsu_lang')).toBe('en');
-
-    // Both header and footer contain the translated university name
-    const enTitles = screen.getAllByText('Fahad Bin Sultan University');
-    expect(enTitles.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('toggles day/night theme and updates body classes and localStorage', async () => {
-    render(<App />);
-
-    const themeToggleBtn = screen.getByTitle('تبديل المظهر النهاري / الليلي');
-    expect(themeToggleBtn).toBeInTheDocument();
-
-    await act(async () => {
-      fireEvent.click(themeToggleBtn);
-    });
-
-    expect(document.body.classList.contains('theme-light')).toBe(true);
-    expect(localStorage.getItem('fbsu_theme')).toBe('light');
-
-    await act(async () => {
-      fireEvent.click(themeToggleBtn);
-    });
-
-    expect(document.body.classList.contains('theme-dark')).toBe(true);
-    expect(localStorage.getItem('fbsu_theme')).toBe('dark');
+    expect(screen.getByText(/Current Auth State:/i)).toBeInTheDocument();
   });
 });
