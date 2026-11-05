@@ -1,48 +1,87 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
+import { AppShell } from '../shared/layout/AppShell';
+import type { AppUser } from '../shared/types/navigation';
+import '../styles/main.css';
+
+const defaultUser: AppUser = {
+  id: '20210045',
+  name: 'إياد الحربي',
+  nameEn: 'Eyad Al-Harbi',
+  role: 'طالب متميز - كلية الهندسة',
+  roleEn: 'Honor Student - Engineering',
+  college: 'كلية الهندسة',
+  car: 'تويوتا كامري 2023',
+  walletBalance: 720.0,
+  avatarColor: '#116E63',
+};
 
 export interface AppProps {
-  initialTitle?: string;
+  initialTab?: string;
+  initialLang?: 'ar' | 'en';
 }
 
-export const App: React.FC<AppProps> = ({
-  initialTitle = 'منظومة الحرم الجامعي والمواقف الذكية - جامعة فهد بن سلطان',
+export const App: FC<AppProps> = ({
+  initialTab = 'map',
+  initialLang = 'ar',
 }) => {
-  const [counter, setCounter] = useState(0);
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
+  const [lang, setLang] = useState<'ar' | 'en'>(initialLang);
+  const [isLight, setIsLight] = useState<boolean>(false);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+
+  const isAr = lang === 'ar';
 
   return (
-    <main
-      style={{
-        padding: '2rem',
-        fontFamily: 'Tajawal, sans-serif',
-        textAlign: 'center',
-        direction: 'rtl',
-      }}
+    <AppShell
+      isAr={isAr}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      currentUser={defaultUser}
+      soundEnabled={soundEnabled}
+      onToggleSound={() => setSoundEnabled((v) => !v)}
+      onToggleLang={() => setLang((l) => (l === 'ar' ? 'en' : 'ar'))}
+      isLightTheme={isLight}
+      onToggleTheme={() => setIsLight((v) => !v)}
     >
-      <header>
-        <h1 style={{ color: '#116E63', marginBottom: '0.5rem' }}>{initialTitle}</h1>
-        <p style={{ color: '#d7a237', fontWeight: 'bold' }}>
-          FBSU Smart Campus & Parking System (React + TypeScript)
-        </p>
-      </header>
+      <div className="container" style={{ padding: '3rem 1.25rem', minHeight: '60vh' }}>
+        <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+          <div className="badge badge-gold" style={{ marginBottom: '1.25rem' }}>
+            {isAr ? 'المرحلة الثالثة: تأسيس React 19 + TypeScript Strict' : 'Phase 3: React 19 + TypeScript Strict'}
+          </div>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem' }}>
+            {isAr ? 'منظومة الحرم الجامعي والمواقف الذكية' : 'Smart Campus & ALPR Vision Platform'}
+          </h2>
+          <p style={{ color: 'var(--text-muted)', lineHeight: 1.8, fontSize: '1rem', marginBottom: '1.5rem' }}>
+            {isAr
+              ? `القسم النشط حالياً: [${activeTab}]. تم بناء الهيكل الرئيسي (AppShell & Header & Ribbon & Navigation & Footer) بنجاح مع مطابقة الـ Design Tokens.`
+              : `Current Active View: [${activeTab}]. Fully responsive institutional AppShell with Header, Ribbon, Navigation, and Footer initialized.`}
+          </p>
 
-      <section style={{ marginTop: '2rem' }}>
-        <p>مرحباً بك في المنظومة الأكاديمية الذكية.</p>
-        <button
-          onClick={() => setCounter(c => c + 1)}
-          style={{
-            background: '#116E63',
-            color: '#fff',
-            border: 'none',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            cursor: 'pointer',
-            marginTop: '1rem',
-          }}
-        >
-          العداد التفاعلي: {counter}
-        </button>
-      </section>
-    </main>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              className="fbsu-alert-btn-primary"
+              onClick={() => setActiveTab('map')}
+              type="button"
+            >
+              {isAr ? 'خريطة المواقف' : 'Parking Map'}
+            </button>
+            <button
+              className="fbsu-alert-btn-secondary"
+              onClick={() => setActiveTab('booking')}
+              type="button"
+            >
+              {isAr ? 'حجز تصريح' : 'Book Permit'}
+            </button>
+            <button
+              className="fbsu-alert-btn-secondary"
+              onClick={() => setActiveTab('tutoring')}
+              type="button"
+            >
+              {isAr ? 'جلسات الشرح' : 'Peer Tutoring'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </AppShell>
   );
 };

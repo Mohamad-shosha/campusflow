@@ -2,26 +2,36 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { App } from './App';
 
-describe('App Component', () => {
-  it('renders university title correctly in Arabic', () => {
-    render(<App />);
-    expect(
-      screen.getByText('منظومة الحرم الجامعي والمواقف الذكية - جامعة فهد بن سلطان')
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('FBSU Smart Campus & Parking System (React + TypeScript)')
-    ).toBeInTheDocument();
+describe('App & AppShell Layout Tests', () => {
+  it('renders top ribbon, header and footer properly', () => {
+    render(<App initialLang="ar" initialTab="map" />);
+
+    expect(screen.getByTestId('top-ribbon')).toBeInTheDocument();
+    expect(screen.getByTestId('main-header')).toBeInTheDocument();
+    expect(screen.getByTestId('main-footer')).toBeInTheDocument();
+
+    // Check brand name in header and footer
+    const brandOccurrences = screen.getAllByText('جامعة فهد بن سلطان');
+    expect(brandOccurrences.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('increments counter when button is clicked', () => {
-    render(<App />);
-    const button = screen.getByRole('button', { name: /العداد التفاعلي: 0/i });
-    expect(button).toBeInTheDocument();
+  it('switches language between Arabic and English when toggle is clicked', () => {
+    render(<App initialLang="ar" />);
 
-    fireEvent.click(button);
-    expect(screen.getByRole('button', { name: /العداد التفاعلي: 1/i })).toBeInTheDocument();
+    const langToggleBtn = screen.getByTitle('Switch to English');
+    fireEvent.click(langToggleBtn);
 
-    fireEvent.click(button);
-    expect(screen.getByRole('button', { name: /العداد التفاعلي: 2/i })).toBeInTheDocument();
+    expect(screen.getByText('Smart Campus & ALPR Vision Platform')).toBeInTheDocument();
+  });
+
+  it('changes active tab when quick navigation buttons are clicked', () => {
+    render(<App initialLang="en" initialTab="map" />);
+
+    expect(screen.getByText(/Current Active View: \[map\]/i)).toBeInTheDocument();
+
+    const bookPermitBtn = screen.getByRole('button', { name: /Book Permit/i });
+    fireEvent.click(bookPermitBtn);
+
+    expect(screen.getByText(/Current Active View: \[booking\]/i)).toBeInTheDocument();
   });
 });

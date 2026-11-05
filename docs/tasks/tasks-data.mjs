@@ -131,7 +131,7 @@ export const tasks = [
 
   // ---------------- P3 ----------------
   T('P3-01', 'Design tokens, global styles & app shell', {
-    status: 'In Progress', pr: 'Branch feature/P3-01-app-shell (جاري البدء)',
+    status: 'Done', pr: 'PR (feature/P3-01-app-shell)',
     pri: 'High', cx: 'L', deps: ['P1-02'], branch: 'feature/P3-01-app-shell',
     goal: 'نقل style.css والخطوط وبناء الـ Header والـ Navigation والـ Footer والـ Router بحيث يطابق التصميم الحالي.',
     files: ['frontend/src/styles/*', 'frontend/src/app/*', 'frontend/src/shared/layout/*'],
