@@ -1,6 +1,9 @@
 import { useState, FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AppShell } from '../shared/layout/AppShell';
+import { AppPreferencesProvider, useAppPreferences } from '../shared/context/AppPreferencesContext';
 import type { AppUser } from '../shared/types/navigation';
+import '../shared/i18n/i18n';
 import '../styles/main.css';
 
 const defaultUser: AppUser = {
@@ -15,46 +18,33 @@ const defaultUser: AppUser = {
   avatarColor: '#116E63',
 };
 
-export interface AppProps {
+export interface AppContentProps {
   initialTab?: string;
-  initialLang?: 'ar' | 'en';
 }
 
-export const App: FC<AppProps> = ({
-  initialTab = 'map',
-  initialLang = 'ar',
-}) => {
+const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
-  const [lang, setLang] = useState<'ar' | 'en'>(initialLang);
-  const [isLight, setIsLight] = useState<boolean>(false);
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
-
-  const isAr = lang === 'ar';
+  const { t } = useTranslation();
+  const { isAr } = useAppPreferences();
 
   return (
     <AppShell
-      isAr={isAr}
       activeTab={activeTab}
       onTabChange={setActiveTab}
       currentUser={defaultUser}
-      soundEnabled={soundEnabled}
-      onToggleSound={() => setSoundEnabled((v) => !v)}
-      onToggleLang={() => setLang((l) => (l === 'ar' ? 'en' : 'ar'))}
-      isLightTheme={isLight}
-      onToggleTheme={() => setIsLight((v) => !v)}
     >
       <div className="container" style={{ padding: '3rem 1.25rem', minHeight: '60vh' }}>
         <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
           <div className="badge badge-gold" style={{ marginBottom: '1.25rem' }}>
-            {isAr ? 'المرحلة الثالثة: تأسيس React 19 + TypeScript Strict' : 'Phase 3: React 19 + TypeScript Strict'}
+            {isAr ? 'المرحلة الثالثة: دعم تعدد اللغات والمظهر التفاعلي (P3-02)' : 'Phase 3: i18n & Theme Switching Engine (P3-02)'}
           </div>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem' }}>
-            {isAr ? 'منظومة الحرم الجامعي والمواقف الذكية' : 'Smart Campus & ALPR Vision Platform'}
+            {t('common.systemTitle')}
           </h2>
           <p style={{ color: 'var(--text-muted)', lineHeight: 1.8, fontSize: '1rem', marginBottom: '1.5rem' }}>
             {isAr
-              ? `القسم النشط حالياً: [${activeTab}]. تم بناء الهيكل الرئيسي (AppShell & Header & Ribbon & Navigation & Footer) بنجاح مع مطابقة الـ Design Tokens.`
-              : `Current Active View: [${activeTab}]. Fully responsive institutional AppShell with Header, Ribbon, Navigation, and Footer initialized.`}
+              ? `القسم النشط حالياً: [${activeTab}]. محرك الترجمة i18n شغال بالكامل مع دعم التبديل التلقائي للخطوط والاتجاه RTL/LTR وحفظ التفضيلات.`
+              : `Current Active View: [${activeTab}]. Full i18n engine active with RTL/LTR document direction, font family switching, and local storage persistence.`}
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -63,25 +53,33 @@ export const App: FC<AppProps> = ({
               onClick={() => setActiveTab('map')}
               type="button"
             >
-              {isAr ? 'خريطة المواقف' : 'Parking Map'}
+              {t('nav.liveMap')}
             </button>
             <button
               className="fbsu-alert-btn-secondary"
               onClick={() => setActiveTab('booking')}
               type="button"
             >
-              {isAr ? 'حجز تصريح' : 'Book Permit'}
+              {t('nav.bookParking')}
             </button>
             <button
               className="fbsu-alert-btn-secondary"
               onClick={() => setActiveTab('tutoring')}
               type="button"
             >
-              {isAr ? 'جلسات الشرح' : 'Peer Tutoring'}
+              {t('nav.peerTutoring')}
             </button>
           </div>
         </div>
       </div>
     </AppShell>
+  );
+};
+
+export const App: FC<AppContentProps> = (props) => {
+  return (
+    <AppPreferencesProvider>
+      <AppContent {...props} />
+    </AppPreferencesProvider>
   );
 };

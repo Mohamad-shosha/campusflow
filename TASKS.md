@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 13 تاسك ✅
+- **المنجز بالكامل (Done):** 14 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 40 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **25%**
+- **المتبقي للبدء (Backlog):** 39 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **26%**
 
 
 
@@ -21,14 +21,14 @@
 | P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
-| P3 | Frontend Foundation (React) | 5 | 1 | 0 | 4 |
+| P3 | Frontend Foundation (React) | 5 | 2 | 0 | 3 |
 | P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **13** | **0** | **40** |
+| **الإجمالي** | | **53** | **14** | **0** | **39** |
 
 ---
 
@@ -189,9 +189,9 @@
 
 ### P3-02 — i18n (AR/EN), RTL/LTR switching, theme toggle
 - **ماذا سيعمل:** ترجمة عربي/إنجليزي بـ react-i18next مع تبديل الاتجاه والثيم وحفظ التفضيل.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P3-01
-- **Git Branch:** `feature/P3-02-i18n-theme` · **Pull Request:** —
+- **Git Branch:** `feature/P3-02-i18n-theme` · **Pull Request:** PR (feature/P3-02-i18n-theme)
 - **الملفات المتوقعة:** `frontend/src/shared/i18n/*`، `locales/ar.json`، `locales/en.json`، `ThemeToggle/LangToggle`
 - **Implementation Steps:** 1) استخراج النصوص من legacy 2) Provider 3) Toggles + persistence 4) اختبارات
 - **Acceptance Criteria:** لا نصوص ثابتة في الـ shell · dir وlang يتحدثان · التفضيل يُحفظ

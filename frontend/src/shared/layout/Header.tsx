@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Car,
   ChevronDown,
@@ -21,17 +22,12 @@ import {
   DoorClosed,
 } from 'lucide-react';
 import type { AppUser } from '../types/navigation';
+import { useAppPreferences } from '../context/AppPreferencesContext';
 
 export interface HeaderProps {
-  isAr: boolean;
   activeTab: string;
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
-  soundEnabled: boolean;
-  onToggleSound: () => void;
-  onToggleLang: () => void;
-  isLightTheme: boolean;
-  onToggleTheme: () => void;
   notificationCount?: number;
   onOpenNotifications?: () => void;
   onOpenWallet?: () => void;
@@ -39,20 +35,16 @@ export interface HeaderProps {
 }
 
 export const Header: FC<HeaderProps> = ({
-  isAr,
   activeTab,
   onTabChange,
   currentUser,
-  soundEnabled,
-  onToggleSound,
-  onToggleLang,
-  isLightTheme,
-  onToggleTheme,
   notificationCount = 3,
   onOpenNotifications,
   onOpenWallet,
   onOpenAuth,
 }) => {
+  const { t } = useTranslation();
+  const { isAr, soundEnabled, toggleSound, toggleLanguage, isLightTheme, toggleTheme } = useAppPreferences();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -82,13 +74,11 @@ export const Header: FC<HeaderProps> = ({
           <div className="brand-section">
             <img
               src="/assets/branding/fbsu-logo.png"
-              alt="شعار جامعة فهد بن سلطان"
+              alt="FBSU Logo"
               className="brand-logo-img"
               style={{ height: '36px' }}
             />
-            <h1 className="brand-uni-name">
-              {isAr ? 'جامعة فهد بن سلطان' : 'Fahad Bin Sultan University'}
-            </h1>
+            <h1 className="brand-uni-name">{t('common.universityName')}</h1>
           </div>
 
           <nav className="nav-menu">
@@ -101,9 +91,10 @@ export const Header: FC<HeaderProps> = ({
                   setOpenDropdown(openDropdown === 'parking' ? null : 'parking');
                 }}
                 type="button"
+                aria-expanded={openDropdown === 'parking'}
               >
                 <Car size={14} />
-                <span>{isAr ? 'المواقف الذكية' : 'Smart Parking'}</span>
+                <span>{t('nav.parkingSuite')}</span>
                 <ChevronDown size={12} className="dropdown-arrow" />
               </button>
 
@@ -115,8 +106,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <MapPin size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'خريطة المواقف الحية' : 'Live Map'}</span>
-                    <span className="dropdown-item-desc">{isAr ? '30 موقفاً وحساسات إنترنت الأشياء' : '30 Bays & IoT'}</span>
+                    <span className="dropdown-item-title">{t('nav.liveMap')}</span>
+                    <span className="dropdown-item-desc">{t('nav.liveMapDesc')}</span>
                   </div>
                 </button>
                 <button
@@ -126,8 +117,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <Calendar size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'حجز موقف وتصريح ذكي' : 'Book Parking'}</span>
-                    <span className="dropdown-item-desc">{isAr ? 'تصريح رقمي FBSU Pass فوري' : 'Digital QR & NFC'}</span>
+                    <span className="dropdown-item-title">{t('nav.bookParking')}</span>
+                    <span className="dropdown-item-desc">{t('nav.bookParkingDesc')}</span>
                   </div>
                 </button>
                 <button
@@ -137,8 +128,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <Zap size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'محاكاة التبادل Flex-Share' : 'Flex Swap Demo'}</span>
-                    <span className="dropdown-item-desc">{isAr ? 'سيناريو بريك إياد وراكان' : 'Break Swap'}</span>
+                    <span className="dropdown-item-title">{t('nav.flexDemo')}</span>
+                    <span className="dropdown-item-desc">{t('nav.flexDemoDesc')}</span>
                   </div>
                 </button>
                 <button
@@ -148,8 +139,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <Camera size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'كاميرات وقارئ اللوحات ALPR' : 'Gate ALPR'}</span>
-                    <span className="dropdown-item-desc">{isAr ? 'رؤية حاسوبية وبوابة آلية' : 'Optical Plate Reader'}</span>
+                    <span className="dropdown-item-title">{t('nav.gateAlpr')}</span>
+                    <span className="dropdown-item-desc">{t('nav.gateAlprDesc')}</span>
                   </div>
                 </button>
                 <button
@@ -159,8 +150,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <RefreshCw size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'شارك موقفك واربح' : 'Share & Earn'}</span>
-                    <span className="dropdown-item-desc">{isAr ? 'كاش باك 17.25 ر.س بالمحفظة' : '17.25 SAR per break'}</span>
+                    <span className="dropdown-item-title">{t('nav.shareAndEarn')}</span>
+                    <span className="dropdown-item-desc">{t('nav.shareAndEarnDesc')}</span>
                   </div>
                 </button>
               </div>
@@ -175,9 +166,10 @@ export const Header: FC<HeaderProps> = ({
                   setOpenDropdown(openDropdown === 'campus' ? null : 'campus');
                 }}
                 type="button"
+                aria-expanded={openDropdown === 'campus'}
               >
                 <BookOpen size={14} />
-                <span>{isAr ? 'الحرم والأنشطة' : 'Campus Hub'}</span>
+                <span>{t('nav.campusHub')}</span>
                 <span className="nav-highlight-dot"></span>
                 <ChevronDown size={12} className="dropdown-arrow" />
               </button>
@@ -190,8 +182,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <Users size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'النشاط الطلابي والتدريس (70 ر.س)' : 'Peer Tutoring (70 SAR)'}</span>
-                    <span className="dropdown-item-desc">{isAr ? 'حصص تقوية وسداد الرسوم الجامعية' : 'Lectures & tuition fee offset'}</span>
+                    <span className="dropdown-item-title">{t('nav.peerTutoring')}</span>
+                    <span className="dropdown-item-desc">{t('nav.peerTutoringDesc')}</span>
                   </div>
                 </button>
                 <button
@@ -201,8 +193,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <UserCheck size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'الساعات المكتبية للعمداء والرؤساء' : 'Faculty Office Hours'}</span>
-                    <span className="dropdown-item-desc">{isAr ? 'د. رغد النفيعي ود. محمد مزهر' : 'Dr. Raghad & Dr. Mezher'}</span>
+                    <span className="dropdown-item-title">{t('nav.officeHours')}</span>
+                    <span className="dropdown-item-desc">{t('nav.officeHoursDesc')}</span>
                   </div>
                 </button>
                 <button
@@ -212,8 +204,8 @@ export const Header: FC<HeaderProps> = ({
                 >
                   <DoorClosed size={14} />
                   <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{isAr ? 'حجز القاعات ومعامل الحاسوب' : 'Labs & Study Pods'}</span>
-                    <span className="dropdown-item-desc">{isAr ? 'إياد، راكان، عبد العزيز ومؤقت المغادرة' : 'Teamwork & countdown timer'}</span>
+                    <span className="dropdown-item-title">{t('nav.studyRooms')}</span>
+                    <span className="dropdown-item-desc">{t('nav.studyRoomsDesc')}</span>
                   </div>
                 </button>
               </div>
@@ -226,7 +218,7 @@ export const Header: FC<HeaderProps> = ({
               type="button"
             >
               <BarChart3 size={14} />
-              <span>{isAr ? 'التحليلات' : 'Analytics'}</span>
+              <span>{t('nav.analytics')}</span>
             </button>
           </nav>
         </div>
@@ -236,36 +228,40 @@ export const Header: FC<HeaderProps> = ({
           <div className="system-utilities-capsule">
             <button
               className={`utility-pill-btn ${soundEnabled ? 'sound-active' : ''}`}
-              onClick={onToggleSound}
+              onClick={toggleSound}
               type="button"
-              title={soundEnabled ? (isAr ? 'كتم المؤثرات الصوتية' : 'Mute Sound') : (isAr ? 'تشغيل المؤثرات الصوتية' : 'Enable Sound')}
+              title={soundEnabled ? t('utilities.disableSound') : t('utilities.enableSound')}
             >
               {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-              <span className="utility-text-label">{soundEnabled ? (isAr ? 'صوت' : 'Sound') : (isAr ? 'صامت' : 'Muted')}</span>
+              <span className="utility-text-label">{soundEnabled ? t('utilities.sound') : t('utilities.muted')}</span>
             </button>
 
             <span className="utility-divider"></span>
 
             <button
               className="utility-pill-btn"
-              onClick={onToggleLang}
+              onClick={toggleLanguage}
               type="button"
-              title={isAr ? 'Switch to English' : 'التحويل للعربية'}
+              title={isAr ? t('utilities.switchToEn') : t('utilities.switchToAr')}
             >
               <Globe size={14} />
-              <span className="utility-text-label" style={{ fontWeight: 800 }}>{isAr ? 'EN' : 'عربي'}</span>
+              <span className="utility-text-label" style={{ fontWeight: 800 }}>
+                {isAr ? 'EN' : 'عربي'}
+              </span>
             </button>
 
             <span className="utility-divider"></span>
 
             <button
               className="utility-pill-btn"
-              onClick={onToggleTheme}
+              onClick={toggleTheme}
               type="button"
-              title={isAr ? 'تبديل المظهر' : 'Toggle Theme'}
+              title={t('utilities.toggleTheme')}
             >
               {isLightTheme ? <Sun size={14} color="var(--fbsu-gold)" /> : <Moon size={14} />}
-              <span className="utility-text-label">{isAr ? (isLightTheme ? 'نهاري' : 'ليلي') : (isLightTheme ? 'Light' : 'Dark')}</span>
+              <span className="utility-text-label">
+                {isLightTheme ? t('utilities.themeLight') : t('utilities.themeDark')}
+              </span>
             </button>
           </div>
 
@@ -274,6 +270,7 @@ export const Header: FC<HeaderProps> = ({
             className="wallet-badge-btn"
             onClick={onOpenNotifications}
             type="button"
+            title={t('utilities.notificationsTitle')}
             style={{
               background: 'rgba(215, 162, 55, 0.12)',
               borderColor: 'var(--fbsu-gold-border)',
@@ -291,9 +288,10 @@ export const Header: FC<HeaderProps> = ({
             className="wallet-badge-btn"
             onClick={onOpenWallet}
             type="button"
+            title={t('utilities.walletTitle')}
           >
             <Wallet size={13} color="var(--fbsu-gold)" />
-            <span>{currentUser.walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}</span>
+            <span>{currentUser.walletBalance.toFixed(2)} {t('common.currency')}</span>
           </button>
 
           {/* User Profile */}
@@ -301,6 +299,7 @@ export const Header: FC<HeaderProps> = ({
             className="auth-btn-header"
             onClick={onOpenAuth}
             type="button"
+            title={t('utilities.profileTitle')}
           >
             <span
               style={{
@@ -320,4 +319,3 @@ export const Header: FC<HeaderProps> = ({
     </header>
   );
 };
-

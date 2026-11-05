@@ -1,10 +1,9 @@
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
-export interface FooterProps {
-  isAr: boolean;
-}
+export const Footer: FC = () => {
+  const { t } = useTranslation();
 
-export const Footer: FC<FooterProps> = ({ isAr }) => {
   return (
     <footer className="main-footer" data-testid="main-footer">
       <div className="container">
@@ -17,44 +16,42 @@ export const Footer: FC<FooterProps> = ({ isAr }) => {
                 alt="FBSU Logo"
               />
               <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>
-                {isAr ? 'جامعة فهد بن سلطان' : 'Fahad Bin Sultan University'}
+                {t('common.universityName')}
               </h4>
             </div>
             <p style={{ fontSize: '0.85rem', lineHeight: 1.8, color: '#e2e8f0', maxWidth: '380px' }}>
-              {isAr
-                ? 'منظومة المواقف الذكية التفاعلية بالذكاء الاصطناعي وإنترنت الأشياء. صُممت خصيصاً لتواكب رؤية المملكة 2030 وتوفر تجربة تنقل أكاديمية فائقة الذكاء لطلاب ومنسوبي الجامعة في تبوك.'
-                : 'Intelligent IoT & AI parking management engineered for Fahad Bin Sultan University in Tabuk, aligned with Saudi Vision 2030.'}
+              {t('footer.description')}
             </p>
           </div>
 
           <div>
             <h5 style={{ color: '#ffffff', fontWeight: 800, marginBottom: '1rem' }}>
-              {isAr ? 'كليات الجامعة' : 'University Colleges'}
+              {t('footer.collegesTitle')}
             </h5>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.55rem', fontSize: '0.85rem' }}>
               <li>
                 <a href="https://fbsu.edu.sa/Ar/All/computing-college" target="_blank" rel="noreferrer" style={{ color: '#e2e8f0' }}>
-                  {isAr ? 'كلية الحاسب الآلي' : 'College of Computing'}
+                  {t('footer.computingCollege')}
                 </a>
               </li>
               <li>
                 <a href="https://fbsu.edu.sa/Ar/All/engineering-college" target="_blank" rel="noreferrer" style={{ color: '#e2e8f0' }}>
-                  {isAr ? 'كلية الهندسة' : 'College of Engineering'}
+                  {t('footer.engineeringCollege')}
                 </a>
               </li>
               <li>
                 <a href="https://fbsu.edu.sa/Ar/All/College-of-Business-and-Management" target="_blank" rel="noreferrer" style={{ color: '#e2e8f0' }}>
-                  {isAr ? 'كلية الأعمال والإدارة' : 'College of Business'}
+                  {t('footer.businessCollege')}
                 </a>
               </li>
               <li>
                 <a href="https://fbsu.edu.sa/Ar/All/College-of-Medicine" target="_blank" rel="noreferrer" style={{ color: '#e2e8f0' }}>
-                  {isAr ? 'كلية الطب' : 'College of Medicine'}
+                  {t('footer.medicineCollege')}
                 </a>
               </li>
               <li>
                 <a href="https://fbsu.edu.sa/Ar/All/College-of-Sciences-and-Humanities" target="_blank" rel="noreferrer" style={{ color: '#e2e8f0' }}>
-                  {isAr ? 'كلية العلوم والدراسات الإنسانية' : 'Sciences & Humanities'}
+                  {t('footer.sciencesCollege')}
                 </a>
               </li>
             </ul>
@@ -62,45 +59,44 @@ export const Footer: FC<FooterProps> = ({ isAr }) => {
 
           <div>
             <h5 style={{ color: '#ffffff', fontWeight: 800, marginBottom: '1rem' }}>
-              {isAr ? 'روابط المنظومة' : 'Platform Links'}
+              {t('footer.linksTitle')}
             </h5>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.55rem', fontSize: '0.85rem' }}>
-              <li><a href="#booking" style={{ color: '#e2e8f0' }}>{isAr ? 'حجز تصريح مواقف' : 'Book Parking Pass'}</a></li>
-              <li><a href="#simulator" style={{ color: '#e2e8f0' }}>{isAr ? 'محاكاة التبادل الذكي' : 'Flex Swap Simulator'}</a></li>
-              <li><a href="#wallet" style={{ color: '#e2e8f0' }}>{isAr ? 'المحفظة الجامعية والاشتراكات' : 'Campus Wallet & Tuition'}</a></li>
-              <li><a href="#gate" style={{ color: '#e2e8f0' }}>{isAr ? 'بوابات ALPR والتحقق التلقائي' : 'ALPR Automated Gates'}</a></li>
-              <li><a href="https://fbsu.edu.sa" target="_blank" rel="noreferrer" style={{ color: '#e2e8f0' }}>{isAr ? 'بوابة الجامعة الرسمية' : 'FBSU Official Portal'}</a></li>
+              <li><a href="#booking" style={{ color: '#e2e8f0' }}>{t('footer.bookPass')}</a></li>
+              <li><a href="#simulator" style={{ color: '#e2e8f0' }}>{t('footer.flexSim')}</a></li>
+              <li><a href="#wallet" style={{ color: '#e2e8f0' }}>{t('footer.walletAndFees')}</a></li>
+              <li><a href="#gate" style={{ color: '#e2e8f0' }}>{t('footer.alprGates')}</a></li>
+              <li><a href="https://fbsu.edu.sa" target="_blank" rel="noreferrer" style={{ color: '#e2e8f0' }}>{t('footer.officialPortal')}</a></li>
             </ul>
           </div>
 
           <div>
             <h5 style={{ color: '#ffffff', fontWeight: 800, marginBottom: '1rem' }}>
-              {isAr ? 'موقع الجامعة والتواصل' : 'Location & Contact'}
+              {t('footer.contactTitle')}
             </h5>
             <p style={{ fontSize: '0.85rem', color: '#e2e8f0', marginBottom: '0.5rem' }}>
-              {isAr ? 'طريق الملك خالد، تبوك 47721، المملكة العربية السعودية' : 'King Khalid Road, Tabuk 47721, Saudi Arabia'}
+              {t('footer.address')}
             </p>
             <p style={{ fontSize: '0.85rem', color: '#e2e8f0', marginBottom: '0.5rem' }}>
-              {isAr ? 'هاتف: 2500 425 14 966+' : 'Tel: +966 14 425 2500'}
+              {t('footer.phone')}
             </p>
             <p style={{ fontSize: '0.85rem', color: '#e2e8f0' }}>
-              info@fbsu.edu.sa
+              {t('footer.email')}
             </p>
           </div>
         </div>
 
         <div className="footer-bottom">
           <div>
-            © 2026 {isAr ? 'جميع الحقوق محفوظة - جامعة فهد بن سلطان (منظومة المواقف والخدمات الذكية)' : 'All rights reserved - Fahad Bin Sultan University (FBSU Smart Campus)'}
+            {t('footer.copyright')}
           </div>
           <div style={{ display: 'flex', gap: '1.25rem' }}>
-            <span>{isAr ? 'سياسة الخصوصية' : 'Privacy Policy'}</span>
-            <span>{isAr ? 'الشروط والأحكام' : 'Terms & Conditions'}</span>
-            <span>{isAr ? 'الاتصال المؤسسي' : 'Institutional Contact'}</span>
+            <span>{t('footer.privacy')}</span>
+            <span>{t('footer.terms')}</span>
+            <span>{t('footer.institutionalContact')}</span>
           </div>
         </div>
       </div>
     </footer>
   );
 };
-
