@@ -178,6 +178,7 @@ export const tasks = [
 
   // ---------------- P4 ----------------
   T('P4-01', 'Ledger + wallet schema', {
+    status: 'Done', pr: 'PR (feature/P4-01-ledger-schema)',
     pri: 'High', cx: 'M', deps: ['P2-03'], branch: 'feature/P4-01-ledger-schema',
     goal: 'جداول المحفظة ودفتر الحركات (ledger) غير القابل للتعديل مع قيود تمنع الرصيد السالب.',
     files: ['db/migration/V4__wallet.sql', 'wallet/domain/*', 'wallet/infra/*'],
