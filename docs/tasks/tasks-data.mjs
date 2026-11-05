@@ -187,6 +187,7 @@ export const tasks = [
     tests: ['Repository tests', 'Constraint tests'], blockedBy: ['Q4'],
   }),
   T('P4-02', 'Wallet service & API', {
+    status: 'Done', pr: 'PR (feature/P4-02-wallet-api)',
     pri: 'Critical', cx: 'L', deps: ['P4-01'], branch: 'feature/P4-02-wallet-api',
     goal: 'خدمة المحفظة: رصيد، سجل، تحويلات ذرية بين المستخدمين، وإعادة المحاولة الآمنة (Idempotency).',
     files: ['wallet/application/*', 'wallet/api/*', 'tests'],
@@ -195,6 +196,7 @@ export const tasks = [
     tests: ['Unit', 'Service', 'Concurrency', 'API', 'Security'], blockedBy: [],
   }),
   T('P4-03', 'Tuition accounts & payment + receipt', {
+    status: 'Done', pr: 'PR (feature/P4-03-tuition)',
     pri: 'High', cx: 'L', deps: ['P4-02', 'Q4'], branch: 'feature/P4-03-tuition',
     goal: 'حسابات الرسوم الدراسية لكل فصل وسدادها من الرصيد وإصدار رقم إيصال فريد.',
     files: ['db/migration/V5__tuition.sql', 'wallet/application/Tuition*', 'wallet/api/*'],

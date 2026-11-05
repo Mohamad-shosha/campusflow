@@ -18,6 +18,16 @@ import sa.edu.fbsu.campus.infra.BuildingRepository;
 import sa.edu.fbsu.campus.infra.CollegeRepository;
 import sa.edu.fbsu.campus.infra.UniversityRepository;
 
+import sa.edu.fbsu.campus.wallet.domain.LedgerEntry;
+import sa.edu.fbsu.campus.wallet.domain.TransactionDirection;
+import sa.edu.fbsu.campus.wallet.domain.TransactionType;
+import sa.edu.fbsu.campus.wallet.domain.Wallet;
+import sa.edu.fbsu.campus.wallet.infra.LedgerEntryRepository;
+import sa.edu.fbsu.campus.wallet.infra.WalletRepository;
+import sa.edu.fbsu.campus.wallet.tuition.domain.TuitionInvoice;
+import sa.edu.fbsu.campus.wallet.tuition.infra.TuitionInvoiceRepository;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -39,6 +49,9 @@ public class DevSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final PasswordService passwordService;
+    private final WalletRepository walletRepository;
+    private final LedgerEntryRepository ledgerEntryRepository;
+    private final TuitionInvoiceRepository tuitionInvoiceRepository;
 
     public DevSeeder(
             UniversityRepository universityRepository,
@@ -47,7 +60,10 @@ public class DevSeeder implements CommandLineRunner {
             AcademicTermRepository termRepository,
             UserRepository userRepository,
             VehicleRepository vehicleRepository,
-            PasswordService passwordService) {
+            PasswordService passwordService,
+            WalletRepository walletRepository,
+            LedgerEntryRepository ledgerEntryRepository,
+            TuitionInvoiceRepository tuitionInvoiceRepository) {
         this.universityRepository = universityRepository;
         this.collegeRepository = collegeRepository;
         this.buildingRepository = buildingRepository;
@@ -55,6 +71,9 @@ public class DevSeeder implements CommandLineRunner {
         this.userRepository = userRepository;
         this.vehicleRepository = vehicleRepository;
         this.passwordService = passwordService;
+        this.walletRepository = walletRepository;
+        this.ledgerEntryRepository = ledgerEntryRepository;
+        this.tuitionInvoiceRepository = tuitionInvoiceRepository;
     }
 
     @Override
@@ -128,6 +147,30 @@ public class DevSeeder implements CommandLineRunner {
                 UserType.STUDENT, Role.STUDENT, "0504440003", bus.getId(), "إدارة الأعمال الدولية",
                 "د ر ع", "9090", "Kia K5 2023");
 
+        // 6. Tuition Invoices for Demo Student (STD-202410101)
+        termRepository.findByUniversityIdAndCode(uniId, "2026-FALL").ifPresent(fallTerm -> {
+            if (tuitionInvoiceRepository.findByInvoiceNumber("INV-2026-CCIS-001").isEmpty()) {
+                userRepository.findByUniversityNumber("STD-202410101").ifPresent(student -> {
+                    tuitionInvoiceRepository.save(new TuitionInvoice(
+                            uniId,
+                            student,
+                            fallTerm,
+                            "INV-2026-CCIS-001",
+                            new BigDecimal("450.00"),
+                            LocalDate.of(2026, 11, 30)
+                    ));
+                    tuitionInvoiceRepository.save(new TuitionInvoice(
+                            uniId,
+                            student,
+                            fallTerm,
+                            "INV-2026-CCIS-002",
+                            new BigDecimal("1500.00"),
+                            LocalDate.of(2026, 12, 31)
+                    ));
+                });
+            }
+        });
+
         log.info("--- [DevSeeder] Completed FBSU dev/demo seeding successfully ---");
     }
 
@@ -172,6 +215,26 @@ public class DevSeeder implements CommandLineRunner {
                 v.setPrimary(true);
                 vehicleRepository.save(v);
             }
+        }
+
+        // Seed initial wallet and ledger entry if not exists
+        if (!walletRepository.existsByUserId(user.getId())) {
+            BigDecimal seedBalance = switch (type) {
+                case STUDENT -> new BigDecimal("720.00");
+                case FACULTY -> new BigDecimal("1500.00");
+                case STAFF -> new BigDecimal("2500.00");
+            };
+            Wallet w = walletRepository.save(new Wallet(universityId, user, seedBalance, "SAR"));
+            ledgerEntryRepository.save(new LedgerEntry(
+                    w,
+                    TransactionType.TOP_UP,
+                    TransactionDirection.CREDIT,
+                    seedBalance,
+                    seedBalance,
+                    "seed-init-" + user.getUniversityNumber(),
+                    "FBSU_SEED",
+                    "Initial institutional seed balance allocation"
+            ));
         }
 
         return user;
