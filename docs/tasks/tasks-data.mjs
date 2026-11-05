@@ -187,6 +187,7 @@ export const tasks = [
     tests: ['Repository tests', 'Constraint tests'], blockedBy: ['Q4'],
   }),
   T('P4-02', 'Wallet service & API', {
+    status: 'Done', pr: 'PR (feature/P4-02-wallet-api)',
     pri: 'Critical', cx: 'L', deps: ['P4-01'], branch: 'feature/P4-02-wallet-api',
     goal: 'خدمة المحفظة: رصيد، سجل، تحويلات ذرية بين المستخدمين، وإعادة المحاولة الآمنة (Idempotency).',
     files: ['wallet/application/*', 'wallet/api/*', 'tests'],

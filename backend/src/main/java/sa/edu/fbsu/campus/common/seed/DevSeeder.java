@@ -18,6 +18,14 @@ import sa.edu.fbsu.campus.infra.BuildingRepository;
 import sa.edu.fbsu.campus.infra.CollegeRepository;
 import sa.edu.fbsu.campus.infra.UniversityRepository;
 
+import sa.edu.fbsu.campus.wallet.domain.LedgerEntry;
+import sa.edu.fbsu.campus.wallet.domain.TransactionDirection;
+import sa.edu.fbsu.campus.wallet.domain.TransactionType;
+import sa.edu.fbsu.campus.wallet.domain.Wallet;
+import sa.edu.fbsu.campus.wallet.infra.LedgerEntryRepository;
+import sa.edu.fbsu.campus.wallet.infra.WalletRepository;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -39,6 +47,8 @@ public class DevSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final PasswordService passwordService;
+    private final WalletRepository walletRepository;
+    private final LedgerEntryRepository ledgerEntryRepository;
 
     public DevSeeder(
             UniversityRepository universityRepository,
@@ -47,7 +57,9 @@ public class DevSeeder implements CommandLineRunner {
             AcademicTermRepository termRepository,
             UserRepository userRepository,
             VehicleRepository vehicleRepository,
-            PasswordService passwordService) {
+            PasswordService passwordService,
+            WalletRepository walletRepository,
+            LedgerEntryRepository ledgerEntryRepository) {
         this.universityRepository = universityRepository;
         this.collegeRepository = collegeRepository;
         this.buildingRepository = buildingRepository;
@@ -55,6 +67,8 @@ public class DevSeeder implements CommandLineRunner {
         this.userRepository = userRepository;
         this.vehicleRepository = vehicleRepository;
         this.passwordService = passwordService;
+        this.walletRepository = walletRepository;
+        this.ledgerEntryRepository = ledgerEntryRepository;
     }
 
     @Override
@@ -172,6 +186,26 @@ public class DevSeeder implements CommandLineRunner {
                 v.setPrimary(true);
                 vehicleRepository.save(v);
             }
+        }
+
+        // Seed initial wallet and ledger entry if not exists
+        if (!walletRepository.existsByUserId(user.getId())) {
+            BigDecimal seedBalance = switch (type) {
+                case STUDENT -> new BigDecimal("720.00");
+                case FACULTY -> new BigDecimal("1500.00");
+                case STAFF -> new BigDecimal("2500.00");
+            };
+            Wallet w = walletRepository.save(new Wallet(universityId, user, seedBalance, "SAR"));
+            ledgerEntryRepository.save(new LedgerEntry(
+                    w,
+                    TransactionType.TOP_UP,
+                    TransactionDirection.CREDIT,
+                    seedBalance,
+                    seedBalance,
+                    "seed-init-" + user.getUniversityNumber(),
+                    "FBSU_SEED",
+                    "Initial institutional seed balance allocation"
+            ));
         }
 
         return user;
