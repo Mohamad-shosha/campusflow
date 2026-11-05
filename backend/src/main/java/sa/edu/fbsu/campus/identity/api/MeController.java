@@ -18,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/me")
 @SecurityRequirement(name = "BearerAuth")
-@Tag(name = "User Profile & Settings", description = "إدارة الملف الشخصي للمستخدم المسجل حالياً وتغيير الإعدادات")
+@Tag(name = "User Profile & Settings", description = "Management of authenticated user profile, preferences, and security credentials")
 public class MeController {
 
     private final ProfileService profileService;
@@ -28,14 +28,14 @@ public class MeController {
     }
 
     @GetMapping
-    @Operation(summary = "عرض الملف الشخصي", description = "إرجاع كافة بيانات المستخدم وسياراته المسجلة من واقع الـ JWT")
+    @Operation(summary = "Get Current User Profile", description = "Retrieve comprehensive user profile and registered campus vehicles from authenticated JWT session")
     public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal UserPrincipal principal) {
         UserProfileResponse response = profileService.getProfile(principal.getUserId());
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping
-    @Operation(summary = "تحديث الملف الشخصي", description = "تحديث الاسم ورقم الجوال واللغة والثيم والتخصص")
+    @Operation(summary = "Update User Profile", description = "Update full name, phone number, academic major/specialty, locale, and theme preferences")
     public ResponseEntity<UserProfileResponse> updateProfile(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody UpdateProfileRequest request) {
@@ -44,12 +44,12 @@ public class MeController {
     }
 
     @PostMapping("/change-password")
-    @Operation(summary = "تغيير كلمة المرور", description = "تغيير كلمة المرور بعد التحقق من صحة كلمة المرور الحالية")
+    @Operation(summary = "Change Password", description = "Update user account password with strict verification of current active password")
     public ResponseEntity<Map<String, String>> changePassword(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody ChangePasswordRequest request) {
         profileService.changePassword(principal.getUserId(), request);
-        return ResponseEntity.ok(Map.of("message", "تم تغيير كلمة المرور بنجاح."));
+        return ResponseEntity.ok(Map.of("message", "Password updated successfully."));
     }
 }
 
