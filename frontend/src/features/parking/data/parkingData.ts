@@ -1,0 +1,164 @@
+export interface ParkingSpot {
+  id: number;
+  zone: string;
+  college: string;
+  collegeEn: string;
+  status: 'available' | 'occupied' | 'flex' | 'flex-share' | 'reserved' | 'faculty' | 'faculty-spot';
+  occupant: string | null;
+  car: string | null;
+  plate: string | null;
+  timeLeft: string | null;
+  distance: string;
+  isFlexEligible?: boolean;
+  isFaculty?: boolean;
+  isEV?: boolean;
+  isAccessible?: boolean;
+}
+
+export interface SimulatorStage {
+  step: number;
+  time: string;
+  title: string;
+  titleEn: string;
+  desc: string;
+  descEn: string;
+  badge?: string;
+  badgeEn?: string;
+  spot1Status: string;
+  spot1Car?: string;
+  spot1Occupant: string;
+  spot1Plate: string | null;
+  spot1Badge?: string;
+  eyadStatus?: string;
+  rakanStatus?: string;
+  actionText?: string;
+  carColor?: string | null;
+  notification?: string;
+  notificationEn?: string;
+  walletEyad?: number;
+  walletRakan?: number;
+  statusType?: 'success' | 'warning' | 'info';
+}
+
+export const INITIAL_PARKING_SPOTS: ParkingSpot[] = [
+  // Zone A: College of Computing & Engineering (1 - 10)
+  { id: 1, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'occupied', occupant: 'إياد الحربي', car: 'تويوتا كامري', plate: 'ب ط ك 1234', timeLeft: 'بريك بعد 15 د', distance: '30 م (ملاصق للمبنى)', isFlexEligible: true },
+  { id: 2, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '35 م', isFlexEligible: false },
+  { id: 3, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '40 م', isFlexEligible: false },
+  { id: 4, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'occupied', occupant: 'سعود الشهري', car: 'شيفروليه كابرس', plate: 'ع س ر 4040', timeLeft: '1 س 45 د', distance: '45 م', isFlexEligible: false },
+  { id: 5, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '50 م', isFlexEligible: false },
+  { id: 6, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'occupied', occupant: 'فيصل العطوي', car: 'لكزس ES', plate: 'ط ب ك 2030', timeLeft: '2 س 10 د', distance: '55 م', isFlexEligible: false },
+  { id: 7, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '60 م', isFlexEligible: false },
+  { id: 8, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'flex-share', occupant: 'محمد الحويطي (في بريك)', car: 'نيسان التيما', plate: 'ر ح ل 7711', timeLeft: 'متاح للتبادل: 2 س 15 د', distance: '65 م', isFlexEligible: true },
+  { id: 9, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '70 م', isFlexEligible: false },
+  { id: 10, zone: 'A', college: 'الحاسب والهندسة', collegeEn: 'Computing & Engineering', status: 'occupied', occupant: 'عمر البلوي', car: 'فورد تورس', plate: 'د ر ع 9090', timeLeft: '45 د', distance: '75 م', isFlexEligible: false },
+
+  // Zone B: College of Business & Management & Medicine (11 - 18)
+  { id: 11, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '40 م', isFlexEligible: false },
+  { id: 12, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'occupied', occupant: 'خالد العنزي', car: 'هوندا أكورد', plate: 'ن ج م 3321', timeLeft: '3 س', distance: '45 م', isFlexEligible: false },
+  { id: 13, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '50 م', isFlexEligible: false },
+  { id: 14, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'flex-share', occupant: 'سلطان القحطاني (بريك)', car: 'تويوتا أفالون', plate: 'ق ح ط 5050', timeLeft: 'متاح للتبادل: 1 س 50 د', distance: '55 م', isFlexEligible: true },
+  { id: 15, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '60 م', isFlexEligible: false },
+  { id: 16, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'occupied', occupant: 'ماجد الرشيدي', car: 'كيا K5', plate: 'س هـ م 1400', timeLeft: '1 س 15 د', distance: '65 م', isFlexEligible: false },
+  { id: 17, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '70 م', isFlexEligible: false },
+  { id: 18, zone: 'B', college: 'إدارة الأعمال والطب', collegeEn: 'Business & Medicine', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '75 م', isFlexEligible: false },
+
+  // Zone C: Faculty Members & Doctors (19 - 24)
+  { id: 19, zone: 'C', college: 'كادر التدريس (دكاترة)', collegeEn: 'Faculty Members', status: 'faculty-spot', occupant: 'د. عبد الله الغامدي', car: 'جينيسيس G80', plate: 'أ ح م 5501', timeLeft: 'محجوز يوم كامل', distance: '15 م (بوابة الإدارة)', isFaculty: true },
+  { id: 20, zone: 'C', college: 'كادر التدريس (دكاترة)', collegeEn: 'Faculty Members', status: 'faculty-spot', occupant: 'د. سمير كمال', car: 'مرسيدس E300', plate: 'س م ر 2020', timeLeft: 'محاضرة حتى 02:00 م', distance: '20 م', isFaculty: true },
+  { id: 21, zone: 'C', college: 'كادر التدريس (دكاترة)', collegeEn: 'Faculty Members', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '25 م', isFaculty: true },
+  { id: 22, zone: 'C', college: 'كادر التدريس (دكاترة)', collegeEn: 'Faculty Members', status: 'faculty-spot', occupant: 'د. ريم العمراني', car: 'بي إم دبليو X5', plate: 'ر ي م 7070', timeLeft: 'معمل حتى 01:00 م', distance: '20 م', isFaculty: true },
+  { id: 23, zone: 'C', college: 'كادر التدريس (دكاترة)', collegeEn: 'Faculty Members', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '25 م', isFaculty: true },
+  { id: 24, zone: 'C', college: 'كادر التدريس (دكاترة)', collegeEn: 'Faculty Members', status: 'faculty-spot', occupant: 'د. طارق السعيد', car: 'أودي A6', plate: 'ط ر ق 1111', timeLeft: 'اجتماع مجلس الكلية', distance: '25 م', isFaculty: true },
+
+  // Zone D: EV Charging & Accessible (25 - 30)
+  { id: 25, zone: 'D', college: 'شحن سيارات كهربائية EV', collegeEn: 'EV Fast Charging (50kW)', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '50 م', isEV: true },
+  { id: 26, zone: 'D', college: 'شحن سيارات كهربائية EV', collegeEn: 'EV Fast Charging (50kW)', status: 'occupied', occupant: 'لوسيد آير (طالب ماجستير)', car: 'Lucid Air Pure', plate: 'ل و س 2024', timeLeft: 'شحن 84% - متبقي 20 د', distance: '55 م', isEV: true },
+  { id: 27, zone: 'D', college: 'شحن سيارات كهربائية EV', collegeEn: 'EV Fast Charging (50kW)', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '60 م', isEV: true },
+  { id: 28, zone: 'D', college: 'مواقف ذوي الاحتياجات', collegeEn: 'Accessible Parking', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '10 م (منحدر مباشر)', isAccessible: true },
+  { id: 29, zone: 'D', college: 'مواقف ذوي الاحتياجات', collegeEn: 'Accessible Parking', status: 'occupied', occupant: 'طالب ذوي همم', car: 'تويوتا برادو', plate: 'أ م ل 1010', timeLeft: 'محاضرة حتى 12:00 ظ', distance: '10 م', isAccessible: true },
+  { id: 30, zone: 'D', college: 'شحن سيارات كهربائية EV', collegeEn: 'EV Fast Charging (50kW)', status: 'available', occupant: null, car: null, plate: null, timeLeft: null, distance: '65 م', isEV: true }
+];
+
+export const SIMULATOR_STAGES: SimulatorStage[] = [
+  {
+    step: 0,
+    time: '08:00 AM',
+    title: 'الصباح: إياد يركن في موقفه #01',
+    titleEn: 'Morning: Eyad parks in Spot #01',
+    desc: 'وصل الطالب إياد الحربي لحضور محاضرته الأولى في كلية الهندسة (08:00 - 10:00 ص) وركن سيارته كامري في موقفه المخصص #01. زميله راكان المطيري لا يزال في منزله ومحاضرته تبدأ الساعة 10:15 ص وفق جدول (أحد/ثلاثاء).',
+    descEn: 'Student Eyad arrived for his first lecture at College of Engineering (08:00 - 10:00 AM) and parked in Spot #01. Student Rakan is at home as his lecture starts at 10:15 AM (Sun/Tue schedule).',
+    spot1Status: 'occupied',
+    spot1Occupant: 'إياد الحربي',
+    spot1Badge: 'مشغول - إياد',
+    spot1Plate: 'ب ط ك 1234',
+    eyadStatus: 'يحضر المحاضرة',
+    rakanStatus: 'في المنزل (محاضرته 10:15)',
+    actionText: 'بدء مغادرة إياد للبريك',
+    carColor: '#116E63'
+  },
+  {
+    step: 1,
+    time: '10:00 AM',
+    title: 'إياد يغادر الجامعة في بريك (3 ساعات ونصف)',
+    titleEn: 'Eyad leaves for a 3.5h break',
+    desc: 'انتهت محاضرة إياد ولديه بريك طويل حتى الساعة 01:30 م. عند خروجه، رصدت كاميرا البوابة (ALPR) سيارته خارجة. قام نظام الذكاء الاصطناعي بتحويل الموقف #01 فوراً إلى "موقف متاح للتبادل الذكي (Flex Share)" بدلاً من تركه فارغاً ومهدوراً طوال اليوم!',
+    descEn: 'Eyad finished his morning lecture and has a 3.5h break until 01:30 PM. The gate ALPR camera detected his car exiting. FBSU AI automatically flagged Spot #01 as "Flex Share Available" instead of leaving it wasted all day!',
+    spot1Status: 'flex-share',
+    spot1Occupant: 'متاح للتبادل (بريك إياد)',
+    spot1Badge: 'تبادل ذكي - متاح للزملاء',
+    spot1Plate: null,
+    eyadStatus: 'غادر الجامعة (بريك 3.5 س)',
+    rakanStatus: 'في الطريق إلى الجامعة',
+    actionText: 'مطابقة الذكاء الاصطناعي مع راكان',
+    carColor: null
+  },
+  {
+    step: 2,
+    time: '10:05 AM',
+    title: 'خوارزمية الذكاء الاصطناعي تطابق جدول راكان',
+    titleEn: 'AI algorithm matches Rakan schedule',
+    desc: 'الذكاء الاصطناعي المرتبط بالبوابة الأكاديمية حلل الجداول، واكتشف أن الطالب راكان لديه كلاس الساعة 10:15 ص في كلية الحاسب (ملاصقة للموقف #01). أرسل النظام إشعاراً فورياً لهاتفه: "تم حجز موقف رقم #01 لك حتى 01:00 م بتعرفة ذكية مخفضة 5.75 ر.س/ساعة"!',
+    descEn: 'AI parsed academic schedules and found student Rakan has a class at 10:15 AM at Computing College (next to Spot #01). It instantly notified Rakan and reserved Spot #01 for his exact time window (10:15 - 01:00)!',
+    spot1Status: 'flex-share',
+    spot1Occupant: 'محجوز لراكان (مؤقت)',
+    spot1Badge: 'حجز ذكي مؤكد لراكان',
+    spot1Plate: 'د ل س 8892',
+    eyadStatus: 'في بريك (يحصل على رصيد محفظة)',
+    rakanStatus: 'تم توجيهه إلى موقف #01',
+    actionText: 'وصول سيارة راكان إلى البوابة',
+    carColor: '#0b6d87'
+  },
+  {
+    step: 3,
+    time: '10:15 AM',
+    title: 'وصول راكان: كاميرا البوابة تتعرف على اللوحة وترفع الحاجز',
+    titleEn: 'Rakan arrives: ALPR scans plate & opens gate',
+    desc: 'وصل راكان إلى بوابة الجامعة الرئيسية. كاميرا الذكاء الاصطناعي قرأت لوحته (د ل س 8892)، تحققت من الحجز الذكي، ورفعت ذراع البوابة تلقائياً مع شاشة إرشادية: "أهلاً راكان - توجه للموقف #01". ركن راكان في ثوانٍ دون البحث أو الدوران في المواقف!',
+    descEn: 'Rakan arrived at the main gate. The AI camera scanned his plate (D L S 8892), validated his flex pass, and lifted the barrier automatically. Rakan parked in seconds without searching!',
+    spot1Status: 'occupied',
+    spot1Occupant: 'راكان المطيري',
+    spot1Badge: 'مشغول - راكان',
+    spot1Plate: 'د ل س 8892',
+    eyadStatus: 'بريك خارجي مستمر',
+    rakanStatus: 'راكن في الموقف #01',
+    actionText: 'انتهاء راكان وعودة إياد',
+    carColor: '#0b6d87'
+  },
+  {
+    step: 4,
+    time: '01:30 PM',
+    title: 'راكان يغادر وإياد يعود ويكسب 17.25 ر.س!',
+    titleEn: 'Rakan leaves, Eyad returns & earns 17.25 SAR!',
+    desc: 'غادر راكان الساعة 01:00 م بعد انتهاء محاضرته. عاد إياد الساعة 01:30 م لحضور محاضرته المسائية ليجد موقفه جاهزاً ونظيفاً! والأروع: أضاف النظام 17.25 ر.س كاش في محفظة إياد مكافأة لمشاركة موقفه (مما خفض تكلفة اشتراكه الشهري بنسبة 50%)!',
+    descEn: 'Rakan finished class and left at 01:00 PM. Eyad returned at 01:30 PM to find his spot ready. Best of all: the system credited 17.25 SAR to Eyad’s university wallet for sharing, saving him 50% on his monthly pass!',
+    spot1Status: 'occupied',
+    spot1Occupant: 'إياد الحربي (مكافأة 17.25 ر.س)',
+    spot1Badge: 'إياد - ربح 17.25 ر.س',
+    spot1Plate: 'ب ط ك 1234',
+    eyadStatus: 'عاد للموقف + رصيد +17.25 ر.س',
+    rakanStatus: 'أنهى يومه بنجاح ودون عناء',
+    actionText: 'إعادة تشغيل المحاكاة',
+    carColor: '#116E63'
+  }
+];

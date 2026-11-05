@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { App } from './App';
 import { tokenStorage } from '../shared/http/tokenStorage';
 
-describe('App Integration, Auth & Route Guard Tests (P3-03 to P3-05)', () => {
+describe('App Full Integration & Feature Navigation Tests', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.lang = 'ar';
@@ -12,21 +12,20 @@ describe('App Integration, Auth & Route Guard Tests (P3-03 to P3-05)', () => {
     vi.clearAllMocks();
   });
 
-  it('renders guest state when no JWT tokens are present', async () => {
+  it('renders brand header, top ribbon, hero section, and live parking map by default', () => {
     render(<App initialTab="map" />);
 
     expect(screen.getByTestId('top-ribbon')).toBeInTheDocument();
     expect(screen.getByTestId('main-header')).toBeInTheDocument();
-
-    const guestStatus = await screen.findByText(/زائر غير مسجل/i);
-    expect(guestStatus).toBeInTheDocument();
+    expect(screen.getByTestId('parking-lot-view')).toBeInTheDocument();
+    expect(screen.getByText(/المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان/i)).toBeInTheDocument();
   });
 
-  it('opens and closes AuthModal when clicking login button', async () => {
+  it('opens and closes AuthModal when clicking header auth button', () => {
     render(<App initialTab="map" />);
 
-    const openLoginBtn = screen.getByTestId('open-login-btn');
-    fireEvent.click(openLoginBtn);
+    const authBtn = screen.getByTitle('الملف الشخصي وتبديل المستخدم');
+    fireEvent.click(authBtn);
 
     expect(screen.getByTestId('auth-modal-overlay')).toBeInTheDocument();
     expect(screen.getByTestId('login-form')).toBeInTheDocument();
@@ -37,24 +36,31 @@ describe('App Integration, Auth & Route Guard Tests (P3-03 to P3-05)', () => {
     expect(screen.queryByTestId('auth-modal-overlay')).not.toBeInTheDocument();
   });
 
-  it('displays auth-required guard when navigating to guarded admin tab as a guest', async () => {
+  it('navigates seamlessly between parking and campus views via category subnav', () => {
     render(<App initialTab="map" />);
 
-    const adminPanelBtn = screen.getByRole('button', { name: /لوحة المسؤول \(محمية\)/i });
-    fireEvent.click(adminPanelBtn);
+    // Click simulator
+    const simBtn = screen.getByRole('button', { name: /محاكاة التبادل Flex-Share/i });
+    fireEvent.click(simBtn);
+    expect(screen.getByTestId('simulator-view')).toBeInTheDocument();
+
+    // Click Gate ALPR
+    const gateBtn = screen.getByRole('button', { name: /بوابة وكاميرات ALPR/i });
+    fireEvent.click(gateBtn);
+    expect(screen.getByTestId('alpr-gate-view')).toBeInTheDocument();
+
+    // Click Share & Earn
+    const shareBtn = screen.getByRole('button', { name: /شارك موقفك واربح/i });
+    fireEvent.click(shareBtn);
+    expect(screen.getByTestId('share-spot-view')).toBeInTheDocument();
+  });
+
+  it('displays auth-required guard when navigating to guarded admin tab as an unauthorized user', async () => {
+    render(<App initialTab="admin-panel" />);
 
     const authRequired = await screen.findByTestId('auth-required');
     expect(authRequired).toBeInTheDocument();
     expect(screen.getByText('تسجيل الدخول مطلوب')).toBeInTheDocument();
-  });
-
-  it('renders SaudiPlate components on the home view', () => {
-    render(<App initialTab="map" />);
-
-    const plates = screen.getAllByTestId('saudi-plate');
-    expect(plates.length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText('ط ر ق')).toBeInTheDocument();
-    expect(screen.getByText('أ ب ح')).toBeInTheDocument();
   });
 
   it('stores and retrieves JWT tokens via tokenStorage correctly', () => {
@@ -71,7 +77,7 @@ describe('App Integration, Auth & Route Guard Tests (P3-03 to P3-05)', () => {
     expect(tokenStorage.getRefreshToken()).toBeNull();
   });
 
-  it('toggles language and updates UI properly with AuthProvider wrapper', async () => {
+  it('toggles language and updates UI direction correctly', async () => {
     render(<App initialTab="map" />);
 
     const langToggleBtn = screen.getByTitle('التحويل إلى اللغة الإنجليزية');
@@ -82,6 +88,5 @@ describe('App Integration, Auth & Route Guard Tests (P3-03 to P3-05)', () => {
 
     expect(document.documentElement.lang).toBe('en');
     expect(document.documentElement.dir).toBe('ltr');
-    expect(screen.getByText(/Authentication Status:/i)).toBeInTheDocument();
   });
 });

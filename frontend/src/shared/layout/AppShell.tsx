@@ -10,6 +10,7 @@ export interface AppShellProps {
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
   notificationCount?: number;
+  onOpenNotifications?: (() => void) | undefined;
   onOpenAuth?: (() => void) | undefined;
   onOpenWallet?: (() => void) | undefined;
   children: ReactNode;
@@ -20,6 +21,7 @@ export const AppShell: FC<AppShellProps> = ({
   onTabChange,
   currentUser,
   notificationCount = 3,
+  onOpenNotifications,
   onOpenAuth,
   onOpenWallet,
   children,
@@ -38,6 +40,7 @@ export const AppShell: FC<AppShellProps> = ({
         onTabChange={onTabChange}
         currentUser={currentUser}
         notificationCount={notificationCount}
+        onOpenNotifications={onOpenNotifications}
         onOpenAuth={onOpenAuth}
         onOpenWallet={onOpenWallet}
       />

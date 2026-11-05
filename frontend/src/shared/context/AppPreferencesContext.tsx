@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { updateDocumentDirection, SupportedLanguage } from '../i18n/i18n';
+import { soundFX } from '../utils/sound';
 
 export type ThemeMode = 'dark' | 'light';
 
@@ -60,6 +61,7 @@ export const AppPreferencesProvider: FC<{ children: ReactNode }> = ({ children }
   // Synchronize sound
   useEffect(() => {
     localStorage.setItem('fbsu_sound', soundEnabled ? 'true' : 'false');
+    soundFX.enabled = soundEnabled;
   }, [soundEnabled]);
 
   const setLanguage = (newLang: SupportedLanguage) => setLang(newLang);
