@@ -13,6 +13,10 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
 
     List<Vehicle> findByUserId(UUID userId);
 
+    List<Vehicle> findByUserIdAndActiveTrue(UUID userId);
+
+    Optional<Vehicle> findByIdAndUserId(UUID id, UUID userId);
+
     List<Vehicle> findByUniversityId(UUID universityId);
 
     Optional<Vehicle> findByUniversityIdAndPlateLettersArAndPlateDigits(
@@ -21,4 +25,5 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
     boolean existsByUniversityIdAndPlateLettersArAndPlateDigits(
             UUID universityId, String plateLettersAr, String plateDigits);
 }
+
 

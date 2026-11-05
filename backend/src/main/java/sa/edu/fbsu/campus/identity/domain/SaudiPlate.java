@@ -104,6 +104,10 @@ public class SaudiPlate implements Serializable {
         return new SaudiPlate(lettersAr, digits);
     }
 
+    public static SaudiPlate of(String lettersAr, String digits) {
+        return new SaudiPlate(lettersAr, digits);
+    }
+
     public static SaudiPlate fromEnglish(String lettersEn, String digits) {
         if (lettersEn == null) {
             throw new IllegalArgumentException("English letters must not be null");
@@ -145,8 +149,16 @@ public class SaudiPlate implements Serializable {
         return lettersAr + " " + digits;
     }
 
+    public String formattedAr() {
+        return toFormattedAr();
+    }
+
     public String toFormattedEn() {
         return lettersEn + " " + digits;
+    }
+
+    public String formattedEn() {
+        return toFormattedEn();
     }
 
     @Override

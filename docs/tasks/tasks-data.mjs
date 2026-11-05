@@ -111,7 +111,7 @@ export const tasks = [
     tests: ['Unit', 'Service', 'API (MockMvc)', 'Security matrix', 'Token tamper/expiry'], blockedBy: ['Q3'],
   }),
   T('P2-04', 'Profile & vehicle API', {
-    status: 'In Progress', pr: 'Branch feature/P2-04-profile-vehicles-api (جاري البدء)',
+    status: 'Done', pr: 'PR (feature/P2-04-profile-vehicles-api)',
     pri: 'Medium', cx: 'M', deps: ['P2-03'], branch: 'feature/P2-04-profile-vehicles-api',
     goal: 'عرض وتعديل الملف الشخصي وإدارة السيارات (بياناتك أنت فقط).',
     files: ['identity/api/MeController.java', 'identity/application/*', 'DTOs', 'tests'],
@@ -120,6 +120,7 @@ export const tasks = [
     tests: ['Service', 'API', 'Security (IDOR)'], blockedBy: [],
   }),
   T('P2-05', 'Dev/demo seed data', {
+    status: 'Done', pr: 'PR (feature/P2-04-profile-vehicles-api)',
     pri: 'Low', cx: 'S', deps: ['P2-03', 'Q17'], branch: 'feature/P2-05-dev-seed',
     goal: 'بيانات تجريبية للتطوير فقط (مستخدمون/كليات/مبانٍ) مشتقة من الواجهة الحالية وبعد إخفاء الهوية.',
     files: ['backend/.../DevSeeder.java', 'seed resources'],
@@ -130,6 +131,7 @@ export const tasks = [
 
   // ---------------- P3 ----------------
   T('P3-01', 'Design tokens, global styles & app shell', {
+    status: 'In Progress', pr: 'Branch feature/P3-01-app-shell (جاري البدء)',
     pri: 'High', cx: 'L', deps: ['P1-02'], branch: 'feature/P3-01-app-shell',
     goal: 'نقل style.css والخطوط وبناء الـ Header والـ Navigation والـ Footer والـ Router بحيث يطابق التصميم الحالي.',
     files: ['frontend/src/styles/*', 'frontend/src/app/*', 'frontend/src/shared/layout/*'],
