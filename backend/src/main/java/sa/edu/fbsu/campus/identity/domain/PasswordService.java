@@ -43,3 +43,4 @@ public class PasswordService {
         return STRONG_PASSWORD_PATTERN.matcher(password).matches();
     }
 }
+

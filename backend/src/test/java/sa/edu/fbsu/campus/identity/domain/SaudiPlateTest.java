@@ -49,7 +49,7 @@ class SaudiPlateTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"1", "42", "312", "9999"})
+    @ValueSource(strings = { "1", "42", "312", "9999" })
     @DisplayName("Should accept valid digit counts (1 to 4 digits)")
     void shouldAcceptValidDigitCounts(String digits) {
         SaudiPlate plate = SaudiPlate.fromArabic("س ل م", digits);
@@ -57,7 +57,7 @@ class SaudiPlateTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "   ", "12345", "abcd", "-5", "12a"})
+    @ValueSource(strings = { "", "   ", "12345", "abcd", "-5", "12a" })
     @DisplayName("Should reject invalid digit patterns")
     void shouldRejectInvalidDigits(String invalidDigits) {
         assertThatThrownBy(() -> SaudiPlate.fromArabic("ط ر ق", invalidDigits))
@@ -65,7 +65,7 @@ class SaudiPlateTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "ط", "ط ر", "ط ر ق م", "WXYZ", "123"})
+    @ValueSource(strings = { "", "ط", "ط ر", "ط ر ق م", "WXYZ", "123" })
     @DisplayName("Should reject invalid letter counts or unsupported letters")
     void shouldRejectInvalidLetters(String invalidLetters) {
         assertThatThrownBy(() -> SaudiPlate.fromArabic(invalidLetters, "1234"))

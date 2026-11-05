@@ -191,3 +191,4 @@ public class User extends BaseTenantEntity {
         this.roles = roles;
     }
 }
+
