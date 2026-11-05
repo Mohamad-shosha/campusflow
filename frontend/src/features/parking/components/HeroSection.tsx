@@ -330,3 +330,4 @@ export const HeroSection: FC<HeroSectionProps> = ({
     </section>
   );
 };
+

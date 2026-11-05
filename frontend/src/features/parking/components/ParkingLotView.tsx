@@ -208,3 +208,4 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
     </div>
   );
 };
+

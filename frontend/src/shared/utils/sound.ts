@@ -145,3 +145,4 @@ export class AudioSynthesizer {
 }
 
 export const soundFX = new AudioSynthesizer();
+

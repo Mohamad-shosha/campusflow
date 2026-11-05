@@ -156,3 +156,4 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
     </div>
   );
 };
+

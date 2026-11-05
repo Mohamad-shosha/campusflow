@@ -31,6 +31,7 @@ export const AuthModal: FC<AuthModalProps> = ({
   const {
     register: loginField,
     handleSubmit: handleLoginSubmit,
+    setValue: setLoginValue,
     formState: { errors: loginErrors, isSubmitting: isLoggingIn },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -239,6 +240,75 @@ export const AuthModal: FC<AuthModalProps> = ({
               <Lock size={18} />
               <span>{isLoggingIn ? 'جاري التحقق...' : 'تسجيل الدخول (FBSU SSO)'}</span>
             </button>
+
+            {/* Quick 1-Click Demo Personas */}
+            <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+              <div
+                style={{
+                  fontSize: '0.78rem',
+                  color: 'var(--text-muted)',
+                  marginBottom: '0.5rem',
+                  textAlign: 'center',
+                  fontWeight: 600,
+                }}
+              >
+                ⚡ تجربة سريعة بنقرة واحدة (حسابات العرض التفاعلي)
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={isLoggingIn}
+                  onClick={() => {
+                    setLoginValue('identifier', '20210045');
+                    setLoginValue('password', 'FbsuDev2026!');
+                    onLogin({ identifier: '20210045', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                  }}
+                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                >
+                  🎓 <strong>إياد الحربي</strong> (طالب)
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={isLoggingIn}
+                  onClick={() => {
+                    setLoginValue('identifier', '20220088');
+                    setLoginValue('password', 'FbsuDev2026!');
+                    onLogin({ identifier: '20220088', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                  }}
+                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                >
+                  🚗 <strong>راكان المطيري</strong> (طالب)
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={isLoggingIn}
+                  onClick={() => {
+                    setLoginValue('identifier', 'FAC-8821');
+                    setLoginValue('password', 'FbsuDev2026!');
+                    onLogin({ identifier: 'FAC-8821', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                  }}
+                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                >
+                  👩‍🏫 <strong>د. رغد النفيعي</strong> (أستاذ)
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={isLoggingIn}
+                  onClick={() => {
+                    setLoginValue('identifier', 'ADM-1001');
+                    setLoginValue('password', 'FbsuDev2026!');
+                    onLogin({ identifier: 'ADM-1001', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                  }}
+                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                >
+                  🛡️ <strong>إدارة النظام</strong> (Admin)
+                </button>
+              </div>
+            </div>
           </form>
         )}
 

@@ -38,3 +38,4 @@ export const CarSvg: FC<CarSvgProps> = ({ color = '#116E63', className = 'car-sv
     </svg>
   );
 };
+

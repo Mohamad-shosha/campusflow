@@ -121,6 +121,21 @@ public class DevSeeder implements CommandLineRunner {
                 UserType.STAFF, Role.SECURITY_OFFICER, "0502220002", null, "الأمن والسلامة الجامعية", null, null, null);
 
         // 5.3 Faculty Members
+        seedUser(uniId, "FAC-8821", "r.alnefaie@fbsu.edu.sa", defaultHashedPass,
+                "د. رغد بنت فهد النفيعي", "Dr. Raghad F. Al-Nefaie",
+                UserType.FACULTY, Role.FACULTY, "0561234567", ccis.getId(), "هندسة البرمجيات والذكاء الاصطناعي",
+                "ن م ر", "3301", "Audi A6 2024");
+
+        seedUser(uniId, "FAC-7700", "m.mezher@fbsu.edu.sa", defaultHashedPass,
+                "د. محمد مزهر", "Dr. Mohammad Mezher",
+                UserType.FACULTY, Role.FACULTY, "0567654321", ccis.getId(), "حوسبة سحابية ونظم موزعة",
+                "س ع د", "7700", "BMW 520i 2023");
+
+        seedUser(uniId, "FAC-9912", "a.ghamdi@fbsu.edu.sa", defaultHashedPass,
+                "د. عبدالله الغامدي", "Dr. Abdullah Al-Ghamdi",
+                UserType.FACULTY, Role.FACULTY, "0569876543", ccis.getId(), "شبكات الحاسب وأمن المعلومات",
+                "ط ر ق", "9912", "Mercedes E300 2023");
+
         User drFahad = seedUser(uniId, "FAC-3001", "fahad.atwi@fbsu.edu.sa", defaultHashedPass,
                 "د. فهد بن أحمد العطوي", "Dr. Fahad A. Al-Atwi",
                 UserType.FACULTY, Role.FACULTY, "0503330003", ccis.getId(), "ذكاء اصطناعي",
@@ -131,7 +146,17 @@ public class DevSeeder implements CommandLineRunner {
                 UserType.FACULTY, Role.FACULTY, "0503330004", eng.getId(), "هندسة مدنية",
                 "س ع د", "2020", "Genesis G80");
 
-        // 5.4 Students with Vehicles
+        // 5.4 Students with Vehicles (Prototype Personas & Demo Users)
+        seedUser(uniId, "20210045", "eyad.harbi@fbsu.edu.sa", defaultHashedPass,
+                "إياد الحربي", "Eyad Al-Harbi",
+                UserType.STUDENT, Role.STUDENT, "0501234567", eng.getId(), "هندسة مدنية",
+                "ب ط ك", "5021", "Toyota Camry 2022");
+
+        seedUser(uniId, "20220088", "rakan.mutairi@fbsu.edu.sa", defaultHashedPass,
+                "راكان المطيري", "Rakan Al-Mutairi",
+                UserType.STUDENT, Role.STUDENT, "0559876543", ccis.getId(), "هندسة البرمجيات",
+                "د ر ع", "8812", "Hyundai Tucson 2023");
+
         seedUser(uniId, "STD-202410101", "ahmed.student@fbsu.edu.sa", defaultHashedPass,
                 "أحمد بن منصور العطوي", "Ahmed M. Al-Atwi",
                 UserType.STUDENT, Role.STUDENT, "0504440001", ccis.getId(), "هندسة البرمجيات",
@@ -147,8 +172,42 @@ public class DevSeeder implements CommandLineRunner {
                 UserType.STUDENT, Role.STUDENT, "0504440003", bus.getId(), "إدارة الأعمال الدولية",
                 "د ر ع", "9090", "Kia K5 2023");
 
-        // 6. Tuition Invoices for Demo Student (STD-202410101)
+        // 6. Tuition Invoices for Demo Students
         termRepository.findByUniversityIdAndCode(uniId, "2026-FALL").ifPresent(fallTerm -> {
+            if (tuitionInvoiceRepository.findByInvoiceNumber("INV-2026-ENG-101").isEmpty()) {
+                userRepository.findByUniversityNumber("20210045").ifPresent(eyad -> {
+                    tuitionInvoiceRepository.save(new TuitionInvoice(
+                            uniId,
+                            eyad,
+                            fallTerm,
+                            "INV-2026-ENG-101",
+                            new BigDecimal("650.00"),
+                            LocalDate.of(2026, 11, 28)
+                    ));
+                    tuitionInvoiceRepository.save(new TuitionInvoice(
+                            uniId,
+                            eyad,
+                            fallTerm,
+                            "INV-2026-ENG-102",
+                            new BigDecimal("1850.00"),
+                            LocalDate.of(2026, 12, 25)
+                    ));
+                });
+            }
+
+            if (tuitionInvoiceRepository.findByInvoiceNumber("INV-2026-CCIS-101").isEmpty()) {
+                userRepository.findByUniversityNumber("20220088").ifPresent(rakan -> {
+                    tuitionInvoiceRepository.save(new TuitionInvoice(
+                            uniId,
+                            rakan,
+                            fallTerm,
+                            "INV-2026-CCIS-101",
+                            new BigDecimal("500.00"),
+                            LocalDate.of(2026, 11, 30)
+                    ));
+                });
+            }
+
             if (tuitionInvoiceRepository.findByInvoiceNumber("INV-2026-CCIS-001").isEmpty()) {
                 userRepository.findByUniversityNumber("STD-202410101").ifPresent(student -> {
                     tuitionInvoiceRepository.save(new TuitionInvoice(

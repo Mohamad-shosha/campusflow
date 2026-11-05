@@ -460,3 +460,4 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
     </div>
   );
 };
+

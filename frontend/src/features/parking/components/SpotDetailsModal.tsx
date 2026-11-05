@@ -173,3 +173,4 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
     </div>
   );
 };
+

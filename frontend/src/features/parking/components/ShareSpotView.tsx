@@ -245,3 +245,4 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
     </div>
   );
 };
+

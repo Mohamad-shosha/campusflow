@@ -352,3 +352,4 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
     </div>
   );
 };
+

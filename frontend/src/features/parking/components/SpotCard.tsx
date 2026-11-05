@@ -135,3 +135,4 @@ export const SpotCard: FC<SpotCardProps> = ({
     </div>
   );
 };
+
