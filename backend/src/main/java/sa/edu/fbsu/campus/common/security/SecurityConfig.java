@@ -80,9 +80,9 @@ public class SecurityConfig {
 
             ProblemDetail pd = ProblemDetail.forStatusAndDetail(
                     HttpStatus.UNAUTHORIZED,
-                    "يجب تسجيل الدخول أولاً للوصول إلى هذا المورد المصرح به."
+                    "Full authentication is required to access this protected institutional resource."
             );
-            pd.setTitle("غير مصرح به (Unauthorized)");
+            pd.setTitle("Unauthorized");
             pd.setType(URI.create("https://fbsu.edu.sa/errors/unauthorized"));
             pd.setProperty("timestamp", Instant.now());
             pd.setProperty("path", request.getRequestURI());
@@ -100,9 +100,9 @@ public class SecurityConfig {
 
             ProblemDetail pd = ProblemDetail.forStatusAndDetail(
                     HttpStatus.FORBIDDEN,
-                    "ليس لديك الصلاحيات الكافية (Role) للوصول إلى هذا المورد."
+                    "Access denied. You do not possess the required institutional roles or authorities to access this resource."
             );
-            pd.setTitle("محظور الوصول (Forbidden)");
+            pd.setTitle("Forbidden");
             pd.setType(URI.create("https://fbsu.edu.sa/errors/forbidden"));
             pd.setProperty("timestamp", Instant.now());
             pd.setProperty("path", request.getRequestURI());

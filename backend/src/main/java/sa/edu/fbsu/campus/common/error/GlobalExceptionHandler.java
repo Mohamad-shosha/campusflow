@@ -23,9 +23,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleValidationExceptions(MethodArgumentNotValidException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
-                "فشل التحقق من صحة المدخلات. يرجى مراجعة الحقول المطلوبة."
+                "Validation failed for one or more fields. Please review required input."
         );
-        problemDetail.setTitle("خطأ في البيانات المدخلة");
+        problemDetail.setTitle("Validation Error");
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/validation-error"));
         problemDetail.setProperty("timestamp", Instant.now());
 
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED,
                 ex.getMessage()
         );
-        problemDetail.setTitle("بيانات الدخول غير صحيحة");
+        problemDetail.setTitle("Invalid Credentials");
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/unauthorized"));
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetail);
@@ -54,9 +54,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleAccessDenied(AccessDeniedException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.FORBIDDEN,
-                "ليس لديك الصلاحيات الكافية للوصول إلى هذا المورد."
+                "Access denied. You do not possess the required permissions to access this resource."
         );
-        problemDetail.setTitle("وصول محظور");
+        problemDetail.setTitle("Access Forbidden");
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/forbidden"));
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
-        problemDetail.setTitle("طلب غير صالح");
+        problemDetail.setTitle("Bad Request");
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/bad-request"));
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
-        problemDetail.setTitle("العنصر غير موجود");
+        problemDetail.setTitle("Resource Not Found");
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/resource-not-found"));
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
@@ -90,9 +90,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleNoResourceFound(NoResourceFoundException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
-                "المسار المطلوب غير موجود: " + ex.getResourcePath()
+                "The requested resource path was not found: " + ex.getResourcePath()
         );
-        problemDetail.setTitle("المسار غير موجود");
+        problemDetail.setTitle("Path Not Found");
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/not-found"));
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
@@ -102,9 +102,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleGenericException(Exception ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "حدث خطأ غير متوقع في الخادم. يرجى مراجعة الدعم الفني."
+                "An unexpected server error occurred. Please contact institutional technical support."
         );
-        problemDetail.setTitle("خطأ في الخادم");
+        problemDetail.setTitle("Internal Server Error");
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/internal-server-error"));
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);

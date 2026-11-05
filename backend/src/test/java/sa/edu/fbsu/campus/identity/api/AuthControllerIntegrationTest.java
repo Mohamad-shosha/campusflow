@@ -142,6 +142,6 @@ class AuthControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginReq)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.title").value("بيانات الدخول غير صحيحة"));
+                .andExpect(jsonPath("$.title").value("Invalid Credentials"));
     }
 }

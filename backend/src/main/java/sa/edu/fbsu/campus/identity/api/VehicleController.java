@@ -21,7 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/vehicles")
 @SecurityRequirement(name = "BearerAuth")
-@Tag(name = "Vehicles Management", description = "إدارة سيارات منسوبي الجامعة ولوحات المركبات السعودية مع حماية IDOR")
+@Tag(name = "Vehicles Management", description = "Campus vehicle permits and Saudi license plate operations with IDOR authorization protection")
 public class VehicleController {
 
     private final VehicleService vehicleService;
@@ -31,14 +31,14 @@ public class VehicleController {
     }
 
     @GetMapping
-    @Operation(summary = "قائمة سيارات المستخدم", description = "عرض كافة المركبات النشطة المسجلة لحساب المستخدم الحالي")
+    @Operation(summary = "List Authenticated User Vehicles", description = "Retrieve all active registered vehicles associated with the current user account")
     public ResponseEntity<List<VehicleDto>> getMyVehicles(@AuthenticationPrincipal UserPrincipal principal) {
         List<VehicleDto> vehicles = vehicleService.getUserVehicles(principal.getUserId());
         return ResponseEntity.ok(vehicles);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "تفاصيل مركبة محددة", description = "جلب بيانات مركبة مع التحقق الصارم من ملكية المستخدم لها")
+    @Operation(summary = "Get Vehicle Details", description = "Retrieve details for a specific registered vehicle with strict user ownership verification")
     public ResponseEntity<VehicleDto> getVehicle(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID id) {
@@ -47,7 +47,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    @Operation(summary = "تسجيل مركبة جديدة", description = "تسجيل سيارة مع التحقق من صحة لوحة المرور السعودية وعدم تكرارها")
+    @Operation(summary = "Register New Vehicle", description = "Register a new vehicle with Moroor Saudi license plate validation and uniqueness checks")
     public ResponseEntity<VehicleDto> addVehicle(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody CreateVehicleRequest request) {
@@ -56,7 +56,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "تعديل بيانات مركبة", description = "تعديل الموديل أو اللون أو تعيينها كسيارة أساسية")
+    @Operation(summary = "Update Vehicle", description = "Update vehicle model, color, or primary designation with ownership enforcement")
     public ResponseEntity<VehicleDto> updateVehicle(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID id,
@@ -66,7 +66,7 @@ public class VehicleController {
     }
 
     @PatchMapping("/{id}/primary")
-    @Operation(summary = "تعيين المركبة كسيارة أساسية", description = "جعل هذه المركبة هي الأساسية لدخول بوابات الجامعة الذكية")
+    @Operation(summary = "Designate Primary Vehicle", description = "Set vehicle as the primary registered vehicle for automated campus gate access")
     public ResponseEntity<VehicleDto> setPrimary(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID id) {
@@ -75,12 +75,12 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "حذف مركبة", description = "إلغاء تفعيل المركبة من سجلات المستخدم")
+    @Operation(summary = "Deactivate Vehicle", description = "Soft-delete and revoke campus gate permit for the specified vehicle")
     public ResponseEntity<Map<String, String>> deleteVehicle(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID id) {
         vehicleService.deleteVehicle(principal.getUserId(), id);
-        return ResponseEntity.ok(Map.of("message", "تم حذف المركبة وإلغاء تفعيلها بنجاح."));
+        return ResponseEntity.ok(Map.of("message", "Vehicle successfully deactivated."));
     }
 }
 

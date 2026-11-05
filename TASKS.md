@@ -9,26 +9,26 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 12 تاسك ✅
-- **قيد العمل حالياً (In Progress):** 1 تاسك ⏳
+- **المنجز بالكامل (Done):** 13 تاسك ✅
+- **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
 - **المتبقي للبدء (Backlog):** 40 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **23%**
+- **نسبة الإنجاز الإجمالية للمشروع:** **25%**
 
-> 📌 **التاسك الشغالين عليه دلوقتي:** **`P3-01` — Design tokens, global styles & app shell** (الفرع: `feature/P3-01-app-shell`)
+
 
 | Phase | الاسم | إجمالي | منجز (Done) ✅ | قيد التنفيذ ⏳ | متبقي 📋 |
 |---|---|---|---|---|---|
 | P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
-| P3 | Frontend Foundation (React) | 5 | 0 | 1 | 4 |
+| P3 | Frontend Foundation (React) | 5 | 1 | 0 | 4 |
 | P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **12** | **1** | **40** |
+| **الإجمالي** | | **53** | **13** | **0** | **40** |
 
 ---
 
@@ -178,9 +178,9 @@
 
 ### P3-01 — Design tokens, global styles & app shell
 - **ماذا سيعمل:** نقل style.css والخطوط وبناء الـ Header والـ Navigation والـ Footer والـ Router بحيث يطابق التصميم الحالي.
-- **Priority:** High · **Complexity:** L · **Status:** ⏳ In Progress (جاري العمل)
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P1-02
-- **Git Branch:** `feature/P3-01-app-shell` · **Pull Request:** Branch feature/P3-01-app-shell (جاري البدء)
+- **Git Branch:** `feature/P3-01-app-shell` · **Pull Request:** PR (feature/P3-01-app-shell)
 - **الملفات المتوقعة:** `frontend/src/styles/*`، `frontend/src/app/*`، `frontend/src/shared/layout/*`
 - **Implementation Steps:** 1) نسخ CSS والخطوط 2) AppShell/Header/NavDropdown/Footer 3) Router skeleton 4) Screenshot baseline
 - **Acceptance Criteria:** مطابقة بصرية (dark+light, RTL, 3 مقاسات)
