@@ -93,7 +93,7 @@ export const tasks = [
     tests: ['Repository tests (Testcontainers)', 'Migration test'], blockedBy: ['D-1'],
   }),
   T('P2-02', 'Users, roles, vehicles schema & domain', {
-    status: 'In Progress', pr: 'Branch feature/P2-02-users-schema (جاري التنفيذ)',
+    status: 'Done', pr: 'PR (feature/P2-02-users-schema)',
     pri: 'High', cx: 'M', deps: ['P2-01'], branch: 'feature/P2-02-users-schema',
     goal: 'جداول المستخدمين والأدوار والسيارات وتوكنات refresh، مع تجزئة كلمات المرور والتحقق من لوحة السيارة السعودية.',
     files: ['db/migration/V3__identity.sql', 'identity/domain/*', 'identity/infra/*'],
@@ -102,6 +102,7 @@ export const tasks = [
     tests: ['Unit (plate, password)', 'Repository tests'], blockedBy: [],
   }),
   T('P2-03', 'Authentication API (register, login, refresh, logout) + RBAC', {
+    status: 'In Progress', pr: 'Branch feature/P2-03-authentication (جاري البدء)',
     pri: 'Critical', cx: 'L', deps: ['P2-02', 'Q3'], branch: 'feature/P2-03-authentication',
     goal: 'تسجيل ودخول وتجديد وخروج بـ JWT، مع صلاحيات الأدوار وrate limiting.',
     files: ['common/security/*', 'identity/api/AuthController.java', 'identity/application/AuthService.java', 'DTOs', 'tests'],

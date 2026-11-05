@@ -9,18 +9,18 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 8 تاسك ✅
+- **المنجز بالكامل (Done):** 9 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 1 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 44 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **15%**
+- **المتبقي للبدء (Backlog):** 43 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **17%**
 
-> 📌 **التاسك الشغالين عليه دلوقتي:** **`P2-02` — Users, roles, vehicles schema & domain** (الفرع: `feature/P2-02-users-schema`)
+> 📌 **التاسك الشغالين عليه دلوقتي:** **`P2-03` — Authentication API (register, login, refresh, logout) + RBAC** (الفرع: `feature/P2-03-authentication`)
 
 | Phase | الاسم | إجمالي | منجز (Done) ✅ | قيد التنفيذ ⏳ | متبقي 📋 |
 |---|---|---|---|---|---|
 | P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
-| P2 | Identity & Campus Core | 5 | 1 | 1 | 3 |
+| P2 | Identity & Campus Core | 5 | 2 | 1 | 2 |
 | P3 | Frontend Foundation (React) | 5 | 0 | 0 | 5 |
 | P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
@@ -28,7 +28,7 @@
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **8** | **1** | **44** |
+| **الإجمالي** | | **53** | **9** | **1** | **43** |
 
 ---
 
@@ -131,9 +131,9 @@
 
 ### P2-02 — Users, roles, vehicles schema & domain
 - **ماذا سيعمل:** جداول المستخدمين والأدوار والسيارات وتوكنات refresh، مع تجزئة كلمات المرور والتحقق من لوحة السيارة السعودية.
-- **Priority:** High · **Complexity:** M · **Status:** ⏳ In Progress (جاري العمل)
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P2-01
-- **Git Branch:** `feature/P2-02-users-schema` · **Pull Request:** Branch feature/P2-02-users-schema (جاري التنفيذ)
+- **Git Branch:** `feature/P2-02-users-schema` · **Pull Request:** PR (feature/P2-02-users-schema)
 - **الملفات المتوقعة:** `db/migration/V3__identity.sql`، `identity/domain/*`، `identity/infra/*`
 - **Implementation Steps:** 1) Migration 2) Entities 3) Value object للوحة (3 حروف عربية + أرقام) 4) BCrypt strength 12 5) اختبارات
 - **Acceptance Criteria:** الرقم الجامعي unique لكل tenant · اللوحة unique لكل tenant · كلمات المرور BCrypt
@@ -142,9 +142,9 @@
 
 ### P2-03 — Authentication API (register, login, refresh, logout) + RBAC
 - **ماذا سيعمل:** تسجيل ودخول وتجديد وخروج بـ JWT، مع صلاحيات الأدوار وrate limiting.
-- **Priority:** Critical · **Complexity:** L · **Status:** Backlog
+- **Priority:** Critical · **Complexity:** L · **Status:** ⏳ In Progress (جاري العمل)
 - **Dependencies:** P2-02، Q3
-- **Git Branch:** `feature/P2-03-authentication` · **Pull Request:** —
+- **Git Branch:** `feature/P2-03-authentication` · **Pull Request:** Branch feature/P2-03-authentication (جاري البدء)
 - **الملفات المتوقعة:** `common/security/*`، `identity/api/AuthController.java`، `identity/application/AuthService.java`، `DTOs`، `tests`
 - **Implementation Steps:** 1) Security config stateless 2) JWT service (access 15د + refresh rotation) 3) AuthService 4) Controller + DTOs + OpenAPI 5) Rate limiter 6) اختبارات الأمان
 - **Acceptance Criteria:** register ينشئ user+vehicle · كلمة مرور خاطئة = 401 بدون كشف وجود المستخدم · توكن منتهي/متلاعب به = 401 · endpoint محمي بدور = 403 · refresh القديم يبطل بعد التدوير · كلمات المرور لا تظهر في اللوج
