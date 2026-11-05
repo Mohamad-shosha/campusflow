@@ -158,6 +158,7 @@ export const tasks = [
     tests: ['Unit', 'Integration (MSW)'], blockedBy: [],
   }),
   T('P3-04', 'Login & Register UI wired to API', {
+    status: 'Done', pr: 'PR (feature/P3-04-auth-ui)',
     pri: 'High', cx: 'M', deps: ['P3-03', 'P2-03'], branch: 'feature/P3-04-auth-ui',
     goal: 'شاشة الدخول والتسجيل مع Validation (Zod) وربط حقيقي بالـ API وحذف الدخول السريع من الإنتاج.',
     files: ['frontend/src/features/auth/*'],
@@ -166,6 +167,7 @@ export const tasks = [
     tests: ['Form validation', 'API integration', 'Playwright register→login'], blockedBy: [],
   }),
   T('P3-05', 'Shared UI kit (Modal, Toast, Badge, Button, FormField, icons, SaudiPlate, QR)', {
+    status: 'Done', pr: 'PR (feature/P3-05-ui-kit)',
     pri: 'Medium', cx: 'M', deps: ['P3-01'], branch: 'feature/P3-05-ui-kit',
     goal: 'مكونات مشتركة بنفس شكل التصميم الحالي، مع Modal بـ focus-trap وToast بدل alert().',
     files: ['frontend/src/shared/ui/*'],

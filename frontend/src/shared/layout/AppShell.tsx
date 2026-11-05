@@ -10,6 +10,7 @@ export interface AppShellProps {
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
   notificationCount?: number;
+  onOpenAuth?: (() => void) | undefined;
   children: ReactNode;
 }
 

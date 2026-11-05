@@ -55,7 +55,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setIsLoading(true);
     try {
       const authData = await authApi.login(credentials);
-      tokenStorage.setTokens(authData.tokens.accessToken, authData.tokens.refreshToken);
+      tokenStorage.setTokens(authData.accessToken, authData.refreshToken);
       await fetchUserProfile();
     } finally {
       setIsLoading(false);
@@ -66,7 +66,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setIsLoading(true);
     try {
       const authData = await authApi.register(payload);
-      tokenStorage.setTokens(authData.tokens.accessToken, authData.tokens.refreshToken);
+      tokenStorage.setTokens(authData.accessToken, authData.refreshToken);
       await fetchUserProfile();
     } finally {
       setIsLoading(false);

@@ -4,12 +4,12 @@ import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react'
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 export interface ToastProps {
-  id?: string;
-  title?: string;
+  id?: string | undefined;
+  title?: string | undefined;
   message: string;
-  type?: ToastType;
-  duration?: number;
-  onClose?: () => void;
+  type?: ToastType | undefined;
+  duration?: number | undefined;
+  onClose?: (() => void) | undefined;
 }
 
 const icons: Record<ToastType, ComponentType<{ size?: number; className?: string }>> = {

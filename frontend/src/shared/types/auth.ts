@@ -3,9 +3,9 @@ export interface ProblemDetail {
   title: string;
   status: number;
   detail: string;
-  instance?: string;
-  timestamp?: string;
-  invalidFields?: Record<string, string>;
+  instance?: string | undefined;
+  timestamp?: string | undefined;
+  invalidFields?: Record<string, string> | undefined;
   [key: string]: unknown;
 }
 
@@ -26,8 +26,8 @@ export interface VehicleDto {
   plateDigits: string;
   formattedPlateAr: string;
   formattedPlateEn: string;
-  makeModel?: string;
-  color?: string;
+  makeModel?: string | undefined;
+  color?: string | undefined;
   primary: boolean;
   active: boolean;
   createdAt: string;
@@ -38,15 +38,15 @@ export interface UserProfile {
   universityId: string;
   universityNumber: string;
   email: string;
-  phone?: string;
+  phone?: string | undefined;
   fullNameAr: string;
   fullNameEn: string;
   userType: UserType;
   status: string;
-  collegeId?: string;
-  specialty?: string;
-  locale?: string;
-  theme?: string;
+  collegeId?: string | undefined;
+  specialty?: string | undefined;
+  locale?: string | undefined;
+  theme?: string | undefined;
   roles: Role[];
   vehicles: VehicleDto[];
 }
@@ -59,39 +59,41 @@ export interface AuthTokens {
 }
 
 export interface AuthResponse {
-  tokens: AuthTokens;
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresInSeconds: number;
   user: {
     id: string;
     universityId: string;
     universityNumber: string;
     email: string;
-    phone?: string;
+    phone?: string | undefined;
     fullNameAr: string;
     fullNameEn: string;
     userType: UserType;
     roles: Role[];
-    primaryVehiclePlate?: string;
+    primaryVehiclePlate?: string | undefined;
   };
 }
 
 export interface LoginRequest {
-  universityCode?: string;
+  universityCode?: string | undefined;
   identifier: string;
   password: string;
 }
 
 export interface RegisterRequest {
-  universityCode?: string;
+  universityCode?: string | undefined;
   universityNumber: string;
   email: string;
   password: string;
   fullNameAr: string;
   fullNameEn: string;
   userType: UserType;
-  phone?: string;
-  plateLettersAr?: string;
-  plateDigits?: string;
-  makeModel?: string;
-  color?: string;
+  phone?: string | undefined;
+  plateLettersAr?: string | undefined;
+  plateDigits?: string | undefined;
+  makeModel?: string | undefined;
+  color?: string | undefined;
 }
-

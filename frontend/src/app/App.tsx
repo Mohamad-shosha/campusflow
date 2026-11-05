@@ -4,6 +4,9 @@ import { AppShell } from '../shared/layout/AppShell';
 import { AppPreferencesProvider, useAppPreferences } from '../shared/context/AppPreferencesContext';
 import { AuthProvider, useAuth } from '../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
+import { AuthModal } from '../features/auth/components/AuthModal';
+import { Toast, type ToastType } from '../shared/components/Toast';
+import { SaudiPlate } from '../shared/components/SaudiPlate';
 import type { AppUser } from '../shared/types/navigation';
 import '../shared/i18n/i18n';
 import '../styles/main.css';
@@ -14,6 +17,10 @@ export interface AppContentProps {
 
 const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
+  const [activeToast, setActiveToast] = useState<{ message: string; type: ToastType; title?: string } | null>(null);
+
   const { t } = useTranslation();
   const { isAr } = useAppPreferences();
   const { user, isAuthenticated, logout } = useAuth();
@@ -43,44 +50,104 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       activeTab={activeTab}
       onTabChange={setActiveTab}
       currentUser={currentUser}
+      onOpenAuth={() => {
+        setAuthModalTab('login');
+        setIsAuthModalOpen(true);
+      }}
     >
       <div className="container" style={{ padding: '3rem 1.25rem', minHeight: '60vh' }}>
-        <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+        {activeToast && (
+          <div style={{ position: 'fixed', top: '1.5rem', insetInlineEnd: '1.5rem', zIndex: 999999 }}>
+            <Toast
+              message={activeToast.message}
+              type={activeToast.type}
+              title={activeToast.title}
+              onClose={() => setActiveToast(null)}
+            />
+          </div>
+        )}
+
+        <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '850px', margin: '0 auto' }}>
           <div className="badge badge-gold" style={{ marginBottom: '1.25rem' }}>
             {isAr
-              ? 'المرحلة الثالثة: عميل الـ API وإدارة الجلسات وحماية المسارات (P3-03)'
-              : 'Phase 3: Typed HTTP Client, Auth Context & Route Guards (P3-03)'}
+              ? 'المرحلة الثالثة: الواجهات الأمامية ومنظومة الهوية والمكونات المشتركة (P3 Complete)'
+              : 'Phase 3: React Foundation, Auth Modals, Shared UI Kit & Architecture (P3 Complete)'}
           </div>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem' }}>
             {t('common.systemTitle')}
           </h2>
 
-          <div style={{ margin: '1rem 0', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-              {isAr ? 'حالة المصادقة الحالية:' : 'Current Auth State:'}{' '}
-              <strong style={{ color: isAuthenticated ? 'var(--status-available)' : 'var(--status-occupied)' }}>
-                {isAuthenticated
-                  ? `${isAr ? 'مسجل دخول كـ' : 'Authenticated as'} ${currentUser.name}`
-                  : `${isAr ? 'زائر (وضع المحاكاة)' : 'Guest (Demo Session)'}`}
-              </strong>
-            </p>
-            {isAuthenticated && (
-              <button
-                className="fbsu-alert-btn-secondary"
-                onClick={() => logout()}
-                style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
-                type="button"
-              >
-                {isAr ? 'تسجيل الخروج' : 'Log Out'}
-              </button>
-            )}
+          <div style={{ margin: '1rem 0', padding: '1.25rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem', display: 'block' }}>
+                  {isAr ? 'حالة الحساب والمصادقة:' : 'Authentication Status:'}
+                </span>
+                <strong style={{ color: isAuthenticated ? 'var(--status-available)' : 'var(--fbsu-gold)', fontSize: '1rem' }}>
+                  {isAuthenticated
+                    ? `✓ ${currentUser.name} (${currentUser.role})`
+                    : `${isAr ? 'زائر غير مسجل (دخول متاح)' : 'Guest (Authentication Available)'}`}
+                </strong>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {!isAuthenticated ? (
+                  <>
+                    <button
+                      className="fbsu-alert-btn-primary"
+                      onClick={() => {
+                        setAuthModalTab('login');
+                        setIsAuthModalOpen(true);
+                      }}
+                      type="button"
+                      data-testid="open-login-btn"
+                    >
+                      {isAr ? 'تسجيل الدخول' : 'Sign In'}
+                    </button>
+                    <button
+                      className="fbsu-alert-btn-secondary"
+                      onClick={() => {
+                        setAuthModalTab('register');
+                        setIsAuthModalOpen(true);
+                      }}
+                      type="button"
+                      data-testid="open-register-btn"
+                    >
+                      {isAr ? 'حساب جديد' : 'Register'}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="fbsu-alert-btn-secondary"
+                    onClick={async () => {
+                      await logout();
+                      setActiveToast({ message: 'تم تسجيل الخروج بنجاح', type: 'info' });
+                    }}
+                    type="button"
+                    data-testid="user-logout-btn"
+                  >
+                    {isAr ? 'تسجيل الخروج' : 'Log Out'}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
-          <p style={{ color: 'var(--text-muted)', lineHeight: 1.8, fontSize: '1rem', marginBottom: '1.5rem' }}>
-            {isAr
-              ? `القسم النشط حالياً: [${activeTab}]. تم إعداد عميل Axios مع اعتراض 401 والتجديد التلقائي لرموز JWT وحماية المسارات بالصلاحيات.`
-              : `Current View: [${activeTab}]. Axios HTTP client with 401 JWT refresh rotation, Auth Context, and RBAC guards active.`}
-          </p>
+          {/* Demonstration of Saudi Plate Component */}
+          <div style={{ margin: '1.5rem 0', display: 'flex', justifyContent: 'center', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <SaudiPlate
+              lettersAr="ط ر ق"
+              lettersEn="T R G"
+              digits="4040"
+              isPrimary={true}
+            />
+            <SaudiPlate
+              lettersAr="أ ب ح"
+              lettersEn="A B J"
+              digits="1234"
+              isPrimary={false}
+            />
+          </div>
 
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
             <button
@@ -130,6 +197,19 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           )}
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialTab={authModalTab}
+        onSuccess={() => {
+          setActiveToast({
+            title: isAr ? 'تمت المصادقة' : 'Authenticated',
+            message: isAr ? 'تم تسجيل الدخول بنجاح وتحديث الصلاحيات' : 'Session authorized successfully',
+            type: 'success',
+          });
+        }}
+      />
     </AppShell>
   );
 };

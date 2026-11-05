@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 15 تاسك ✅
+- **المنجز بالكامل (Done):** 17 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 38 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **28%**
+- **المتبقي للبدء (Backlog):** 36 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **32%**
 
 
 
@@ -21,14 +21,14 @@
 | P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
-| P3 | Frontend Foundation (React) | 5 | 3 | 0 | 2 |
+| P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **15** | **0** | **38** |
+| **الإجمالي** | | **53** | **17** | **0** | **36** |
 
 ---
 
@@ -211,9 +211,9 @@
 
 ### P3-04 — Login & Register UI wired to API
 - **ماذا سيعمل:** شاشة الدخول والتسجيل مع Validation (Zod) وربط حقيقي بالـ API وحذف الدخول السريع من الإنتاج.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P3-03، P2-03
-- **Git Branch:** `feature/P3-04-auth-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P3-04-auth-ui` · **Pull Request:** PR (feature/P3-04-auth-ui)
 - **الملفات المتوقعة:** `frontend/src/features/auth/*`
 - **Implementation Steps:** 1) الفورم والـ validation 2) استدعاء الـ API 3) حالات الخطأ 4) Accessibility 5) اختبارات
 - **Acceptance Criteria:** Validation لكل حقل · نجاح التسجيل/الدخول يحفظ الجلسة · لا قيم افتراضية صامتة
@@ -222,9 +222,9 @@
 
 ### P3-05 — Shared UI kit (Modal, Toast, Badge, Button, FormField, icons, SaudiPlate, QR)
 - **ماذا سيعمل:** مكونات مشتركة بنفس شكل التصميم الحالي، مع Modal بـ focus-trap وToast بدل alert().
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P3-01
-- **Git Branch:** `feature/P3-05-ui-kit` · **Pull Request:** —
+- **Git Branch:** `feature/P3-05-ui-kit` · **Pull Request:** PR (feature/P3-05-ui-kit)
 - **الملفات المتوقعة:** `frontend/src/shared/ui/*`
 - **Implementation Steps:** 1) بناء المكونات 2) اختبارات 3) توثيق الاستخدام
 - **Acceptance Criteria:** تعمل بالكيبورد · axe بدون مخالفات

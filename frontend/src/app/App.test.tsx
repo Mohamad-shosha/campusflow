@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { App } from './App';
 import { tokenStorage } from '../shared/http/tokenStorage';
 
-describe('App Integration, Auth & Route Guard Tests (P3-03)', () => {
+describe('App Integration, Auth & Route Guard Tests (P3-03 to P3-05)', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.lang = 'ar';
@@ -12,14 +12,29 @@ describe('App Integration, Auth & Route Guard Tests (P3-03)', () => {
     vi.clearAllMocks();
   });
 
-  it('renders guest simulation state when no JWT tokens are present', async () => {
+  it('renders guest state when no JWT tokens are present', async () => {
     render(<App initialTab="map" />);
 
     expect(screen.getByTestId('top-ribbon')).toBeInTheDocument();
     expect(screen.getByTestId('main-header')).toBeInTheDocument();
 
-    const guestStatus = await screen.findByText(/زائر \(وضع المحاكاة\)/i);
+    const guestStatus = await screen.findByText(/زائر غير مسجل/i);
     expect(guestStatus).toBeInTheDocument();
+  });
+
+  it('opens and closes AuthModal when clicking login button', async () => {
+    render(<App initialTab="map" />);
+
+    const openLoginBtn = screen.getByTestId('open-login-btn');
+    fireEvent.click(openLoginBtn);
+
+    expect(screen.getByTestId('auth-modal-overlay')).toBeInTheDocument();
+    expect(screen.getByTestId('login-form')).toBeInTheDocument();
+
+    const closeBtn = screen.getByTestId('auth-modal-close');
+    fireEvent.click(closeBtn);
+
+    expect(screen.queryByTestId('auth-modal-overlay')).not.toBeInTheDocument();
   });
 
   it('displays auth-required guard when navigating to guarded admin tab as a guest', async () => {
@@ -31,6 +46,15 @@ describe('App Integration, Auth & Route Guard Tests (P3-03)', () => {
     const authRequired = await screen.findByTestId('auth-required');
     expect(authRequired).toBeInTheDocument();
     expect(screen.getByText('تسجيل الدخول مطلوب')).toBeInTheDocument();
+  });
+
+  it('renders SaudiPlate components on the home view', () => {
+    render(<App initialTab="map" />);
+
+    const plates = screen.getAllByTestId('saudi-plate');
+    expect(plates.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText('ط ر ق')).toBeInTheDocument();
+    expect(screen.getByText('أ ب ح')).toBeInTheDocument();
   });
 
   it('stores and retrieves JWT tokens via tokenStorage correctly', () => {
@@ -58,6 +82,6 @@ describe('App Integration, Auth & Route Guard Tests (P3-03)', () => {
 
     expect(document.documentElement.lang).toBe('en');
     expect(document.documentElement.dir).toBe('ltr');
-    expect(screen.getByText(/Current Auth State:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Authentication Status:/i)).toBeInTheDocument();
   });
 });
