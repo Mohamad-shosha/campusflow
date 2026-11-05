@@ -140,6 +140,7 @@ export const tasks = [
     tests: ['Component tests', 'Playwright responsive screenshots'], blockedBy: [],
   }),
   T('P3-02', 'i18n (AR/EN), RTL/LTR switching, theme toggle', {
+    status: 'Done', pr: 'PR (feature/P3-02-i18n-theme)',
     pri: 'High', cx: 'M', deps: ['P3-01'], branch: 'feature/P3-02-i18n-theme',
     goal: 'ترجمة عربي/إنجليزي بـ react-i18next مع تبديل الاتجاه والثيم وحفظ التفضيل.',
     files: ['frontend/src/shared/i18n/*', 'locales/ar.json', 'locales/en.json', 'ThemeToggle/LangToggle'],
