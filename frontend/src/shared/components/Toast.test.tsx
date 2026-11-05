@@ -4,13 +4,7 @@ import { Toast } from './Toast';
 
 describe('Toast Component', () => {
   it('renders title and message correctly', () => {
-    render(
-      <Toast
-        title="نجاح العملية"
-        message="تم تفعيل قارئ البوابة بنجاح"
-        type="success"
-      />
-    );
+    render(<Toast title="نجاح العملية" message="تم تفعيل قارئ البوابة بنجاح" type="success" />);
 
     expect(screen.getByText('نجاح العملية')).toBeInTheDocument();
     expect(screen.getByText('تم تفعيل قارئ البوابة بنجاح')).toBeInTheDocument();
@@ -21,13 +15,7 @@ describe('Toast Component', () => {
     vi.useFakeTimers();
     const onClose = vi.fn();
 
-    render(
-      <Toast
-        message="رصيدك غير كافٍ"
-        type="error"
-        onClose={onClose}
-      />
-    );
+    render(<Toast message="رصيدك غير كافٍ" type="error" onClose={onClose} />);
 
     const closeBtn = screen.getByRole('button', { name: /close notification/i });
     fireEvent.click(closeBtn);

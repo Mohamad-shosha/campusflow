@@ -63,12 +63,12 @@ export const AppPreferencesProvider: FC<{ children: ReactNode }> = ({ children }
   }, [soundEnabled]);
 
   const setLanguage = (newLang: SupportedLanguage) => setLang(newLang);
-  const toggleLanguage = () => setLang((prev) => (prev === 'ar' ? 'en' : 'ar'));
+  const toggleLanguage = () => setLang(prev => (prev === 'ar' ? 'en' : 'ar'));
 
   const setTheme = (newTheme: ThemeMode) => setThemeState(newTheme);
-  const toggleTheme = () => setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  const toggleTheme = () => setThemeState(prev => (prev === 'dark' ? 'light' : 'dark'));
 
-  const toggleSound = () => setSoundEnabled((prev) => !prev);
+  const toggleSound = () => setSoundEnabled(prev => !prev);
 
   const value: AppPreferencesContextType = {
     lang,
@@ -83,11 +83,7 @@ export const AppPreferencesProvider: FC<{ children: ReactNode }> = ({ children }
     toggleSound,
   };
 
-  return (
-    <AppPreferencesContext.Provider value={value}>
-      {children}
-    </AppPreferencesContext.Provider>
-  );
+  return <AppPreferencesContext.Provider value={value}>{children}</AppPreferencesContext.Provider>;
 };
 
 export const useAppPreferences = (): AppPreferencesContextType => {
@@ -97,4 +93,3 @@ export const useAppPreferences = (): AppPreferencesContextType => {
   }
   return context;
 };
-

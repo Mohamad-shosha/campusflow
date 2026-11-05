@@ -26,4 +26,3 @@ export interface AppUser {
   walletBalance: number;
   avatarColor?: string;
 }
-

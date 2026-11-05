@@ -2,7 +2,12 @@ import { useState, FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X, User, ShieldCheck, Lock } from 'lucide-react';
-import { loginSchema, registerSchema, type LoginFormData, type RegisterFormData } from '../schemas/authValidation';
+import {
+  loginSchema,
+  registerSchema,
+  type LoginFormData,
+  type RegisterFormData,
+} from '../schemas/authValidation';
 import { useAuth } from '../context/AuthContext';
 
 export interface AuthModalProps {
@@ -120,7 +125,10 @@ export const AuthModal: FC<AuthModalProps> = ({
         </div>
 
         {/* Tab Switcher */}
-        <div className="auth-tab-buttons" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+        <div
+          className="auth-tab-buttons"
+          style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}
+        >
           <button
             className={`auth-tab-btn ${activeTab === 'login' ? 'active' : ''}`}
             onClick={() => {
@@ -179,7 +187,14 @@ export const AuthModal: FC<AuthModalProps> = ({
                 />
               </div>
               {loginErrors.identifier && (
-                <span style={{ color: '#f43f5e', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>
+                <span
+                  style={{
+                    color: '#f43f5e',
+                    fontSize: '0.75rem',
+                    marginTop: '0.25rem',
+                    display: 'block',
+                  }}
+                >
                   {loginErrors.identifier.message}
                 </span>
               )}
@@ -196,7 +211,14 @@ export const AuthModal: FC<AuthModalProps> = ({
                 />
               </div>
               {loginErrors.password && (
-                <span style={{ color: '#f43f5e', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>
+                <span
+                  style={{
+                    color: '#f43f5e',
+                    fontSize: '0.75rem',
+                    marginTop: '0.25rem',
+                    display: 'block',
+                  }}
+                >
                   {loginErrors.password.message}
                 </span>
               )}
@@ -204,7 +226,12 @@ export const AuthModal: FC<AuthModalProps> = ({
 
             <button
               className="btn-primary"
-              style={{ width: '100%', justifyContent: 'center', padding: '0.95rem', fontSize: '0.95rem' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.95rem',
+                fontSize: '0.95rem',
+              }}
               type="submit"
               disabled={isLoggingIn}
               data-testid="submit-login-btn"
@@ -218,7 +245,14 @@ export const AuthModal: FC<AuthModalProps> = ({
         {/* Register Form */}
         {activeTab === 'register' && (
           <form onSubmit={handleRegisterSubmit(onRegister)} data-testid="register-form">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '0.75rem',
+                marginBottom: '0.85rem',
+              }}
+            >
               <div className="form-group">
                 <label className="form-label">الاسم بالعربية:</label>
                 <input
@@ -228,7 +262,9 @@ export const AuthModal: FC<AuthModalProps> = ({
                   {...regField('fullNameAr')}
                 />
                 {regErrors.fullNameAr && (
-                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>{regErrors.fullNameAr.message}</span>
+                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>
+                    {regErrors.fullNameAr.message}
+                  </span>
                 )}
               </div>
 
@@ -241,12 +277,21 @@ export const AuthModal: FC<AuthModalProps> = ({
                   {...regField('fullNameEn')}
                 />
                 {regErrors.fullNameEn && (
-                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>{regErrors.fullNameEn.message}</span>
+                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>
+                    {regErrors.fullNameEn.message}
+                  </span>
                 )}
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '0.75rem',
+                marginBottom: '0.85rem',
+              }}
+            >
               <div className="form-group">
                 <label className="form-label">الرقم الجامعي:</label>
                 <input
@@ -256,7 +301,9 @@ export const AuthModal: FC<AuthModalProps> = ({
                   {...regField('universityNumber')}
                 />
                 {regErrors.universityNumber && (
-                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>{regErrors.universityNumber.message}</span>
+                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>
+                    {regErrors.universityNumber.message}
+                  </span>
                 )}
               </div>
 
@@ -279,11 +326,20 @@ export const AuthModal: FC<AuthModalProps> = ({
                 {...regField('email')}
               />
               {regErrors.email && (
-                <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>{regErrors.email.message}</span>
+                <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>
+                  {regErrors.email.message}
+                </span>
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '0.75rem',
+                marginBottom: '0.85rem',
+              }}
+            >
               <div className="form-group">
                 <label className="form-label">كلمة المرور:</label>
                 <input
@@ -293,7 +349,9 @@ export const AuthModal: FC<AuthModalProps> = ({
                   {...regField('password')}
                 />
                 {regErrors.password && (
-                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>{regErrors.password.message}</span>
+                  <span style={{ color: '#f43f5e', fontSize: '0.72rem' }}>
+                    {regErrors.password.message}
+                  </span>
                 )}
               </div>
 
@@ -309,8 +367,24 @@ export const AuthModal: FC<AuthModalProps> = ({
             </div>
 
             {/* Vehicle Optional */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid var(--border-subtle)' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--fbsu-gold)', fontWeight: 800, display: 'block', marginBottom: '0.4rem' }}>
+            <div
+              style={{
+                background: 'rgba(255,255,255,0.02)',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                marginBottom: '1rem',
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--fbsu-gold)',
+                  fontWeight: 800,
+                  display: 'block',
+                  marginBottom: '0.4rem',
+                }}
+              >
                 بيانات المركبة لدخول البوابات التلقائي (اختياري):
               </span>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
@@ -331,7 +405,12 @@ export const AuthModal: FC<AuthModalProps> = ({
 
             <button
               className="btn-primary"
-              style={{ width: '100%', justifyContent: 'center', padding: '0.95rem', fontSize: '0.95rem' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.95rem',
+                fontSize: '0.95rem',
+              }}
               type="submit"
               disabled={isRegistering}
               data-testid="submit-register-btn"

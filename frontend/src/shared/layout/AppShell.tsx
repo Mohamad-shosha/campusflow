@@ -36,9 +36,7 @@ export const AppShell: FC<AppShellProps> = ({
         currentUser={currentUser}
         notificationCount={notificationCount}
       />
-      <main className="main-content">
-        {children}
-      </main>
+      <main className="main-content">{children}</main>
       <Footer />
     </div>
   );

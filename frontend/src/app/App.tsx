@@ -19,7 +19,11 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
-  const [activeToast, setActiveToast] = useState<{ message: string; type: ToastType; title?: string } | null>(null);
+  const [activeToast, setActiveToast] = useState<{
+    message: string;
+    type: ToastType;
+    title?: string;
+  } | null>(null);
 
   const { t } = useTranslation();
   const { isAr } = useAppPreferences();
@@ -57,7 +61,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     >
       <div className="container" style={{ padding: '3rem 1.25rem', minHeight: '60vh' }}>
         {activeToast && (
-          <div style={{ position: 'fixed', top: '1.5rem', insetInlineEnd: '1.5rem', zIndex: 999999 }}>
+          <div
+            style={{ position: 'fixed', top: '1.5rem', insetInlineEnd: '1.5rem', zIndex: 999999 }}
+          >
             <Toast
               message={activeToast.message}
               type={activeToast.type}
@@ -67,23 +73,54 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           </div>
         )}
 
-        <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '850px', margin: '0 auto' }}>
+        <div
+          className="glass-panel"
+          style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '850px', margin: '0 auto' }}
+        >
           <div className="badge badge-gold" style={{ marginBottom: '1.25rem' }}>
             {isAr
               ? 'المرحلة الثالثة: الواجهات الأمامية ومنظومة الهوية والمكونات المشتركة (P3 Complete)'
               : 'Phase 3: React Foundation, Auth Modals, Shared UI Kit & Architecture (P3 Complete)'}
           </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem' }}>
+          <h2
+            style={{
+              fontSize: '1.8rem',
+              fontWeight: 900,
+              color: 'var(--text-main)',
+              marginBottom: '1rem',
+            }}
+          >
             {t('common.systemTitle')}
           </h2>
 
-          <div style={{ margin: '1rem 0', padding: '1.25rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div
+            style={{
+              margin: '1rem 0',
+              padding: '1.25rem',
+              background: 'rgba(255,255,255,0.03)',
+              borderRadius: '12px',
+              border: '1px solid var(--border-subtle)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+              }}
+            >
               <div>
                 <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem', display: 'block' }}>
                   {isAr ? 'حالة الحساب والمصادقة:' : 'Authentication Status:'}
                 </span>
-                <strong style={{ color: isAuthenticated ? 'var(--status-available)' : 'var(--fbsu-gold)', fontSize: '1rem' }}>
+                <strong
+                  style={{
+                    color: isAuthenticated ? 'var(--status-available)' : 'var(--fbsu-gold)',
+                    fontSize: '1rem',
+                  }}
+                >
                   {isAuthenticated
                     ? `✓ ${currentUser.name} (${currentUser.role})`
                     : `${isAr ? 'زائر غير مسجل (دخول متاح)' : 'Guest (Authentication Available)'}`}
@@ -134,22 +171,29 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           </div>
 
           {/* Demonstration of Saudi Plate Component */}
-          <div style={{ margin: '1.5rem 0', display: 'flex', justifyContent: 'center', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <SaudiPlate
-              lettersAr="ط ر ق"
-              lettersEn="T R G"
-              digits="4040"
-              isPrimary={true}
-            />
-            <SaudiPlate
-              lettersAr="أ ب ح"
-              lettersEn="A B J"
-              digits="1234"
-              isPrimary={false}
-            />
+          <div
+            style={{
+              margin: '1.5rem 0',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '1.5rem',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <SaudiPlate lettersAr="ط ر ق" lettersEn="T R G" digits="4040" isPrimary={true} />
+            <SaudiPlate lettersAr="أ ب ح" lettersEn="A B J" digits="1234" isPrimary={false} />
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginBottom: '2rem',
+            }}
+          >
             <button
               className="fbsu-alert-btn-primary"
               onClick={() => setActiveTab('map')}
@@ -205,7 +249,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         onSuccess={() => {
           setActiveToast({
             title: isAr ? 'تمت المصادقة' : 'Authenticated',
-            message: isAr ? 'تم تسجيل الدخول بنجاح وتحديث الصلاحيات' : 'Session authorized successfully',
+            message: isAr
+              ? 'تم تسجيل الدخول بنجاح وتحديث الصلاحيات'
+              : 'Session authorized successfully',
             type: 'success',
           });
         }}
@@ -214,7 +260,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   );
 };
 
-export const App: FC<AppContentProps> = (props) => {
+export const App: FC<AppContentProps> = props => {
   return (
     <AppPreferencesProvider>
       <AuthProvider>

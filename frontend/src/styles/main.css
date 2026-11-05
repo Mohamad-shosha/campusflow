@@ -11,7 +11,7 @@
 
 :root {
   /* FBSU Official Brand Palette */
-  --fbsu-primary: #116E63;
+  --fbsu-primary: #116e63;
   --fbsu-primary-hover: #158376;
   --fbsu-primary-dark: #0b4941;
   --fbsu-primary-deep: #062b26;
@@ -70,21 +70,23 @@
 
 /* Light Theme Variables */
 body.theme-light {
-  --bg-app: #F2F3F5;
-  --bg-canvas: #E8ECEF;
+  --bg-app: #f2f3f5;
+  --bg-canvas: #e8ecef;
   --bg-card: rgba(255, 255, 255, 0.96);
   --bg-card-hover: #ffffff;
   --bg-card-elevated: #ffffff;
   --border-subtle: rgba(17, 110, 99, 0.14);
   --border-active: rgba(17, 110, 99, 0.45);
-  --text-main: #19232B;
+  --text-main: #19232b;
   --text-muted: #334155;
   --text-dim: #64748b;
   --card-shadow: 0 10px 30px rgba(17, 110, 99, 0.08);
 }
 
 /* Base Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -102,15 +104,17 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
-  background-image: 
+  background-image:
     radial-gradient(circle at 15% 15%, rgba(17, 110, 99, 0.18) 0, transparent 40%),
     radial-gradient(circle at 85% 10%, rgba(215, 162, 55, 0.1) 0, transparent 35%),
     radial-gradient(circle at 50% 90%, rgba(17, 110, 99, 0.12) 0, transparent 50%);
   background-attachment: fixed;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
-body[dir="ltr"] {
+body[dir='ltr'] {
   font-family: var(--font-en);
 }
 
@@ -128,7 +132,9 @@ button {
   transition: all 0.2s var(--ease);
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: inherit;
 }
 
@@ -147,7 +153,9 @@ input, select, textarea {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow);
-  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  transition:
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease);
 }
 
 .glass-panel:hover {
@@ -443,7 +451,9 @@ body.theme-light .nav-menu {
   border: 1px solid var(--border-active);
   border-radius: 14px;
   padding: 0.5rem;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(17, 110, 99, 0.2);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.65),
+    0 0 20px rgba(17, 110, 99, 0.2);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -458,7 +468,9 @@ body.theme-light .nav-menu {
 body.theme-light .nav-dropdown-menu {
   background: rgba(255, 255, 255, 0.98);
   border-color: rgba(17, 110, 99, 0.22);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.12), 0 0 15px rgba(17, 110, 99, 0.1);
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.12),
+    0 0 15px rgba(17, 110, 99, 0.1);
 }
 
 .nav-dropdown-group:hover .nav-dropdown-menu,
@@ -743,7 +755,6 @@ body.theme-light .utility-pill-btn:hover {
   transform: translateY(-1px);
 }
 
-
 .persona-badge-box {
   display: flex;
   align-items: center;
@@ -831,8 +842,8 @@ body.theme-light .persona-badge-box {
   background-size: cover;
   background-position: center 35%;
   filter: contrast(1.1);
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 95%);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 95%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 95%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 95%);
 }
 
 .hero-grid {
@@ -1261,11 +1272,21 @@ body.theme-light .persona-badge-box {
   border-radius: 3px;
 }
 
-.legend-chip.avail { background: var(--status-available); }
-.legend-chip.occ { background: var(--status-occupied); }
-.legend-chip.flx { background: var(--status-flex); }
-.legend-chip.res { background: #3b82f6; }
-.legend-chip.fac { background: var(--status-faculty); }
+.legend-chip.avail {
+  background: var(--status-available);
+}
+.legend-chip.occ {
+  background: var(--status-occupied);
+}
+.legend-chip.flx {
+  background: var(--status-flex);
+}
+.legend-chip.res {
+  background: #3b82f6;
+}
+.legend-chip.fac {
+  background: var(--status-faculty);
+}
 
 .parking-lot-canvas {
   background: var(--bg-canvas);
@@ -1343,7 +1364,10 @@ body.theme-light .campus-road-header {
 .parking-spot-card.available::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: var(--status-available);
 }
 
@@ -1353,7 +1377,10 @@ body.theme-light .campus-road-header {
 .parking-spot-card.occupied::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: var(--status-occupied);
 }
 
@@ -1364,7 +1391,10 @@ body.theme-light .campus-road-header {
 .parking-spot-card.flex-share::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: var(--fbsu-gold);
 }
 
@@ -1374,7 +1404,10 @@ body.theme-light .campus-road-header {
 .parking-spot-card.reserved-user::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: #3b82f6;
 }
 
@@ -1384,7 +1417,10 @@ body.theme-light .campus-road-header {
 .parking-spot-card.faculty-spot::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: var(--status-faculty);
 }
 
@@ -1493,7 +1529,7 @@ body.theme-light .campus-road-header {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
   position: relative;
   z-index: 10;
   font-size: 0.8rem;
@@ -1532,8 +1568,12 @@ body.theme-light .campus-road-header {
 }
 
 @keyframes scan-vertical {
-  0% { top: 10%; }
-  100% { top: 90%; }
+  0% {
+    top: 10%;
+  }
+  100% {
+    top: 90%;
+  }
 }
 
 .gate-barrier-stage {
@@ -1570,16 +1610,10 @@ body.theme-light .campus-road-header {
 .barrier-arm {
   height: 10px;
   width: 230px;
-  background: repeating-linear-gradient(
-    45deg,
-    #ffffff,
-    #ffffff 15px,
-    #ef4444 15px,
-    #ef4444 30px
-  );
+  background: repeating-linear-gradient(45deg, #ffffff, #ffffff 15px, #ef4444 15px, #ef4444 30px);
   transform-origin: left center;
   transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .barrier-arm.open {
@@ -2478,8 +2512,8 @@ body.theme-light .faculty-subject-chip {
 }
 
 .tuition-stamp-seal {
-  border: 2px solid #116E63;
-  color: #116E63;
+  border: 2px solid #116e63;
+  color: #116e63;
   font-weight: 900;
   font-size: 0.75rem;
   padding: 0.35rem 0.75rem;
@@ -2487,7 +2521,6 @@ body.theme-light .faculty-subject-chip {
   text-transform: uppercase;
   transform: rotate(-5deg);
 }
-
 
 /* Mobile & Phablet Screens (< 768px) */
 @media (max-width: 768px) {
@@ -2864,23 +2897,31 @@ body.theme-light .faculty-subject-chip {
   backdrop-filter: blur(24px);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(17, 110, 99, 0.18);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.55),
+    0 0 25px rgba(17, 110, 99, 0.18);
   color: var(--text-main);
   direction: inherit;
   overflow: hidden;
   will-change: transform, opacity;
   animation: fbsuToastEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  transition:
+    transform 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
 }
 
 body.theme-light .fbsu-toast {
   background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 16px 36px rgba(17, 110, 99, 0.15), 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 16px 36px rgba(17, 110, 99, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .fbsu-toast:hover {
   transform: translateY(-2px);
-  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.65), 0 0 35px rgba(17, 110, 99, 0.28);
+  box-shadow:
+    0 22px 50px rgba(0, 0, 0, 0.65),
+    0 0 35px rgba(17, 110, 99, 0.28);
 }
 
 .fbsu-toast.dismissing {
@@ -2890,7 +2931,9 @@ body.theme-light .fbsu-toast {
 /* Toast Type Variants */
 .fbsu-toast-success {
   border-color: rgba(16, 185, 129, 0.45);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(16, 185, 129, 0.25);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.55),
+    0 0 25px rgba(16, 185, 129, 0.25);
 }
 .fbsu-toast-success .fbsu-toast-icon-wrap {
   background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.08) 70%);
@@ -2903,7 +2946,9 @@ body.theme-light .fbsu-toast {
 
 .fbsu-toast-error {
   border-color: rgba(244, 63, 94, 0.5);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(244, 63, 94, 0.28);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.55),
+    0 0 25px rgba(244, 63, 94, 0.28);
 }
 .fbsu-toast-error .fbsu-toast-icon-wrap {
   background: radial-gradient(circle, rgba(244, 63, 94, 0.25) 0%, rgba(244, 63, 94, 0.08) 70%);
@@ -2916,7 +2961,9 @@ body.theme-light .fbsu-toast {
 
 .fbsu-toast-warning {
   border-color: rgba(215, 162, 55, 0.5);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(215, 162, 55, 0.25);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.55),
+    0 0 25px rgba(215, 162, 55, 0.25);
 }
 .fbsu-toast-warning .fbsu-toast-icon-wrap {
   background: radial-gradient(circle, rgba(215, 162, 55, 0.25) 0%, rgba(215, 162, 55, 0.08) 70%);
@@ -2929,7 +2976,9 @@ body.theme-light .fbsu-toast {
 
 .fbsu-toast-info {
   border-color: rgba(17, 110, 99, 0.6);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(17, 110, 99, 0.25);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.55),
+    0 0 25px rgba(17, 110, 99, 0.25);
 }
 .fbsu-toast-info .fbsu-toast-icon-wrap {
   background: radial-gradient(circle, rgba(17, 110, 99, 0.3) 0%, rgba(17, 110, 99, 0.1) 70%);
@@ -3013,7 +3062,7 @@ body.theme-light .fbsu-toast {
   animation: fbsuToastProgress linear forwards;
 }
 
-[dir="rtl"] .fbsu-toast-progress {
+[dir='rtl'] .fbsu-toast-progress {
   transform-origin: right;
 }
 
@@ -3085,7 +3134,9 @@ body.theme-light .fbsu-toast {
   backdrop-filter: blur(28px);
   border-radius: var(--radius-xl);
   border: 1px solid rgba(215, 162, 55, 0.35);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(215, 162, 55, 0.2);
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.75),
+    0 0 35px rgba(215, 162, 55, 0.2);
   padding: 2.25rem 2rem 1.85rem 2rem;
   text-align: center;
   animation: fbsuAlertModalEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -3094,7 +3145,9 @@ body.theme-light .fbsu-toast {
 body.theme-light .fbsu-alert-dialog {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 249, 250, 0.98) 100%);
   border-color: rgba(17, 110, 99, 0.3);
-  box-shadow: 0 25px 60px rgba(17, 110, 99, 0.18), 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 25px 60px rgba(17, 110, 99, 0.18),
+    0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .fbsu-alert-icon-ring {
@@ -3196,8 +3249,12 @@ body.theme-light .fbsu-alert-dialog {
 }
 
 @keyframes fbsuBackdropFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fbsuAlertModalEnter {
@@ -3210,4 +3267,3 @@ body.theme-light .fbsu-alert-dialog {
     transform: scale(1) translateY(0);
   }
 }
-

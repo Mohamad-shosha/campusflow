@@ -22,7 +22,11 @@ export const FormField: FC<FormFieldProps> = ({
   testId = 'form-field',
 }) => {
   return (
-    <div className={`form-group ${className}`.trim()} data-testid={testId} style={{ marginBottom: '1rem' }}>
+    <div
+      className={`form-group ${className}`.trim()}
+      data-testid={testId}
+      style={{ marginBottom: '1rem' }}
+    >
       <label
         htmlFor={htmlFor}
         className="form-label"

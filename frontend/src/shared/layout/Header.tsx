@@ -44,7 +44,8 @@ export const Header: FC<HeaderProps> = ({
   onOpenAuth,
 }) => {
   const { t } = useTranslation();
-  const { isAr, soundEnabled, toggleSound, toggleLanguage, isLightTheme, toggleTheme } = useAppPreferences();
+  const { isAr, soundEnabled, toggleSound, toggleLanguage, isLightTheme, toggleTheme } =
+    useAppPreferences();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -86,7 +87,7 @@ export const Header: FC<HeaderProps> = ({
             <div className={`nav-dropdown-group ${openDropdown === 'parking' ? 'open' : ''}`}>
               <button
                 className={`nav-item nav-dropdown-trigger ${isParkingActive ? 'active' : ''}`}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setOpenDropdown(openDropdown === 'parking' ? null : 'parking');
                 }}
@@ -161,7 +162,7 @@ export const Header: FC<HeaderProps> = ({
             <div className={`nav-dropdown-group ${openDropdown === 'campus' ? 'open' : ''}`}>
               <button
                 className={`nav-item nav-dropdown-trigger ${isCampusActive ? 'active' : ''}`}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setOpenDropdown(openDropdown === 'campus' ? null : 'campus');
                 }}
@@ -233,7 +234,9 @@ export const Header: FC<HeaderProps> = ({
               title={soundEnabled ? t('utilities.disableSound') : t('utilities.enableSound')}
             >
               {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-              <span className="utility-text-label">{soundEnabled ? t('utilities.sound') : t('utilities.muted')}</span>
+              <span className="utility-text-label">
+                {soundEnabled ? t('utilities.sound') : t('utilities.muted')}
+              </span>
             </button>
 
             <span className="utility-divider"></span>
@@ -291,7 +294,9 @@ export const Header: FC<HeaderProps> = ({
             title={t('utilities.walletTitle')}
           >
             <Wallet size={13} color="var(--fbsu-gold)" />
-            <span>{currentUser.walletBalance.toFixed(2)} {t('common.currency')}</span>
+            <span>
+              {currentUser.walletBalance.toFixed(2)} {t('common.currency')}
+            </span>
           </button>
 
           {/* User Profile */}
@@ -311,7 +316,8 @@ export const Header: FC<HeaderProps> = ({
               }}
             ></span>
             <span>
-              {isAr ? currentUser.name.split(' ')[0] : currentUser.nameEn.split(' ')[0]} ({currentUser.role.split(' ')[0]})
+              {isAr ? currentUser.name.split(' ')[0] : currentUser.nameEn.split(' ')[0]} (
+              {currentUser.role.split(' ')[0]})
             </span>
           </button>
         </div>

@@ -6,10 +6,7 @@ export interface TopRibbonProps {
   timeString?: string;
 }
 
-export const TopRibbon: FC<TopRibbonProps> = ({
-  flexCount = 3,
-  timeString = '08:45:00',
-}) => {
+export const TopRibbon: FC<TopRibbonProps> = ({ flexCount = 3, timeString = '08:45:00' }) => {
   const { t } = useTranslation();
 
   return (
@@ -30,9 +27,7 @@ export const TopRibbon: FC<TopRibbonProps> = ({
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <span className="ribbon-item">
-            📅 {t('ribbon.term')}
-          </span>
+          <span className="ribbon-item">📅 {t('ribbon.term')}</span>
           <span className="ribbon-item">
             ⏰ <span id="live-time-clock">{timeString}</span>
           </span>

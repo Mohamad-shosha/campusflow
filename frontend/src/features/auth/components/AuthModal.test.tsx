@@ -47,9 +47,7 @@ describe('AuthModal Component', () => {
       expect(
         screen.getByText(/الرقم الجامعي أو البريد يجب ألا يقل عن 3 أحرف/i)
       ).toBeInTheDocument();
-      expect(
-        screen.getByText(/كلمة المرور يجب ألا تقل عن 8 خانات/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/كلمة المرور يجب ألا تقل عن 8 خانات/i)).toBeInTheDocument();
     });
   });
 

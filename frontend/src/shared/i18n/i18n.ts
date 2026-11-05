@@ -44,4 +44,3 @@ export function updateDocumentDirection(lang: SupportedLanguage) {
 updateDocumentDirection(savedLang);
 
 export default i18n;
-

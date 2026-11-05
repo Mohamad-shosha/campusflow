@@ -42,6 +42,8 @@ describe('FormField Component', () => {
       </FormField>
     );
 
-    expect(screen.getByTestId('form-field-hint')).toHaveTextContent('Saudi mobile starting with 05');
+    expect(screen.getByTestId('form-field-hint')).toHaveTextContent(
+      'Saudi mobile starting with 05'
+    );
   });
 });

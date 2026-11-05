@@ -91,13 +91,7 @@ export const QR: FC<QRProps> = ({
 
         {/* Data Dots */}
         {dots.map((dot, idx) => (
-          <circle
-            key={idx}
-            cx={dot.x}
-            cy={dot.y}
-            r={3.8}
-            fill={dot.isGold ? '#d7a237' : fgColor}
-          />
+          <circle key={idx} cx={dot.x} cy={dot.y} r={3.8} fill={dot.isGold ? '#d7a237' : fgColor} />
         ))}
 
         {/* Center alignment marker */}

@@ -17,4 +17,3 @@ export const tokenStorage = {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   },
 };
-

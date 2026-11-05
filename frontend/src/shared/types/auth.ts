@@ -10,12 +10,7 @@ export interface ProblemDetail {
 }
 
 export type Role =
-  | 'CAMPUS_ADMIN'
-  | 'SECURITY_OFFICER'
-  | 'PARKING_OFFICER'
-  | 'FACULTY'
-  | 'STUDENT'
-  | 'PEER_TUTOR';
+  'CAMPUS_ADMIN' | 'SECURITY_OFFICER' | 'PARKING_OFFICER' | 'FACULTY' | 'STUDENT' | 'PEER_TUTOR';
 
 export type UserType = 'STUDENT' | 'FACULTY' | 'STAFF';
 

@@ -41,7 +41,9 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({
         style={{ padding: '2rem', textAlign: 'center', margin: '2rem auto', maxWidth: '480px' }}
         data-testid="auth-required"
       >
-        <h3 style={{ color: 'var(--status-occupied)', marginBottom: '0.5rem' }}>تسجيل الدخول مطلوب</h3>
+        <h3 style={{ color: 'var(--status-occupied)', marginBottom: '0.5rem' }}>
+          تسجيل الدخول مطلوب
+        </h3>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
           يجب تسجيل الدخول بالرقم الجامعي أو البريد للوصول إلى هذا القسم.
         </p>
@@ -66,4 +68,3 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({
 
   return <>{children}</>;
 };
-

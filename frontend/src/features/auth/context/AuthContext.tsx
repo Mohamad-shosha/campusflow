@@ -89,7 +89,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const hasAnyRole = (roles: Role[]): boolean => {
-    return user?.roles ? roles.some((r) => user.roles.includes(r)) : false;
+    return user?.roles ? roles.some(r => user.roles.includes(r)) : false;
   };
 
   const value: AuthContextType = {

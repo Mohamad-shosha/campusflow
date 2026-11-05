@@ -1,13 +1,7 @@
 import { FC, ReactNode } from 'react';
 
 export type BadgeVariant =
-  | 'fbsu'
-  | 'gold'
-  | 'available'
-  | 'occupied'
-  | 'flex'
-  | 'faculty'
-  | 'neutral';
+  'fbsu' | 'gold' | 'available' | 'occupied' | 'flex' | 'faculty' | 'neutral';
 
 export interface BadgeProps {
   variant?: BadgeVariant;
@@ -47,10 +41,7 @@ export const Badge: FC<BadgeProps> = ({
   };
 
   return (
-    <span
-      className={`badge ${getVariantClass()} ${className}`.trim()}
-      data-testid={testId}
-    >
+    <span className={`badge ${getVariantClass()} ${className}`.trim()} data-testid={testId}>
       {dot && (
         <span
           style={{

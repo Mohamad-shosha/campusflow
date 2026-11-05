@@ -20,7 +20,7 @@ let failedQueue: Array<{
 }> = [];
 
 const processQueue = (error: unknown, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
+  failedQueue.forEach(prom => {
     if (error) {
       prom.reject(error);
     } else if (token) {
@@ -39,12 +39,12 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 // Response interceptor: Automatic 401 refresh token rotation
 apiClient.interceptors.response.use(
-  (response) => response,
+  response => response,
   async (error: AxiosError<ProblemDetail>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
@@ -59,13 +59,13 @@ apiClient.interceptors.response.use(
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((newToken) => {
+          .then(newToken => {
             if (originalRequest.headers) {
               originalRequest.headers.Authorization = `Bearer ${newToken}`;
             }
             return apiClient(originalRequest);
           })
-          .catch((err) => Promise.reject(err));
+          .catch(err => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -108,4 +108,3 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-

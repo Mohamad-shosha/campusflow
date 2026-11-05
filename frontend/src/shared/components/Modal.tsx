@@ -39,7 +39,7 @@ export const Modal: FC<ModalProps> = ({
   return (
     <div
       className="modal-overlay open"
-      onClick={(e) => {
+      onClick={e => {
         if (e.target === e.currentTarget) onClose();
       }}
       data-testid={testId}
