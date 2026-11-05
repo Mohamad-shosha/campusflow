@@ -48,10 +48,10 @@ services:
       - "${BACKEND_PORT:-8080}:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 15s
+      interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 35s
+      retries: 5
+      start_period: 90s
     networks:
       - fbsu-network
 
@@ -60,8 +60,8 @@ services:
   # ============================================================================
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.frontend
     container_name: fbsu-frontend
     restart: unless-stopped
     depends_on:
