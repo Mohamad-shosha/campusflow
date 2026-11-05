@@ -55,4 +55,3 @@ export interface TransferRequest {
   description?: string | undefined;
   idempotencyKey: string;
 }
-
