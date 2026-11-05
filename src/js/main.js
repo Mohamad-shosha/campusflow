@@ -121,6 +121,58 @@ class AudioSynthesizer {
     osc.start(now);
     osc.stop(now + 0.05);
   }
+
+  playError() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'sine';
+    osc1.frequency.setValueAtTime(260, now);
+    osc1.frequency.linearRampToValueAtTime(180, now + 0.15);
+    osc2.frequency.setValueAtTime(130, now);
+    osc2.frequency.linearRampToValueAtTime(90, now + 0.15);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.35);
+    osc2.stop(now + 0.35);
+  }
+
+  playWarning() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.setValueAtTime(440, now + 0.08);
+    osc.frequency.setValueAtTime(392, now + 0.1);
+
+    gain.gain.setValueAtTime(0.07, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
 }
 
 const soundFX = new AudioSynthesizer();
@@ -2738,7 +2790,15 @@ function openAuthModal(initialTab = 'login') {
     appState.isLoggedIn = true;
     soundFX.playSuccess();
     confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
-    alert(`🎉 تم إنشاء الحساب بنجاح، مرحباً بك يا ${name}! تم تخصيص رصيد ترحيبي 100 ر.س في محفظتك وتفعيل قارئ البوابة لمركبتك.`);
+    const isArReg = (typeof appState !== 'undefined' && appState.currentLang === 'ar') || document.documentElement.lang === 'ar';
+    showToast(
+      isArReg
+        ? `🎉 مرحباً بك يا ${name}! تم إنشاء حسابك بنجاح، وتخصيص 100 ر.س رصيد ترحيبي في محفظتك وتفعيل قارئ البوابة لمركبتك.`
+        : `🎉 Welcome ${name}! Your account was created successfully with 100 SAR welcome credit and gate reader access.`,
+      'success',
+      isArReg ? 'تم إنشاء الحساب بنجاح' : 'Account Created Successfully',
+      6000
+    );
     closeModal();
     renderApp();
   });
@@ -2911,33 +2971,223 @@ function openSpotModal(spot) {
 }
 
 // ============================================================================
-// Toast Notification Engine
+// FBSU Luxury Toast & Custom Alert Engine
 // ============================================================================
-function showToast(title, message, iconName = 'bell') {
-  soundFX.playSuccess();
-  const existing = document.querySelector('.fbsu-toast-notification');
-  if (existing) existing.remove();
+function getOrCreateToastContainer() {
+  let container = document.getElementById('fbsu-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'fbsu-toast-container';
+    container.className = 'fbsu-toast-container';
+    container.setAttribute('aria-live', 'polite');
+    container.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(container);
+  }
+  return container;
+}
 
+function showToast(arg1, arg2, arg3 = null, arg4 = 4500) {
+  const isAr = (typeof appState !== 'undefined' && appState.currentLang === 'ar') || document.documentElement.lang === 'ar';
+  let title = '';
+  let message = '';
+  let type = 'info';
+  let iconName = '';
+  let duration = 4500;
+
+  const validTypes = ['success', 'error', 'warning', 'info'];
+
+  if (typeof arg2 === 'string' && validTypes.includes(arg2.toLowerCase())) {
+    // Pattern: showToast(message, type, title, duration)
+    message = String(arg1 || '');
+    type = arg2.toLowerCase();
+    title = arg3;
+    duration = typeof arg4 === 'number' ? arg4 : 4500;
+  } else if (typeof arg2 === 'string') {
+    // Pattern: showToast(title, message, iconName)
+    title = String(arg1 || '');
+    message = String(arg2 || '');
+    iconName = typeof arg3 === 'string' ? arg3 : '';
+    if (iconName === 'wallet' || iconName === 'checkCircle2' || iconName === 'award') {
+      type = 'success';
+    } else if (iconName === 'doorClosed' || iconName === 'bookOpen' || iconName === 'clock') {
+      type = 'info';
+    } else {
+      type = 'success';
+    }
+    duration = 4500;
+  } else {
+    // Pattern: showToast(message) or alert(message)
+    message = String(arg1 || '');
+    type = 'info';
+    duration = 4500;
+  }
+
+  // Fallback title if none provided
+  if (!title) {
+    const defaultTitles = {
+      success: isAr ? 'تمت العملية بنجاح' : 'Success',
+      error: isAr ? 'تنبيه خطأ' : 'Error Occurred',
+      warning: isAr ? 'تنبيه هـام' : 'Attention',
+      info: isAr ? 'منظومة الجامعة الذكية' : 'Campus Notification'
+    };
+    title = defaultTitles[type] || defaultTitles.info;
+  }
+
+  // Auditory feedback
+  if (type === 'success') {
+    soundFX.playSuccess();
+  } else if (type === 'error') {
+    soundFX.playError();
+  } else if (type === 'warning') {
+    soundFX.playWarning();
+  } else {
+    soundFX.playClick();
+  }
+
+  // Icon selection
+  if (!iconName) {
+    const defaultIcons = {
+      success: 'checkCircle2',
+      error: 'alertCircle',
+      warning: 'alertTriangle',
+      info: 'info'
+    };
+    iconName = defaultIcons[type] || 'info';
+  }
+
+  const container = getOrCreateToastContainer();
   const toast = document.createElement('div');
-  toast.className = 'fbsu-toast-notification';
+  toast.className = `fbsu-toast fbsu-toast-${type}`;
+  toast.setAttribute('role', 'alert');
+
   toast.innerHTML = `
-    <div style="width:36px; height:36px; border-radius:var(--radius-md); background:var(--fbsu-gold-light); color:var(--fbsu-gold); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-      ${createIcon(iconName, { size: 18, color: 'var(--fbsu-gold)' })}
+    <div class="fbsu-toast-icon-wrap">
+      ${createIcon(iconName, { size: 20 })}
     </div>
-    <div style="flex:1;">
-      <div style="font-size:0.88rem; font-weight:800; color:var(--text-main); margin-bottom:0.2rem;">${title}</div>
-      <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.45;">${message}</div>
+    <div class="fbsu-toast-body">
+      ${title ? `<div class="fbsu-toast-title">${title}</div>` : ''}
+      <div class="fbsu-toast-message">${message}</div>
     </div>
+    <button class="fbsu-toast-close" type="button" aria-label="${isAr ? 'إغلاق' : 'Close'}" title="${isAr ? 'إغلاق' : 'Close'}">
+      ${createIcon('close', { size: 14 })}
+    </button>
+    <div class="fbsu-toast-progress" style="animation-duration: ${duration}ms;"></div>
   `;
 
-  document.body.appendChild(toast);
-  setTimeout(() => {
-    toast.style.transition = 'all 0.4s ease';
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(40px)';
-    setTimeout(() => toast.remove(), 400);
-  }, 4500);
+  let dismissTimeout = null;
+  let remainingTime = duration;
+  let startTime = Date.now();
+  let isDismissed = false;
+
+  function dismiss() {
+    if (isDismissed) return;
+    isDismissed = true;
+    clearTimeout(dismissTimeout);
+    toast.classList.add('dismissing');
+    toast.addEventListener('animationend', () => {
+      toast.remove();
+    }, { once: true });
+    setTimeout(() => {
+      if (toast.parentElement) toast.remove();
+    }, 350);
+  }
+
+  function startTimer() {
+    startTime = Date.now();
+    dismissTimeout = setTimeout(dismiss, remainingTime);
+  }
+
+  function pauseTimer() {
+    clearTimeout(dismissTimeout);
+    remainingTime -= (Date.now() - startTime);
+  }
+
+  startTimer();
+
+  toast.addEventListener('mouseenter', pauseTimer);
+  toast.addEventListener('mouseleave', () => {
+    if (remainingTime > 0) startTimer();
+  });
+
+  toast.querySelector('.fbsu-toast-close')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    soundFX.playClick();
+    dismiss();
+  });
+
+  container.appendChild(toast);
+  return { dismiss };
 }
+
+function showModalAlert(message, { title = null, type = 'info', confirmText = null } = {}) {
+  return new Promise((resolve) => {
+    const isAr = (typeof appState !== 'undefined' && appState.currentLang === 'ar') || document.documentElement.lang === 'ar';
+    const defaultTitles = {
+      success: isAr ? 'تمت العملية بنجاح' : 'Success',
+      error: isAr ? 'تنبيه خطأ' : 'Attention Required',
+      warning: isAr ? 'تنبيه هـام' : 'Notice',
+      info: isAr ? 'منظومة جامعة فهد بن سلطان' : 'FBSU Smart Campus'
+    };
+    const finalTitle = title || defaultTitles[type] || defaultTitles.info;
+    const finalConfirm = confirmText || (isAr ? 'حسناً، فهمت' : 'OK, Understood');
+
+    if (type === 'success') soundFX.playSuccess();
+    else if (type === 'error') soundFX.playError();
+    else if (type === 'warning') soundFX.playWarning();
+    else soundFX.playClick();
+
+    const iconMap = {
+      success: 'checkCircle2',
+      error: 'alertCircle',
+      warning: 'alertTriangle',
+      info: 'info'
+    };
+    const iconName = iconMap[type] || 'info';
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'fbsu-alert-backdrop';
+    backdrop.innerHTML = `
+      <div class="fbsu-alert-dialog type-${type}" role="dialog" aria-modal="true">
+        <div class="fbsu-alert-icon-ring">
+          ${createIcon(iconName, { size: 36 })}
+        </div>
+        <h3 class="fbsu-alert-title">${finalTitle}</h3>
+        <p class="fbsu-alert-message">${message}</p>
+        <div class="fbsu-alert-actions">
+          <button class="fbsu-alert-btn-primary" id="fbsu-alert-ok-btn">${finalConfirm}</button>
+        </div>
+      </div>
+    `;
+
+    function closeDialog() {
+      soundFX.playClick();
+      backdrop.remove();
+      document.removeEventListener('keydown', handleKey);
+      resolve(true);
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        closeDialog();
+      }
+    }
+
+    backdrop.querySelector('#fbsu-alert-ok-btn')?.addEventListener('click', closeDialog);
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeDialog();
+    });
+    document.addEventListener('keydown', handleKey);
+
+    document.body.appendChild(backdrop);
+  });
+}
+
+// Global luxury overrides
+window.fbsuToast = showToast;
+window.fbsuAlert = showModalAlert;
+window.alert = function (message) {
+  showToast(String(message), 'info');
+};
 
 // ============================================================================
 // Enhanced University Wallet & Tuition Settlement Modal
@@ -3160,7 +3410,11 @@ function openTuitionPaymentModal() {
     const input = document.getElementById('tuition-pay-input');
     const amt = parseFloat(input?.value || '0');
     if (amt <= 0 || amt > user.walletBalance) {
-      alert(isAr ? 'عفواً، رصيدك غير كافٍ لسداد هذا المبلغ!' : 'Insufficient wallet balance!');
+      showToast(
+        isAr ? 'عفواً، رصيد محفظتك غير كافٍ لسداد هذا المبلغ الجامعي. يرجى شحن الرصيد أولاً.' : 'Insufficient wallet balance to settle tuition fees. Please top up.',
+        'error',
+        isAr ? 'رصيد غير كافٍ' : 'Insufficient Balance'
+      );
       return;
     }
 
@@ -3381,7 +3635,11 @@ function openBookTutoringModal(sessionId) {
 
   document.getElementById('confirm-tutoring-pay-btn')?.addEventListener('click', () => {
     if (currentUser.walletBalance < session.hourlyRate) {
-      alert(isAr ? 'عفواً، رصيدك غير كافٍ. يرجى شحن المحفظة أولاً!' : 'Insufficient wallet balance! Please top up.');
+      showToast(
+        isAr ? 'عفواً، رصيدك الحالي غير كافٍ لحجز جلسة الشرح. يرجى شحن المحفظة الجامعية أولاً!' : 'Insufficient balance for this tutoring session! Please top up your wallet.',
+        'warning',
+        isAr ? 'تنبيه رصيد المحفظة' : 'Wallet Balance Alert'
+      );
       return;
     }
 
@@ -4070,7 +4328,15 @@ function attachEventListeners() {
       spread: 80,
       origin: { y: 0.5 }
     });
-    alert('تم تفعيل وضع التبادل الذكي لموقفك بنجاح! موعد عودتك مضمون بنسبة 100%، وتم إيداع 17.25 ر.س في محفظتك الجامعية!');
+    const isArSwap = (typeof appState !== 'undefined' && appState.currentLang === 'ar') || document.documentElement.lang === 'ar';
+    showToast(
+      isArSwap
+        ? 'تم تفعيل وضع التبادل الذكي لموقفك بنجاح! موعد عودتك مضمون بنسبة 100%، وتم إيداع 17.25 ر.س في محفظتك الجامعية!'
+        : 'Smart parking swap activated! Your return time is 100% guaranteed, and 17.25 SAR was deposited to your wallet!',
+      'success',
+      isArSwap ? 'التبادل الذكي نشط' : 'Smart Swap Activated',
+      6000
+    );
     renderApp();
   });
 }
