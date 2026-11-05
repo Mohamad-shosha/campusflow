@@ -205,6 +205,7 @@ export const tasks = [
     tests: ['Unit', 'Service', 'API', 'Concurrency'], blockedBy: ['Q4'],
   }),
   T('P4-04', 'Wallet UI (balance, history, top-up per Q4)', {
+    status: 'Done', pr: 'PR (feature/P4-04-wallet-ui)',
     pri: 'Medium', cx: 'M', deps: ['P3-04', 'P4-02'], branch: 'feature/P4-04-wallet-ui',
     goal: 'شاشة المحفظة: الرصيد والسجل والشحن (حسب قرار Q4) بنفس شكل التصميم.',
     files: ['frontend/src/features/wallet/*'],

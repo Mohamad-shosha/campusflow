@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 20 تاسك ✅
+- **المنجز بالكامل (Done):** 21 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 33 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **38%**
+- **المتبقي للبدء (Backlog):** 32 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **40%**
 
 
 
@@ -22,13 +22,13 @@
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
-| P4 | Wallet & Tuition | 5 | 3 | 0 | 2 |
+| P4 | Wallet & Tuition | 5 | 4 | 0 | 1 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **20** | **0** | **33** |
+| **الإجمالي** | | **53** | **21** | **0** | **32** |
 
 ---
 
@@ -269,9 +269,9 @@
 
 ### P4-04 — Wallet UI (balance, history, top-up per Q4)
 - **ماذا سيعمل:** شاشة المحفظة: الرصيد والسجل والشحن (حسب قرار Q4) بنفس شكل التصميم.
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P3-04، P4-02
-- **Git Branch:** `feature/P4-04-wallet-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P4-04-wallet-ui` · **Pull Request:** PR (feature/P4-04-wallet-ui)
 - **الملفات المتوقعة:** `frontend/src/features/wallet/*`
 - **Implementation Steps:** 1) المكونات 2) ربط الـ API 3) حالات التحميل/الخطأ 4) اختبارات
 - **Acceptance Criteria:** تطابق مع النسخة القديمة · بيانات حقيقية من السيرفر

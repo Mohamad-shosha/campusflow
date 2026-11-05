@@ -11,6 +11,7 @@ export interface AppShellProps {
   currentUser: AppUser;
   notificationCount?: number;
   onOpenAuth?: (() => void) | undefined;
+  onOpenWallet?: (() => void) | undefined;
   children: ReactNode;
 }
 
@@ -19,6 +20,8 @@ export const AppShell: FC<AppShellProps> = ({
   onTabChange,
   currentUser,
   notificationCount = 3,
+  onOpenAuth,
+  onOpenWallet,
   children,
 }) => {
   const { isAr, isLightTheme } = useAppPreferences();
@@ -35,6 +38,8 @@ export const AppShell: FC<AppShellProps> = ({
         onTabChange={onTabChange}
         currentUser={currentUser}
         notificationCount={notificationCount}
+        onOpenAuth={onOpenAuth}
+        onOpenWallet={onOpenWallet}
       />
       <main className="main-content">{children}</main>
       <Footer />

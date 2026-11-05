@@ -28,10 +28,10 @@ export interface HeaderProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
-  notificationCount?: number;
-  onOpenNotifications?: () => void;
-  onOpenWallet?: () => void;
-  onOpenAuth?: () => void;
+  notificationCount?: number | undefined;
+  onOpenNotifications?: (() => void) | undefined;
+  onOpenWallet?: (() => void) | undefined;
+  onOpenAuth?: (() => void) | undefined;
 }
 
 export const Header: FC<HeaderProps> = ({

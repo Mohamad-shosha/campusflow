@@ -5,6 +5,7 @@ import { AppPreferencesProvider, useAppPreferences } from '../shared/context/App
 import { AuthProvider, useAuth } from '../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
 import { AuthModal } from '../features/auth/components/AuthModal';
+import { WalletPage } from '../features/wallet';
 import { Toast, type ToastType } from '../shared/components/Toast';
 import { SaudiPlate } from '../shared/components/SaudiPlate';
 import type { AppUser } from '../shared/types/navigation';
@@ -17,6 +18,7 @@ export interface AppContentProps {
 
 const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
+  const [liveBalance, setLiveBalance] = useState<number>(720.0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const [activeToast, setActiveToast] = useState<{
@@ -36,7 +38,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         nameEn: user.fullNameEn,
         role: user.roles[0] || 'STUDENT',
         roleEn: user.roles[0] || 'STUDENT',
-        walletBalance: 720.0,
+        walletBalance: liveBalance,
         avatarColor: '#116E63',
       }
     : {
@@ -45,7 +47,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         nameEn: 'Eyad Al-Harbi',
         role: 'طالب متميز',
         roleEn: 'Honor Student',
-        walletBalance: 720.0,
+        walletBalance: liveBalance,
         avatarColor: '#116E63',
       };
 
@@ -58,6 +60,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         setAuthModalTab('login');
         setIsAuthModalOpen(true);
       }}
+      onOpenWallet={() => setActiveTab('wallet')}
     >
       <div className="container" style={{ padding: '3rem 1.25rem', minHeight: '60vh' }}>
         {activeToast && (
@@ -209,6 +212,14 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               {t('nav.bookParking')}
             </button>
             <button
+              className={activeTab === 'wallet' ? 'fbsu-alert-btn-primary' : 'fbsu-alert-btn-secondary'}
+              onClick={() => setActiveTab('wallet')}
+              type="button"
+              data-testid="tab-wallet-btn"
+            >
+              {isAr ? 'المحفظة الرقمية' : 'Digital Wallet'}
+            </button>
+            <button
               className="fbsu-alert-btn-secondary"
               onClick={() => setActiveTab('admin-panel')}
               type="button"
@@ -216,6 +227,12 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               {isAr ? 'لوحة المسؤول (محمية)' : 'Admin Panel (Guarded)'}
             </button>
           </div>
+
+          {activeTab === 'wallet' && (
+            <div style={{ marginTop: '2rem', textAlign: 'initial' }}>
+              <WalletPage onBalanceUpdate={b => setLiveBalance(b)} />
+            </div>
+          )}
 
           {activeTab === 'admin-panel' && (
             <ProtectedRoute requiredRoles={['CAMPUS_ADMIN']}>
