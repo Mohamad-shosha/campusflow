@@ -93,3 +93,4 @@ public class RefreshToken extends BaseEntity {
         this.replacedByTokenHash = replacedByTokenHash;
     }
 }
+

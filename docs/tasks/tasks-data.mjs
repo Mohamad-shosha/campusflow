@@ -102,7 +102,7 @@ export const tasks = [
     tests: ['Unit (plate, password)', 'Repository tests'], blockedBy: [],
   }),
   T('P2-03', 'Authentication API (register, login, refresh, logout) + RBAC', {
-    status: 'In Progress', pr: 'Branch feature/P2-03-authentication (جاري البدء)',
+    status: 'Done', pr: 'PR (feature/P2-03-authentication)',
     pri: 'Critical', cx: 'L', deps: ['P2-02', 'Q3'], branch: 'feature/P2-03-authentication',
     goal: 'تسجيل ودخول وتجديد وخروج بـ JWT، مع صلاحيات الأدوار وrate limiting.',
     files: ['common/security/*', 'identity/api/AuthController.java', 'identity/application/AuthService.java', 'DTOs', 'tests'],
@@ -111,6 +111,7 @@ export const tasks = [
     tests: ['Unit', 'Service', 'API (MockMvc)', 'Security matrix', 'Token tamper/expiry'], blockedBy: ['Q3'],
   }),
   T('P2-04', 'Profile & vehicle API', {
+    status: 'In Progress', pr: 'Branch feature/P2-04-profile-vehicles-api (جاري البدء)',
     pri: 'Medium', cx: 'M', deps: ['P2-03'], branch: 'feature/P2-04-profile-vehicles-api',
     goal: 'عرض وتعديل الملف الشخصي وإدارة السيارات (بياناتك أنت فقط).',
     files: ['identity/api/MeController.java', 'identity/application/*', 'DTOs', 'tests'],

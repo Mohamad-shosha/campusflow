@@ -9,18 +9,18 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 9 تاسك ✅
+- **المنجز بالكامل (Done):** 10 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 1 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 43 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **17%**
+- **المتبقي للبدء (Backlog):** 42 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **19%**
 
-> 📌 **التاسك الشغالين عليه دلوقتي:** **`P2-03` — Authentication API (register, login, refresh, logout) + RBAC** (الفرع: `feature/P2-03-authentication`)
+> 📌 **التاسك الشغالين عليه دلوقتي:** **`P2-04` — Profile & vehicle API** (الفرع: `feature/P2-04-profile-vehicles-api`)
 
 | Phase | الاسم | إجمالي | منجز (Done) ✅ | قيد التنفيذ ⏳ | متبقي 📋 |
 |---|---|---|---|---|---|
 | P0 | Discovery & Planning | 1 | 1 | 0 | 0 |
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
-| P2 | Identity & Campus Core | 5 | 2 | 1 | 2 |
+| P2 | Identity & Campus Core | 5 | 3 | 1 | 1 |
 | P3 | Frontend Foundation (React) | 5 | 0 | 0 | 5 |
 | P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
@@ -28,7 +28,7 @@
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **9** | **1** | **43** |
+| **الإجمالي** | | **53** | **10** | **1** | **42** |
 
 ---
 
@@ -142,9 +142,9 @@
 
 ### P2-03 — Authentication API (register, login, refresh, logout) + RBAC
 - **ماذا سيعمل:** تسجيل ودخول وتجديد وخروج بـ JWT، مع صلاحيات الأدوار وrate limiting.
-- **Priority:** Critical · **Complexity:** L · **Status:** ⏳ In Progress (جاري العمل)
+- **Priority:** Critical · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P2-02، Q3
-- **Git Branch:** `feature/P2-03-authentication` · **Pull Request:** Branch feature/P2-03-authentication (جاري البدء)
+- **Git Branch:** `feature/P2-03-authentication` · **Pull Request:** PR (feature/P2-03-authentication)
 - **الملفات المتوقعة:** `common/security/*`، `identity/api/AuthController.java`، `identity/application/AuthService.java`، `DTOs`، `tests`
 - **Implementation Steps:** 1) Security config stateless 2) JWT service (access 15د + refresh rotation) 3) AuthService 4) Controller + DTOs + OpenAPI 5) Rate limiter 6) اختبارات الأمان
 - **Acceptance Criteria:** register ينشئ user+vehicle · كلمة مرور خاطئة = 401 بدون كشف وجود المستخدم · توكن منتهي/متلاعب به = 401 · endpoint محمي بدور = 403 · refresh القديم يبطل بعد التدوير · كلمات المرور لا تظهر في اللوج
@@ -153,9 +153,9 @@
 
 ### P2-04 — Profile & vehicle API
 - **ماذا سيعمل:** عرض وتعديل الملف الشخصي وإدارة السيارات (بياناتك أنت فقط).
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ⏳ In Progress (جاري العمل)
 - **Dependencies:** P2-03
-- **Git Branch:** `feature/P2-04-profile-vehicles-api` · **Pull Request:** —
+- **Git Branch:** `feature/P2-04-profile-vehicles-api` · **Pull Request:** Branch feature/P2-04-profile-vehicles-api (جاري البدء)
 - **الملفات المتوقعة:** `identity/api/MeController.java`، `identity/application/*`، `DTOs`، `tests`
 - **Implementation Steps:** 1) Services 2) Controllers + DTOs 3) اختبارات IDOR
 - **Acceptance Criteria:** المستخدم لا يصل إلا لبياناته · أخطاء validation بصيغة ProblemDetail

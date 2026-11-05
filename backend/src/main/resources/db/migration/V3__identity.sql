@@ -80,3 +80,4 @@ CREATE TABLE IF NOT EXISTS refresh_token (
 
 CREATE INDEX IF NOT EXISTS idx_refresh_token_user_id ON refresh_token(user_id);
 CREATE INDEX IF NOT EXISTS idx_refresh_token_hash ON refresh_token(token_hash);
+

@@ -97,3 +97,4 @@ public class Vehicle extends BaseTenantEntity {
         this.active = active;
     }
 }
+

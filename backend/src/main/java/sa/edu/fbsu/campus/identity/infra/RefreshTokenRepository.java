@@ -18,3 +18,4 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
 
     long deleteByExpiresAtBefore(Instant cutoff);
 }
+

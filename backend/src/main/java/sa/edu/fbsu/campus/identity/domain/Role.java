@@ -8,3 +8,4 @@ public enum Role {
     SECURITY_OFFICER,
     STAFF
 }
+

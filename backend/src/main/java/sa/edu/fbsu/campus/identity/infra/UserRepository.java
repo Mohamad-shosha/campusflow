@@ -21,3 +21,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findByUniversityId(UUID universityId);
 }
+

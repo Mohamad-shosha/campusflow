@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
  * Value Object representing a validated Saudi Arabia vehicle license plate.
  * Standard format consists of 3 Arabic letters and 1 to 4 numeric digits.
  * Official Saudi Moroor letter mapping:
- * ا=A, ب=B, ح=J, د=D, ر=R, س=S, ص=X, ط=T, ع=E, ق=G, ك=K, ل=L, م=Z, ن=N, ه=H, و=U, ى=V.
+ * ا=A, ب=B, ح=J, د=D, ر=R, س=S, ص=X, ط=T, ع=E, ق=G, ك=K, ل=L, م=Z, ن=N, ه=H,
+ * و=U, ى=V.
  */
 @Embeddable
 public class SaudiPlate implements Serializable {
@@ -73,12 +74,14 @@ public class SaudiPlate implements Serializable {
 
         String cleanedDigits = rawDigits.trim();
         if (!DIGITS_PATTERN.matcher(cleanedDigits).matches()) {
-            throw new IllegalArgumentException("Saudi license plate digits must be between 1 and 4 digits, got: " + rawDigits);
+            throw new IllegalArgumentException(
+                    "Saudi license plate digits must be between 1 and 4 digits, got: " + rawDigits);
         }
 
         String normalizedAr = normalizeArabicLetters(rawLettersAr);
         if (normalizedAr.length() != 3) {
-            throw new IllegalArgumentException("Saudi license plate must contain exactly 3 valid letters, got: " + rawLettersAr);
+            throw new IllegalArgumentException(
+                    "Saudi license plate must contain exactly 3 valid letters, got: " + rawLettersAr);
         }
 
         StringBuilder enBuilder = new StringBuilder();
@@ -91,7 +94,8 @@ public class SaudiPlate implements Serializable {
         }
 
         // Store formatted letters separated by space: "ط ر ق" and "T R G"
-        this.lettersAr = String.format("%c %c %c", normalizedAr.charAt(0), normalizedAr.charAt(1), normalizedAr.charAt(2));
+        this.lettersAr = String.format("%c %c %c", normalizedAr.charAt(0), normalizedAr.charAt(1),
+                normalizedAr.charAt(2));
         this.lettersEn = String.format("%c %c %c", enBuilder.charAt(0), enBuilder.charAt(1), enBuilder.charAt(2));
         this.digits = cleanedDigits;
     }
@@ -147,8 +151,10 @@ public class SaudiPlate implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         SaudiPlate that = (SaudiPlate) o;
         return Objects.equals(lettersAr, that.lettersAr) && Objects.equals(digits, that.digits);
     }

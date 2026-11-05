@@ -63,3 +63,4 @@ class PasswordServiceTest {
         assertThat(passwordService.isStrong("NoDigitsPassword")).isFalse(); // no digit
     }
 }
+

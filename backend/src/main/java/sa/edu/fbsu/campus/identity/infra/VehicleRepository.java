@@ -21,3 +21,4 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
     boolean existsByUniversityIdAndPlateLettersArAndPlateDigits(
             UUID universityId, String plateLettersAr, String plateDigits);
 }
+
