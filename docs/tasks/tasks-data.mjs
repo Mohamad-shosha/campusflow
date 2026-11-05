@@ -214,6 +214,7 @@ export const tasks = [
     tests: ['Component', 'API integration', 'E2E'], blockedBy: ['Q4'],
   }),
   T('P4-05', 'Tuition UI + receipt', {
+    status: 'Done', pr: 'PR (feature/P4-05-tuition-ui)',
     pri: 'Medium', cx: 'M', deps: ['P4-03', 'P4-04'], branch: 'feature/P4-05-tuition-ui',
     goal: 'شاشة سداد الرسوم وعرض/طباعة الإيصال.',
     files: ['frontend/src/features/tuition/*'],

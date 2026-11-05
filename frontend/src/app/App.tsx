@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from '../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
 import { AuthModal } from '../features/auth/components/AuthModal';
 import { WalletPage } from '../features/wallet';
+import { TuitionPage } from '../features/tuition';
 import { Toast, type ToastType } from '../shared/components/Toast';
 import { SaudiPlate } from '../shared/components/SaudiPlate';
 import type { AppUser } from '../shared/types/navigation';
@@ -220,6 +221,14 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               {isAr ? 'المحفظة الرقمية' : 'Digital Wallet'}
             </button>
             <button
+              className={activeTab === 'tuition' ? 'fbsu-alert-btn-primary' : 'fbsu-alert-btn-secondary'}
+              onClick={() => setActiveTab('tuition')}
+              type="button"
+              data-testid="tab-tuition-btn"
+            >
+              {isAr ? 'الرسوم الدراسية' : 'Tuition Fees'}
+            </button>
+            <button
               className="fbsu-alert-btn-secondary"
               onClick={() => setActiveTab('admin-panel')}
               type="button"
@@ -231,6 +240,15 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           {activeTab === 'wallet' && (
             <div style={{ marginTop: '2rem', textAlign: 'initial' }}>
               <WalletPage onBalanceUpdate={b => setLiveBalance(b)} />
+            </div>
+          )}
+
+          {activeTab === 'tuition' && (
+            <div style={{ marginTop: '2rem', textAlign: 'initial' }}>
+              <TuitionPage
+                onBalanceUpdate={b => setLiveBalance(b)}
+                onOpenTopUp={() => setActiveTab('wallet')}
+              />
             </div>
           )}
 
