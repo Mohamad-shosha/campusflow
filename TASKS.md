@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 17 تاسك ✅
+- **المنجز بالكامل (Done):** 20 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 36 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **32%**
+- **المتبقي للبدء (Backlog):** 33 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **38%**
 
 
 
@@ -22,13 +22,13 @@
 | P1 | Foundation & DevOps | 6 | 6 | 0 | 0 |
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
-| P4 | Wallet & Tuition | 5 | 0 | 0 | 5 |
+| P4 | Wallet & Tuition | 5 | 3 | 0 | 2 |
 | P5 | Parking | 9 | 0 | 0 | 9 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **17** | **0** | **36** |
+| **الإجمالي** | | **53** | **20** | **0** | **33** |
 
 ---
 
@@ -236,9 +236,9 @@
 
 ### P4-01 — Ledger + wallet schema
 - **ماذا سيعمل:** جداول المحفظة ودفتر الحركات (ledger) غير القابل للتعديل مع قيود تمنع الرصيد السالب.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P2-03
-- **Git Branch:** `feature/P4-01-ledger-schema` · **Pull Request:** —
+- **Git Branch:** `feature/P4-01-ledger-schema` · **Pull Request:** PR (feature/P4-01-ledger-schema)
 - **الملفات المتوقعة:** `db/migration/V4__wallet.sql`، `wallet/domain/*`، `wallet/infra/*`
 - **Implementation Steps:** 1) Migration 2) Entities (@Version) 3) Repositories 4) اختبارات القيود
 - **Acceptance Criteria:** CHECK balance >= 0 · idempotency_key unique · ledger append-only
@@ -247,9 +247,9 @@
 
 ### P4-02 — Wallet service & API
 - **ماذا سيعمل:** خدمة المحفظة: رصيد، سجل، تحويلات ذرية بين المستخدمين، وإعادة المحاولة الآمنة (Idempotency).
-- **Priority:** Critical · **Complexity:** L · **Status:** Backlog
+- **Priority:** Critical · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P4-01
-- **Git Branch:** `feature/P4-02-wallet-api` · **Pull Request:** —
+- **Git Branch:** `feature/P4-02-wallet-api` · **Pull Request:** PR (feature/P4-02-wallet-api)
 - **الملفات المتوقعة:** `wallet/application/*`، `wallet/api/*`، `tests`
 - **Implementation Steps:** 1) WalletService (debit/credit/transfer) 2) Controller + DTOs 3) Idempotency-Key 4) اختبار التزامن
 - **Acceptance Criteria:** التحويل ذري · لا double-spend تحت التوازي · تكرار نفس الـ key لا يكرر العملية
@@ -258,9 +258,9 @@
 
 ### P4-03 — Tuition accounts & payment + receipt
 - **ماذا سيعمل:** حسابات الرسوم الدراسية لكل فصل وسدادها من الرصيد وإصدار رقم إيصال فريد.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P4-02، Q4
-- **Git Branch:** `feature/P4-03-tuition` · **Pull Request:** —
+- **Git Branch:** `feature/P4-03-tuition` · **Pull Request:** PR (feature/P4-03-tuition)
 - **الملفات المتوقعة:** `db/migration/V5__tuition.sql`، `wallet/application/Tuition*`، `wallet/api/*`
 - **Implementation Steps:** 1) Migration 2) Service 3) Receipt numbering 4) API 5) اختبارات
 - **Acceptance Criteria:** المبلغ ≤ الرصيد و≤ المتبقي · رقم الإيصال فريد

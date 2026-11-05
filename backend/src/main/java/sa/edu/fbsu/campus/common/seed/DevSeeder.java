@@ -24,6 +24,8 @@ import sa.edu.fbsu.campus.wallet.domain.TransactionType;
 import sa.edu.fbsu.campus.wallet.domain.Wallet;
 import sa.edu.fbsu.campus.wallet.infra.LedgerEntryRepository;
 import sa.edu.fbsu.campus.wallet.infra.WalletRepository;
+import sa.edu.fbsu.campus.wallet.tuition.domain.TuitionInvoice;
+import sa.edu.fbsu.campus.wallet.tuition.infra.TuitionInvoiceRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,6 +51,7 @@ public class DevSeeder implements CommandLineRunner {
     private final PasswordService passwordService;
     private final WalletRepository walletRepository;
     private final LedgerEntryRepository ledgerEntryRepository;
+    private final TuitionInvoiceRepository tuitionInvoiceRepository;
 
     public DevSeeder(
             UniversityRepository universityRepository,
@@ -59,7 +62,8 @@ public class DevSeeder implements CommandLineRunner {
             VehicleRepository vehicleRepository,
             PasswordService passwordService,
             WalletRepository walletRepository,
-            LedgerEntryRepository ledgerEntryRepository) {
+            LedgerEntryRepository ledgerEntryRepository,
+            TuitionInvoiceRepository tuitionInvoiceRepository) {
         this.universityRepository = universityRepository;
         this.collegeRepository = collegeRepository;
         this.buildingRepository = buildingRepository;
@@ -69,6 +73,7 @@ public class DevSeeder implements CommandLineRunner {
         this.passwordService = passwordService;
         this.walletRepository = walletRepository;
         this.ledgerEntryRepository = ledgerEntryRepository;
+        this.tuitionInvoiceRepository = tuitionInvoiceRepository;
     }
 
     @Override
@@ -141,6 +146,30 @@ public class DevSeeder implements CommandLineRunner {
                 "عمر بن راشد الشمري", "Omar R. Al-Shammari",
                 UserType.STUDENT, Role.STUDENT, "0504440003", bus.getId(), "إدارة الأعمال الدولية",
                 "د ر ع", "9090", "Kia K5 2023");
+
+        // 6. Tuition Invoices for Demo Student (STD-202410101)
+        termRepository.findByUniversityIdAndCode(uniId, "2026-FALL").ifPresent(fallTerm -> {
+            if (tuitionInvoiceRepository.findByInvoiceNumber("INV-2026-CCIS-001").isEmpty()) {
+                userRepository.findByUniversityNumber("STD-202410101").ifPresent(student -> {
+                    tuitionInvoiceRepository.save(new TuitionInvoice(
+                            uniId,
+                            student,
+                            fallTerm,
+                            "INV-2026-CCIS-001",
+                            new BigDecimal("450.00"),
+                            LocalDate.of(2026, 11, 30)
+                    ));
+                    tuitionInvoiceRepository.save(new TuitionInvoice(
+                            uniId,
+                            student,
+                            fallTerm,
+                            "INV-2026-CCIS-002",
+                            new BigDecimal("1500.00"),
+                            LocalDate.of(2026, 12, 31)
+                    ));
+                });
+            }
+        });
 
         log.info("--- [DevSeeder] Completed FBSU dev/demo seeding successfully ---");
     }

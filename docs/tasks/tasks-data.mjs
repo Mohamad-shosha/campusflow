@@ -196,6 +196,7 @@ export const tasks = [
     tests: ['Unit', 'Service', 'Concurrency', 'API', 'Security'], blockedBy: [],
   }),
   T('P4-03', 'Tuition accounts & payment + receipt', {
+    status: 'Done', pr: 'PR (feature/P4-03-tuition)',
     pri: 'High', cx: 'L', deps: ['P4-02', 'Q4'], branch: 'feature/P4-03-tuition',
     goal: 'حسابات الرسوم الدراسية لكل فصل وسدادها من الرصيد وإصدار رقم إيصال فريد.',
     files: ['db/migration/V5__tuition.sql', 'wallet/application/Tuition*', 'wallet/api/*'],
