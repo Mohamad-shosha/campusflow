@@ -1,9 +1,11 @@
+name: fbsu-smart-campus
+
 services:
   # ============================================================================
   # 1. PostgreSQL Database Service with Persistent Volume and Health Check
   # ============================================================================
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: fbsu-postgres
     restart: unless-stopped
     environment:
@@ -68,7 +70,7 @@ services:
     ports:
       - "${FRONTEND_PORT:-80}:80"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/"]
       interval: 15s
       timeout: 3s
       retries: 3

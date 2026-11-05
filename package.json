@@ -1,6 +1,7 @@
 {
-  "name": "rakan",
-  "version": "0.0.0",
+  "name": "fbsu-smart-campus",
+  "version": "1.0.0",
+  "description": "FBSU Smart Campus & ALPR Smart Parking Enterprise Platform",
   "private": true,
   "type": "module",
   "scripts": {

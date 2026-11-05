@@ -101,3 +101,4 @@ jobs:
           context: ./frontend
           push: false
           tags: fbsu-campus-frontend:test
+
