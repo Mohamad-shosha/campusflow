@@ -1,7 +1,9 @@
-import { useState, FC } from 'react';
-import { Calendar, ShieldCheck } from 'lucide-react';
+import { useState, useEffect, FC } from 'react';
+import { Calendar, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
 import { DigitalPassModal, type DigitalPassData } from './DigitalPassModal';
 import { soundFX } from '../../../shared/utils/sound';
+import { parkingApi } from '../api/parkingApi';
+import type { ParkingSpotResponse, BookingResponse } from '../types/parking';
 
 export interface BookingWizardViewProps {
   isAr: boolean;
@@ -13,12 +15,16 @@ export interface BookingWizardViewProps {
     primarySpot?: number;
   };
   onOpenGate?: () => void;
+  onOpenAuth?: () => void;
+  onBookingSuccess?: (booking: BookingResponse) => void;
 }
 
 export const BookingWizardView: FC<BookingWizardViewProps> = ({
   isAr,
   currentUser,
   onOpenGate,
+  onOpenAuth,
+  onBookingSuccess,
 }) => {
   const [schedulePattern, setSchedulePattern] = useState<string>('sun-tue');
   const [selectedCollege, setSelectedCollege] = useState<string>('computing');
@@ -27,6 +33,39 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
   const [timeTo, setTimeTo] = useState<string>('12:00');
   const [optInFlex, setOptInFlex] = useState<boolean>(true);
   const [digitalPass, setDigitalPass] = useState<DigitalPassData | null>(null);
+
+  // Live backend spots for the selected zone
+  const [availableSpots, setAvailableSpots] = useState<ParkingSpotResponse[]>([]);
+  const [selectedSpotId, setSelectedSpotId] = useState<string>('');
+  const [selectedBayNumber, setSelectedBayNumber] = useState<number>(2);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
+  // Map college to zone
+  const targetZone = selectedCollege === 'business' ? 'B' : selectedCollege === 'medicine' ? 'B' : selectedCollege === 'sciences' ? 'C' : 'A';
+
+  useEffect(() => {
+    let isMounted = true;
+    parkingApi.getSpots(targetZone)
+      .then(spots => {
+        if (!isMounted) return;
+        const available = spots.filter(s => s.status === 'AVAILABLE');
+        setAvailableSpots(available);
+        if (available.length > 0) {
+          setSelectedSpotId(available[0].id);
+          setSelectedBayNumber(available[0].bayNumber);
+        } else if (spots.length > 0) {
+          setSelectedSpotId(spots[0].id);
+          setSelectedBayNumber(spots[0].bayNumber);
+        }
+      })
+      .catch(err => {
+        console.warn('Could not load spots for zone', targetZone, err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [targetZone]);
 
   // Price calculations
   let basePrice = 17.25;
@@ -48,36 +87,80 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
     totalPrice = basePrice - discount;
   }
 
-  const handleConfirm = () => {
-    soundFX.playSuccess();
-    setDigitalPass({
-      spotId: currentUser.primarySpot || 2,
-      college:
-        selectedCollege === 'computing'
-          ? isAr
-            ? 'كلية الحاسب الآلي'
-            : 'College of Computing'
-          : selectedCollege === 'engineering'
-            ? isAr
-              ? 'كلية الهندسة'
-              : 'College of Engineering'
-            : isAr
-              ? 'كلية إدارة الأعمال'
-              : 'College of Business',
-      userName: currentUser.name,
-      userId: currentUser.id,
-      plate: currentUser.plate || 'ب ط ك 1234',
-      duration:
-        tariffPlan === 'hourly'
-          ? `3 ${isAr ? 'ساعات' : 'Hours'} (${timeFrom} - ${timeTo})`
-          : tariffPlan === 'daily'
-            ? isAr
-              ? 'يوم كامل'
-              : 'Full Day'
-            : isAr
-              ? 'اشتراك شهري'
-              : 'Monthly Pass',
-    });
+  const handleConfirm = async () => {
+    setBookingError(null);
+    setIsSubmitting(true);
+
+    try {
+      // Build ISO timestamps for reservation
+      const today = new Date();
+      const [fromH, fromM] = timeFrom.split(':').map(Number);
+      const [toH, toM] = timeTo.split(':').map(Number);
+
+      const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), fromH, fromM, 0);
+      let endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), toH, toM, 0);
+
+      // If end time is before or equal to start time, advance by 2 hours
+      if (endDate <= startDate) {
+        endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+      }
+
+      // If no spot selected yet, fallback to fetching any available
+      let targetSpotId = selectedSpotId;
+      if (!targetSpotId) {
+        const spots = await parkingApi.getSpots(targetZone);
+        const avail = spots.find(s => s.status === 'AVAILABLE') || spots[0];
+        if (avail) {
+          targetSpotId = avail.id;
+          setSelectedBayNumber(avail.bayNumber);
+        }
+      }
+
+      if (!targetSpotId) {
+        throw new Error(isAr ? 'لم يتم العثور على موقف متاح في هذا القطاع' : 'No available spot found in this zone');
+      }
+
+      const booking = await parkingApi.createBooking({
+        spotId: targetSpotId,
+        idempotencyKey: 'booking-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString(),
+      });
+
+      soundFX.playSuccess();
+      setDigitalPass({
+        spotId: booking.bayNumber,
+        college: isAr ? booking.zoneNameAr : booking.zoneNameEn,
+        userName: currentUser.name,
+        userId: currentUser.id,
+        plate: booking.vehiclePlate || currentUser.plate || 'أ ب ح 1234',
+        duration: `${booking.durationHours} ${isAr ? 'ساعات' : 'Hours'} (${timeFrom} - ${timeTo})`,
+        bookingId: booking.id,
+        passCode: booking.digitalPassCode,
+        qrToken: booking.qrToken,
+        totalAmount: booking.totalAmount,
+      });
+
+      onBookingSuccess?.(booking);
+    } catch (err: any) {
+      console.error('Booking failed:', err);
+      soundFX.playError();
+      const status = err?.response?.status;
+      const detail = err?.response?.data?.detail;
+
+      if (status === 401) {
+        setBookingError(isAr ? 'يرجى تسجيل الدخول أولاً لتأكيد الحجز وخصم الرصيد من محفظتك' : 'Please sign in to confirm booking and debit your campus wallet.');
+        onOpenAuth?.();
+      } else if (status === 409 || detail?.includes('overlap')) {
+        setBookingError(isAr ? 'عذراً! هذا الموقف محجوز بالفعل في هذا التوقيت. يرجى اختيار موقف آخر.' : 'This spot is already booked for this time window. Please select another bay.');
+      } else if (detail) {
+        setBookingError(detail);
+      } else {
+        setBookingError(isAr ? 'تعذر إتمام الحجز. يرجى التأكد من رصيد المحفظة والاتصال.' : 'Failed to complete booking. Please verify wallet balance and connectivity.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -215,11 +298,42 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
             </div>
           </div>
 
+          {/* Spot Picker */}
+          <div className="form-group">
+            <label className="form-label">
+              {isAr ? '4. اختيار الموقف المطلوب في هذا القطاع:' : '4. Select Parking Bay:'}
+            </label>
+            {availableSpots.length > 0 ? (
+              <select
+                value={selectedSpotId}
+                onChange={e => {
+                  const sId = e.target.value;
+                  setSelectedSpotId(sId);
+                  const found = availableSpots.find(s => s.id === sId);
+                  if (found) setSelectedBayNumber(found.bayNumber);
+                }}
+                className="form-control"
+              >
+                {availableSpots.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {isAr
+                      ? `موقف #${String(s.bayNumber).padStart(2, '0')} (${s.zoneCode} - ${s.zoneNameAr}) — مسافة ${s.distanceMeters}م`
+                      : `Bay #${String(s.bayNumber).padStart(2, '0')} (${s.zoneCode} - ${s.zoneNameEn}) — ${s.distanceMeters}m`}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div style={{ color: 'var(--status-occupied)', fontSize: '0.85rem', padding: '0.5rem 0' }}>
+                {isAr ? 'لا توجد مواقف شاغرة حالياً في هذا القطاع، سيتم تخصيص أقرب موقف متاح تلقائياً.' : 'No vacant bays currently in this zone; system will auto-assign closest available.'}
+              </div>
+            )}
+          </div>
+
           {/* Time Range */}
           {tariffPlan === 'hourly' && (
             <div className="form-group">
               <label className="form-label">
-                {isAr ? '4. الساعات المطلوبة للموقف:' : '4. Required Hours:'}
+                {isAr ? '5. الساعات المطلوبة للموقف:' : '5. Required Hours:'}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
@@ -280,19 +394,49 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
             </label>
           </div>
 
+          {bookingError && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#f87171',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.85rem 1rem',
+                fontSize: '0.88rem',
+                marginBottom: '1rem',
+              }}
+            >
+              <AlertCircle size={18} style={{ flexShrink: 0 }} />
+              <span>{bookingError}</span>
+            </div>
+          )}
+
           <button
             className="btn-gold"
             onClick={handleConfirm}
-            style={{ width: '100%', justifyContent: 'center', padding: '0.95rem' }}
+            disabled={isSubmitting}
+            style={{ width: '100%', justifyContent: 'center', padding: '0.95rem', opacity: isSubmitting ? 0.7 : 1 }}
             type="button"
             data-testid="confirm-booking-btn"
           >
-            <ShieldCheck size={18} color="#0b1a17" />
-            <span>
-              {isAr
-                ? 'تأكيد الحجز وإصدار التصريح الرقمي الذكي'
-                : 'Confirm & Generate Digital Gate Pass'}
-            </span>
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="spin-anim" />
+                <span>{isAr ? 'جاري التحقق وحجز الموقف...' : 'Verifying and booking spot...'}</span>
+              </>
+            ) : (
+              <>
+                <ShieldCheck size={18} color="#0b1a17" />
+                <span>
+                  {isAr
+                    ? 'تأكيد الحجز وإصدار التصريح الرقمي الذكي'
+                    : 'Confirm & Generate Digital Gate Pass'}
+                </span>
+              </>
+            )}
           </button>
         </div>
 
@@ -360,7 +504,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
           >
             <span>{isAr ? 'الموقف المخصص:' : 'Assigned Spot:'}</span>
             <strong style={{ color: 'var(--status-available)' }}>
-              {isAr ? 'موقف #02 (كلية الحاسب)' : 'Bay #02 (Computing)'}
+              {isAr ? `موقف #${String(selectedBayNumber).padStart(2, '0')} (${selectedCollege})` : `Bay #${String(selectedBayNumber).padStart(2, '0')} (${selectedCollege})`}
             </strong>
           </div>
           <div

@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 28 تاسك ✅
+- **المنجز بالكامل (Done):** 29 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 25 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **53%**
+- **المتبقي للبدء (Backlog):** 24 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **55%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 6 | 0 | 3 |
+| P5 | Parking | 9 | 7 | 0 | 2 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **28** | **0** | **25** |
+| **الإجمالي** | | **53** | **29** | **0** | **24** |
 
 ---
 
@@ -360,9 +360,9 @@
 
 ### P5-07 — Booking UI + pass/QR
 - **ماذا سيعمل:** شاشة حجز الموقف واختيار التعرفة وعرض التصريح الرقمي.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P5-03، P5-06
-- **Git Branch:** `feature/P5-07-booking-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P5-07-booking-ui` · **Pull Request:** PR (feature/P5-07-booking-ui)
 - **الملفات المتوقعة:** `frontend/src/features/parking/booking/*`
 - **Implementation Steps:** 1) الفورم 2) السعر من الـ API 3) Pass modal + QR حقيقي 4) اختبارات
 - **Acceptance Criteria:** السعر المعروض = سعر السيرفر

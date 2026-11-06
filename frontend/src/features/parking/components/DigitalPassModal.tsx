@@ -11,6 +11,10 @@ export interface DigitalPassData {
   userId: string;
   plate: string;
   duration: string;
+  bookingId?: string;
+  passCode?: string;
+  qrToken?: string;
+  totalAmount?: number;
 }
 
 export interface DigitalPassModalProps {
@@ -19,6 +23,7 @@ export interface DigitalPassModalProps {
   isAr: boolean;
   onClose: () => void;
   onOpenGate?: (() => void) | undefined;
+  onCancelBooking?: (bookingId: string) => Promise<void>;
 }
 
 export const DigitalPassModal: FC<DigitalPassModalProps> = ({
@@ -93,8 +98,13 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
             <span className="badge badge-fbsu">{passData.college}</span>
           </div>
 
-          <div className="pass-qr-box" style={{ margin: '1.25rem 0', display: 'flex', justifyContent: 'center' }}>
-            <QR value={`FBSU-PASS-${passData.spotId}-${passData.plate}`} size={160} />
+          <div className="pass-qr-box" style={{ margin: '1.25rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+            <QR value={passData.qrToken || passData.passCode || `FBSU-PASS-${passData.spotId}-${passData.plate}`} size={160} />
+            {passData.passCode && (
+              <span style={{ fontSize: '0.8rem', color: 'var(--fbsu-gold)', letterSpacing: '1px', fontFamily: 'var(--font-mono, monospace)', fontWeight: 700 }}>
+                {passData.passCode}
+              </span>
+            )}
           </div>
 
           <div

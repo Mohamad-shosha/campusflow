@@ -273,10 +273,23 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               id: currentUser.id,
               name: currentUser.name,
               car: 'تويوتا كامري 2023',
-              plate: 'ب ط ك 1234',
+              plate: user?.vehicles?.[0]
+                ? user.vehicles[0].plateLettersAr + ' ' + user.vehicles[0].plateDigits
+                : 'أ ب ح 1234',
               primarySpot: 2,
             }}
             onOpenGate={() => setActiveTab('gate')}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onBookingSuccess={booking => {
+              fetchParkingData();
+              setActiveToast({
+                title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
+                message: isAr
+                  ? 'تم تأكيد حجز موقف #' + booking.bayNumber + ' بنجاح، وخصم ' + booking.totalAmount + ' ر.س من محفظتك.'
+                  : 'Bay #' + booking.bayNumber + ' booked. ' + booking.totalAmount + ' SAR debited from wallet.',
+                type: 'success',
+              });
+            }}
           />
         )}
 

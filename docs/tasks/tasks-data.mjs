@@ -279,6 +279,7 @@ export const tasks = [
     tests: ['Component', 'E2E', 'Responsive'], blockedBy: [],
   }),
   T('P5-07', 'Booking UI + pass/QR', {
+    status: 'Done', pr: 'PR (feature/P5-07-booking-ui)',
     pri: 'High', cx: 'M', deps: ['P5-03', 'P5-06'], branch: 'feature/P5-07-booking-ui',
     goal: 'شاشة حجز الموقف واختيار التعرفة وعرض التصريح الرقمي.',
     files: ['frontend/src/features/parking/booking/*'],
