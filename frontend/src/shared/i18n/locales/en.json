@@ -14,6 +14,15 @@
     "error": "Error",
     "warning": "Warning"
   },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "loginRequired": "Please sign in to continue",
+    "student": "Student",
+    "faculty": "Faculty",
+    "staff": "Staff",
+    "admin": "Admin"
+  },
   "ribbon": {
     "location": "Fahad Bin Sultan University - Tabuk",
     "officialBadge": "Official Smart Campus Gateway",
@@ -81,4 +90,3 @@
     "institutionalContact": "Institutional Contact"
   }
 }
-

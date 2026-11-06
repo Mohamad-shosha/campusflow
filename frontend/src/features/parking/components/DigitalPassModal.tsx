@@ -1,6 +1,6 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { X, Camera } from 'lucide-react';
+import { X, Camera, RotateCcw } from 'lucide-react';
 import { QR } from '../../../shared/components/QR';
 import { soundFX } from '../../../shared/utils/sound';
 
@@ -11,10 +11,10 @@ export interface DigitalPassData {
   userId: string;
   plate: string;
   duration: string;
-  bookingId?: string;
-  passCode?: string;
-  qrToken?: string;
-  totalAmount?: number;
+  bookingId?: string | undefined;
+  passCode?: string | undefined;
+  qrToken?: string | undefined;
+  totalAmount?: number | undefined;
 }
 
 export interface DigitalPassModalProps {
@@ -23,7 +23,7 @@ export interface DigitalPassModalProps {
   isAr: boolean;
   onClose: () => void;
   onOpenGate?: (() => void) | undefined;
-  onCancelBooking?: (bookingId: string) => Promise<void>;
+  onCancelBooking?: ((bookingId: string) => Promise<void>) | undefined;
 }
 
 export const DigitalPassModal: FC<DigitalPassModalProps> = ({
@@ -32,7 +32,10 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
   isAr,
   onClose,
   onOpenGate,
+  onCancelBooking,
 }) => {
+  const [isCancelling, setIsCancelling] = useState<boolean>(false);
+
   useEffect(() => {
     if (isOpen && passData) {
       soundFX.playSuccess();
@@ -49,6 +52,17 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
   }, [isOpen, passData]);
 
   if (!isOpen || !passData) return null;
+
+  const handleCancelClick = async () => {
+    if (!passData.bookingId || !onCancelBooking) return;
+    setIsCancelling(true);
+    try {
+      await onCancelBooking(passData.bookingId);
+      onClose();
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   return (
     <div
@@ -141,9 +155,46 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
               </span>
               <strong style={{ color: 'var(--status-available)' }}>{passData.duration}</strong>
             </div>
+            {typeof passData.totalAmount === 'number' && (
+              <div style={{ gridColumn: '1 / -1', borderTop: '1px dashed rgba(255,255,255,0.1)', paddingTop: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>
+                  {isAr ? 'المبلغ المخصوم من المحفظة:' : 'Wallet Deduction:'}
+                </span>
+                <strong style={{ color: 'var(--fbsu-gold)' }}>
+                  {Number(passData.totalAmount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
+                </strong>
+              </div>
+            )}
           </div>
 
-          <div style={{ marginTop: '1.5rem' }}>
+          <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            {passData.bookingId && onCancelBooking && (
+              <button
+                className="btn-glass"
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  borderColor: 'rgba(239, 68, 68, 0.5)',
+                  color: '#f87171',
+                }}
+                onClick={handleCancelClick}
+                disabled={isCancelling}
+                type="button"
+                data-testid="modal-cancel-booking-btn"
+              >
+                <RotateCcw size={15} className={isCancelling ? 'spin-anim' : ''} />
+                <span>
+                  {isCancelling
+                    ? isAr
+                      ? 'جاري إلغاء الحجز واسترداد المبلغ...'
+                      : 'Cancelling & Refunding...'
+                    : isAr
+                      ? 'إلغاء الحجز واسترداد المبلغ للمحفظة'
+                      : 'Cancel Booking & Refund Wallet'}
+                </span>
+              </button>
+            )}
+
             <button
               className="btn-primary"
               style={{ width: '100%', justifyContent: 'center' }}

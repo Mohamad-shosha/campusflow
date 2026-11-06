@@ -6,6 +6,7 @@ import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
 import { AuthModal } from '../features/auth/components/AuthModal';
 import { WalletPage } from '../features/wallet';
 import { TuitionPage } from '../features/tuition';
+import { walletApi } from '../features/wallet/api/walletApi';
 import { Toast, type ToastType } from '../shared/components/Toast';
 import type { AppUser } from '../shared/types/navigation';
 import { INITIAL_PARKING_SPOTS, type ParkingSpot } from '../features/parking/data/parkingData';
@@ -45,7 +46,7 @@ export interface AppContentProps {
 
 const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
-  const [liveBalance, setLiveBalance] = useState<number>(720.0);
+  const [liveBalance, setLiveBalance] = useState<number>(0.0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isNotifModalOpen, setIsNotifModalOpen] = useState<boolean>(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
@@ -69,7 +70,27 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   } | null>(null);
 
   const { isAr } = useAppPreferences();
-  const { user } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  // Fetch live wallet balance from backend whenever user is authenticated
+  const fetchWalletBalance = useCallback(async () => {
+    if (!isAuthenticated) {
+      setLiveBalance(0.0);
+      return;
+    }
+    try {
+      const walletData = await walletApi.getWallet();
+      if (walletData && walletData.balance !== undefined) {
+        setLiveBalance(Number(walletData.balance));
+      }
+    } catch {
+      // Non-blocking if backend unreachable in unit tests
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    fetchWalletBalance();
+  }, [fetchWalletBalance, user?.id]);
 
   const fetchParkingData = useCallback(async () => {
     setIsParkingLoading(true);
@@ -98,23 +119,44 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     return () => clearInterval(interval);
   }, [fetchParkingData]);
 
+  const handleRefreshAll = useCallback(async () => {
+    await Promise.all([fetchParkingData(), fetchWalletBalance()]);
+  }, [fetchParkingData, fetchWalletBalance]);
+
+  const handleLogout = async () => {
+    await logout();
+    setLiveBalance(0.0);
+    setActiveToast({
+      title: isAr ? 'تم تسجيل الخروج' : 'Signed Out',
+      message: isAr
+        ? 'تم تسجيل الخروج من حسابك الجامعي بنجاح.'
+        : 'You have been signed out of your campus session.',
+      type: 'info',
+    });
+  };
+
   const currentUser: AppUser = user
     ? {
         id: user.universityNumber,
         name: user.fullNameAr,
         nameEn: user.fullNameEn,
-        role: user.roles[0] || 'STUDENT',
-        roleEn: user.roles[0] || 'STUDENT',
+        role:
+          user.userType === 'FACULTY'
+            ? 'عضو هيئة تدريس'
+            : user.userType === 'STAFF'
+              ? 'إداري'
+              : 'طالب',
+        roleEn: user.roles[0] || user.userType || 'STUDENT',
         walletBalance: liveBalance,
         avatarColor: '#116E63',
       }
     : {
-        id: '20210045',
-        name: 'إياد الحربي',
-        nameEn: 'Eyad Al-Harbi',
-        role: 'طالب متميز - كلية الهندسة',
-        roleEn: 'Honor Student - Engineering',
-        walletBalance: liveBalance,
+        id: 'guest',
+        name: 'زائر',
+        nameEn: 'Guest',
+        role: 'زائر',
+        roleEn: 'Guest',
+        walletBalance: 0.0,
         avatarColor: '#116E63',
       };
 
@@ -144,25 +186,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
-  const handleShareConfirmed = (hours: number, earnAmount: number) => {
-    setParkingSpots(prev =>
-      prev.map(s =>
-        s.id === 1
-          ? {
-              ...s,
-              status: 'flex-share' as const,
-              occupant: isAr ? 'متاح للتبادل (بريك إياد)' : 'Available for Flex Share',
-              timeLeft: isAr ? `متاح: ${hours} ساعات` : `Window: ${hours} hrs`,
-            }
-          : s
-      )
-    );
-    setLiveBalance(prev => prev + earnAmount);
+  const handleShareConfirmed = (_hours: number, earnAmount: number) => {
+    handleRefreshAll();
     setActiveToast({
       title: isAr ? 'تم تفعيل التبادل الذكي' : 'Flex Share Activated',
       message: isAr
-        ? `تمت إتاحة موقفك وإيداع ${earnAmount.toFixed(2)} ر.س في محفظتك`
-        : `Spot shared and ${earnAmount.toFixed(2)} SAR credited to wallet`,
+        ? `تمت إتاحة موقفك للتبادل الذكي (عائد +${earnAmount.toFixed(2)} ر.س عند حجزه)`
+        : `Spot shared for Flex exchange (+${earnAmount.toFixed(2)} SAR reward upon claim)`,
       type: 'success',
     });
   };
@@ -212,6 +242,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       activeTab={activeTab}
       onTabChange={setActiveTab}
       currentUser={currentUser}
+      isAuthenticated={isAuthenticated}
+      onLogout={handleLogout}
       notificationCount={notifications.length}
       onOpenNotifications={() => setIsNotifModalOpen(true)}
       onOpenAuth={() => {
@@ -254,13 +286,37 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
-              plate: 'ب ط ك 1234',
+              plate: user?.vehicles?.[0]
+                ? user.vehicles[0].plateLettersAr + ' ' + user.vehicles[0].plateDigits
+                : 'ب ط ك 1234',
               primarySpot: 1,
             }}
+            isAuthenticated={isAuthenticated}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
             onReserveSpot={handleReserveSpot}
+            onBookingSuccess={booking => {
+              handleRefreshAll();
+              setActiveToast({
+                title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
+                message: isAr
+                  ? `تم حجز موقف #${booking.bayNumber} وخصم ${Number(booking.totalAmount).toFixed(2)} ر.س من محفظتك الجامعية.`
+                  : `Bay #${booking.bayNumber} reserved and ${Number(booking.totalAmount).toFixed(2)} SAR debited from your wallet.`,
+                type: 'success',
+              });
+            }}
+            onBookingCancelled={() => {
+              handleRefreshAll();
+              setActiveToast({
+                title: isAr ? 'تم إلغاء الحجز واسترداد المبلغ' : 'Booking Cancelled & Refunded',
+                message: isAr
+                  ? 'تم إلغاء الحجز وإعادة المبلغ المخصوم إلى محفظتك الجامعية فوراً.'
+                  : 'Reservation cancelled and full amount refunded to your wallet.',
+                type: 'info',
+              });
+            }}
             onOpenGate={() => setActiveTab('gate')}
             isLoading={isParkingLoading}
-            onRefresh={fetchParkingData}
+            onRefresh={handleRefreshAll}
             lastUpdated={parkingLastUpdated}
           />
         )}
@@ -278,16 +334,27 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
                 : 'أ ب ح 1234',
               primarySpot: 2,
             }}
+            isAuthenticated={isAuthenticated}
             onOpenGate={() => setActiveTab('gate')}
             onOpenAuth={() => setIsAuthModalOpen(true)}
             onBookingSuccess={booking => {
-              fetchParkingData();
+              handleRefreshAll();
               setActiveToast({
                 title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
                 message: isAr
-                  ? 'تم تأكيد حجز موقف #' + booking.bayNumber + ' بنجاح، وخصم ' + booking.totalAmount + ' ر.س من محفظتك.'
-                  : 'Bay #' + booking.bayNumber + ' booked. ' + booking.totalAmount + ' SAR debited from wallet.',
+                  ? 'تم تأكيد حجز موقف #' + booking.bayNumber + ' بنجاح، وخصم ' + Number(booking.totalAmount).toFixed(2) + ' ر.س من محفظتك.'
+                  : 'Bay #' + booking.bayNumber + ' booked. ' + Number(booking.totalAmount).toFixed(2) + ' SAR debited from wallet.',
                 type: 'success',
+              });
+            }}
+            onBookingCancelled={() => {
+              handleRefreshAll();
+              setActiveToast({
+                title: isAr ? 'تم إلغاء الحجز واسترداد الرصيد' : 'Booking Cancelled & Refunded',
+                message: isAr
+                  ? 'تم إلغاء الحجز وإعادة المبلغ كاملاً إلى محفظتك الجامعية.'
+                  : 'Booking cancelled and amount refunded to your wallet.',
+                type: 'info',
               });
             }}
           />
@@ -311,6 +378,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               walletBalance: currentUser.walletBalance,
             }}
             onShareConfirmed={handleShareConfirmed}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onRefreshSpots={handleRefreshAll}
           />
         )}
 
@@ -369,7 +438,11 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         {/* Tab 10: Wallet Page */}
         {activeTab === 'wallet' && (
           <div style={{ marginTop: '1rem' }}>
-            <WalletPage onBalanceUpdate={b => setLiveBalance(b)} />
+            <WalletPage
+              onBalanceUpdate={b => setLiveBalance(b)}
+              onNavigateToTuition={() => setActiveTab('tuition')}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+            />
           </div>
         )}
 
@@ -414,11 +487,12 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         onClose={() => setIsAuthModalOpen(false)}
         initialTab={authModalTab}
         onSuccess={() => {
+          handleRefreshAll();
           setActiveToast({
             title: isAr ? 'تمت المصادقة' : 'Authenticated',
             message: isAr
-              ? 'تم تسجيل الدخول بنجاح وتحديث الصلاحيات'
-              : 'Session authorized successfully',
+              ? 'تم تسجيل الدخول بنجاح وتحديث رصيد المحفظة والصلاحيات'
+              : 'Signed in and synced live wallet balance',
             type: 'success',
           });
         }}

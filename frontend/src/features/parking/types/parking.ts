@@ -66,9 +66,12 @@ export interface ParkingTariffResponse {
 
 export interface CreateBookingRequest {
   spotId: string;
+  vehicleId?: string;
+  durationHours?: number;
+  autoDebitWallet?: boolean;
   idempotencyKey: string;
   startTime: string; // ISO-8601
-  endTime: string;   // ISO-8601
+  endTime?: string;   // ISO-8601
 }
 
 export interface BookingResponse {
@@ -214,4 +217,3 @@ export function mapBackendSpotToUi(backendSpot: ParkingSpotResponse) {
     isAccessible,
   };
 }
-

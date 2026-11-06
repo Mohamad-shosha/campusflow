@@ -37,11 +37,14 @@ export const LedgerTable: FC<LedgerTableProps> = ({
       case 'TUITION_PAYMENT':
         return { labelAr: 'سداد رسوم دراسية', labelEn: 'Tuition Payment', variant: 'gold' };
       case 'P2P_TRANSFER':
+      case 'PEER_TRANSFER':
         return { labelAr: 'تحويل مالي فوري', labelEn: 'P2P Transfer', variant: 'flex' };
       case 'PARKING_FEE':
         return { labelAr: 'رسوم مواقف', labelEn: 'Parking Fee', variant: 'occupied' };
       case 'PARKING_REWARD':
+      case 'REFUND':
         return { labelAr: 'مكافأة مشاركة موقف', labelEn: 'Parking Reward', variant: 'available' };
+      case 'CAMPUS_PURCHASE':
       case 'CAFETERIA_PURCHASE':
         return { labelAr: 'مشتريات كافتيريا', labelEn: 'Cafeteria', variant: 'neutral' };
       default:

@@ -21,6 +21,17 @@ describe('App Full Integration & Feature Navigation Tests', () => {
     expect(screen.getByText(/المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان/i)).toBeInTheDocument();
   });
 
+  it('displays Sign In button and 0.00 wallet balance when unauthenticated instead of static demo persona', () => {
+    render(<App initialTab="map" />);
+
+    const authBtn = screen.getByTestId('header-auth-btn');
+    expect(authBtn).toHaveTextContent('تسجيل الدخول');
+    expect(authBtn).not.toHaveTextContent('إياد');
+
+    const walletBalance = screen.getByTestId('header-wallet-balance');
+    expect(walletBalance).toHaveTextContent('0.00');
+  });
+
   it('opens and closes AuthModal when clicking header auth button', () => {
     render(<App initialTab="map" />);
 

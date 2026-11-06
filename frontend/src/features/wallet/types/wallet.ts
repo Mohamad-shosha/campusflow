@@ -3,9 +3,12 @@ export type WalletStatus = 'ACTIVE' | 'FROZEN' | 'SUSPENDED';
 export type TransactionType =
   | 'TOP_UP'
   | 'P2P_TRANSFER'
+  | 'PEER_TRANSFER'
   | 'TUITION_PAYMENT'
   | 'PARKING_FEE'
   | 'PARKING_REWARD'
+  | 'REFUND'
+  | 'CAMPUS_PURCHASE'
   | 'CAFETERIA_PURCHASE'
   | 'BOOKSTORE_PURCHASE'
   | 'LIBRARY_FINE'
