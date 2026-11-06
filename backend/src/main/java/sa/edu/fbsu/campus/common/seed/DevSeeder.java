@@ -26,6 +26,15 @@ import sa.edu.fbsu.campus.wallet.infra.LedgerEntryRepository;
 import sa.edu.fbsu.campus.wallet.infra.WalletRepository;
 import sa.edu.fbsu.campus.wallet.tuition.domain.TuitionInvoice;
 import sa.edu.fbsu.campus.wallet.tuition.infra.TuitionInvoiceRepository;
+import sa.edu.fbsu.campus.parking.domain.ParkingZone;
+import sa.edu.fbsu.campus.parking.domain.ParkingSpot;
+import sa.edu.fbsu.campus.parking.domain.ParkingTariff;
+import sa.edu.fbsu.campus.parking.domain.SpotStatus;
+import sa.edu.fbsu.campus.parking.domain.SpotType;
+import sa.edu.fbsu.campus.parking.infra.ParkingZoneRepository;
+import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
+import sa.edu.fbsu.campus.parking.infra.ParkingTariffRepository;
+import sa.edu.fbsu.campus.parking.infra.SpotAssignmentRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -52,6 +61,10 @@ public class DevSeeder implements CommandLineRunner {
     private final WalletRepository walletRepository;
     private final LedgerEntryRepository ledgerEntryRepository;
     private final TuitionInvoiceRepository tuitionInvoiceRepository;
+    private final ParkingZoneRepository parkingZoneRepository;
+    private final ParkingSpotRepository parkingSpotRepository;
+    private final ParkingTariffRepository parkingTariffRepository;
+    private final SpotAssignmentRepository spotAssignmentRepository;
 
     public DevSeeder(
             UniversityRepository universityRepository,
@@ -63,7 +76,11 @@ public class DevSeeder implements CommandLineRunner {
             PasswordService passwordService,
             WalletRepository walletRepository,
             LedgerEntryRepository ledgerEntryRepository,
-            TuitionInvoiceRepository tuitionInvoiceRepository) {
+            TuitionInvoiceRepository tuitionInvoiceRepository,
+            ParkingZoneRepository parkingZoneRepository,
+            ParkingSpotRepository parkingSpotRepository,
+            ParkingTariffRepository parkingTariffRepository,
+            SpotAssignmentRepository spotAssignmentRepository) {
         this.universityRepository = universityRepository;
         this.collegeRepository = collegeRepository;
         this.buildingRepository = buildingRepository;
@@ -74,6 +91,10 @@ public class DevSeeder implements CommandLineRunner {
         this.walletRepository = walletRepository;
         this.ledgerEntryRepository = ledgerEntryRepository;
         this.tuitionInvoiceRepository = tuitionInvoiceRepository;
+        this.parkingZoneRepository = parkingZoneRepository;
+        this.parkingSpotRepository = parkingSpotRepository;
+        this.parkingTariffRepository = parkingTariffRepository;
+        this.spotAssignmentRepository = spotAssignmentRepository;
     }
 
     @Override
@@ -230,6 +251,58 @@ public class DevSeeder implements CommandLineRunner {
             }
         });
 
+        // 7. Seed Parking Zones
+        ParkingZone zoneA = seedParkingZone(uniId, "A", "الحاسب والهندسة", "Computing & Engineering", eng.getId(), 10);
+        ParkingZone zoneB = seedParkingZone(uniId, "B", "إدارة الأعمال والطب", "Business & Medicine", bus.getId(), 8);
+        ParkingZone zoneC = seedParkingZone(uniId, "C", "كادر التدريس (دكاترة)", "Faculty Members", ccis.getId(), 6);
+        ParkingZone zoneD = seedParkingZone(uniId, "D", "شحن كهربائي وذوي الهمم", "EV & Accessible", null, 6);
+
+        // 8. Seed Parking Tariffs
+        seedTariff(uniId, UserType.STUDENT, new BigDecimal("5.75"), new BigDecimal("25.00"), new BigDecimal("5.75"));
+        seedTariff(uniId, UserType.FACULTY, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        seedTariff(uniId, UserType.STAFF, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+
+        // 9. Seed 30 Prototype Parking Bays
+        if (parkingSpotRepository.findAllByUniversityIdOrderByBayNumberAsc(uniId).isEmpty()) {
+            // Zone A (Bays 1 - 10)
+            seedSpot(uniId, zoneA, 1, SpotType.STANDARD, SpotStatus.OCCUPIED, 30, true, "إياد الحربي", "Eyad Al-Harbi", "تويوتا كامري", "ب ط ك", "1234", "بريك بعد 15 د");
+            seedSpot(uniId, zoneA, 2, SpotType.STANDARD, SpotStatus.AVAILABLE, 35, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneA, 3, SpotType.STANDARD, SpotStatus.AVAILABLE, 40, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneA, 4, SpotType.STANDARD, SpotStatus.OCCUPIED, 45, false, "سعود الشهري", "Saud Al-Shehri", "شيفروليه كابرس", "ع س ر", "4040", "1 س 45 د");
+            seedSpot(uniId, zoneA, 5, SpotType.STANDARD, SpotStatus.AVAILABLE, 50, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneA, 6, SpotType.STANDARD, SpotStatus.OCCUPIED, 55, false, "فيصل العطوي", "Faisal Al-Atwi", "لكزس ES", "ط ب ك", "2030", "2 س 10 د");
+            seedSpot(uniId, zoneA, 7, SpotType.STANDARD, SpotStatus.AVAILABLE, 60, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneA, 8, SpotType.STANDARD, SpotStatus.FLEX_SHARE, 65, true, "محمد الحويطي (في بريك)", "Mohammad Al-Hwaiti (Break)", "نيسان التيما", "ر ح ل", "7711", "متاح للتبادل: 2 س 15 د");
+            seedSpot(uniId, zoneA, 9, SpotType.STANDARD, SpotStatus.AVAILABLE, 70, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneA, 10, SpotType.STANDARD, SpotStatus.OCCUPIED, 75, false, "عمر البلوي", "Omar Al-Balawi", "فورد تورس", "د ر ع", "9090", "45 د");
+
+            // Zone B (Bays 11 - 18)
+            seedSpot(uniId, zoneB, 11, SpotType.STANDARD, SpotStatus.AVAILABLE, 40, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneB, 12, SpotType.STANDARD, SpotStatus.OCCUPIED, 45, false, "خالد العنزي", "Khalid Al-Anazi", "هوندا أكورد", "ن ج م", "3321", "3 س");
+            seedSpot(uniId, zoneB, 13, SpotType.STANDARD, SpotStatus.AVAILABLE, 50, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneB, 14, SpotType.STANDARD, SpotStatus.FLEX_SHARE, 55, true, "سلطان القحطاني (بريك)", "Sultan Al-Qahtani (Break)", "تويوتا أفالون", "ق ح ط", "5050", "متاح للتبادل: 1 س 50 د");
+            seedSpot(uniId, zoneB, 15, SpotType.STANDARD, SpotStatus.AVAILABLE, 60, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneB, 16, SpotType.STANDARD, SpotStatus.OCCUPIED, 65, false, "ماجد الرشيدي", "Majid Al-Rashidi", "كيا K5", "س هـ م", "1400", "1 س 15 د");
+            seedSpot(uniId, zoneB, 17, SpotType.STANDARD, SpotStatus.AVAILABLE, 70, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneB, 18, SpotType.STANDARD, SpotStatus.AVAILABLE, 75, false, null, null, null, null, null, null);
+
+            // Zone C: Faculty Dedicated (Bays 19 - 24)
+            seedSpot(uniId, zoneC, 19, SpotType.FACULTY, SpotStatus.FACULTY_ASSIGNED, 15, false, "د. عبدالله الغامدي", "Dr. Abdullah Al-Ghamdi", "جينيسيس G80", "أ ح م", "5501", "محجوز يوم كامل");
+            seedSpot(uniId, zoneC, 20, SpotType.FACULTY, SpotStatus.FACULTY_ASSIGNED, 20, false, "د. سمير كمال", "Dr. Samir Kamal", "مرسيدس E300", "س م ر", "2020", "محاضرة حتى 02:00 م");
+            seedSpot(uniId, zoneC, 21, SpotType.FACULTY, SpotStatus.AVAILABLE, 25, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneC, 22, SpotType.FACULTY, SpotStatus.FACULTY_ASSIGNED, 20, false, "د. ريم العمراني", "Dr. Reem Al-Amrani", "بي إم دبليو X5", "ر ي م", "7070", "معمل حتى 01:00 م");
+            seedSpot(uniId, zoneC, 23, SpotType.FACULTY, SpotStatus.AVAILABLE, 25, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneC, 24, SpotType.FACULTY, SpotStatus.FACULTY_ASSIGNED, 25, false, "د. طارق السعيد", "Dr. Tariq Al-Saeed", "أودي A6", "ط ر ق", "1111", "اجتماع مجلس الكلية");
+
+            // Zone D: EV Charging & Accessible (Bays 25 - 30)
+            seedSpot(uniId, zoneD, 25, SpotType.EV_CHARGING, SpotStatus.AVAILABLE, 50, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneD, 26, SpotType.EV_CHARGING, SpotStatus.OCCUPIED, 55, false, "لوسيد آير (طالب ماجستير)", "Lucid Air (Master Student)", "Lucid Air Pure", "ل و س", "2024", "شحن 84% - متبقي 20 د");
+            seedSpot(uniId, zoneD, 27, SpotType.EV_CHARGING, SpotStatus.AVAILABLE, 60, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneD, 28, SpotType.ACCESSIBLE, SpotStatus.AVAILABLE, 10, false, null, null, null, null, null, null);
+            seedSpot(uniId, zoneD, 29, SpotType.ACCESSIBLE, SpotStatus.OCCUPIED, 10, false, "طالب ذوي همم", "Special Needs Student", "تويوتا برادو", "أ م ل", "1010", "محاضرة حتى 12:00 ظ");
+            seedSpot(uniId, zoneD, 30, SpotType.EV_CHARGING, SpotStatus.AVAILABLE, 65, false, null, null, null, null, null, null);
+        }
+
         log.info("--- [DevSeeder] Completed FBSU dev/demo seeding successfully ---");
     }
 
@@ -297,5 +370,42 @@ public class DevSeeder implements CommandLineRunner {
         }
 
         return user;
+    }
+
+    private ParkingZone seedParkingZone(UUID universityId, String code, String nameAr, String nameEn, UUID collegeId, int totalSpots) {
+        return parkingZoneRepository.findByUniversityIdAndCode(universityId, code)
+                .orElseGet(() -> parkingZoneRepository.save(new ParkingZone(universityId, code, nameAr, nameEn, collegeId, totalSpots)));
+    }
+
+    private void seedTariff(UUID universityId, UserType userType, BigDecimal hourly, BigDecimal dailyCap, BigDecimal cashback) {
+        if (!parkingTariffRepository.existsByUniversityIdAndUserType(universityId, userType)) {
+            parkingTariffRepository.save(new ParkingTariff(universityId, userType, hourly, dailyCap, cashback));
+        }
+    }
+
+    private void seedSpot(
+            UUID universityId,
+            ParkingZone zone,
+            int bayNumber,
+            SpotType type,
+            SpotStatus status,
+            int distance,
+            boolean isFlex,
+            String occupantAr,
+            String occupantEn,
+            String car,
+            String plateLetters,
+            String plateDigits,
+            String timeLeft) {
+        if (!parkingSpotRepository.existsByUniversityIdAndBayNumber(universityId, bayNumber)) {
+            ParkingSpot s = new ParkingSpot(universityId, zone, bayNumber, type, status, distance, isFlex);
+            s.setOccupantNameAr(occupantAr);
+            s.setOccupantNameEn(occupantEn);
+            s.setVehicleModel(car);
+            s.setPlateLettersAr(plateLetters);
+            s.setPlateDigits(plateDigits);
+            s.setTimeLeftText(timeLeft);
+            parkingSpotRepository.save(s);
+        }
     }
 }
