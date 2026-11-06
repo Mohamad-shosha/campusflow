@@ -33,6 +33,12 @@ class DevSeederTest extends AbstractPostgresIntegrationTest {
     @Autowired
     private sa.edu.fbsu.campus.infra.UniversityRepository universityRepository;
 
+    @Autowired
+    private sa.edu.fbsu.campus.parking.infra.ParkingZoneRepository parkingZoneRepository;
+
+    @Autowired
+    private sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository parkingSpotRepository;
+
     @Test
     @DisplayName("DevSeeder should populate FBSU demo dataset and be idempotent")
     void shouldSeedFbsuDemoDataAndBeIdempotent() {
@@ -63,7 +69,20 @@ class DevSeederTest extends AbstractPostgresIntegrationTest {
         // 4. Verify Student vehicle
         assertThat(vehicleRepository.findByUserId(student.getId())).isNotEmpty();
 
-        // 5. Test idempotency: running again should not throw any exceptions
+        // 5. Verify Parking Zones and 30 Spots
+        assertThat(parkingZoneRepository.findAllByUniversityIdOrderByCodeAsc(fbsu.getId())).hasSize(4);
+        assertThat(parkingSpotRepository.findAllByUniversityIdOrderByBayNumberAsc(fbsu.getId())).hasSize(30);
+
+        var spot1 = parkingSpotRepository.findByUniversityIdAndBayNumber(fbsu.getId(), 1).orElse(null);
+        assertThat(spot1).isNotNull();
+        assertThat(spot1.getOccupantNameAr()).isEqualTo("إياد الحربي");
+        assertThat(spot1.isFlexEligible()).isTrue();
+
+        var spot26 = parkingSpotRepository.findByUniversityIdAndBayNumber(fbsu.getId(), 26).orElse(null);
+        assertThat(spot26).isNotNull();
+        assertThat(spot26.getSpotType()).isEqualTo(sa.edu.fbsu.campus.parking.domain.SpotType.EV_CHARGING);
+
+        // 6. Test idempotency: running again should not throw any exceptions
         assertDoesNotThrow(() -> devSeeder.run());
     }
 }

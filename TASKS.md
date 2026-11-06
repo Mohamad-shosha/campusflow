@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 22 تاسك ✅
+- **المنجز بالكامل (Done):** 23 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 31 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **42%**
+- **المتبقي للبدء (Backlog):** 30 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **43%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 0 | 0 | 9 |
+| P5 | Parking | 9 | 1 | 0 | 8 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **22** | **0** | **31** |
+| **الإجمالي** | | **53** | **23** | **0** | **30** |
 
 ---
 
@@ -294,9 +294,9 @@
 
 ### P5-01 — Parking schema (zones, spots, assignments, tariffs)
 - **ماذا سيعمل:** جداول المناطق والمواقف والتعيينات والتعرفات.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P2-01
-- **Git Branch:** `feature/P5-01-parking-schema` · **Pull Request:** —
+- **Git Branch:** `feature/P5-01-parking-schema` · **Pull Request:** PR (feature/P5-01-parking-schema)
 - **الملفات المتوقعة:** `db/migration/V6__parking.sql`، `parking/domain/*`
 - **Implementation Steps:** 1) Migration 2) Entities 3) Seed للمواقف (dev) 4) اختبارات
 - **Acceptance Criteria:** القيود صحيحة · جاهز للـ exclusion constraints
