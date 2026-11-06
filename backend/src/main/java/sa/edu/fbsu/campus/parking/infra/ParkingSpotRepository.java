@@ -1,6 +1,8 @@
 package sa.edu.fbsu.campus.parking.infra;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,6 +15,10 @@ import java.util.UUID;
 
 @Repository
 public interface ParkingSpotRepository extends JpaRepository<ParkingSpot, UUID> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM ParkingSpot s JOIN FETCH s.zone z WHERE s.id = :spotId")
+    Optional<ParkingSpot> findByIdForUpdate(@Param("spotId") UUID spotId);
 
     Optional<ParkingSpot> findByUniversityIdAndBayNumber(UUID universityId, int bayNumber);
 
@@ -32,4 +38,3 @@ public interface ParkingSpotRepository extends JpaRepository<ParkingSpot, UUID> 
 
     long countByUniversityIdAndStatus(UUID universityId, SpotStatus status);
 }
-

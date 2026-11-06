@@ -21,7 +21,9 @@ import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
 import sa.edu.fbsu.campus.wallet.dto.TopUpRequest;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -130,6 +132,11 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         JsonNode bookingJson = objectMapper.readTree(bookRes.getResponse().getContentAsString());
         String bookingId = bookingJson.get("id").asText();
 
+        // Verify spot status & occupant metadata in DB
+        ParkingSpot updatedSpot = spotRepository.findById(spot.getId()).orElseThrow();
+        assertThat(updatedSpot.getStatus()).isEqualTo(SpotStatus.RESERVED);
+        assertThat(updatedSpot.getOccupantNameAr()).isEqualTo("طالب تجريبي");
+
         // 4. Verify wallet was debited: 100.00 - 11.50 = 88.50 SAR
         mockMvc.perform(get("/api/v1/wallet")
                         .header("Authorization", "Bearer " + token))
@@ -161,18 +168,102 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                 .andExpect(jsonPath("$.passCode").isNotEmpty())
                 .andExpect(jsonPath("$.qrPayload").isNotEmpty());
 
-        // 7. Cancel booking and verify automatic wallet refund
+        // 7. Cancel booking and verify automatic wallet refund + spot release
         mockMvc.perform(post("/api/v1/parking/bookings/" + bookingId + "/cancel")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CANCELLED"));
 
+        ParkingSpot releasedSpot = spotRepository.findById(spot.getId()).orElseThrow();
+        assertThat(releasedSpot.getStatus()).isEqualTo(SpotStatus.AVAILABLE);
+        assertThat(releasedSpot.getOccupantNameAr()).isNull();
+
         // Verify balance refunded back to 100.00 SAR
         mockMvc.perform(get("/api/v1/wallet")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(100.00));
+    }
+
+    @Test
+    @DisplayName("Frontend Payload Compatibility: Auto-debit wallet when startTime/endTime sent without explicit autoDebitWallet flag, and reject insufficient funds")
+    void shouldAutoDebitWhenFrontendPayloadOmitsAutoDebitFlagAndRejectInsufficientBalance() throws Exception {
+        ensureUniversity();
+        String suffix = UUID.randomUUID().toString().substring(0, 6);
+        String token = obtainAuthToken(suffix);
+
+        ParkingSpot spot = spotRepository.findAll().stream()
+                .filter(s -> s.getStatus() == SpotStatus.AVAILABLE)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No available spot for test"));
+
+        // 1. Attempt booking with 0.00 SAR balance -> must fail with 400 Bad Request
+        Instant start = Instant.now();
+        Instant end = start.plus(Duration.ofHours(3));
+        Map<String, Object> frontendPayload = Map.of(
+                "spotId", spot.getId().toString(),
+                "idempotencyKey", "FE-INSUFF-" + suffix,
+                "startTime", start.toString(),
+                "endTime", end.toString()
+        );
+
+        mockMvc.perform(post("/api/v1/parking/bookings")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(frontendPayload)))
+                .andExpect(status().isBadRequest());
+
+        // Spot must remain AVAILABLE
+        assertThat(spotRepository.findById(spot.getId()).orElseThrow().getStatus()).isEqualTo(SpotStatus.AVAILABLE);
+
+        // 2. Top up 50.00 SAR and book 3 hours (17.25 SAR) using frontend payload format
+        TopUpRequest topUp = new TopUpRequest(
+                new BigDecimal("50.00"),
+                "APPLE_PAY",
+                "TOPUP-FE-" + suffix,
+                "Frontend Test Top-up"
+        );
+        mockMvc.perform(post("/api/v1/wallet/top-up")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(topUp)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.balance").value(50.00));
+
+        Map<String, Object> validFrontendPayload = Map.of(
+                "spotId", spot.getId().toString(),
+                "idempotencyKey", "FE-VALID-" + suffix,
+                "startTime", start.toString(),
+                "endTime", end.toString()
+        );
+
+        MvcResult bookRes = mockMvc.perform(post("/api/v1/parking/bookings")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validFrontendPayload)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.durationHours").value(3.0))
+                .andExpect(jsonPath("$.totalAmount").value(17.25))
+                .andReturn();
+
+        String bookingId = objectMapper.readTree(bookRes.getResponse().getContentAsString()).get("id").asText();
+
+        // Wallet must be debited: 50.00 - 17.25 = 32.75 SAR
+        mockMvc.perform(get("/api/v1/wallet")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.balance").value(32.75));
+
+        // Clean up by cancelling booking -> refunded to 50.00 SAR
+        mockMvc.perform(post("/api/v1/parking/bookings/" + bookingId + "/cancel")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/wallet")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.balance").value(50.00));
     }
 
     private void ensureUniversity() {

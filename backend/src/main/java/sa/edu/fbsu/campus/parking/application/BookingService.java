@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.identity.domain.User;
+import sa.edu.fbsu.campus.identity.domain.UserType;
 import sa.edu.fbsu.campus.identity.domain.Vehicle;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.identity.infra.VehicleRepository;
@@ -67,10 +68,14 @@ public class BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Campus user not found: " + userId));
 
-        ParkingSpot spot = spotRepository.findById(request.spotId())
+        ParkingSpot spot = spotRepository.findByIdForUpdate(request.spotId())
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot not found: " + request.spotId()));
 
-        if (spot.getStatus() == SpotStatus.FACULTY_ASSIGNED && user.getUserType() != sa.edu.fbsu.campus.identity.domain.UserType.FACULTY) {
+        if (spot.getStatus() == SpotStatus.OCCUPIED || spot.getStatus() == SpotStatus.RESERVED) {
+            throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is already reserved or occupied.");
+        }
+
+        if (spot.getStatus() == SpotStatus.FACULTY_ASSIGNED && user.getUserType() != UserType.FACULTY) {
             throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is restricted to faculty members.");
         }
 
@@ -97,22 +102,26 @@ public class BookingService {
             throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is already booked for the selected time window.");
         }
 
-        // Calculate pricing from active institutional tariff
+        // Calculate pricing from active institutional tariff (default 5.75 SAR/hr, 25.00 SAR daily cap)
         BigDecimal ratePerHour = new BigDecimal("5.75");
         BigDecimal dailyCap = new BigDecimal("25.00");
         var tariffOpt = tariffRepository.findByUniversityIdAndUserType(user.getUniversityId(), user.getUserType());
         if (tariffOpt.isPresent()) {
             ParkingTariff tariff = tariffOpt.get();
-            ratePerHour = tariff.getHourlyRate();
-            dailyCap = tariff.getDailyCap();
+            if (tariff.getHourlyRate() != null && tariff.getHourlyRate().compareTo(BigDecimal.ZERO) > 0) {
+                ratePerHour = tariff.getHourlyRate();
+            }
+            if (tariff.getDailyCap() != null && tariff.getDailyCap().compareTo(BigDecimal.ZERO) > 0) {
+                dailyCap = tariff.getDailyCap();
+            }
         }
 
         BigDecimal calculatedTotal = ratePerHour.multiply(durationHours).setScale(2, RoundingMode.HALF_UP);
         BigDecimal totalAmount = calculatedTotal.min(dailyCap);
 
-        // Atomic wallet debit if required
-        if (request.autoDebitWallet() && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
-            String desc = "Parking reservation: Bay " + spot.getBayCode() + " (" + durationHours + "h)";
+        // Atomic wallet debit when autoDebitWallet is enabled (true by default)
+        if (Boolean.TRUE.equals(request.autoDebitWallet()) && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
+            String desc = "Parking reservation: Bay " + spot.getBayCode() + " (" + durationHours.stripTrailingZeros().toPlainString() + "h)";
             walletService.debit(
                     userId,
                     totalAmount,
@@ -146,13 +155,23 @@ public class BookingService {
 
         ParkingBooking saved = bookingRepository.save(booking);
 
-        // Update spot status if starting now
-        if (startTime.isBefore(Instant.now().plus(Duration.ofMinutes(15)))) {
-            spot.setStatus(SpotStatus.RESERVED);
-            spotRepository.save(spot);
+        // Immediately mark spot as RESERVED and populate occupant metadata
+        spot.setStatus(SpotStatus.RESERVED);
+        spot.setCurrentOccupantId(user.getId());
+        spot.setOccupantNameAr(user.getFullNameAr());
+        spot.setOccupantNameEn(user.getFullNameEn());
+        if (vehicle != null) {
+            spot.setVehicleModel(vehicle.getMakeModel());
+            if (vehicle.getPlate() != null) {
+                spot.setPlateLettersAr(vehicle.getPlate().getLettersAr());
+                spot.setPlateDigits(vehicle.getPlate().getDigits());
+            }
         }
+        spot.setTimeLeftText("محجوز (" + durationHours.stripTrailingZeros().toPlainString() + " س)");
+        spot.setSessionEndsAt(endTime);
+        spotRepository.save(spot);
 
-        log.info("Created parking booking {} for user {} on bay {}", saved.getId(), userId, spot.getBayCode());
+        log.info("Created parking booking {} for user {} on bay {} (Amount: {} SAR)", saved.getId(), userId, spot.getBayCode(), totalAmount);
         return BookingResponse.fromEntity(saved);
     }
 
@@ -206,10 +225,18 @@ public class BookingService {
             log.info("Refunded {} SAR to user {} for cancelled booking {}", booking.getTotalAmount(), userId, booking.getId());
         }
 
-        // Check if spot should be marked available
+        // Release spot back to AVAILABLE and clear occupant metadata
         ParkingSpot spot = booking.getSpot();
         if (spot.getStatus() == SpotStatus.RESERVED) {
             spot.setStatus(SpotStatus.AVAILABLE);
+            spot.setCurrentOccupantId(null);
+            spot.setOccupantNameAr(null);
+            spot.setOccupantNameEn(null);
+            spot.setVehicleModel(null);
+            spot.setPlateLettersAr(null);
+            spot.setPlateDigits(null);
+            spot.setTimeLeftText(null);
+            spot.setSessionEndsAt(null);
             spotRepository.save(spot);
         }
 
