@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 26 تاسك ✅
+- **المنجز بالكامل (Done):** 27 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 27 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **49%**
+- **المتبقي للبدء (Backlog):** 26 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **51%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 4 | 0 | 5 |
+| P5 | Parking | 9 | 5 | 0 | 4 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **26** | **0** | **27** |
+| **الإجمالي** | | **53** | **27** | **0** | **26** |
 
 ---
 
@@ -338,9 +338,9 @@
 
 ### P5-05 — Gate/ALPR decision API (simulated adapter)
 - **ماذا سيعمل:** API يستقبل لوحة السيارة ويقرر السماح/المنع مع السبب، عبر adapter يمكن استبداله بكاميرا حقيقية لاحقًا.
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P5-03، Q8
-- **Git Branch:** `feature/P5-05-gate-api` · **Pull Request:** —
+- **Git Branch:** `feature/P5-05-gate-api` · **Pull Request:** PR (feature/P5-05-gate-api)
 - **الملفات المتوقعة:** `parking/application/Gate*`، `parking/infra/SimulatedAlprAdapter.java`، `parking/api/*`
 - **Implementation Steps:** 1) Port + adapter 2) Decision service 3) gate_event logging 4) API
 - **Acceptance Criteria:** قرار + سبب لكل لوحة · كل محاولة تُسجّل

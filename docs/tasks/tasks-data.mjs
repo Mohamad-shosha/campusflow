@@ -261,6 +261,7 @@ export const tasks = [
     tests: ['Unit', 'Service', 'Concurrency', 'API'], blockedBy: ['Q6'],
   }),
   T('P5-05', 'Gate/ALPR decision API (simulated adapter)', {
+    status: 'Done', pr: 'PR (feature/P5-05-gate-api)',
     pri: 'Medium', cx: 'M', deps: ['P5-03', 'Q8'], branch: 'feature/P5-05-gate-api',
     goal: 'API يستقبل لوحة السيارة ويقرر السماح/المنع مع السبب، عبر adapter يمكن استبداله بكاميرا حقيقية لاحقًا.',
     files: ['parking/application/Gate*', 'parking/infra/SimulatedAlprAdapter.java', 'parking/api/*'],
