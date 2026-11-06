@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { X, Zap } from 'lucide-react';
+import { X, Zap, AlertCircle, Loader2 } from 'lucide-react';
 import type { ParkingSpot } from '../data/parkingData';
 
 export interface SpotDetailsModalProps {
@@ -8,6 +8,8 @@ export interface SpotDetailsModalProps {
   isAr: boolean;
   onClose: () => void;
   onBook: (spot: ParkingSpot) => void;
+  isBooking?: boolean | undefined;
+  bookingError?: string | null | undefined;
 }
 
 export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
@@ -16,6 +18,8 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
   isAr,
   onClose,
   onBook,
+  isBooking = false,
+  bookingError = null,
 }) => {
   if (!isOpen || !spot) return null;
 
@@ -139,20 +143,52 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
           </div>
         </div>
 
+        {bookingError && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              color: '#f87171',
+              borderRadius: 'var(--radius-md)',
+              padding: '0.85rem 1rem',
+              fontSize: '0.85rem',
+              marginBottom: '1rem',
+            }}
+            data-testid="spot-modal-booking-error"
+          >
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{bookingError}</span>
+          </div>
+        )}
+
         {isAvailable || isFlex ? (
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button
               className="btn-gold"
-              style={{ flex: 1, justifyContent: 'center' }}
+              style={{ flex: 1, justifyContent: 'center', opacity: isBooking ? 0.7 : 1 }}
               onClick={() => onBook(spot)}
+              disabled={isBooking}
               type="button"
+              data-testid="modal-book-spot-btn"
             >
-              <Zap size={16} color="#0b1a17" />
-              <span>
-                {isAr
-                  ? `احجز هذا الموقف الآن (${isFlex ? 'تعرفة مخفضة 5.75 ر.س' : 'حجز فوري'})`
-                  : `Book This Bay Now (${isFlex ? 'Flex Rate 5.75 SAR' : 'Instant'})`}
-              </span>
+              {isBooking ? (
+                <>
+                  <Loader2 size={16} className="spin-anim" />
+                  <span>{isAr ? 'جاري الحجز وخصم الرسوم...' : 'Booking & Debiting Wallet...'}</span>
+                </>
+              ) : (
+                <>
+                  <Zap size={16} color="#0b1a17" />
+                  <span>
+                    {isAr
+                      ? `احجز هذا الموقف الآن (3 ساعات - 17.25 ر.س من المحفظة)`
+                      : `Book This Bay Now (3 hrs - 17.25 SAR from Wallet)`}
+                  </span>
+                </>
+              )}
             </button>
           </div>
         ) : (
@@ -173,4 +209,3 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
     </div>
   );
 };
-

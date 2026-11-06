@@ -16,7 +16,15 @@ import java.util.UUID;
 @Repository
 public interface ParkingBookingRepository extends JpaRepository<ParkingBooking, UUID> {
 
-    List<ParkingBooking> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    @Query("""
+            SELECT b FROM ParkingBooking b
+            JOIN FETCH b.spot s
+            JOIN FETCH s.zone z
+            LEFT JOIN FETCH b.vehicle v
+            WHERE b.user.id = :userId
+            ORDER BY b.createdAt DESC
+            """)
+    List<ParkingBooking> findByUserIdOrderByCreatedAtDesc(@Param("userId") UUID userId);
 
     List<ParkingBooking> findByUserIdAndStatusInOrderByStartTimeDesc(UUID userId, Collection<BookingStatus> statuses);
 
@@ -40,6 +48,7 @@ public interface ParkingBookingRepository extends JpaRepository<ParkingBooking, 
 
     @Query("""
             SELECT b FROM ParkingBooking b
+            JOIN FETCH b.user u
             JOIN FETCH b.spot s
             JOIN FETCH s.zone z
             LEFT JOIN FETCH b.vehicle v
@@ -47,4 +56,3 @@ public interface ParkingBookingRepository extends JpaRepository<ParkingBooking, 
             """)
     Optional<ParkingBooking> findDetailedById(@Param("bookingId") UUID bookingId);
 }
-

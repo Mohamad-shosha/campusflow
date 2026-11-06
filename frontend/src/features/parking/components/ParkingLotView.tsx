@@ -1,10 +1,12 @@
 import { useState, FC } from 'react';
 import { MapPin, Building2, ArrowUp, ArrowDown, ShieldCheck, RotateCw } from 'lucide-react';
 import type { ParkingSpot } from '../data/parkingData';
+import type { BookingResponse } from '../types/parking';
 import { SpotCard } from './SpotCard';
 import { SpotDetailsModal } from './SpotDetailsModal';
 import { DigitalPassModal, type DigitalPassData } from './DigitalPassModal';
 import { soundFX } from '../../../shared/utils/sound';
+import { parkingApi } from '../api/parkingApi';
 
 export interface ParkingLotViewProps {
   spots: ParkingSpot[];
@@ -12,21 +14,29 @@ export interface ParkingLotViewProps {
   currentUser: {
     id: string;
     name: string;
-    plate?: string;
-    primarySpot?: number;
+    plate?: string | undefined;
+    primarySpot?: number | undefined;
   };
-  onReserveSpot?: (spotId: number) => void;
-  onOpenGate?: () => void;
-  isLoading?: boolean;
-  onRefresh?: () => void;
-  lastUpdated?: Date | null;
+  isAuthenticated?: boolean | undefined;
+  onOpenAuth?: (() => void) | undefined;
+  onReserveSpot?: ((spotId: number) => void) | undefined;
+  onBookingSuccess?: ((booking: BookingResponse) => void) | undefined;
+  onBookingCancelled?: (() => void) | undefined;
+  onOpenGate?: (() => void) | undefined;
+  isLoading?: boolean | undefined;
+  onRefresh?: (() => void) | undefined;
+  lastUpdated?: Date | null | undefined;
 }
 
 export const ParkingLotView: FC<ParkingLotViewProps> = ({
   spots,
   isAr,
   currentUser,
+  isAuthenticated,
+  onOpenAuth,
   onReserveSpot,
+  onBookingSuccess,
+  onBookingCancelled,
   onOpenGate,
   isLoading = false,
   onRefresh,
@@ -34,6 +44,8 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
 }) => {
   const [activeZone, setActiveZone] = useState<string>('all');
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null);
+  const [isBookingSpot, setIsBookingSpot] = useState<boolean>(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
   const [digitalPass, setDigitalPass] = useState<DigitalPassData | null>(null);
 
   const filteredSpots = spots.filter(spot => {
@@ -41,17 +53,91 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
     return spot.zone === activeZone;
   });
 
-  const handleBookFromModal = (spot: ParkingSpot) => {
-    setSelectedSpot(null);
-    onReserveSpot?.(spot.id);
-    setDigitalPass({
-      spotId: spot.id,
-      college: isAr ? spot.college : spot.collegeEn,
-      userName: currentUser.name,
-      userId: currentUser.id,
-      plate: currentUser.plate || 'ب ط ك 1234',
-      duration: isAr ? '3 ساعات (09:00 - 12:00)' : '3 Hours (09:00 - 12:00)',
-    });
+  const handleBookFromModal = async (spot: ParkingSpot) => {
+    setBookingError(null);
+
+    // If spot does not have backendId (isolated unit test fallback), use local handler
+    if (!spot.backendId) {
+      setSelectedSpot(null);
+      onReserveSpot?.(spot.id);
+      setDigitalPass({
+        spotId: spot.id,
+        college: isAr ? spot.college : spot.collegeEn,
+        userName: currentUser.name,
+        userId: currentUser.id,
+        plate: currentUser.plate || 'ب ط ك 1234',
+        duration: isAr ? '3 ساعات (09:00 - 12:00)' : '3 Hours (09:00 - 12:00)',
+      });
+      return;
+    }
+
+    if (isAuthenticated === false) {
+      setBookingError(
+        isAr
+          ? 'يرجى تسجيل الدخول أولاً لتأكيد الحجز وخصم الرسوم من محفظتك الجامعية.'
+          : 'Please sign in first to confirm your booking and debit your campus wallet.'
+      );
+      onOpenAuth?.();
+      return;
+    }
+
+    setIsBookingSpot(true);
+    try {
+      const startDate = new Date();
+      const endDate = new Date(startDate.getTime() + 3 * 60 * 60 * 1000);
+
+      const booking = await parkingApi.createBooking({
+        spotId: spot.backendId,
+        durationHours: 3.0,
+        autoDebitWallet: true,
+        idempotencyKey: 'map-booking-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString(),
+      });
+
+      soundFX.playSuccess();
+      setSelectedSpot(null);
+      setDigitalPass({
+        spotId: booking.bayNumber || spot.id,
+        college: isAr ? booking.zoneNameAr || spot.college : booking.zoneNameEn || spot.collegeEn,
+        userName: currentUser.name,
+        userId: currentUser.id,
+        plate: booking.vehiclePlate || currentUser.plate || 'ب ط ك 1234',
+        duration: `${booking.durationHours} ${isAr ? 'ساعات' : 'Hours'}`,
+        bookingId: booking.id,
+        passCode: booking.digitalPassCode,
+        qrToken: booking.qrToken,
+        totalAmount: Number(booking.totalAmount),
+      });
+      onBookingSuccess?.(booking);
+    } catch (err: unknown) {
+      soundFX.playError();
+      const errorObj = err as { response?: { status?: number; data?: { detail?: string; message?: string } } };
+      if (errorObj?.response?.status === 401) {
+        setBookingError(
+          isAr
+            ? 'يرجى تسجيل الدخول أولاً لتأكيد الحجز وخصم الرصيد من محفظتك.'
+            : 'Please sign in to confirm booking and debit your campus wallet.'
+        );
+        onOpenAuth?.();
+      } else {
+        setBookingError(
+          errorObj?.response?.data?.detail ||
+            errorObj?.response?.data?.message ||
+            (isAr
+              ? 'تعذر إتمام الحجز. يرجى التأكد من رصيد المحفظة وتوفر الموقف.'
+              : 'Failed to complete booking. Please verify wallet balance and spot availability.')
+        );
+      }
+    } finally {
+      setIsBookingSpot(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    await parkingApi.cancelBooking(bookingId);
+    soundFX.playSuccess();
+    onBookingCancelled?.();
   };
 
   return (
@@ -211,7 +297,10 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
               spot={spot}
               isAr={isAr}
               isCurrentUserSpot={currentUser.primarySpot === spot.id}
-              onClick={s => setSelectedSpot(s)}
+              onClick={s => {
+                setBookingError(null);
+                setSelectedSpot(s);
+              }}
             />
           ))}
         </div>
@@ -222,8 +311,13 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
         isOpen={selectedSpot !== null}
         spot={selectedSpot}
         isAr={isAr}
-        onClose={() => setSelectedSpot(null)}
+        onClose={() => {
+          setBookingError(null);
+          setSelectedSpot(null);
+        }}
         onBook={handleBookFromModal}
+        isBooking={isBookingSpot}
+        bookingError={bookingError}
       />
 
       {/* Digital Pass Modal */}
@@ -233,8 +327,8 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
         isAr={isAr}
         onClose={() => setDigitalPass(null)}
         onOpenGate={onOpenGate}
+        onCancelBooking={digitalPass?.bookingId ? handleCancelBooking : undefined}
       />
     </div>
   );
 };
-

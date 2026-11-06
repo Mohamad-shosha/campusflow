@@ -24,7 +24,7 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
   const [activeTab, setActiveTab] = useState<'INVOICES' | 'RECEIPTS'>('INVOICES');
   const [invoices, setInvoices] = useState<TuitionInvoiceResponse[]>([]);
   const [receipts, setReceipts] = useState<TuitionReceiptResponse[]>([]);
-  const [walletBalance, setWalletBalance] = useState<number>(720.0);
+  const [walletBalance, setWalletBalance] = useState<number>(0.0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<TuitionInvoiceResponse | null>(null);
@@ -52,40 +52,9 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
           if (onBalanceUpdate) onBalanceUpdate(Number(walletData.balance));
         }
       } else {
-        // Fallback demo dataset
-        const demoInvoices: TuitionInvoiceResponse[] = [
-          {
-            id: 'demo-inv-001',
-            invoiceNumber: 'INV-2026-CCIS-001',
-            termId: 'term-fall-2026',
-            termCode: '2026-FALL',
-            termNameAr: 'الفصل الدراسي الأول 2026/2027',
-            termNameEn: 'Fall Semester 2026/2027',
-            totalAmount: 450.0,
-            paidAmount: 0.0,
-            remainingAmount: 450.0,
-            status: 'UNPAID',
-            dueDate: '2026-11-30',
-            createdAt: new Date().toISOString(),
-          },
-          {
-            id: 'demo-inv-002',
-            invoiceNumber: 'INV-2026-CCIS-002',
-            termId: 'term-fall-2026',
-            termCode: '2026-FALL',
-            termNameAr: 'الفصل الدراسي الأول 2026/2027',
-            termNameEn: 'Fall Semester 2026/2027',
-            totalAmount: 1500.0,
-            paidAmount: 0.0,
-            remainingAmount: 1500.0,
-            status: 'UNPAID',
-            dueDate: '2026-12-31',
-            createdAt: new Date().toISOString(),
-          },
-        ];
-        setInvoices(demoInvoices);
+        setInvoices([]);
         setReceipts([]);
-        setWalletBalance(720.0);
+        setWalletBalance(0.0);
       }
     } catch (err: unknown) {
       console.error('Failed to load tuition data:', err);
@@ -304,4 +273,3 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
     </div>
   );
 };
-

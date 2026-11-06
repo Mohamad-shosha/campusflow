@@ -1,5 +1,5 @@
-import { useState, useEffect, FC } from 'react';
-import { Calendar, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback, FC } from 'react';
+import { Calendar, ShieldCheck, AlertCircle, Loader2, RotateCcw, QrCode, CheckCircle2, RefreshCw } from 'lucide-react';
 import { DigitalPassModal, type DigitalPassData } from './DigitalPassModal';
 import { soundFX } from '../../../shared/utils/sound';
 import { parkingApi } from '../api/parkingApi';
@@ -10,21 +10,25 @@ export interface BookingWizardViewProps {
   currentUser: {
     id: string;
     name: string;
-    car?: string;
-    plate?: string;
-    primarySpot?: number;
+    car?: string | undefined;
+    plate?: string | undefined;
+    primarySpot?: number | undefined;
   };
-  onOpenGate?: () => void;
-  onOpenAuth?: () => void;
-  onBookingSuccess?: (booking: BookingResponse) => void;
+  isAuthenticated?: boolean | undefined;
+  onOpenGate?: (() => void) | undefined;
+  onOpenAuth?: (() => void) | undefined;
+  onBookingSuccess?: ((booking: BookingResponse) => void) | undefined;
+  onBookingCancelled?: (() => void) | undefined;
 }
 
 export const BookingWizardView: FC<BookingWizardViewProps> = ({
   isAr,
   currentUser,
+  isAuthenticated,
   onOpenGate,
   onOpenAuth,
   onBookingSuccess,
+  onBookingCancelled,
 }) => {
   const [schedulePattern, setSchedulePattern] = useState<string>('sun-tue');
   const [selectedCollege, setSelectedCollege] = useState<string>('computing');
@@ -40,70 +44,99 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
   const [selectedBayNumber, setSelectedBayNumber] = useState<number>(2);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [cancelMessage, setCancelMessage] = useState<string | null>(null);
+
+  // User's active and historical bookings
+  const [myBookings, setMyBookings] = useState<BookingResponse[]>([]);
+  const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(false);
+  const [cancellingBookingId, setCancellingBookingId] = useState<string | null>(null);
 
   // Map college to zone
   const targetZone = selectedCollege === 'business' ? 'B' : selectedCollege === 'medicine' ? 'B' : selectedCollege === 'sciences' ? 'C' : 'A';
 
-  useEffect(() => {
-    let isMounted = true;
-    parkingApi.getSpots(targetZone)
-      .then(spots => {
-        if (!isMounted) return;
-        const available = spots.filter(s => s.status === 'AVAILABLE');
-        setAvailableSpots(available);
-        if (available.length > 0) {
-          setSelectedSpotId(available[0].id);
-          setSelectedBayNumber(available[0].bayNumber);
-        } else if (spots.length > 0) {
-          setSelectedSpotId(spots[0].id);
-          setSelectedBayNumber(spots[0].bayNumber);
-        }
-      })
-      .catch(err => {
-        console.warn('Could not load spots for zone', targetZone, err);
-      });
-    return () => {
-      isMounted = false;
-    };
+  const loadSpotsForZone = useCallback(async () => {
+    try {
+      const spots = await parkingApi.getSpots(targetZone);
+      const available = spots.filter(s => s.status === 'AVAILABLE');
+      setAvailableSpots(available);
+      if (available.length > 0) {
+        setSelectedSpotId(available[0].id);
+        setSelectedBayNumber(available[0].bayNumber);
+      } else if (spots.length > 0) {
+        setSelectedSpotId(spots[0].id);
+        setSelectedBayNumber(spots[0].bayNumber);
+      }
+    } catch (err) {
+      console.warn('Could not load spots for zone', targetZone, err);
+    }
   }, [targetZone]);
 
-  // Price calculations
+  const loadMyBookings = useCallback(async () => {
+    if (!isAuthenticated || typeof parkingApi.getMyBookings !== 'function') {
+      return;
+    }
+    setIsLoadingBookings(true);
+    try {
+      const data = await parkingApi.getMyBookings();
+      if (Array.isArray(data)) {
+        setMyBookings(data);
+      }
+    } catch {
+      // Non-blocking in offline/unit test mode
+    } finally {
+      setIsLoadingBookings(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    loadSpotsForZone();
+  }, [loadSpotsForZone]);
+
+  useEffect(() => {
+    loadMyBookings();
+  }, [loadMyBookings]);
+
+  // Compute hours from timeFrom and timeTo
+  const [fromH, fromM] = timeFrom.split(':').map(Number);
+  const [toH, toM] = timeTo.split(':').map(Number);
+  const rawHours = ((toH * 60 + (toM || 0)) - (fromH * 60 + (fromM || 0))) / 60;
+  const computedHours = rawHours > 0 ? Math.max(0.5, Math.min(12.0, rawHours)) : 3.0;
+  const durationHours = tariffPlan === 'daily' ? 8.0 : tariffPlan === 'monthly' ? 12.0 : computedHours;
+
+  // Price calculations matching backend tariff (5.75 SAR/hr, 25.00 SAR daily cap)
   let basePrice = 17.25;
-  let discount = 5.75;
-  let totalPrice = 11.5;
+  let totalPrice = 17.25;
 
   if (tariffPlan === 'daily') {
-    basePrice = 15.0;
-    discount = optInFlex ? 5.0 : 0.0;
-    totalPrice = basePrice - discount;
+    basePrice = 25.0;
+    totalPrice = 25.0;
   } else if (tariffPlan === 'monthly') {
-    basePrice = 450.0;
-    discount = optInFlex ? 225.0 : 0.0;
-    totalPrice = basePrice - discount;
+    basePrice = 25.0;
+    totalPrice = 25.0;
   } else {
-    // hourly (3 hours default)
-    basePrice = 17.25;
-    discount = optInFlex ? 5.75 : 0.0;
-    totalPrice = basePrice - discount;
+    basePrice = Number((durationHours * 5.75).toFixed(2));
+    totalPrice = Math.min(25.0, basePrice);
   }
 
   const handleConfirm = async () => {
     setBookingError(null);
+    setCancelMessage(null);
+
+    if (isAuthenticated === false) {
+      setBookingError(
+        isAr
+          ? 'يرجى تسجيل الدخول أولاً لتأكيد الحجز وخصم الرصيد من محفظتك'
+          : 'Please sign in to confirm booking and debit your campus wallet.'
+      );
+      onOpenAuth?.();
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Build ISO timestamps for reservation
-      const today = new Date();
-      const [fromH, fromM] = timeFrom.split(':').map(Number);
-      const [toH, toM] = timeTo.split(':').map(Number);
-
-      const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), fromH, fromM, 0);
-      let endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), toH, toM, 0);
-
-      // If end time is before or equal to start time, advance by 2 hours
-      if (endDate <= startDate) {
-        endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
-      }
+      const startDate = new Date();
+      const endDate = new Date(startDate.getTime() + durationHours * 60 * 60 * 1000);
 
       // If no spot selected yet, fallback to fetching any available
       let targetSpotId = selectedSpotId;
@@ -122,6 +155,8 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
 
       const booking = await parkingApi.createBooking({
         spotId: targetSpotId,
+        durationHours,
+        autoDebitWallet: true,
         idempotencyKey: 'booking-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
         startTime: startDate.toISOString(),
         endTime: endDate.toISOString(),
@@ -138,10 +173,11 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
         bookingId: booking.id,
         passCode: booking.digitalPassCode,
         qrToken: booking.qrToken,
-        totalAmount: booking.totalAmount,
+        totalAmount: Number(booking.totalAmount),
       });
 
       onBookingSuccess?.(booking);
+      await Promise.all([loadSpotsForZone(), loadMyBookings()]);
     } catch (err: any) {
       console.error('Booking failed:', err);
       soundFX.playError();
@@ -151,7 +187,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
       if (status === 401) {
         setBookingError(isAr ? 'يرجى تسجيل الدخول أولاً لتأكيد الحجز وخصم الرصيد من محفظتك' : 'Please sign in to confirm booking and debit your campus wallet.');
         onOpenAuth?.();
-      } else if (status === 409 || detail?.includes('overlap')) {
+      } else if (status === 409 || detail?.includes('overlap') || detail?.includes('already')) {
         setBookingError(isAr ? 'عذراً! هذا الموقف محجوز بالفعل في هذا التوقيت. يرجى اختيار موقف آخر.' : 'This spot is already booked for this time window. Please select another bay.');
       } else if (detail) {
         setBookingError(detail);
@@ -160,6 +196,32 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    setCancellingBookingId(bookingId);
+    setBookingError(null);
+    setCancelMessage(null);
+    try {
+      await parkingApi.cancelBooking(bookingId);
+      soundFX.playSuccess();
+      setDigitalPass(null);
+      setCancelMessage(
+        isAr
+          ? 'تم إلغاء الحجز بنجاح وإعادة المبلغ كاملاً إلى محفظتك الجامعية وتحرير الموقف.'
+          : 'Reservation cancelled! Full amount refunded to your wallet and bay released.'
+      );
+      onBookingCancelled?.();
+      await Promise.all([loadSpotsForZone(), loadMyBookings()]);
+    } catch (err: any) {
+      soundFX.playError();
+      setBookingError(
+        err?.response?.data?.detail ||
+          (isAr ? 'تعذر إلغاء الحجز.' : 'Could not cancel reservation.')
+      );
+    } finally {
+      setCancellingBookingId(null);
     }
   };
 
@@ -177,8 +239,8 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
         </h3>
         <p className="section-subtitle">
           {isAr
-            ? 'نظام تعرفة ذكي ومرن مطابق لمعايير المواقف الذكية (5.75 ر.س / ساعة، أو سقف يومي 15 ر.س، أو اشتراك شهري مع خصم التبادل الذكي).'
-            : 'Flexible tariff structure compliant with smart campus standards (5.75 SAR/hr, 15 SAR daily cap, or monthly pass with 50% sharing discount).'}
+            ? 'نظام تعرفة ذكي ومرن مطابق لمعايير المواقف الذكية (5.75 ر.س / ساعة، أو سقف يومي 25 ر.س، مع خصم مباشر من المحفظة الجامعية).'
+            : 'Flexible tariff structure compliant with smart campus standards (5.75 SAR/hr, 25 SAR daily cap, with instant campus wallet deduction).'}
         </p>
       </div>
 
@@ -284,7 +346,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 tabIndex={0}
               >
                 <h5>{isAr ? 'يومي كامل' : 'Daily Cap'}</h5>
-                <span style={{ color: 'var(--fbsu-gold)' }}>15.00 SAR</span>
+                <span style={{ color: 'var(--fbsu-gold)' }}>25.00 SAR</span>
               </div>
               <div
                 className={`pattern-option ${tariffPlan === 'monthly' ? 'selected' : ''}`}
@@ -293,7 +355,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 tabIndex={0}
               >
                 <h5>{isAr ? 'اشتراك شهري' : 'Monthly'}</h5>
-                <span style={{ color: 'var(--fbsu-gold)' }}>450 SAR (or 225*)</span>
+                <span style={{ color: 'var(--fbsu-gold)' }}>25.00 SAR/day</span>
               </div>
             </div>
           </div>
@@ -313,6 +375,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                   if (found) setSelectedBayNumber(found.bayNumber);
                 }}
                 className="form-control"
+                data-testid="wizard-spot-select"
               >
                 {availableSpots.map(s => (
                   <option key={s.id} value={s.id}>
@@ -382,8 +445,8 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
               <div>
                 <strong style={{ color: 'var(--fbsu-gold)', fontSize: '0.9rem' }}>
                   {isAr
-                    ? 'تفعيل ميزة التبادل الذكي التلقائي (اربح حتى 50% خصم)'
-                    : 'Opt-in for AI Flex Sharing (Save up to 50%)'}
+                    ? 'تفعيل ميزة التبادل الذكي التلقائي (اربح كاش باك في البريك)'
+                    : 'Opt-in for AI Flex Sharing (Earn break cashback)'}
                 </strong>
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
                   {isAr
@@ -408,9 +471,32 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 fontSize: '0.88rem',
                 marginBottom: '1rem',
               }}
+              data-testid="booking-error-alert"
             >
               <AlertCircle size={18} style={{ flexShrink: 0 }} />
               <span>{bookingError}</span>
+            </div>
+          )}
+
+          {cancelMessage && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                background: 'rgba(56, 194, 176, 0.12)',
+                border: '1px solid var(--status-available)',
+                color: 'var(--status-available)',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.85rem 1rem',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                marginBottom: '1rem',
+              }}
+              data-testid="booking-cancel-alert"
+            >
+              <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
+              <span>{cancelMessage}</span>
             </div>
           )}
 
@@ -519,14 +605,14 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
             <span>{isAr ? 'فترة الحجز:' : 'Window:'}</span>
             <span>
               {tariffPlan === 'hourly'
-                ? `3 ${isAr ? 'ساعات' : 'Hours'} (${timeFrom} - ${timeTo})`
+                ? `${durationHours} ${isAr ? 'ساعات' : 'Hours'} (${timeFrom} - ${timeTo})`
                 : tariffPlan === 'daily'
                   ? isAr
-                    ? 'يوم كامل'
-                    : 'Full Day'
+                    ? 'يوم كامل (سقف 25 ر.س)'
+                    : 'Full Day (25 SAR Cap)'
                   : isAr
-                    ? 'شهر كامل'
-                    : '1 Month'}
+                    ? 'باقة ممتدة'
+                    : 'Extended Pass'}
             </span>
           </div>
           <div
@@ -550,8 +636,8 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
               color: 'var(--text-muted)',
             }}
           >
-            <span>{isAr ? 'خصم التبادل المتوقع:' : 'Flex Discount:'}</span>
-            <span style={{ color: 'var(--status-available)' }}>- {discount.toFixed(2)} SAR</span>
+            <span>{isAr ? 'خصم السقف اليومي:' : 'Cap Adjustment:'}</span>
+            <span style={{ color: 'var(--status-available)' }}>- {(basePrice - totalPrice).toFixed(2)} SAR</span>
           </div>
 
           <div
@@ -565,7 +651,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
             }}
           >
             <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-main)' }}>
-              {isAr ? 'الإجمالي المستحق:' : 'Total Amount:'}
+              {isAr ? 'الإجمالي المستحق (يُخصم من المحفظة):' : 'Total Amount (Wallet Debit):'}
             </span>
             <div
               style={{
@@ -574,6 +660,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 color: 'var(--fbsu-gold)',
                 fontFamily: 'var(--font-en)',
               }}
+              data-testid="booking-total-price"
             >
               {totalPrice.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
             </div>
@@ -594,14 +681,137 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
         </div>
       </div>
 
+      {/* User's Active & Historical Reservations ("My Bookings") */}
+      {isAuthenticated && (
+        <div
+          className="glass-panel"
+          style={{ marginTop: '2rem', padding: '1.75rem' }}
+          data-testid="my-bookings-section"
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1rem',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+            }}
+          >
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+              {isAr ? 'سجل حجوزاتي وتصاريحي النشطة' : 'My Parking Reservations & Passes'}
+            </h4>
+            <button
+              type="button"
+              className="utility-pill-btn"
+              onClick={loadMyBookings}
+              disabled={isLoadingBookings}
+              data-testid="refresh-my-bookings-btn"
+            >
+              <RefreshCw size={14} className={isLoadingBookings ? 'spin-anim' : ''} />
+              <span>{isAr ? 'تحديث السجل' : 'Refresh'}</span>
+            </button>
+          </div>
+
+          {myBookings.length === 0 ? (
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', padding: '1rem 0' }}>
+              {isAr ? 'لا توجد حجوزات مسجلة في حسابك حالياً.' : 'No reservations found on your account yet.'}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {myBookings.map(booking => {
+                const isConfirmed = booking.status === 'CONFIRMED' || booking.status === 'ACTIVE';
+                const isCancelling = cancellingBookingId === booking.id;
+
+                return (
+                  <div
+                    key={booking.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '1rem',
+                      padding: '1rem 1.25rem',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${isConfirmed ? 'var(--fbsu-gold-border)' : 'var(--border-subtle)'}`,
+                      borderRadius: 'var(--radius-md)',
+                    }}
+                    data-testid={`my-booking-card-${booking.id}`}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.25rem' }}>
+                        <strong style={{ color: 'var(--fbsu-gold)', fontSize: '1rem' }}>
+                          {isAr ? `موقف #${booking.bayNumber}` : `Bay #${booking.bayNumber}`} ({isAr ? booking.zoneNameAr : booking.zoneNameEn})
+                        </strong>
+                        <span className={`badge ${isConfirmed ? 'badge-available' : 'badge-occupied'}`}>
+                          {isConfirmed ? (isAr ? 'مؤكد ونشط' : 'CONFIRMED') : (isAr ? 'ملغي (مسترد)' : booking.status)}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', flexWrap: 'wrap', gap: '0.85rem' }}>
+                        <span>{isAr ? 'التصريح:' : 'Pass:'} <strong>{booking.digitalPassCode}</strong></span>
+                        <span>{isAr ? 'المدة:' : 'Duration:'} <strong>{booking.durationHours}h</strong></span>
+                        <span>{isAr ? 'المبلغ:' : 'Amount:'} <strong style={{ color: 'var(--fbsu-gold)' }}>{Number(booking.totalAmount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}</strong></span>
+                      </div>
+                    </div>
+
+                    {isConfirmed && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button
+                          type="button"
+                          className="utility-pill-btn"
+                          onClick={() =>
+                            setDigitalPass({
+                              spotId: booking.bayNumber,
+                              college: isAr ? booking.zoneNameAr : booking.zoneNameEn,
+                              userName: currentUser.name,
+                              userId: currentUser.id,
+                              plate: booking.vehiclePlate || currentUser.plate || 'أ ب ح 1234',
+                              duration: `${booking.durationHours} ${isAr ? 'ساعات' : 'Hours'}`,
+                              bookingId: booking.id,
+                              passCode: booking.digitalPassCode,
+                              qrToken: booking.qrToken,
+                              totalAmount: Number(booking.totalAmount),
+                            })
+                          }
+                          data-testid={`view-pass-btn-${booking.id}`}
+                        >
+                          <QrCode size={14} color="var(--fbsu-gold)" />
+                          <span>{isAr ? 'عرض التصريح' : 'View Pass'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="utility-pill-btn"
+                          onClick={() => handleCancelBooking(booking.id)}
+                          disabled={isCancelling}
+                          style={{ borderColor: 'rgba(239, 68, 68, 0.45)', color: '#f87171' }}
+                          data-testid={`cancel-booking-btn-${booking.id}`}
+                        >
+                          <RotateCcw size={14} className={isCancelling ? 'spin-anim' : ''} />
+                          <span>
+                            {isCancelling
+                              ? isAr ? 'جاري الإلغاء...' : 'Cancelling...'
+                              : isAr ? 'إلغاء واسترداد المبلغ' : 'Cancel & Refund'}
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       <DigitalPassModal
         isOpen={digitalPass !== null}
         passData={digitalPass}
         isAr={isAr}
         onClose={() => setDigitalPass(null)}
         onOpenGate={onOpenGate}
+        onCancelBooking={digitalPass?.bookingId ? handleCancelBooking : undefined}
       />
     </div>
   );
 };
-

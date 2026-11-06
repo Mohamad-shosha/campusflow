@@ -9,6 +9,8 @@ export interface AppShellProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
+  isAuthenticated?: boolean;
+  onLogout?: (() => void) | undefined;
   notificationCount?: number;
   onOpenNotifications?: (() => void) | undefined;
   onOpenAuth?: (() => void) | undefined;
@@ -20,6 +22,8 @@ export const AppShell: FC<AppShellProps> = ({
   activeTab,
   onTabChange,
   currentUser,
+  isAuthenticated = false,
+  onLogout,
   notificationCount = 3,
   onOpenNotifications,
   onOpenAuth,
@@ -39,6 +43,8 @@ export const AppShell: FC<AppShellProps> = ({
         activeTab={activeTab}
         onTabChange={onTabChange}
         currentUser={currentUser}
+        isAuthenticated={isAuthenticated}
+        onLogout={onLogout}
         notificationCount={notificationCount}
         onOpenNotifications={onOpenNotifications}
         onOpenAuth={onOpenAuth}

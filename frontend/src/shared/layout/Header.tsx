@@ -20,6 +20,8 @@ import {
   Users,
   UserCheck,
   DoorClosed,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
 import type { AppUser } from '../types/navigation';
 import { useAppPreferences } from '../context/AppPreferencesContext';
@@ -28,6 +30,8 @@ export interface HeaderProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
+  isAuthenticated?: boolean;
+  onLogout?: (() => void) | undefined;
   notificationCount?: number | undefined;
   onOpenNotifications?: (() => void) | undefined;
   onOpenWallet?: (() => void) | undefined;
@@ -38,6 +42,8 @@ export const Header: FC<HeaderProps> = ({
   activeTab,
   onTabChange,
   currentUser,
+  isAuthenticated = false,
+  onLogout,
   notificationCount = 3,
   onOpenNotifications,
   onOpenWallet,
@@ -292,34 +298,73 @@ export const Header: FC<HeaderProps> = ({
             onClick={onOpenWallet}
             type="button"
             title={t('utilities.walletTitle')}
+            data-testid="header-wallet-btn"
           >
             <Wallet size={13} color="var(--fbsu-gold)" />
-            <span>
-              {currentUser.walletBalance.toFixed(2)} {t('common.currency')}
+            <span data-testid="header-wallet-balance">
+              {isAuthenticated ? currentUser.walletBalance.toFixed(2) : '0.00'}{' '}
+              {t('common.currency')}
             </span>
           </button>
 
-          {/* User Profile */}
-          <button
-            className="auth-btn-header"
-            onClick={onOpenAuth}
-            type="button"
-            title={t('utilities.profileTitle')}
-          >
-            <span
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: currentUser.avatarColor || '#116E63',
-                display: 'inline-block',
-              }}
-            ></span>
-            <span>
-              {isAr ? currentUser.name.split(' ')[0] : currentUser.nameEn.split(' ')[0]} (
-              {currentUser.role.split(' ')[0]})
-            </span>
-          </button>
+          {/* User Profile / Sign In & Sign Out */}
+          {isAuthenticated ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <button
+                className="auth-btn-header"
+                onClick={onOpenAuth}
+                type="button"
+                title={t('utilities.profileTitle')}
+                data-testid="header-auth-btn"
+              >
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: currentUser.avatarColor || '#116E63',
+                    display: 'inline-block',
+                  }}
+                ></span>
+                <span>
+                  {isAr ? currentUser.name.split(' ')[0] : currentUser.nameEn.split(' ')[0]} (
+                  {isAr ? currentUser.role.split(' ')[0] : currentUser.roleEn.split(' ')[0]})
+                </span>
+              </button>
+              {onLogout && (
+                <button
+                  className="utility-pill-btn"
+                  onClick={onLogout}
+                  type="button"
+                  title={t('auth.signOut')}
+                  data-testid="header-logout-btn"
+                  style={{
+                    border: '1px solid rgba(239, 68, 68, 0.45)',
+                    color: '#f87171',
+                    padding: '0.35rem 0.65rem',
+                    borderRadius: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  <LogOut size={13} />
+                  <span className="utility-text-label">{t('auth.signOut')}</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              className="auth-btn-header"
+              onClick={onOpenAuth}
+              type="button"
+              title={t('utilities.profileTitle')}
+              data-testid="header-auth-btn"
+            >
+              <LogIn size={14} color="var(--fbsu-gold)" />
+              <span>{t('auth.signIn')}</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

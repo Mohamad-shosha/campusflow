@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, LogIn } from 'lucide-react';
 import { BalanceCard } from './BalanceCard';
 import { LedgerTable } from './LedgerTable';
 import { TopUpModal } from './TopUpModal';
@@ -12,9 +12,11 @@ import type { WalletResponse, LedgerEntryResponse, Page } from '../types/wallet'
 
 export interface WalletPageProps {
   onBalanceUpdate?: (newBalance: number) => void;
+  onNavigateToTuition?: () => void;
+  onOpenAuth?: () => void;
 }
 
-export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate }) => {
+export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth }) => {
   const { i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const { user, isAuthenticated } = useAuth();
@@ -55,44 +57,36 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate }) => {
           onBalanceUpdate(Number(walletData.balance));
         }
       } else {
-        // Fallback demo state for guest / unauthenticated preview
-        const demoWallet: WalletResponse = {
-          id: 'demo-wallet-id',
-          userId: 'demo-user-id',
-          balance: 720.0,
+        // Unauthenticated state: 0.00 SAR, never display hardcoded 720.00 SAR
+        const emptyWallet: WalletResponse = {
+          id: 'unauthenticated-wallet',
+          userId: 'guest',
+          balance: 0.0,
           currency: 'SAR',
           status: 'ACTIVE',
           updatedAt: new Date().toISOString(),
         };
-        const demoLedger: Page<LedgerEntryResponse> = {
-          content: [
-            {
-              id: 'demo-ledger-1',
-              transactionType: 'TOP_UP',
-              direction: 'CREDIT',
-              amount: 720.0,
-              balanceAfter: 720.0,
-              referenceId: 'FBSU_INIT_ALLOC',
-              description: isAr ? 'تخصيص رصيد المنحة الجامعية الأولي' : 'Initial institutional semester balance allocation',
-              createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-            },
-          ],
+        const emptyLedger: Page<LedgerEntryResponse> = {
+          content: [],
           totalPages: 1,
-          totalElements: 1,
+          totalElements: 0,
           size: 15,
           number: 0,
           first: true,
           last: true,
         };
-        setWallet(demoWallet);
-        setLedgerPage(demoLedger);
+        setWallet(emptyWallet);
+        setLedgerPage(emptyLedger);
+        if (onBalanceUpdate) {
+          onBalanceUpdate(0.0);
+        }
       }
     } catch (err: unknown) {
       console.error('Failed to load wallet data:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, isAr, onBalanceUpdate]);
+  }, [isAuthenticated, onBalanceUpdate]);
 
   useEffect(() => {
     fetchWalletData(currentPage);
@@ -173,13 +167,60 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate }) => {
         </div>
       </div>
 
+      {!isAuthenticated && (
+        <div
+          className="glass-panel"
+          style={{
+            padding: '1.15rem 1.4rem',
+            marginBottom: '1.25rem',
+            border: '1px solid var(--fbsu-gold-border)',
+            background: 'var(--fbsu-gold-light)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+          data-testid="wallet-auth-prompt"
+        >
+          <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-main)' }}>
+            {isAr
+              ? 'يرجى تسجيل الدخول بحسابك الجامعي لعرض رصيد محفظتك الفعلي وسجل معاملاتك المالية.'
+              : 'Please sign in with your university account to view your actual wallet balance and ledger history.'}
+          </span>
+          {onOpenAuth && (
+            <button
+              type="button"
+              className="btn-gold"
+              onClick={onOpenAuth}
+              data-testid="wallet-signin-btn"
+            >
+              <LogIn size={15} color="#0b1a17" />
+              <span>{isAr ? 'تسجيل الدخول' : 'Sign In'}</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Balance Card */}
       <BalanceCard
         wallet={wallet}
         isLoading={isLoading}
         onRefresh={() => fetchWalletData(currentPage)}
-        onOpenTopUp={() => setIsTopUpOpen(true)}
-        onOpenTransfer={() => setIsTransferOpen(true)}
+        onOpenTopUp={() => {
+          if (!isAuthenticated && onOpenAuth) {
+            onOpenAuth();
+            return;
+          }
+          setIsTopUpOpen(true);
+        }}
+        onOpenTransfer={() => {
+          if (!isAuthenticated && onOpenAuth) {
+            onOpenAuth();
+            return;
+          }
+          setIsTransferOpen(true);
+        }}
       />
 
       {/* Ledger Table */}
@@ -210,4 +251,3 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate }) => {
     </div>
   );
 };
-
