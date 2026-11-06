@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 29 تاسك ✅
+- **المنجز بالكامل (Done):** 30 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 24 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **55%**
+- **المتبقي للبدء (Backlog):** 23 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **57%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 7 | 0 | 2 |
+| P5 | Parking | 9 | 8 | 0 | 1 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **29** | **0** | **24** |
+| **الإجمالي** | | **53** | **30** | **0** | **23** |
 
 ---
 
@@ -371,9 +371,9 @@
 
 ### P5-08 — Flex-Share UI
 - **ماذا سيعمل:** شاشة تفعيل التبادل وحساب الأرباح المتوقعة.
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P5-04، P5-06
-- **Git Branch:** `feature/P5-08-flex-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P5-08-flex-ui` · **Pull Request:** PR (feature/P5-08-flex-ui)
 - **الملفات المتوقعة:** `frontend/src/features/parking/flex/*`
 - **Implementation Steps:** 1) المكونات 2) ربط الـ API 3) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy · منع التفعيل المتكرر

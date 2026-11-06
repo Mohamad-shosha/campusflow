@@ -113,9 +113,10 @@ export interface FlexOfferResponse {
   spotId: string;
   bayNumber: number;
   bayCode: string;
-  zoneNameAr: string;
-  zoneNameEn: string;
-  offererId: string;
+  zoneCode?: string;
+  zoneNameAr?: string;
+  zoneNameEn?: string;
+  offererId?: string;
   offererNameAr: string;
   offererNameEn: string;
   claimerId?: string | null;
@@ -123,15 +124,18 @@ export interface FlexOfferResponse {
   claimerNameEn?: string | null;
   startTime: string;
   endTime: string;
-  rewardAmountSar: number;
-  status: 'OFFERED' | 'CLAIMED' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
-  createdAt: string;
+  rewardAmount?: number;
+  rewardAmountSar?: number;
+  currency?: string;
+  status: 'AVAILABLE' | 'OFFERED' | 'CLAIMED' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
+  rewardPaid?: boolean;
+  createdAt?: string;
 }
 
 export interface CreateFlexOfferRequest {
   spotId: string;
-  startTime: string;
-  endTime: string;
+  durationMinutes: number;
+  startTime?: string;
 }
 
 export interface GateScanRequest {

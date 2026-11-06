@@ -288,6 +288,7 @@ export const tasks = [
     tests: ['Form validation', 'API integration', 'E2E'], blockedBy: [],
   }),
   T('P5-08', 'Flex-Share UI', {
+    status: 'Done', pr: 'PR (feature/P5-08-flex-ui)',
     pri: 'Medium', cx: 'M', deps: ['P5-04', 'P5-06'], branch: 'feature/P5-08-flex-ui',
     goal: 'شاشة تفعيل التبادل وحساب الأرباح المتوقعة.',
     files: ['frontend/src/features/parking/flex/*'],
