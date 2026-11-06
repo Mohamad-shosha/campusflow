@@ -6,3 +6,4 @@ public enum SpotType {
     EV_CHARGING,
     ACCESSIBLE
 }
+

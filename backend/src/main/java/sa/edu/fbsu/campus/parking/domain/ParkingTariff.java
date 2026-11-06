@@ -84,3 +84,4 @@ public class ParkingTariff extends BaseTenantEntity {
         this.active = active;
     }
 }
+

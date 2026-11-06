@@ -90,3 +90,4 @@ public class ParkingZone extends BaseTenantEntity {
         this.active = active;
     }
 }
+

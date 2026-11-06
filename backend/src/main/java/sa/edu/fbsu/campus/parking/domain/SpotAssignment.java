@@ -97,3 +97,4 @@ public class SpotAssignment extends BaseTenantEntity {
         this.active = active;
     }
 }
+

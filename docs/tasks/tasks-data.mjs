@@ -225,6 +225,7 @@ export const tasks = [
 
   // ---------------- P5 ----------------
   T('P5-01', 'Parking schema (zones, spots, assignments, tariffs)', {
+    status: 'Done', pr: 'PR (feature/P5-01-parking-schema)',
     pri: 'High', cx: 'M', deps: ['P2-01'], branch: 'feature/P5-01-parking-schema',
     goal: 'جداول المناطق والمواقف والتعيينات والتعرفات.',
     files: ['db/migration/V6__parking.sql', 'parking/domain/*'],
@@ -233,6 +234,7 @@ export const tasks = [
     tests: ['Repository tests', 'Migration test'], blockedBy: ['Q7'],
   }),
   T('P5-02', 'Spots & zones API', {
+    status: 'Done', pr: 'PR (feature/P5-02-spots-api)',
     pri: 'High', cx: 'M', deps: ['P5-01'], branch: 'feature/P5-02-spots-api',
     goal: 'API لعرض المواقف مع فلترة بالمنطقة والحالة.',
     files: ['parking/api/*', 'parking/application/*'],

@@ -18,3 +18,4 @@ public interface ParkingTariffRepository extends JpaRepository<ParkingTariff, UU
 
     boolean existsByUniversityIdAndUserType(UUID universityId, UserType userType);
 }
+

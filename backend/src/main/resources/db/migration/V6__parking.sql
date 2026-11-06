@@ -90,3 +90,4 @@ CREATE TABLE IF NOT EXISTS spot_assignment (
 
 CREATE INDEX IF NOT EXISTS idx_spot_assignment_spot_id ON spot_assignment(spot_id);
 CREATE INDEX IF NOT EXISTS idx_spot_assignment_user_id ON spot_assignment(user_id);
+

@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 23 تاسك ✅
+- **المنجز بالكامل (Done):** 24 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 30 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **43%**
+- **المتبقي للبدء (Backlog):** 29 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **45%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 1 | 0 | 8 |
+| P5 | Parking | 9 | 2 | 0 | 7 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **23** | **0** | **30** |
+| **الإجمالي** | | **53** | **24** | **0** | **29** |
 
 ---
 
@@ -305,9 +305,9 @@
 
 ### P5-02 — Spots & zones API
 - **ماذا سيعمل:** API لعرض المواقف مع فلترة بالمنطقة والحالة.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P5-01
-- **Git Branch:** `feature/P5-02-spots-api` · **Pull Request:** —
+- **Git Branch:** `feature/P5-02-spots-api` · **Pull Request:** PR (feature/P5-02-spots-api)
 - **الملفات المتوقعة:** `parking/api/*`، `parking/application/*`
 - **Implementation Steps:** 1) Service 2) Controller + DTOs 3) Filtering/pagination
 - **Acceptance Criteria:** الفلترة صحيحة · DTOs فقط

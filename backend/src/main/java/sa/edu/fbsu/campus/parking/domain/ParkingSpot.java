@@ -187,3 +187,4 @@ public class ParkingSpot extends BaseTenantEntity {
         this.sessionEndsAt = sessionEndsAt;
     }
 }
+

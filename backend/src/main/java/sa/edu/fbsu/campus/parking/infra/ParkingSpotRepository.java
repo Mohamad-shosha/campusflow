@@ -32,3 +32,4 @@ public interface ParkingSpotRepository extends JpaRepository<ParkingSpot, UUID> 
 
     long countByUniversityIdAndStatus(UUID universityId, SpotStatus status);
 }
+

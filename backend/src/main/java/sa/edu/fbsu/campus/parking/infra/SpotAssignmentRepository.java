@@ -17,3 +17,4 @@ public interface SpotAssignmentRepository extends JpaRepository<SpotAssignment, 
 
     Optional<SpotAssignment> findByUserIdAndActiveTrue(UUID userId);
 }
+

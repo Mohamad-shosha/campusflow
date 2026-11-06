@@ -17,3 +17,4 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZone, UUID> 
 
     boolean existsByUniversityIdAndCode(UUID universityId, String code);
 }
+

@@ -7,3 +7,4 @@ public enum SpotStatus {
     FLEX_SHARE,
     FACULTY_ASSIGNED
 }
+
