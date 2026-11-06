@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 30 تاسك ✅
+- **المنجز بالكامل (Done):** 31 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 23 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **57%**
+- **المتبقي للبدء (Backlog):** 22 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **58%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 8 | 0 | 1 |
+| P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **30** | **0** | **23** |
+| **الإجمالي** | | **53** | **31** | **0** | **22** |
 
 ---
 
@@ -382,9 +382,9 @@
 
 ### P5-09 — Gate scanner + simulator UI (demo)
 - **ماذا سيعمل:** ماسح البوابة والمحاكي التوضيحي (للعرض فقط).
-- **Priority:** Low · **Complexity:** M · **Status:** Backlog
+- **Priority:** Low · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P5-05
-- **Git Branch:** `feature/P5-09-gate-sim-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P5-09-gate-sim-ui` · **Pull Request:** PR (feature/P5-09-gate-sim-ui)
 - **الملفات المتوقعة:** `frontend/src/features/parking/gate/*`، `simulator/*`
 - **Implementation Steps:** 1) Gate scanner 2) Simulator stages 3) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy

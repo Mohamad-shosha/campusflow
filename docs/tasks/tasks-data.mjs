@@ -297,6 +297,7 @@ export const tasks = [
     tests: ['Component', 'E2E'], blockedBy: [],
   }),
   T('P5-09', 'Gate scanner + simulator UI (demo)', {
+    status: 'Done', pr: 'PR (feature/P5-09-gate-sim-ui)',
     pri: 'Low', cx: 'M', deps: ['P5-05'], branch: 'feature/P5-09-gate-sim-ui',
     goal: 'ماسح البوابة والمحاكي التوضيحي (للعرض فقط).',
     files: ['frontend/src/features/parking/gate/*', 'simulator/*'],
