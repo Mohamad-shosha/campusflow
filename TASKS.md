@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 27 تاسك ✅
+- **المنجز بالكامل (Done):** 28 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 26 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **51%**
+- **المتبقي للبدء (Backlog):** 25 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **53%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 5 | 0 | 4 |
+| P5 | Parking | 9 | 6 | 0 | 3 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **27** | **0** | **26** |
+| **الإجمالي** | | **53** | **28** | **0** | **25** |
 
 ---
 
@@ -349,9 +349,9 @@
 
 ### P5-06 — Parking map UI
 - **ماذا سيعمل:** خريطة المواقف (30 موقف) مع فلتر المناطق وبطاقة الموقف.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P3-05، P5-02
-- **Git Branch:** `feature/P5-06-map-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P5-06-map-ui` · **Pull Request:** PR (feature/P5-06-map-ui)
 - **الملفات المتوقعة:** `frontend/src/features/parking/map/*`
 - **Implementation Steps:** 1) SpotCard وGrid 2) Zone filter 3) Spot modal 4) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy

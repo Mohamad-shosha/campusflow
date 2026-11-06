@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, useEffect, useCallback, FC } from 'react';
 import { AppShell } from '../shared/layout/AppShell';
 import { AppPreferencesProvider, useAppPreferences } from '../shared/context/AppPreferencesContext';
 import { AuthProvider, useAuth } from '../features/auth/context/AuthContext';
@@ -9,6 +9,8 @@ import { TuitionPage } from '../features/tuition';
 import { Toast, type ToastType } from '../shared/components/Toast';
 import type { AppUser } from '../shared/types/navigation';
 import { INITIAL_PARKING_SPOTS, type ParkingSpot } from '../features/parking/data/parkingData';
+import { parkingApi } from '../features/parking/api/parkingApi';
+import { mapBackendSpotToUi, type ParkingSummaryResponse } from '../features/parking/types/parking';
 import {
   INITIAL_TUTORING_SESSIONS,
   FACULTY_MEMBERS,
@@ -50,6 +52,10 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
 
   // Dynamic campus state
   const [parkingSpots, setParkingSpots] = useState<ParkingSpot[]>(INITIAL_PARKING_SPOTS);
+  const [isParkingLoading, setIsParkingLoading] = useState<boolean>(false);
+  const [parkingLastUpdated, setParkingLastUpdated] = useState<Date | null>(null);
+  const [parkingSummary, setParkingSummary] = useState<ParkingSummaryResponse | null>(null);
+
   const [tutoringSessions, setTutoringSessions] =
     useState<TutoringSession[]>(INITIAL_TUTORING_SESSIONS);
   const [facultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
@@ -64,6 +70,33 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
 
   const { isAr } = useAppPreferences();
   const { user } = useAuth();
+
+  const fetchParkingData = useCallback(async () => {
+    setIsParkingLoading(true);
+    try {
+      const [backendSpots, summary] = await Promise.all([
+        parkingApi.getSpots(),
+        parkingApi.getSummary().catch(() => null),
+      ]);
+      if (backendSpots && backendSpots.length > 0) {
+        setParkingSpots(backendSpots.map(mapBackendSpotToUi));
+        setParkingLastUpdated(new Date());
+      }
+      if (summary) {
+        setParkingSummary(summary);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch live parking data from backend:', err);
+    } finally {
+      setIsParkingLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchParkingData();
+    const interval = setInterval(fetchParkingData, 30000);
+    return () => clearInterval(interval);
+  }, [fetchParkingData]);
 
   const currentUser: AppUser = user
     ? {
@@ -85,9 +118,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         avatarColor: '#116E63',
       };
 
-  const totalSpots = parkingSpots.length;
-  const availableCount = parkingSpots.filter(s => s.status === 'available').length;
-  const flexCount = parkingSpots.filter(s => s.status === 'flex' || s.status === 'flex-share').length;
+  const totalSpots = parkingSummary?.totalSpots ?? parkingSpots.length;
+  const availableCount = parkingSummary?.availableSpots ?? parkingSpots.filter(s => s.status === 'available').length;
+  const flexCount = parkingSummary?.flexSpots ?? parkingSpots.filter(s => s.status === 'flex' || s.status === 'flex-share').length;
 
   const handleReserveSpot = (spotId: number) => {
     setParkingSpots(prev =>
@@ -226,6 +259,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
             }}
             onReserveSpot={handleReserveSpot}
             onOpenGate={() => setActiveTab('gate')}
+            isLoading={isParkingLoading}
+            onRefresh={fetchParkingData}
+            lastUpdated={parkingLastUpdated}
           />
         )}
 

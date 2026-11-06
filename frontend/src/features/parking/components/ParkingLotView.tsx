@@ -1,5 +1,5 @@
 import { useState, FC } from 'react';
-import { MapPin, Building2, ArrowUp, ArrowDown, ShieldCheck } from 'lucide-react';
+import { MapPin, Building2, ArrowUp, ArrowDown, ShieldCheck, RotateCw } from 'lucide-react';
 import type { ParkingSpot } from '../data/parkingData';
 import { SpotCard } from './SpotCard';
 import { SpotDetailsModal } from './SpotDetailsModal';
@@ -17,6 +17,9 @@ export interface ParkingLotViewProps {
   };
   onReserveSpot?: (spotId: number) => void;
   onOpenGate?: () => void;
+  isLoading?: boolean;
+  onRefresh?: () => void;
+  lastUpdated?: Date | null;
 }
 
 export const ParkingLotView: FC<ParkingLotViewProps> = ({
@@ -25,6 +28,9 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
   currentUser,
   onReserveSpot,
   onOpenGate,
+  isLoading = false,
+  onRefresh,
+  lastUpdated,
 }) => {
   const [activeZone, setActiveZone] = useState<string>('all');
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null);
@@ -50,21 +56,40 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
 
   return (
     <div data-testid="parking-lot-view">
-      <div className="section-head">
-        <span className="section-eyebrow">
-          <MapPin size={16} color="var(--fbsu-gold)" />
-          <span>{isAr ? 'خريطة المواقف التفاعلية' : 'Interactive Map'}</span>
-        </span>
-        <h3 className="section-title">
-          {isAr
-            ? 'المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان (30 موقف)'
-            : 'FBSU Live Digital Parking Lot (30 Bays)'}
-        </h3>
-        <p className="section-subtitle">
-          {isAr
-            ? 'عرض لحظي لحالة الحساسات الأرضية وكاميرات الرؤية الحاسوبية. اضغط على أي موقف لعرض التفاصيل الكاملة، أو حجزه، أو تفعيل التبادل الذكي!'
-            : 'Real-time sensor & computer vision status. Click any bay to view details, reserve, or initiate AI flex exchange!'}
-        </p>
+      <div className="section-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <span className="section-eyebrow">
+            <MapPin size={16} color="var(--fbsu-gold)" />
+            <span>{isAr ? 'خريطة المواقف التفاعلية' : 'Interactive Map'}</span>
+          </span>
+          <h3 className="section-title">
+            {isAr
+              ? 'المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان (30 موقف)'
+              : 'FBSU Live Digital Parking Lot (30 Bays)'}
+          </h3>
+          <p className="section-subtitle">
+            {isAr
+              ? 'عرض لحظي لحالة الحساسات الأرضية وكاميرات الرؤية الحاسوبية. اضغط على أي موقف لعرض التفاصيل الكاملة، أو حجزه، أو تفعيل التبادل الذكي!'
+              : 'Real-time sensor & computer vision status. Click any bay to view details, reserve, or initiate AI flex exchange!'}
+          </p>
+        </div>
+
+        {onRefresh && (
+          <button
+            type="button"
+            className="btn-glass"
+            onClick={() => {
+              soundFX.playClick();
+              onRefresh();
+            }}
+            disabled={isLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', alignSelf: 'center' }}
+            title={isAr ? 'تحديث فوري من قاعدة البيانات' : 'Sync live with PostgreSQL'}
+          >
+            <RotateCw size={15} className={isLoading ? 'spin-anim' : ''} />
+            <span>{isAr ? (isLoading ? 'جاري المزامنة...' : 'تحديث مباشر') : (isLoading ? 'Syncing...' : 'Live Sync')}</span>
+          </button>
+        )}
       </div>
 
       {/* Parking Toolbar: Filters & Legend */}
@@ -162,7 +187,11 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             }}
           >
             <ShieldCheck size={14} color="var(--fbsu-gold)" />
-            <span>{isAr ? 'مزامنة إنترنت الأشياء IoT نشطة' : 'IoT Real-time Sync Active'}</span>
+            <span>
+              {isAr
+                ? (lastUpdated ? `مزامنة حية نشطة مع قاعدة البيانات (${lastUpdated.toLocaleTimeString('ar-SA')})` : 'مزامنة إنترنت الأشياء IoT نشطة')
+                : (lastUpdated ? `Live Database Sync (${lastUpdated.toLocaleTimeString()})` : 'IoT Real-time Sync Active')}
+            </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <ArrowDown size={14} color="var(--fbsu-primary)" />
@@ -175,7 +204,7 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
         </div>
 
         {/* Bays Grid */}
-        <div className="parking-bays-container">
+        <div className="parking-bays-container" style={{ opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
           {filteredSpots.map(spot => (
             <SpotCard
               key={spot.id}

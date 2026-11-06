@@ -101,7 +101,7 @@ export const SpotCard: FC<SpotCardProps> = ({
   return (
     <div
       className={`parking-spot-card ${statusClass}`}
-      data-testid={`spot-card-${spot.id}`}
+      data-testid="spot-card"
       data-spot-id={spot.id}
       onClick={() => {
         soundFX.playClick();

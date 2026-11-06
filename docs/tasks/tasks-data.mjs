@@ -270,6 +270,7 @@ export const tasks = [
     tests: ['Unit', 'API', 'Security'], blockedBy: ['Q8'],
   }),
   T('P5-06', 'Parking map UI', {
+    status: 'Done', pr: 'PR (feature/P5-06-map-ui)',
     pri: 'High', cx: 'M', deps: ['P3-05', 'P5-02'], branch: 'feature/P5-06-map-ui',
     goal: 'خريطة المواقف (30 موقف) مع فلتر المناطق وبطاقة الموقف.',
     files: ['frontend/src/features/parking/map/*'],

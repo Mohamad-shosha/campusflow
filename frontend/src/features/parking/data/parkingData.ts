@@ -1,5 +1,6 @@
 export interface ParkingSpot {
   id: number;
+  backendId?: string;
   zone: string;
   college: string;
   collegeEn: string;
