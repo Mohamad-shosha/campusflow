@@ -252,6 +252,7 @@ export const tasks = [
     tests: ['Unit pricing', 'Service', 'Concurrency', 'API', 'Security'], blockedBy: ['Q7'],
   }),
   T('P5-04', 'Flex-Share offers/claims/rewards', {
+    status: 'Done', pr: 'PR (feature/P5-04-flex-share)',
     pri: 'High', cx: 'L', deps: ['P5-03', 'Q6'], branch: 'feature/P5-04-flex-share',
     goal: 'عرض الموقف للتبادل أثناء البريك وحجزه من زميل ومكافأة المالك حسب القواعد المعتمدة.',
     files: ['parking/domain/Flex*', 'parking/application/Flex*', 'parking/api/*'],

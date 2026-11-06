@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 25 تاسك ✅
+- **المنجز بالكامل (Done):** 26 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 28 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **47%**
+- **المتبقي للبدء (Backlog):** 27 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **49%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 3 | 0 | 6 |
+| P5 | Parking | 9 | 4 | 0 | 5 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **25** | **0** | **28** |
+| **الإجمالي** | | **53** | **26** | **0** | **27** |
 
 ---
 
@@ -327,9 +327,9 @@
 
 ### P5-04 — Flex-Share offers/claims/rewards
 - **ماذا سيعمل:** عرض الموقف للتبادل أثناء البريك وحجزه من زميل ومكافأة المالك حسب القواعد المعتمدة.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P5-03، Q6
-- **Git Branch:** `feature/P5-04-flex-share` · **Pull Request:** —
+- **Git Branch:** `feature/P5-04-flex-share` · **Pull Request:** PR (feature/P5-04-flex-share)
 - **الملفات المتوقعة:** `parking/domain/Flex*`، `parking/application/Flex*`، `parking/api/*`
 - **Implementation Steps:** 1) Offer/Claim model 2) Matching rules 3) Reward idempotent 4) API 5) اختبارات إساءة الاستخدام
 - **Acceptance Criteria:** المكافأة مرة واحدة لكل عرض · عودة المالك مضمونة حسب القاعدة المعتمدة
