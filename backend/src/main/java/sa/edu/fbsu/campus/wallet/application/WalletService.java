@@ -49,7 +49,7 @@ public class WalletService {
         });
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public WalletResponse getWalletResponse(UUID userId) {
         Wallet wallet = getOrCreateWallet(userId);
         return WalletResponse.fromEntity(wallet);
@@ -120,7 +120,7 @@ public class WalletService {
 
         // 2. Lock wallet row for update
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found for user: " + userId));
+                .orElseGet(() -> getOrCreateWallet(userId));
 
         // 3. Debit wallet balance
         wallet.debit(debitAmount);
@@ -265,7 +265,7 @@ public class WalletService {
         return WalletResponse.fromEntity(senderWallet);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<LedgerEntryResponse> getLedgerHistory(UUID userId, Pageable pageable) {
         Wallet wallet = getOrCreateWallet(userId);
         return ledgerEntryRepository.findByWalletIdOrderByCreatedAtDesc(wallet.getId(), pageable)
