@@ -186,5 +186,8 @@ public class ParkingSpot extends BaseTenantEntity {
     public void setSessionEndsAt(Instant sessionEndsAt) {
         this.sessionEndsAt = sessionEndsAt;
     }
-}
 
+    public String getBayCode() {
+        return (zone != null ? zone.getCode() : "") + "-" + String.format("%02d", bayNumber);
+    }
+}

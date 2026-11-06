@@ -146,6 +146,48 @@ public class WalletService {
     }
 
     @Transactional
+    public WalletResponse refund(
+            UUID userId,
+            BigDecimal amount,
+            String idempotencyKey,
+            String referenceId,
+            String description
+    ) {
+        Objects.requireNonNull(amount, "Refund amount cannot be null");
+        Objects.requireNonNull(idempotencyKey, "IdempotencyKey cannot be null");
+
+        BigDecimal refundAmount = amount.setScale(2, RoundingMode.HALF_UP);
+
+        if (ledgerEntryRepository.existsByIdempotencyKey(idempotencyKey)) {
+            log.warn("Idempotency key '{}' already processed for refund. Returning current wallet state.", idempotencyKey);
+            return getWalletResponse(userId);
+        }
+
+        Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
+                .orElseGet(() -> getOrCreateWallet(userId));
+
+        wallet.credit(refundAmount);
+        Wallet savedWallet = walletRepository.save(wallet);
+
+        LedgerEntry entry = new LedgerEntry(
+                savedWallet,
+                TransactionType.REFUND,
+                TransactionDirection.CREDIT,
+                refundAmount,
+                savedWallet.getBalance(),
+                idempotencyKey,
+                referenceId,
+                description
+        );
+        ledgerEntryRepository.save(entry);
+
+        log.info("Wallet refund successful: {} SAR credited to user {}, new balance: {} SAR",
+                refundAmount, userId, savedWallet.getBalance());
+
+        return WalletResponse.fromEntity(savedWallet);
+    }
+
+    @Transactional
     public WalletResponse transfer(UUID senderUserId, TransferRequest request) {
         Objects.requireNonNull(request, "TransferRequest cannot be null");
         BigDecimal amount = request.amount().setScale(2, RoundingMode.HALF_UP);

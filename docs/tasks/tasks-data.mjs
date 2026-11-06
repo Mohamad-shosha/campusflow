@@ -243,6 +243,7 @@ export const tasks = [
     tests: ['Service', 'API'], blockedBy: [],
   }),
   T('P5-03', 'Booking + pricing + digital pass', {
+    status: 'Done', pr: 'PR (feature/P5-03-parking-booking)',
     pri: 'Critical', cx: 'L', deps: ['P5-02', 'P4-02', 'Q7'], branch: 'feature/P5-03-parking-booking',
     goal: 'حجز موقف بالسعر المحسوب على السيرفر وإصدار تصريح رقمي (QR)، مع منع تعارض الحجوزات في الـ DB.',
     files: ['db/migration/V7__booking.sql', 'parking/application/Booking*', 'parking/api/*'],

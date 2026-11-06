@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 24 تاسك ✅
+- **المنجز بالكامل (Done):** 25 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 29 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **45%**
+- **المتبقي للبدء (Backlog):** 28 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **47%**
 
 
 
@@ -23,12 +23,12 @@
 | P2 | Identity & Campus Core | 5 | 5 | 0 | 0 |
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
-| P5 | Parking | 9 | 2 | 0 | 7 |
+| P5 | Parking | 9 | 3 | 0 | 6 |
 | P6 | Campus Services | 7 | 0 | 0 | 7 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **24** | **0** | **29** |
+| **الإجمالي** | | **53** | **25** | **0** | **28** |
 
 ---
 
@@ -316,9 +316,9 @@
 
 ### P5-03 — Booking + pricing + digital pass
 - **ماذا سيعمل:** حجز موقف بالسعر المحسوب على السيرفر وإصدار تصريح رقمي (QR)، مع منع تعارض الحجوزات في الـ DB.
-- **Priority:** Critical · **Complexity:** L · **Status:** Backlog
+- **Priority:** Critical · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P5-02، P4-02، Q7
-- **Git Branch:** `feature/P5-03-parking-booking` · **Pull Request:** —
+- **Git Branch:** `feature/P5-03-parking-booking` · **Pull Request:** PR (feature/P5-03-parking-booking)
 - **الملفات المتوقعة:** `db/migration/V7__booking.sql`، `parking/application/Booking*`، `parking/api/*`
 - **Implementation Steps:** 1) Exclusion constraint على الفترة 2) Pricing service 3) خصم من المحفظة ذريًا 4) Pass + QR payload 5) اختبارات
 - **Acceptance Criteria:** التعارض مستحيل (اختبار توازي) · السعر من السيرفر فقط · فشل الدفع يلغي الحجز
