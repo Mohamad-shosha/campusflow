@@ -35,9 +35,23 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
     const letters = `${parts[0] || 'س'} ${parts[1] || 'ع'} ${parts[2] || 'د'}`;
     const numbers = parts[3] || '7700';
     const enMap: Record<string, string> = {
-      'أ': 'A', 'ب': 'B', 'ح': 'J', 'د': 'D', 'ر': 'R', 'س': 'S',
-      'ص': 'X', 'ط': 'T', 'ع': 'E', 'ق': 'G', 'ك': 'K', 'ل': 'L',
-      'م': 'M', 'ن': 'N', 'ه': 'H', 'و': 'U', 'ي': 'V',
+      أ: 'A',
+      ب: 'B',
+      ح: 'J',
+      د: 'D',
+      ر: 'R',
+      س: 'S',
+      ص: 'X',
+      ط: 'T',
+      ع: 'E',
+      ق: 'G',
+      ك: 'K',
+      ل: 'L',
+      م: 'M',
+      ن: 'N',
+      ه: 'H',
+      و: 'U',
+      ي: 'V',
     };
     const lettersEn = letters
       .split(' ')
@@ -86,8 +100,14 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
         }),
         plate: selectedPlate,
         decision: decision.decision,
-        driverName: (isAr ? decision.driverNameAr : decision.driverNameEn) || (isAr ? 'غير مسجل' : 'Unregistered'),
-        bayInfo: decision.bayNumber ? (isAr ? `موقف #${decision.bayNumber}` : `Bay #${decision.bayNumber}`) : '—',
+        driverName:
+          (isAr ? decision.driverNameAr : decision.driverNameEn) ||
+          (isAr ? 'غير مسجل' : 'Unregistered'),
+        bayInfo: decision.bayNumber
+          ? isAr
+            ? `موقف #${decision.bayNumber}`
+            : `Bay #${decision.bayNumber}`
+          : '—',
         reason: isAr ? decision.displayMessageAr : decision.displayMessageEn,
       };
 
@@ -131,7 +151,9 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
       <div className="section-head">
         <span className="section-eyebrow">
           <Camera size={16} color="var(--fbsu-gold)" />
-          <span>{isAr ? 'محاكي بوابات الجامعة والذكاء الاصطناعي' : 'Gate & ALPR Computer Vision'}</span>
+          <span>
+            {isAr ? 'محاكي بوابات الجامعة والذكاء الاصطناعي' : 'Gate & ALPR Computer Vision'}
+          </span>
         </span>
         <h3 className="section-title">
           {isAr
@@ -159,10 +181,18 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                 fontFamily: 'var(--font-en)',
               }}
             >
-              <span style={{ width: '8px', height: '8px', background: '#ff3344', borderRadius: '50%' }}></span>
+              <span
+                style={{ width: '8px', height: '8px', background: '#ff3344', borderRadius: '50%' }}
+              ></span>
               <span>LIVE: CAM-01 (MAIN_NORTH_GATE_FBSU)</span>
             </div>
-            <div style={{ color: 'var(--text-dim)', fontFamily: 'var(--font-en)', fontSize: '0.75rem' }}>
+            <div
+              style={{
+                color: 'var(--text-dim)',
+                fontFamily: 'var(--font-en)',
+                fontSize: '0.75rem',
+              }}
+            >
               60 FPS | 4K HDR | MODEL: FBSU-ALPR-v4.2
             </div>
           </div>
@@ -180,7 +210,10 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                   top: '-22px',
                   right: 0,
                   fontSize: '0.7rem',
-                  color: lastDecision?.decision === 'GRANTED' ? 'var(--status-available)' : 'var(--fbsu-gold)',
+                  color:
+                    lastDecision?.decision === 'GRANTED'
+                      ? 'var(--status-available)'
+                      : 'var(--fbsu-gold)',
                   fontFamily: 'var(--font-en)',
                   fontWeight: 800,
                 }}
@@ -189,10 +222,10 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                 {isScanning
                   ? 'ANALYZING...'
                   : lastDecision?.decision === 'GRANTED'
-                  ? '99.8%'
-                  : lastDecision?.decision === 'DENIED'
-                  ? '98.5% (DENIED)'
-                  : 'READY'}
+                    ? '99.8%'
+                    : lastDecision?.decision === 'DENIED'
+                      ? '98.5% (DENIED)'
+                      : 'READY'}
               </div>
             </div>
 
@@ -232,7 +265,12 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
         {/* Controls & AI Recognition Result */}
         <div
           className="glass-panel"
-          style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+          style={{
+            padding: '1.75rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
         >
           <div>
             <h4
@@ -252,7 +290,9 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
 
             <div className="form-group">
               <label className="form-label" style={{ marginBottom: '0.65rem' }}>
-                {isAr ? 'اختر سيارة للتجربة والفحص المباشر عبر قاعدة البيانات:' : 'Select Vehicle to Scan Against Real Database:'}
+                {isAr
+                  ? 'اختر سيارة للتجربة والفحص المباشر عبر قاعدة البيانات:'
+                  : 'Select Vehicle to Scan Against Real Database:'}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.6rem' }}>
                 {/* Preset 1: Faculty */}
@@ -263,16 +303,40 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                   style={{ textAlign: 'start' }}
                   data-testid="preset-faculty-btn"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <h5 style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-main)' }}>
-                      {isAr ? 'سيارة عضو هيئة التدريس (د. محمد مزهر)' : 'Faculty Vehicle (Dr. Mezher)'}
+                      {isAr
+                        ? 'سيارة عضو هيئة التدريس (د. محمد مزهر)'
+                        : 'Faculty Vehicle (Dr. Mezher)'}
                     </h5>
-                    <span style={{ fontSize: '0.72rem', background: 'var(--fbsu-gold-light)', color: 'var(--fbsu-gold)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        background: 'var(--fbsu-gold-light)',
+                        color: 'var(--fbsu-gold)',
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '4px',
+                      }}
+                    >
                       {isAr ? 'تصريح هيئة التدريس' : 'Faculty Permit'}
                     </span>
                   </div>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.2rem', display: 'block' }}>
-                    {isAr ? 'لوحة:' : 'Plate:'} <strong>س ع د 7700</strong> — {isAr ? 'موقف محجوز #19 (المنطقة C)' : 'Dedicated Bay #19 (Zone C)'}
+                  <span
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      marginTop: '0.2rem',
+                      display: 'block',
+                    }}
+                  >
+                    {isAr ? 'لوحة:' : 'Plate:'} <strong>س ع د 7700</strong> —{' '}
+                    {isAr ? 'موقف محجوز #19 (المنطقة C)' : 'Dedicated Bay #19 (Zone C)'}
                   </span>
                 </button>
 
@@ -284,16 +348,40 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                   style={{ textAlign: 'start' }}
                   data-testid="preset-student-btn"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <h5 style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-main)' }}>
-                      {isAr ? 'سيارة الطالب سعد القحطاني (كامري)' : 'Student Vehicle (Saad Al-Qahtani)'}
+                      {isAr
+                        ? 'سيارة الطالب سعد القحطاني (كامري)'
+                        : 'Student Vehicle (Saad Al-Qahtani)'}
                     </h5>
-                    <span style={{ fontSize: '0.72rem', background: 'rgba(56, 194, 176, 0.1)', color: 'var(--status-available)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        background: 'rgba(56, 194, 176, 0.1)',
+                        color: 'var(--status-available)',
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '4px',
+                      }}
+                    >
                       {isAr ? 'طالب مسجل' : 'Student'}
                     </span>
                   </div>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.2rem', display: 'block' }}>
-                    {isAr ? 'لوحة:' : 'Plate:'} <strong>أ ب ح 1234</strong> — {isAr ? 'يفحص الحجز الفعال في المنظومة' : 'Checks Active Booking in System'}
+                  <span
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      marginTop: '0.2rem',
+                      display: 'block',
+                    }}
+                  >
+                    {isAr ? 'لوحة:' : 'Plate:'} <strong>أ ب ح 1234</strong> —{' '}
+                    {isAr ? 'يفحص الحجز الفعال في المنظومة' : 'Checks Active Booking in System'}
                   </span>
                 </button>
 
@@ -305,16 +393,40 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                   style={{ textAlign: 'start' }}
                   data-testid="preset-unregistered-btn"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <h5 style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-main)' }}>
                       {isAr ? 'مركبة غير مسجلة (غير مصرحة)' : 'Unregistered Vehicle'}
                     </h5>
-                    <span style={{ fontSize: '0.72rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--status-occupied)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        color: 'var(--status-occupied)',
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '4px',
+                      }}
+                    >
                       {isAr ? 'مرفوض آلياً' : 'Auto Deny'}
                     </span>
                   </div>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.2rem', display: 'block' }}>
-                    {isAr ? 'لوحة:' : 'Plate:'} <strong>ق و ل 9999</strong> — {isAr ? 'يتم منع فتح الحاجز آلياً وتسجيل محاولة الدخول' : 'Barrier stays closed & logs access'}
+                  <span
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      marginTop: '0.2rem',
+                      display: 'block',
+                    }}
+                  >
+                    {isAr ? 'لوحة:' : 'Plate:'} <strong>ق و ل 9999</strong> —{' '}
+                    {isAr
+                      ? 'يتم منع فتح الحاجز آلياً وتسجيل محاولة الدخول'
+                      : 'Barrier stays closed & logs access'}
                   </span>
                 </button>
 
@@ -329,7 +441,16 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                   style={{ textAlign: 'start' }}
                   data-testid="toggle-custom-plate-btn"
                 >
-                  <h5 style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <h5
+                    style={{
+                      margin: 0,
+                      fontSize: '0.92rem',
+                      color: 'var(--text-main)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
                     <Sparkles size={14} color="var(--fbsu-gold)" />
                     <span>{isAr ? 'تجربة لوحة مخصصة أخرى' : 'Test Custom License Plate'}</span>
                   </h5>
@@ -436,8 +557,8 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                 lastDecision?.decision === 'GRANTED'
                   ? 'var(--status-available-border)'
                   : lastDecision?.decision === 'DENIED'
-                  ? 'rgba(239, 68, 68, 0.4)'
-                  : 'var(--border-subtle)'
+                    ? 'rgba(239, 68, 68, 0.4)'
+                    : 'var(--border-subtle)'
               }`,
               borderRadius: 'var(--radius-md)',
               padding: '1rem',
@@ -447,16 +568,34 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
           >
             {lastDecision?.decision === 'GRANTED' ? (
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                <CheckCircle2 size={26} color="var(--status-available)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <CheckCircle2
+                  size={26}
+                  color="var(--status-available)"
+                  style={{ flexShrink: 0, marginTop: '2px' }}
+                />
                 <div>
-                  <h5 style={{ color: 'var(--status-available)', fontWeight: 800, fontSize: '0.95rem' }}>
-                    {isAr ? 'تم التحقق بنجاح - مرحباً بك في جامعة فهد بن سلطان' : 'Access Granted - Welcome to FBSU'}
+                  <h5
+                    style={{
+                      color: 'var(--status-available)',
+                      fontWeight: 800,
+                      fontSize: '0.95rem',
+                    }}
+                  >
+                    {isAr
+                      ? 'تم التحقق بنجاح - مرحباً بك في جامعة فهد بن سلطان'
+                      : 'Access Granted - Welcome to FBSU'}
                   </h5>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', marginTop: '0.2rem' }}>
                     {isAr ? lastDecision.displayMessageAr : lastDecision.displayMessageEn}
                   </p>
                   {lastDecision.driverNameAr && (
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                    <div
+                      style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--text-muted)',
+                        marginTop: '0.35rem',
+                      }}
+                    >
                       {isAr ? 'السائق:' : 'Driver:'}{' '}
                       <strong style={{ color: 'var(--text-main)' }}>
                         {isAr ? lastDecision.driverNameAr : lastDecision.driverNameEn}
@@ -465,8 +604,10 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                         <span>
                           {' '}
                           | {isAr ? 'الموقف:' : 'Bay:'}{' '}
-                          <strong style={{ color: 'var(--fbsu-gold)' }}>#{lastDecision.bayNumber}</strong> (
-                          {isAr ? lastDecision.zoneNameAr : lastDecision.zoneNameEn})
+                          <strong style={{ color: 'var(--fbsu-gold)' }}>
+                            #{lastDecision.bayNumber}
+                          </strong>{' '}
+                          ({isAr ? lastDecision.zoneNameAr : lastDecision.zoneNameEn})
                         </span>
                       )}
                     </div>
@@ -483,8 +624,16 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', marginTop: '0.2rem' }}>
                     {isAr ? lastDecision.displayMessageAr : lastDecision.displayMessageEn}
                   </p>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem', display: 'block' }}>
-                    {isAr ? 'رمز الحالة:' : 'Code:'} <code style={{ color: 'var(--fbsu-gold)' }}>{lastDecision.reasonCode}</code>
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--text-muted)',
+                      marginTop: '0.35rem',
+                      display: 'block',
+                    }}
+                  >
+                    {isAr ? 'رمز الحالة:' : 'Code:'}{' '}
+                    <code style={{ color: 'var(--fbsu-gold)' }}>{lastDecision.reasonCode}</code>
                   </span>
                 </div>
               </div>
@@ -510,14 +659,21 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
       {/* Audit Log / Gate History Section */}
       {scanHistory.length > 0 && (
         <div style={{ marginTop: '2.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}
+          >
             <Shield size={16} color="var(--fbsu-gold)" />
             <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)' }}>
-              {isAr ? 'سجل عمليات تدقيق البوابة الحي (Gate Access Audit Log)' : 'Live Gate Access Audit Log'}
+              {isAr
+                ? 'سجل عمليات تدقيق البوابة الحي (Gate Access Audit Log)'
+                : 'Live Gate Access Audit Log'}
             </h4>
           </div>
 
-          <div className="table-responsive glass-panel" style={{ padding: '0.75rem', overflowX: 'auto' }}>
+          <div
+            className="table-responsive glass-panel"
+            style={{ padding: '0.75rem', overflowX: 'auto' }}
+          >
             <table className="ledger-table" style={{ width: '100%', fontSize: '0.85rem' }}>
               <thead>
                 <tr>
@@ -527,8 +683,12 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                       <span>{isAr ? 'الوقت' : 'Time'}</span>
                     </div>
                   </th>
-                  <th style={{ textAlign: 'start' }}>{isAr ? 'اللوحة المفحوصة' : 'Scanned Plate'}</th>
-                  <th style={{ textAlign: 'start' }}>{isAr ? 'السائق / العضو' : 'Driver / Member'}</th>
+                  <th style={{ textAlign: 'start' }}>
+                    {isAr ? 'اللوحة المفحوصة' : 'Scanned Plate'}
+                  </th>
+                  <th style={{ textAlign: 'start' }}>
+                    {isAr ? 'السائق / العضو' : 'Driver / Member'}
+                  </th>
                   <th style={{ textAlign: 'start' }}>{isAr ? 'الموقف' : 'Spot'}</th>
                   <th style={{ textAlign: 'start' }}>{isAr ? 'القرار' : 'Decision'}</th>
                   <th style={{ textAlign: 'start' }}>{isAr ? 'تفاصيل القرار' : 'Reason / Note'}</th>
@@ -537,11 +697,15 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
               <tbody>
                 {scanHistory.map(entry => (
                   <tr key={entry.id}>
-                    <td style={{ fontFamily: 'var(--font-en)', color: 'var(--text-muted)' }}>{entry.timestamp}</td>
+                    <td style={{ fontFamily: 'var(--font-en)', color: 'var(--text-muted)' }}>
+                      {entry.timestamp}
+                    </td>
                     <td style={{ fontWeight: 800, color: 'var(--text-main)' }}>{entry.plate}</td>
                     <td>{entry.driverName}</td>
                     <td>
-                      <span style={{ color: 'var(--fbsu-gold)', fontWeight: 700 }}>{entry.bayInfo}</span>
+                      <span style={{ color: 'var(--fbsu-gold)', fontWeight: 700 }}>
+                        {entry.bayInfo}
+                      </span>
                     </td>
                     <td>
                       <span
@@ -552,8 +716,13 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                           fontSize: '0.75rem',
                           fontWeight: 800,
                           background:
-                            entry.decision === 'GRANTED' ? 'rgba(56, 194, 176, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                          color: entry.decision === 'GRANTED' ? 'var(--status-available)' : 'var(--status-occupied)',
+                            entry.decision === 'GRANTED'
+                              ? 'rgba(56, 194, 176, 0.15)'
+                              : 'rgba(239, 68, 68, 0.15)',
+                          color:
+                            entry.decision === 'GRANTED'
+                              ? 'var(--status-available)'
+                              : 'var(--status-occupied)',
                         }}
                       >
                         {entry.decision === 'GRANTED'
@@ -561,11 +730,13 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                             ? 'مصرّح (فتح الحاجز)'
                             : 'GRANTED (OPEN)'
                           : isAr
-                          ? 'مرفوض (إغلاق)'
-                          : 'DENIED (CLOSED)'}
+                            ? 'مرفوض (إغلاق)'
+                            : 'DENIED (CLOSED)'}
                       </span>
                     </td>
-                    <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{entry.reason}</td>
+                    <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                      {entry.reason}
+                    </td>
                   </tr>
                 ))}
               </tbody>

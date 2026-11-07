@@ -45,8 +45,7 @@ export const HeroSection: FC<HeroSectionProps> = ({
             <h2 className="hero-title">
               {isAr ? (
                 <>
-                  مواقف ذكية بتبادل مرن تلقائي{' '}
-                  <span className="highlight">دون إهدار لأي موقف</span>
+                  مواقف ذكية بتبادل مرن تلقائي <span className="highlight">دون إهدار لأي موقف</span>
                 </>
               ) : (
                 <>
@@ -109,7 +108,10 @@ export const HeroSection: FC<HeroSectionProps> = ({
           </div>
 
           {/* Feature Showcase Card */}
-          <div className="glass-panel" style={{ padding: '1.75rem', borderColor: 'var(--fbsu-primary-border)' }}>
+          <div
+            className="glass-panel"
+            style={{ padding: '1.75rem', borderColor: 'var(--fbsu-primary-border)' }}
+          >
             <div
               style={{
                 display: 'flex',
@@ -140,7 +142,9 @@ export const HeroSection: FC<HeroSectionProps> = ({
                     {isAr ? 'مبدأ التبادل الذكي (Flex Share)' : 'Smart Flex Share Logic'}
                   </h3>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {isAr ? 'نموذج محاكاة واقعي للتبادل الذكي بين الطلاب' : 'Realistic Student Flex Sharing Model'}
+                    {isAr
+                      ? 'نموذج محاكاة واقعي للتبادل الذكي بين الطلاب'
+                      : 'Realistic Student Flex Sharing Model'}
                   </span>
                 </div>
               </div>
@@ -282,7 +286,9 @@ export const HeroSection: FC<HeroSectionProps> = ({
             </div>
             <div>
               <div className="stat-chip-num">{totalSpots}</div>
-              <div className="stat-chip-label">{isAr ? 'إجمالي مواقف القطاع' : 'Total Pilot Bays'}</div>
+              <div className="stat-chip-label">
+                {isAr ? 'إجمالي مواقف القطاع' : 'Total Pilot Bays'}
+              </div>
             </div>
           </div>
 
@@ -297,7 +303,9 @@ export const HeroSection: FC<HeroSectionProps> = ({
               <div className="stat-chip-num" style={{ color: 'var(--status-available)' }}>
                 {availableCount}
               </div>
-              <div className="stat-chip-label">{isAr ? 'مواقف شاغرة الآن' : 'Available Right Now'}</div>
+              <div className="stat-chip-label">
+                {isAr ? 'مواقف شاغرة الآن' : 'Available Right Now'}
+              </div>
             </div>
           </div>
 
@@ -312,7 +320,9 @@ export const HeroSection: FC<HeroSectionProps> = ({
               <div className="stat-chip-num" style={{ color: 'var(--fbsu-gold)' }}>
                 {flexCount}
               </div>
-              <div className="stat-chip-label">{isAr ? 'مواقف بالتبادل الذكي' : 'In Flex Mode'}</div>
+              <div className="stat-chip-label">
+                {isAr ? 'مواقف بالتبادل الذكي' : 'In Flex Mode'}
+              </div>
             </div>
           </div>
 
@@ -330,4 +340,3 @@ export const HeroSection: FC<HeroSectionProps> = ({
     </section>
   );
 };
-

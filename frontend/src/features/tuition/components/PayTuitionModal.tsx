@@ -41,7 +41,9 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
     e.preventDefault();
 
     if (!effectiveAmount || effectiveAmount <= 0) {
-      setErrorMessage(isAr ? 'الرجاء إدخال مبلغ سداد صحيح.' : 'Please enter a valid payment amount.');
+      setErrorMessage(
+        isAr ? 'الرجاء إدخال مبلغ سداد صحيح.' : 'Please enter a valid payment amount.'
+      );
       return;
     }
 
@@ -66,9 +68,10 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
     setIsLoading(true);
     setErrorMessage(null);
 
-    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID
-      ? `tuition-pay-${crypto.randomUUID()}`
-      : `tuition-pay-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+    const idempotencyKey =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? `tuition-pay-${crypto.randomUUID()}`
+        : `tuition-pay-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
     try {
       const receipt = await tuitionApi.payTuition({
@@ -81,7 +84,12 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string; message?: string } } };
       const detail = axiosErr.response?.data?.detail || axiosErr.response?.data?.message;
-      setErrorMessage(detail || (isAr ? 'فشلت عملية سداد الرسوم. يرجى مراجعة الرصيد والمحاولة مرة أخرى.' : 'Tuition payment failed. Please check wallet balance and try again.'));
+      setErrorMessage(
+        detail ||
+          (isAr
+            ? 'فشلت عملية سداد الرسوم. يرجى مراجعة الرصيد والمحاولة مرة أخرى.'
+            : 'Tuition payment failed. Please check wallet balance and try again.')
+      );
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +103,11 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
       testId="pay-tuition-modal"
       maxWidth="500px"
     >
-      <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+      >
         {errorMessage && (
           <div
             style={{
@@ -128,7 +140,9 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
             <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
               {isAr ? 'رقم الفاتورة:' : 'Invoice No:'}
             </span>
-            <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontFamily: 'monospace' }}>
+            <strong
+              style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontFamily: 'monospace' }}
+            >
               {invoice.invoiceNumber}
             </strong>
           </div>
@@ -142,7 +156,14 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
             </span>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              borderTop: '1px solid rgba(255,255,255,0.05)',
+              paddingTop: '0.5rem',
+            }}
+          >
             <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               {isAr ? 'المبلغ المتبقي المطلوب:' : 'Remaining Balance Due:'}
             </span>
@@ -177,7 +198,14 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
 
         {/* Payment Amount Choice */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '0.85rem',
+              color: 'var(--text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
             {isAr ? 'تحديد خيار السداد' : 'Payment Option'}
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
@@ -190,8 +218,12 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
               style={{
                 padding: '0.75rem 0.5rem',
                 borderRadius: '8px',
-                border: paymentMode === 'FULL' ? '1.5px solid var(--fbsu-gold)' : '1px solid var(--border-color)',
-                background: paymentMode === 'FULL' ? 'rgba(215, 162, 55, 0.18)' : 'rgba(255, 255, 255, 0.03)',
+                border:
+                  paymentMode === 'FULL'
+                    ? '1.5px solid var(--fbsu-gold)'
+                    : '1px solid var(--border-color)',
+                background:
+                  paymentMode === 'FULL' ? 'rgba(215, 162, 55, 0.18)' : 'rgba(255, 255, 255, 0.03)',
                 color: paymentMode === 'FULL' ? 'var(--fbsu-gold)' : 'var(--text-main)',
                 fontWeight: 700,
                 fontSize: '0.82rem',
@@ -199,7 +231,9 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
               }}
               data-testid="pay-mode-full"
             >
-              {isAr ? `سداد كامل (${remaining.toFixed(2)} ر.س)` : `Full (${remaining.toFixed(2)} SAR)`}
+              {isAr
+                ? `سداد كامل (${remaining.toFixed(2)} ر.س)`
+                : `Full (${remaining.toFixed(2)} SAR)`}
             </button>
 
             <button
@@ -211,8 +245,14 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
               style={{
                 padding: '0.75rem 0.5rem',
                 borderRadius: '8px',
-                border: paymentMode === 'CUSTOM' ? '1.5px solid var(--fbsu-gold)' : '1px solid var(--border-color)',
-                background: paymentMode === 'CUSTOM' ? 'rgba(215, 162, 55, 0.18)' : 'rgba(255, 255, 255, 0.03)',
+                border:
+                  paymentMode === 'CUSTOM'
+                    ? '1.5px solid var(--fbsu-gold)'
+                    : '1px solid var(--border-color)',
+                background:
+                  paymentMode === 'CUSTOM'
+                    ? 'rgba(215, 162, 55, 0.18)'
+                    : 'rgba(255, 255, 255, 0.03)',
                 color: paymentMode === 'CUSTOM' ? 'var(--fbsu-gold)' : 'var(--text-main)',
                 fontWeight: 700,
                 fontSize: '0.82rem',
@@ -227,7 +267,14 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
 
         {paymentMode === 'CUSTOM' && (
           <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '0.85rem',
+                color: 'var(--text-secondary)',
+                marginBottom: '0.5rem',
+              }}
+            >
               {isAr ? 'أدخل مبلغ الدفعة (ر.س)' : 'Installment Amount (SAR)'}
             </label>
             <input
@@ -259,7 +306,14 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
         {/* Warning if insufficient balance */}
         {!hasEnoughBalance && onOpenTopUp && (
           <div style={{ textAlign: 'center' }}>
-            <span style={{ fontSize: '0.82rem', color: '#f87171', display: 'block', marginBottom: '0.5rem' }}>
+            <span
+              style={{
+                fontSize: '0.82rem',
+                color: '#f87171',
+                display: 'block',
+                marginBottom: '0.5rem',
+              }}
+            >
               {isAr ? 'رصيدك لا يكفي لإتمام هذه العملية.' : 'Insufficient wallet balance.'}
             </span>
             <Button
@@ -296,4 +350,3 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
     </Modal>
   );
 };
-

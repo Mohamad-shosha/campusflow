@@ -37,4 +37,3 @@ describe('TuitionInvoiceCard Component', () => {
     expect(handlePay).toHaveBeenCalledWith(mockInvoice);
   });
 });
-

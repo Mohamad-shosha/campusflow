@@ -18,11 +18,15 @@ describe('AlprGateView Component', () => {
     render(<AlprGateView isAr={true} />);
 
     expect(screen.getByTestId('alpr-gate-view')).toBeInTheDocument();
-    expect(screen.getByText('نظام التعرف التلقائي على اللوحات (ALPR) وفتح البوابات الذكي')).toBeInTheDocument();
+    expect(
+      screen.getByText('نظام التعرف التلقائي على اللوحات (ALPR) وفتح البوابات الذكي')
+    ).toBeInTheDocument();
     expect(screen.getByTestId('preset-faculty-btn')).toBeInTheDocument();
     expect(screen.getByTestId('preset-student-btn')).toBeInTheDocument();
     expect(screen.getByTestId('preset-unregistered-btn')).toBeInTheDocument();
-    expect(screen.getByTestId('gate-status-text')).toHaveTextContent('البوابة مغلقة - بانتظار الفحص');
+    expect(screen.getByTestId('gate-status-text')).toHaveTextContent(
+      'البوابة مغلقة - بانتظار الفحص'
+    );
   });
 
   it('handles faculty scan successfully and opens barrier arm (GRANTED)', async () => {
@@ -57,8 +61,12 @@ describe('AlprGateView Component', () => {
         plateLettersAr: 'س ع د',
         plateDigits: '7700',
       });
-      expect(screen.getByTestId('gate-status-text')).toHaveTextContent('البوابة مفتوحة - تفضل بالمرور');
-      expect(screen.getByText('تم التحقق بنجاح - مرحباً بك في جامعة فهد بن سلطان')).toBeInTheDocument();
+      expect(screen.getByTestId('gate-status-text')).toHaveTextContent(
+        'البوابة مفتوحة - تفضل بالمرور'
+      );
+      expect(
+        screen.getByText('تم التحقق بنجاح - مرحباً بك في جامعة فهد بن سلطان')
+      ).toBeInTheDocument();
       expect(screen.getByText('#19')).toBeInTheDocument();
     });
   });
@@ -87,7 +95,9 @@ describe('AlprGateView Component', () => {
         plateLettersAr: 'ق و ل',
         plateDigits: '9999',
       });
-      expect(screen.getByTestId('gate-status-text')).toHaveTextContent('البوابة مغلقة - بانتظار الفحص');
+      expect(screen.getByTestId('gate-status-text')).toHaveTextContent(
+        'البوابة مغلقة - بانتظار الفحص'
+      );
       expect(screen.getByText('تم رفض الدخول - الحاجز مغلق')).toBeInTheDocument();
       expect(screen.getByText('UNREGISTERED_VEHICLE')).toBeInTheDocument();
     });

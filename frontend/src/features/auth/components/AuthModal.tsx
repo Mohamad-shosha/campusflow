@@ -242,7 +242,13 @@ export const AuthModal: FC<AuthModalProps> = ({
             </button>
 
             {/* Quick 1-Click Demo Personas */}
-            <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+            <div
+              style={{
+                marginTop: '1.25rem',
+                paddingTop: '1rem',
+                borderTop: '1px solid var(--border-color)',
+              }}
+            >
               <div
                 style={{
                   fontSize: '0.78rem',
@@ -262,9 +268,17 @@ export const AuthModal: FC<AuthModalProps> = ({
                   onClick={() => {
                     setLoginValue('identifier', '20210045');
                     setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({ identifier: '20210045', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                    onLogin({
+                      identifier: '20210045',
+                      password: 'FbsuDev2026!',
+                      universityCode: 'FBSU',
+                    });
                   }}
-                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.45rem 0.6rem',
+                    justifyContent: 'flex-start',
+                  }}
                 >
                   🎓 <strong>إياد الحربي</strong> (طالب)
                 </button>
@@ -275,9 +289,17 @@ export const AuthModal: FC<AuthModalProps> = ({
                   onClick={() => {
                     setLoginValue('identifier', '20220088');
                     setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({ identifier: '20220088', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                    onLogin({
+                      identifier: '20220088',
+                      password: 'FbsuDev2026!',
+                      universityCode: 'FBSU',
+                    });
                   }}
-                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.45rem 0.6rem',
+                    justifyContent: 'flex-start',
+                  }}
                 >
                   🚗 <strong>راكان المطيري</strong> (طالب)
                 </button>
@@ -288,9 +310,17 @@ export const AuthModal: FC<AuthModalProps> = ({
                   onClick={() => {
                     setLoginValue('identifier', 'FAC-8821');
                     setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({ identifier: 'FAC-8821', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                    onLogin({
+                      identifier: 'FAC-8821',
+                      password: 'FbsuDev2026!',
+                      universityCode: 'FBSU',
+                    });
                   }}
-                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.45rem 0.6rem',
+                    justifyContent: 'flex-start',
+                  }}
                 >
                   👩‍🏫 <strong>د. رغد النفيعي</strong> (أستاذ)
                 </button>
@@ -301,9 +331,17 @@ export const AuthModal: FC<AuthModalProps> = ({
                   onClick={() => {
                     setLoginValue('identifier', 'ADM-1001');
                     setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({ identifier: 'ADM-1001', password: 'FbsuDev2026!', universityCode: 'FBSU' });
+                    onLogin({
+                      identifier: 'ADM-1001',
+                      password: 'FbsuDev2026!',
+                      universityCode: 'FBSU',
+                    });
                   }}
-                  style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start' }}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.45rem 0.6rem',
+                    justifyContent: 'flex-start',
+                  }}
                 >
                   🛡️ <strong>إدارة النظام</strong> (Admin)
                 </button>

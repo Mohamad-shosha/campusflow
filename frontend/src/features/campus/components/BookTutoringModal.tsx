@@ -54,7 +54,9 @@ export const BookTutoringModal: FC<BookTutoringModalProps> = ({
           <X size={16} />
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}
+        >
           <div
             style={{
               width: '44px',
@@ -69,7 +71,9 @@ export const BookTutoringModal: FC<BookTutoringModalProps> = ({
             <Award size={24} color="var(--fbsu-gold)" />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            <h3
+              style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}
+            >
               {isAr ? 'تأكيد حجز جلسة الشرح الأكاديمي' : 'Confirm Peer Tutoring Booking'}
             </h3>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -88,7 +92,14 @@ export const BookTutoringModal: FC<BookTutoringModalProps> = ({
             marginBottom: '1.25rem',
           }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', fontSize: '0.88rem' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '0.85rem',
+              fontSize: '0.88rem',
+            }}
+          >
             <div>
               <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.78rem' }}>
                 {isAr ? 'المعلم الأقران:' : 'Tutor:'}
@@ -184,7 +195,10 @@ export const BookTutoringModal: FC<BookTutoringModalProps> = ({
               fontWeight: 800,
             }}
           >
-            ✓ {isAr ? 'تم تأكيد حجز الجلسة وخصم الرسوم بنجاح!' : 'Session booked & fee settled successfully!'}
+            ✓{' '}
+            {isAr
+              ? 'تم تأكيد حجز الجلسة وخصم الرسوم بنجاح!'
+              : 'Session booked & fee settled successfully!'}
           </div>
         ) : (
           <button
@@ -217,4 +231,3 @@ export const BookTutoringModal: FC<BookTutoringModalProps> = ({
     </div>
   );
 };
-

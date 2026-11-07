@@ -5,7 +5,9 @@ export class AudioSynthesizer {
 
   private init() {
     if (!this.ctx && typeof window !== 'undefined') {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
       }
@@ -145,4 +147,3 @@ export class AudioSynthesizer {
 }
 
 export const soundFX = new AudioSynthesizer();
-

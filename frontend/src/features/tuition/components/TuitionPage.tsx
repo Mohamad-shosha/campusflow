@@ -27,8 +27,10 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
   const [walletBalance, setWalletBalance] = useState<number>(0.0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<TuitionInvoiceResponse | null>(null);
-  const [selectedReceiptForView, setSelectedReceiptForView] = useState<TuitionReceiptResponse | null>(null);
+  const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] =
+    useState<TuitionInvoiceResponse | null>(null);
+  const [selectedReceiptForView, setSelectedReceiptForView] =
+    useState<TuitionReceiptResponse | null>(null);
 
   const [toast, setToast] = useState<{
     message: string;
@@ -80,7 +82,11 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
   };
 
   return (
-    <div className="tuition-feature-page" data-testid="tuition-page" style={{ maxWidth: '960px', margin: '0 auto' }}>
+    <div
+      className="tuition-feature-page"
+      data-testid="tuition-page"
+      style={{ maxWidth: '960px', margin: '0 auto' }}
+    >
       {toast && (
         <div style={{ position: 'fixed', top: '1.5rem', insetInlineEnd: '1.5rem', zIndex: 999999 }}>
           <Toast
@@ -93,11 +99,29 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
       )}
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          marginBottom: '1.5rem',
+        }}
+      >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              marginBottom: '0.35rem',
+            }}
+          >
             <GraduationCap size={26} color="var(--fbsu-gold)" />
-            <h2 style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--text-main)', margin: 0 }}>
+            <h2
+              style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--text-main)', margin: 0 }}
+            >
               {isAr ? 'الحسابات والرسوم الدراسية' : 'Tuition Accounts & Digital Settlement'}
             </h2>
           </div>
@@ -118,7 +142,9 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
             style={{ padding: '0.45rem 0.8rem', borderRadius: '8px' }}
           >
             <RefreshCw size={14} className={isLoading ? 'spin-icon' : ''} />
-            <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{isAr ? 'تحديث' : 'Refresh'}</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+              {isAr ? 'تحديث' : 'Refresh'}
+            </span>
           </button>
         </div>
       </div>
@@ -139,7 +165,8 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
           style={{
             padding: '0.6rem 1.25rem',
             borderRadius: '8px',
-            border: activeTab === 'INVOICES' ? '1px solid var(--fbsu-gold)' : '1px solid transparent',
+            border:
+              activeTab === 'INVOICES' ? '1px solid var(--fbsu-gold)' : '1px solid transparent',
             background: activeTab === 'INVOICES' ? 'rgba(215, 162, 55, 0.15)' : 'transparent',
             color: activeTab === 'INVOICES' ? 'var(--fbsu-gold)' : 'var(--text-secondary)',
             fontWeight: 800,
@@ -162,7 +189,8 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
           style={{
             padding: '0.6rem 1.25rem',
             borderRadius: '8px',
-            border: activeTab === 'RECEIPTS' ? '1px solid var(--fbsu-gold)' : '1px solid transparent',
+            border:
+              activeTab === 'RECEIPTS' ? '1px solid var(--fbsu-gold)' : '1px solid transparent',
             background: activeTab === 'RECEIPTS' ? 'rgba(215, 162, 55, 0.15)' : 'transparent',
             color: activeTab === 'RECEIPTS' ? 'var(--fbsu-gold)' : 'var(--text-secondary)',
             fontWeight: 800,
@@ -184,8 +212,13 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
       {activeTab === 'INVOICES' && (
         <div data-testid="invoices-list-container">
           {invoices.length === 0 ? (
-            <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-              {isAr ? 'لا توجد فواتير دراسية مسجلة بحسابك حالياً.' : 'No tuition invoices found on your account.'}
+            <div
+              className="glass-panel"
+              style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}
+            >
+              {isAr
+                ? 'لا توجد فواتير دراسية مسجلة بحسابك حالياً.'
+                : 'No tuition invoices found on your account.'}
             </div>
           ) : (
             invoices.map(invoice => (
@@ -204,11 +237,20 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
       {activeTab === 'RECEIPTS' && (
         <div data-testid="receipts-list-container">
           {receipts.length === 0 ? (
-            <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <div
+              className="glass-panel"
+              style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}
+            >
               {isAr ? 'لا توجد إيصالات سداد مسجلة حتى الآن.' : 'No payment receipts found yet.'}
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '1rem',
+              }}
+            >
               {receipts.map(rct => (
                 <div
                   key={rct.id}
@@ -220,8 +262,21 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
                   }}
                   data-testid={`receipt-card-${rct.id}`}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <strong style={{ fontSize: '0.88rem', color: 'var(--fbsu-gold)', fontFamily: 'monospace' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    <strong
+                      style={{
+                        fontSize: '0.88rem',
+                        color: 'var(--fbsu-gold)',
+                        fontFamily: 'monospace',
+                      }}
+                    >
                       {rct.receiptNumber}
                     </strong>
                     <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>
@@ -229,12 +284,28 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '1.35rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '0.5rem', fontVariantNumeric: 'tabular-nums' }}>
+                  <div
+                    style={{
+                      fontSize: '1.35rem',
+                      fontWeight: 900,
+                      color: 'var(--text-main)',
+                      marginBottom: '0.5rem',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {Number(rct.amountPaid).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                   </div>
 
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.85rem' }}>
-                    <div>{isAr ? 'الفاتورة:' : 'Invoice:'} {rct.invoiceNumber}</div>
+                  <div
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '0.85rem',
+                    }}
+                  >
+                    <div>
+                      {isAr ? 'الفاتورة:' : 'Invoice:'} {rct.invoiceNumber}
+                    </div>
                     <div>{rct.termNameEn}</div>
                   </div>
 

@@ -129,7 +129,7 @@ public class SaudiPlate implements Serializable {
 
     private static String normalizeArabicLetters(String input) {
         String s = input.replaceAll("[\\s\\u0640\\u064B-\\u065F]", ""); // remove spaces, tatweel, tashkeel
-        s = s.replace('أ', 'ا').replace('إ', 'ا').replace('آ', 'ا').replace('ة', 'ه').replace('ي', 'ى');
+        s = s.replace('أ', 'ا').replace('إ', 'ا').replace('آ', 'ا').replace('ة', 'ه').replace('ي', 'ى').replace('ج', 'ح');
         return s;
     }
 

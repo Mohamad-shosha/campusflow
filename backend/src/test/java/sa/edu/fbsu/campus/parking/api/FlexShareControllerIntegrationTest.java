@@ -64,7 +64,7 @@ class FlexShareControllerIntegrationTest extends AbstractPostgresIntegrationTest
                 UserType.STUDENT,
                 "052234" + suffix.substring(0, 4),
                 "د ر ع",
-                "5522",
+                String.valueOf(1000 + Math.abs(suffix.hashCode() % 8999)),
                 "هيونداي النترا",
                 "فضي"
         );

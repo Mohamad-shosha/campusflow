@@ -57,4 +57,3 @@ describe('BalanceCard Component', () => {
     expect(handleTransfer).toHaveBeenCalledTimes(1);
   });
 });
-

@@ -64,8 +64,8 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                 "Test Student",
                 UserType.STUDENT,
                 "051234" + suffix.substring(0, 4),
-                "أ ب ج",
-                "1234",
+                "أ ب ح",
+                String.valueOf(1000 + Math.abs(suffix.hashCode() % 8999)),
                 "تويوتا كامري",
                 "أبيض"
         );

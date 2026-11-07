@@ -50,7 +50,9 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
         >
           <div>
             <span className="badge badge-gold">
-              {isAr ? `قطاع ${spot.zone} - ${spot.college}` : `Zone ${spot.zone} - ${spot.collegeEn}`}
+              {isAr
+                ? `قطاع ${spot.zone} - ${spot.college}`
+                : `Zone ${spot.zone} - ${spot.collegeEn}`}
             </span>
             <h3
               style={{
@@ -60,7 +62,9 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
                 marginTop: '0.35rem',
               }}
             >
-              {isAr ? `موقف رقم #${String(spot.id).padStart(2, '0')}` : `Bay #${String(spot.id).padStart(2, '0')}`}
+              {isAr
+                ? `موقف رقم #${String(spot.id).padStart(2, '0')}`
+                : `Bay #${String(spot.id).padStart(2, '0')}`}
             </h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               {isAr

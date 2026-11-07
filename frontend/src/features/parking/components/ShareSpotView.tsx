@@ -1,5 +1,15 @@
 import { useState, useEffect, FC } from 'react';
-import { RefreshCw, Clock, Wallet, CheckCircle, Car, ArrowRight, AlertCircle, Sparkles, User } from 'lucide-react';
+import {
+  RefreshCw,
+  Clock,
+  Wallet,
+  CheckCircle,
+  Car,
+  ArrowRight,
+  AlertCircle,
+  Sparkles,
+  User,
+} from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundFX } from '../../../shared/utils/sound';
 import { parkingApi } from '../api/parkingApi';
@@ -82,7 +92,8 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
     setIsSubmitting(true);
 
     try {
-      const targetSpotId = selectedSpotId || (allSpots.length > 0 ? allSpots[0].id : 'spot-fallback-id');
+      const targetSpotId =
+        selectedSpotId || (allSpots.length > 0 ? allSpots[0].id : 'spot-fallback-id');
       await parkingApi.createFlexOffer({
         spotId: targetSpotId,
         durationMinutes: breakHours * 60,
@@ -101,7 +112,9 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
       loadOffers();
     } catch (err: unknown) {
       soundFX.playError();
-      const errorObj = err as { response?: { status?: number; data?: { detail?: string; message?: string } } };
+      const errorObj = err as {
+        response?: { status?: number; data?: { detail?: string; message?: string } };
+      };
       if (errorObj?.response?.status === 401) {
         setShareError(
           isAr
@@ -146,7 +159,9 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
       loadOffers();
     } catch (err: unknown) {
       soundFX.playError();
-      const errorObj = err as { response?: { status?: number; data?: { detail?: string; message?: string } } };
+      const errorObj = err as {
+        response?: { status?: number; data?: { detail?: string; message?: string } };
+      };
       if (errorObj?.response?.status === 401) {
         setClaimError(
           isAr
@@ -168,9 +183,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
     }
   };
 
-  const availableOffers = offers.filter(
-    o => o.status === 'AVAILABLE' || o.status === 'OFFERED'
-  );
+  const availableOffers = offers.filter(o => o.status === 'AVAILABLE' || o.status === 'OFFERED');
 
   return (
     <div data-testid="share-spot-view">
@@ -191,10 +204,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
         </p>
       </div>
 
-      <div
-        className="glass-panel"
-        style={{ maxWidth: '850px', margin: '0 auto', padding: '2rem' }}
-      >
+      <div className="glass-panel" style={{ maxWidth: '850px', margin: '0 auto', padding: '2rem' }}>
         {/* Sub-Tabs: Share My Spot vs Browse Available Offers */}
         <div
           style={{
@@ -254,9 +264,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
             }}
           >
             <Car size={16} />
-            <span>
-              {isAr ? 'المواقف المعروضة للتبادل' : 'Browse Shared Spots'}
-            </span>
+            <span>{isAr ? 'المواقف المعروضة للتبادل' : 'Browse Shared Spots'}</span>
             {availableOffers.length > 0 && (
               <span
                 style={{
@@ -293,7 +301,16 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)' }}>
                   {currentUser.name} ({currentUser.role})
                 </h4>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div
+                  style={{
+                    color: 'var(--text-muted)',
+                    fontSize: '0.85rem',
+                    marginTop: '0.45rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
                   <span>{isAr ? 'الموقف المخصص:' : 'Assigned Bay:'}</span>
                   {allSpots.length > 0 ? (
                     <select
@@ -313,14 +330,22 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                       data-testid="spot-select"
                     >
                       {allSpots.map(s => (
-                        <option key={s.id} value={s.id} style={{ background: '#0b1a17', color: '#fff' }}>
-                          {isAr ? `موقف رقم #${s.bayNumber} (${s.zoneNameAr})` : `Bay #${s.bayNumber} (${s.zoneCode})`}
+                        <option
+                          key={s.id}
+                          value={s.id}
+                          style={{ background: '#0b1a17', color: '#fff' }}
+                        >
+                          {isAr
+                            ? `موقف رقم #${s.bayNumber} (${s.zoneNameAr})`
+                            : `Bay #${s.bayNumber} (${s.zoneCode})`}
                         </option>
                       ))}
                     </select>
                   ) : (
                     <strong style={{ color: 'var(--fbsu-gold)' }}>
-                      {isAr ? `موقف رقم #${currentUser.primarySpot || '01'}` : `Bay #${currentUser.primarySpot || '01'}`}
+                      {isAr
+                        ? `موقف رقم #${currentUser.primarySpot || '01'}`
+                        : `Bay #${currentUser.primarySpot || '01'}`}
                     </strong>
                   )}
                 </div>
@@ -464,7 +489,13 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                         : 'Direct Wallet Cashback Earning:'}
                     </span>
                   </h5>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.825rem', marginTop: '0.35rem' }}>
+                  <p
+                    style={{
+                      color: 'var(--text-muted)',
+                      fontSize: '0.825rem',
+                      marginTop: '0.35rem',
+                    }}
+                  >
                     {isAr
                       ? 'محسوب وفق تعرفة 5.75 ر.س/ساعة مع ضمان توفير الموقف لك فور عودتك بنسبة 100%.'
                       : 'Calculated at standard 5.75 SAR/hr with guaranteed vacancy upon your return.'}
@@ -498,7 +529,15 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 }}
                 data-testid="flex-share-success-banner"
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    marginBottom: '0.5rem',
+                  }}
+                >
                   <CheckCircle size={22} />
                   <span style={{ fontSize: '1.1rem' }}>
                     {isAr ? 'تم تفعيل التبادل الذكي لموقفك بنجاح!' : 'Spot Placed in AI Flex Mode!'}
@@ -552,8 +591,8 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                       ? 'جارٍ تفعيل التبادل في النظام...'
                       : 'Activating Flex Share...'
                     : isAr
-                    ? 'أنا مغادر الآن - إتاحة موقفي للزملاء وإيداع المكافأة'
-                    : 'I am Leaving Now - Activate Flex Share & Earn'}
+                      ? 'أنا مغادر الآن - إتاحة موقفي للزملاء وإيداع المكافأة'
+                      : 'I am Leaving Now - Activate Flex Share & Earn'}
                 </span>
               </button>
             )}
@@ -655,8 +694,17 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
             {/* Offers List */}
             {isLoadingOffers ? (
               <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-muted)' }}>
-                <RefreshCw size={32} className="spin" color="var(--fbsu-gold)" style={{ marginBottom: '0.75rem' }} />
-                <p>{isAr ? 'جارٍ تحميل المواقف المتاحة للتبادل...' : 'Loading available shared spots...'}</p>
+                <RefreshCw
+                  size={32}
+                  className="spin"
+                  color="var(--fbsu-gold)"
+                  style={{ marginBottom: '0.75rem' }}
+                />
+                <p>
+                  {isAr
+                    ? 'جارٍ تحميل المواقف المتاحة للتبادل...'
+                    : 'Loading available shared spots...'}
+                </p>
               </div>
             ) : availableOffers.length === 0 ? (
               <div
@@ -668,11 +716,31 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                   border: '1px dashed var(--border-subtle)',
                 }}
               >
-                <Sparkles size={40} color="var(--fbsu-gold)" style={{ marginBottom: '1rem', opacity: 0.8 }} />
-                <h5 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                  {isAr ? 'لا توجد مواقف معروضة للتبادل حالياً' : 'No Active Flex-Share Spots at This Moment'}
+                <Sparkles
+                  size={40}
+                  color="var(--fbsu-gold)"
+                  style={{ marginBottom: '1rem', opacity: 0.8 }}
+                />
+                <h5
+                  style={{
+                    fontSize: '1.1rem',
+                    fontWeight: 800,
+                    color: 'var(--text-main)',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  {isAr
+                    ? 'لا توجد مواقف معروضة للتبادل حالياً'
+                    : 'No Active Flex-Share Spots at This Moment'}
                 </h5>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: '450px', margin: '0 auto 1.5rem auto' }}>
+                <p
+                  style={{
+                    color: 'var(--text-muted)',
+                    fontSize: '0.85rem',
+                    maxWidth: '450px',
+                    margin: '0 auto 1.5rem auto',
+                  }}
+                >
                   {isAr
                     ? 'يمكنك أن تكون أول من يشارك موقفه أثناء فترة خروجك للبريك لتحصل على رصيد فوري بمحفظتك!'
                     : 'Be the first to share your spot when heading out for a break and earn instant campus wallet credits!'}
@@ -688,7 +756,13 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                  gap: '1rem',
+                }}
+              >
                 {availableOffers.map(offer => {
                   const isClaiming = claimingOfferId === offer.id;
                   const reward = offer.rewardAmount ?? offer.rewardAmountSar ?? 5.75;
@@ -711,7 +785,14 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                       data-testid={`flex-offer-card-${offer.id}`}
                     >
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '0.75rem',
+                          }}
+                        >
                           <span
                             style={{
                               background: 'var(--fbsu-gold-light)',
@@ -739,12 +820,29 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                           </span>
                         </div>
 
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-main)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <div
+                          style={{
+                            fontSize: '0.85rem',
+                            color: 'var(--text-main)',
+                            marginBottom: '0.35rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                          }}
+                        >
                           <User size={14} color="var(--text-muted)" />
                           <span>{ownerName || (isAr ? 'عضو جامعي' : 'Campus Member')}</span>
                         </div>
 
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <div
+                          style={{
+                            fontSize: '0.78rem',
+                            color: 'var(--text-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                          }}
+                        >
                           <Clock size={14} color="var(--text-muted)" />
                           <span>
                             {isAr ? 'المكافأة النقدية للطرفين: ' : 'Cashback: '}

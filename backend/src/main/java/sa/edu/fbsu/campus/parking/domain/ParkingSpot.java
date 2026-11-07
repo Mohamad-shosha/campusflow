@@ -187,6 +187,7 @@ public class ParkingSpot extends BaseTenantEntity {
         this.sessionEndsAt = sessionEndsAt;
     }
 
+    /** Formatted bay code combining zone code and zero-padded bay number (e.g. A-05). */
     public String getBayCode() {
         return (zone != null ? zone.getCode() : "") + "-" + String.format("%02d", bayNumber);
     }

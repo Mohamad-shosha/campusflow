@@ -88,11 +88,7 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
                 {isAr ? 'تصريح دخول المواقف الذكي' : 'Digital Parking Gate Pass'}
               </h3>
             </div>
-            <img
-              src="/assets/branding/fbsu-logo.png"
-              style={{ height: '36px' }}
-              alt="FBSU"
-            />
+            <img src="/assets/branding/fbsu-logo.png" style={{ height: '36px' }} alt="FBSU" />
           </div>
 
           <div style={{ textAlign: 'center', margin: '1rem 0' }}>
@@ -112,10 +108,34 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
             <span className="badge badge-fbsu">{passData.college}</span>
           </div>
 
-          <div className="pass-qr-box" style={{ margin: '1.25rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-            <QR value={passData.qrToken || passData.passCode || `FBSU-PASS-${passData.spotId}-${passData.plate}`} size={160} />
+          <div
+            className="pass-qr-box"
+            style={{
+              margin: '1.25rem 0',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <QR
+              value={
+                passData.qrToken ||
+                passData.passCode ||
+                `FBSU-PASS-${passData.spotId}-${passData.plate}`
+              }
+              size={160}
+            />
             {passData.passCode && (
-              <span style={{ fontSize: '0.8rem', color: 'var(--fbsu-gold)', letterSpacing: '1px', fontFamily: 'var(--font-mono, monospace)', fontWeight: 700 }}>
+              <span
+                style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--fbsu-gold)',
+                  letterSpacing: '1px',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  fontWeight: 700,
+                }}
+              >
                 {passData.passCode}
               </span>
             )}
@@ -156,7 +176,15 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
               <strong style={{ color: 'var(--status-available)' }}>{passData.duration}</strong>
             </div>
             {typeof passData.totalAmount === 'number' && (
-              <div style={{ gridColumn: '1 / -1', borderTop: '1px dashed rgba(255,255,255,0.1)', paddingTop: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
+              <div
+                style={{
+                  gridColumn: '1 / -1',
+                  borderTop: '1px dashed rgba(255,255,255,0.1)',
+                  paddingTop: '0.5rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <span style={{ color: 'var(--text-muted)' }}>
                   {isAr ? 'المبلغ المخصوم من المحفظة:' : 'Wallet Deduction:'}
                 </span>
@@ -167,7 +195,9 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
             )}
           </div>
 
-          <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+          <div
+            style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}
+          >
             {passData.bookingId && onCancelBooking && (
               <button
                 className="btn-glass"
@@ -205,7 +235,11 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
               type="button"
             >
               <Camera size={16} color="#ffffff" />
-              <span>{isAr ? 'فتح البوابة الذكية تلقائياً (NFC/ALPR)' : 'Trigger Smart Barrier (NFC/ALPR)'}</span>
+              <span>
+                {isAr
+                  ? 'فتح البوابة الذكية تلقائياً (NFC/ALPR)'
+                  : 'Trigger Smart Barrier (NFC/ALPR)'}
+              </span>
             </button>
           </div>
         </div>

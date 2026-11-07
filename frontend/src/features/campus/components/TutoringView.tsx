@@ -50,7 +50,9 @@ export const TutoringView: FC<TutoringViewProps> = ({
       <div className="section-head">
         <span className="section-eyebrow">
           <BookOpen size={16} color="var(--fbsu-gold)" />
-          <span>{isAr ? 'الأنشطة الطلابية وشروحات الأقران' : 'Peer Tutoring & Student Economy'}</span>
+          <span>
+            {isAr ? 'الأنشطة الطلابية وشروحات الأقران' : 'Peer Tutoring & Student Economy'}
+          </span>
         </span>
         <h3 className="section-title">
           {isAr
@@ -67,8 +69,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
       {/* Student Economy Banner */}
       <div
         style={{
-          background:
-            'linear-gradient(135deg, rgba(17,110,99,0.2), rgba(215,162,55,0.15))',
+          background: 'linear-gradient(135deg, rgba(17,110,99,0.2), rgba(215,162,55,0.15))',
           border: '1px solid var(--fbsu-gold-border)',
           borderRadius: 'var(--radius-xl)',
           padding: '1.4rem 1.6rem',
@@ -180,9 +181,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
         </div>
 
         <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-          {isAr ? 'المستخدم الحالي الحاجز:' : 'Current User:'}{' '}
-          <strong>{currentUser.name}</strong> ({currentUser.walletBalance.toFixed(2)}{' '}
-          {isAr ? 'ر.س' : 'SAR'})
+          {isAr ? 'المستخدم الحالي الحاجز:' : 'Current User:'} <strong>{currentUser.name}</strong> (
+          {currentUser.walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'})
         </div>
       </div>
 
@@ -284,7 +284,12 @@ export const TutoringView: FC<TutoringViewProps> = ({
                 soundFX.playClick();
                 setSelectedSession(s);
               }}
-              style={{ width: '100%', justifyContent: 'center', padding: '0.85rem', fontSize: '0.9rem' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.85rem',
+                fontSize: '0.9rem',
+              }}
               type="button"
             >
               <Wallet size={16} color="#0b1a17" />
@@ -317,4 +322,3 @@ export const TutoringView: FC<TutoringViewProps> = ({
     </div>
   );
 };
-

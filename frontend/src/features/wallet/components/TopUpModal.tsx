@@ -40,20 +40,27 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!effectiveAmount || effectiveAmount <= 0) {
-      setErrorMessage(isAr ? 'الرجاء إدخال مبلغ صحيح أكبر من صفر.' : 'Please enter a valid amount greater than 0.');
+      setErrorMessage(
+        isAr ? 'الرجاء إدخال مبلغ صحيح أكبر من صفر.' : 'Please enter a valid amount greater than 0.'
+      );
       return;
     }
     if (effectiveAmount > 50000) {
-      setErrorMessage(isAr ? 'الحد الأقصى لعملية الشحن الواحدة هو 50,000 ر.س.' : 'Maximum single top-up limit is 50,000 SAR.');
+      setErrorMessage(
+        isAr
+          ? 'الحد الأقصى لعملية الشحن الواحدة هو 50,000 ر.س.'
+          : 'Maximum single top-up limit is 50,000 SAR.'
+      );
       return;
     }
 
     setIsLoading(true);
     setErrorMessage(null);
 
-    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID
-      ? `topup-${crypto.randomUUID()}`
-      : `topup-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+    const idempotencyKey =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? `topup-${crypto.randomUUID()}`
+        : `topup-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
     try {
       const updatedWallet = await walletApi.topUp({
@@ -66,7 +73,10 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string; message?: string } } };
       const detail = axiosErr.response?.data?.detail || axiosErr.response?.data?.message;
-      setErrorMessage(detail || (isAr ? 'فشلت عملية الشحن. يرجى المحاولة مرة أخرى.' : 'Top-up failed. Please try again.'));
+      setErrorMessage(
+        detail ||
+          (isAr ? 'فشلت عملية الشحن. يرجى المحاولة مرة أخرى.' : 'Top-up failed. Please try again.')
+      );
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +90,11 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
       testId="top-up-modal"
       maxWidth="480px"
     >
-      <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+      >
         {errorMessage && (
           <div
             style={{
@@ -102,7 +116,14 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
 
         {/* Preset Amounts */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '0.85rem',
+              color: 'var(--text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
             {isAr ? 'اختر المبلغ (ر.س)' : 'Select Amount (SAR)'}
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
@@ -116,8 +137,12 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
                   style={{
                     padding: '0.6rem 0.25rem',
                     borderRadius: '8px',
-                    border: isSelected ? '1.5px solid var(--fbsu-gold)' : '1px solid var(--border-color)',
-                    background: isSelected ? 'rgba(215, 162, 55, 0.2)' : 'rgba(255, 255, 255, 0.03)',
+                    border: isSelected
+                      ? '1.5px solid var(--fbsu-gold)'
+                      : '1px solid var(--border-color)',
+                    background: isSelected
+                      ? 'rgba(215, 162, 55, 0.2)'
+                      : 'rgba(255, 255, 255, 0.03)',
                     color: isSelected ? 'var(--fbsu-gold)' : 'var(--text-main)',
                     fontWeight: isSelected ? 800 : 600,
                     fontSize: '0.88rem',
@@ -135,7 +160,14 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
 
         {/* Custom Amount */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '0.85rem',
+              color: 'var(--text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
             {isAr ? 'أو أدخل مبلغاً آخر' : 'Or enter custom amount'}
           </label>
           <div style={{ position: 'relative' }}>
@@ -164,14 +196,31 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
 
         {/* Payment Channel Selection */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '0.85rem',
+              color: 'var(--text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
             {isAr ? 'وسيلة الدفع' : 'Payment Method'}
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
             {[
               { id: 'MADA', nameAr: 'مدى mada', nameEn: 'Mada', icon: <CreditCard size={18} /> },
-              { id: 'APPLE_PAY', nameAr: 'Apple Pay', nameEn: 'Apple Pay', icon: <Smartphone size={18} /> },
-              { id: 'CREDIT_CARD', nameAr: 'بطاقة ائتمانية', nameEn: 'Credit Card', icon: <CreditCard size={18} /> },
+              {
+                id: 'APPLE_PAY',
+                nameAr: 'Apple Pay',
+                nameEn: 'Apple Pay',
+                icon: <Smartphone size={18} />,
+              },
+              {
+                id: 'CREDIT_CARD',
+                nameAr: 'بطاقة ائتمانية',
+                nameEn: 'Credit Card',
+                icon: <CreditCard size={18} />,
+              },
             ].map(m => {
               const active = paymentMethod === m.id;
               return (
@@ -182,7 +231,9 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
                   style={{
                     padding: '0.75rem 0.5rem',
                     borderRadius: '8px',
-                    border: active ? '1.5px solid var(--fbsu-gold)' : '1px solid var(--border-color)',
+                    border: active
+                      ? '1.5px solid var(--fbsu-gold)'
+                      : '1px solid var(--border-color)',
                     background: active ? 'rgba(215, 162, 55, 0.15)' : 'rgba(255, 255, 255, 0.03)',
                     color: active ? 'var(--fbsu-gold)' : 'var(--text-secondary)',
                     display: 'flex',
@@ -222,4 +273,3 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
     </Modal>
   );
 };
-

@@ -11,12 +11,7 @@ export interface SpotCardProps {
   onClick: (spot: ParkingSpot) => void;
 }
 
-export const SpotCard: FC<SpotCardProps> = ({
-  spot,
-  isAr,
-  isCurrentUserSpot = false,
-  onClick,
-}) => {
+export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = false, onClick }) => {
   let statusClass = 'available';
   let badgeText = isAr ? 'متاح الآن' : 'Available';
   let statusColor = 'var(--status-available)';
@@ -135,4 +130,3 @@ export const SpotCard: FC<SpotCardProps> = ({
     </div>
   );
 };
-

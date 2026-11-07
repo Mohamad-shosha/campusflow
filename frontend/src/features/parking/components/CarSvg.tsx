@@ -15,7 +15,16 @@ export const CarSvg: FC<CarSvgProps> = ({ color = '#116E63', className = 'car-sv
       style={{ display: 'block', margin: '0 auto', maxHeight: '100%' }}
     >
       <ellipse cx="50" cy="85" rx="42" ry="70" fill="rgba(0,0,0,0.4)" filter="blur(6px)" />
-      <rect x="18" y="10" width="64" height="135" rx="24" fill={color} stroke="#ffffff" strokeWidth="2" />
+      <rect
+        x="18"
+        y="10"
+        width="64"
+        height="135"
+        rx="24"
+        fill={color}
+        stroke="#ffffff"
+        strokeWidth="2"
+      />
       <path
         d="M 26 52 Q 50 42 74 52 L 70 76 Q 50 72 30 76 Z"
         fill="#0c1f1c"
@@ -28,8 +37,26 @@ export const CarSvg: FC<CarSvgProps> = ({ color = '#116E63', className = 'car-sv
         stroke="rgba(255,255,255,0.4)"
         strokeWidth="1.5"
       />
-      <rect x="12" y="55" width="7" height="15" rx="3" fill={color} stroke="#ffffff" strokeWidth="1" />
-      <rect x="81" y="55" width="7" height="15" rx="3" fill={color} stroke="#ffffff" strokeWidth="1" />
+      <rect
+        x="12"
+        y="55"
+        width="7"
+        height="15"
+        rx="3"
+        fill={color}
+        stroke="#ffffff"
+        strokeWidth="1"
+      />
+      <rect
+        x="81"
+        y="55"
+        width="7"
+        height="15"
+        rx="3"
+        fill={color}
+        stroke="#ffffff"
+        strokeWidth="1"
+      />
       <rect x="23" y="14" width="14" height="8" rx="3" fill="#fef08a" opacity="0.9" />
       <rect x="63" y="14" width="14" height="8" rx="3" fill="#fef08a" opacity="0.9" />
       <rect x="23" y="136" width="14" height="6" rx="2" fill="#ef4444" />
@@ -38,4 +65,3 @@ export const CarSvg: FC<CarSvgProps> = ({ color = '#116E63', className = 'car-sv
     </svg>
   );
 };
-
