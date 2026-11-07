@@ -8,58 +8,142 @@ import {
   Check,
   Calendar,
   Plus,
+  AlertCircle,
 } from 'lucide-react';
 import type { StudyRoom } from '../data/campusData';
 import { BookRoomModal } from './BookRoomModal';
+import { roomsApi } from '../api/roomsApi';
 import { soundFX } from '../../../shared/utils/sound';
 
 export interface StudyRoomsViewProps {
   rooms: StudyRoom[];
   isAr: boolean;
+  isAuthenticated?: boolean | undefined;
   currentUser: {
     id: string;
     name: string;
   };
-  onRoomBooked?: (roomId: string, timeFrom: string, timeTo: string, purpose: string) => void;
+  onOpenAuth?: (() => void) | undefined;
+  onRoomBooked?: (
+    roomId: string,
+    timeFrom: string,
+    timeTo: string,
+    purpose: string,
+    updatedRoom?: StudyRoom
+  ) => void;
+  onRoomUpdated?: (updatedRoom: StudyRoom) => void;
 }
 
 export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
   rooms,
   isAr,
+  isAuthenticated = false,
   currentUser,
+  onOpenAuth = () => {},
   onRoomBooked,
+  onRoomUpdated,
 }) => {
-  const [countdownMins, setCountdownMins] = useState<number>(14);
-  const [selectedRoom, setSelectedRoom] = useState<StudyRoom | null>(null);
   const [roomList, setRoomList] = useState<StudyRoom[]>(rooms);
+  const [selectedRoom, setSelectedRoom] = useState<StudyRoom | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [countdownMap, setCountdownMap] = useState<Record<string, number>>({});
 
-  // Live countdown timer for active lab
+  useEffect(() => {
+    setRoomList(rooms);
+    const initialCounts: Record<string, number> = {};
+    rooms.forEach(r => {
+      if (r.activeBooking) {
+        initialCounts[r.id] = r.activeBooking.remainingMinutes ?? 15;
+      }
+    });
+    setCountdownMap(initialCounts);
+  }, [rooms]);
+
+  // Live countdown timer for active sessions
   useEffect(() => {
     const timer = setInterval(() => {
-      setCountdownMins(prev => (prev > 1 ? prev - 1 : 20));
+      setCountdownMap(prev => {
+        const next = { ...prev };
+        Object.keys(next).forEach(k => {
+          if ((next[k] ?? 0) > 1) {
+            next[k] = (next[k] ?? 0) - 1;
+          }
+        });
+        return next;
+      });
     }, 60000);
     return () => clearInterval(timer);
   }, []);
 
-  const handleExtend = (_roomId: string) => {
-    soundFX.playSuccess();
-    setCountdownMins(prev => prev + 10);
+  const handleExtend = async (roomId: string) => {
+    if (!isAuthenticated) {
+      onOpenAuth();
+      return;
+    }
+    setActionError(null);
+    const targetRoom = roomList.find(r => r.id === roomId);
+    const bookingId = targetRoom?.activeBooking?.bookingId;
+
+    if (!bookingId) {
+      // Mock / fallback
+      soundFX.playSuccess();
+      setCountdownMap(prev => ({ ...prev, [roomId]: (prev[roomId] ?? 10) + 10 }));
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const updated = await roomsApi.extendBooking(bookingId);
+      soundFX.playSuccess();
+      setRoomList(prev => prev.map(r => (r.id === roomId ? updated : r)));
+      setCountdownMap(prev => ({ ...prev, [roomId]: (prev[roomId] ?? 10) + 10 }));
+      onRoomUpdated?.(updated);
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setActionError(
+        detail || (isAr ? 'تعذر تمديد وقت الجلسة.' : 'Unable to extend study room session.')
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleRelease = (roomId: string) => {
-    soundFX.playSuccess();
-    setRoomList(prev =>
-      prev.map(r =>
-        r.id === roomId
-          ? {
-              ...r,
-              status: 'available',
-              activeBooking: undefined,
-            }
-          : r
-      )
-    );
+  const handleRelease = async (roomId: string) => {
+    if (!isAuthenticated) {
+      onOpenAuth();
+      return;
+    }
+    setActionError(null);
+    const targetRoom = roomList.find(r => r.id === roomId);
+    const bookingId = targetRoom?.activeBooking?.bookingId;
+
+    if (!bookingId) {
+      // Mock / fallback
+      soundFX.playSuccess();
+      setRoomList(prev =>
+        prev.map(r =>
+          r.id === roomId ? { ...r, status: 'available', activeBooking: undefined } : r
+        )
+      );
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const updated = await roomsApi.releaseBooking(bookingId);
+      soundFX.playSuccess();
+      setRoomList(prev => prev.map(r => (r.id === roomId ? updated : r)));
+      onRoomUpdated?.(updated);
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setActionError(detail || (isAr ? 'تعذر إخلاء القاعة.' : 'Unable to release study room.'));
+    } finally {
+      setIsProcessing(false);
+    }
   };
+
+  const activeInUseRoom = roomList.find(r => r.status === 'in-use');
 
   return (
     <div data-testid="study-rooms-view">
@@ -80,22 +164,50 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
         </p>
       </div>
 
+      {actionError && (
+        <div
+          data-testid="study-rooms-error-banner"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.85rem 1.25rem',
+            marginBottom: '1.5rem',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(244,63,94,0.12)',
+            border: '1px solid rgba(244,63,94,0.35)',
+            color: '#fda4af',
+            fontSize: '0.86rem',
+            fontWeight: 700,
+          }}
+        >
+          <AlertCircle size={18} />
+          <span>{actionError}</span>
+        </div>
+      )}
+
       {/* Hub Header Action */}
       <div className="campus-hub-toolbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span className="pulse-dot-green"></span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 800 }}>
-            {isAr
-              ? 'معمل الحاسب 102 مشغول حالياً بجلسة عمل جماعي لـ (إياد وراكان وعبد العزيز)'
-              : 'Computer Lab 102 actively in use by student study group'}
+            {activeInUseRoom
+              ? isAr
+                ? `${activeInUseRoom.name} مشغول حالياً بجلسة عمل جماعي لـ (${activeInUseRoom.activeBooking?.teamLead || 'الطلاب'})`
+                : `${activeInUseRoom.nameEn || activeInUseRoom.name} actively in use by ${activeInUseRoom.activeBooking?.teamLeadEn || activeInUseRoom.activeBooking?.teamLead || 'student team'}`
+              : isAr
+                ? 'جميع القاعات والمعامل جاهزة ومتاحة للحجز الفوري'
+                : 'All study pods and specialized labs are ready for immediate reservation'}
           </span>
         </div>
 
         <button
           className="btn-primary"
+          data-testid="hub-reserve-room-btn"
           onClick={() => {
             soundFX.playClick();
-            setSelectedRoom(roomList[1] || roomList[0]);
+            const firstAvail = roomList.find(r => r.status === 'available') || roomList[0];
+            if (firstAvail) setSelectedRoom(firstAvail);
           }}
           type="button"
         >
@@ -109,14 +221,21 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
         {roomList.map(room => {
           const isInUse = room.status === 'in-use';
           const isReserved = room.status === 'reserved';
+          const displayName = isAr ? room.name : room.nameEn || room.name;
+          const displayBuilding = isAr ? room.building : room.buildingEn || room.building;
+          const displayCapacity = isAr ? room.capacity : room.capacityEn || room.capacity;
+          const displayBadge = isAr ? room.typeBadge : room.typeBadgeEn || room.typeBadge;
+          const remainingMins = countdownMap[room.id] ?? room.activeBooking?.remainingMinutes ?? 15;
+          const totalMins = room.activeBooking?.totalMinutes ?? 20;
+          const progressPercent = Math.min(100, Math.max(5, (remainingMins / totalMins) * 100));
 
           return (
-            <div key={room.id} className="room-card">
+            <div key={room.id} className="room-card" data-testid={`room-card-${room.id}`}>
               <div>
                 <div className="room-card-head">
                   <span className="room-badge-type">
                     <Monitor size={13} color="var(--fbsu-primary)" />
-                    <span>{room.typeBadge}</span>
+                    <span>{displayBadge}</span>
                   </span>
 
                   <span
@@ -138,12 +257,12 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                   </span>
                 </div>
 
-                <h4 className="room-title">{room.name}</h4>
+                <h4 className="room-title">{displayName}</h4>
                 <div className="room-location-text">
                   <MapPin size={13} color="var(--text-dim)" />
                   <span>
-                    {room.building} • {isAr ? 'سعة: ' : 'Cap: '}
-                    <strong>{room.capacity}</strong>
+                    {displayBuilding} • {isAr ? 'سعة: ' : 'Cap: '}
+                    <strong>{displayCapacity}</strong>
                   </span>
                 </div>
 
@@ -153,7 +272,9 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                     <div className="timer-header-flex">
                       <span className="timer-team-label">{room.activeBooking.purpose}</span>
                       <span className="countdown-digits">
-                        09:00 - 09:20 ({countdownMins} {isAr ? 'د متبقية' : 'min left'})
+                        {room.activeBooking.timeSlot ||
+                          `${room.activeBooking.startLabel} - ${room.activeBooking.endLabel}`}{' '}
+                        ({remainingMins} {isAr ? 'د متبقية' : 'min left'})
                       </span>
                     </div>
 
@@ -166,7 +287,7 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                     >
                       {isAr ? 'المجموعة:' : 'Team:'}{' '}
                       <strong>
-                        {room.activeBooking.teamMembers
+                        {room.activeBooking.teamMembers && room.activeBooking.teamMembers.length > 0
                           ? room.activeBooking.teamMembers.join(' • ')
                           : room.activeBooking.teamLead}
                       </strong>
@@ -175,7 +296,7 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                     <div className="timer-progress-track">
                       <div
                         className="timer-progress-fill"
-                        style={{ width: `${Math.min(100, (countdownMins / 20) * 100)}%` }}
+                        style={{ width: `${progressPercent}%` }}
                       ></div>
                     </div>
 
@@ -188,9 +309,15 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                         color: 'var(--text-dim)',
                       }}
                     >
-                      <span>{isAr ? 'وقت الدخول: 09:00 ص' : 'Start: 09:00 AM'}</span>
+                      <span>
+                        {isAr
+                          ? `وقت الدخول: ${room.activeBooking.startLabel || '09:00 ص'}`
+                          : `Start: ${room.activeBooking.startLabel || '09:00 AM'}`}
+                      </span>
                       <span style={{ color: '#f43f5e', fontWeight: 800 }}>
-                        {isAr ? 'موعد الخروج الإلزامي: 09:20 ص' : 'Exit: 09:20 AM'}
+                        {isAr
+                          ? `موعد الخروج: ${room.activeBooking.endLabel || '09:20 ص'}`
+                          : `Exit: ${room.activeBooking.endLabel || '09:20 AM'}`}
                       </span>
                     </div>
                   </div>
@@ -227,13 +354,14 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                   {isAr ? 'التجهيزات والتقنيات المتوفرة:' : 'Included Tech & Equipment:'}
                 </div>
                 <div className="room-specs-list">
-                  {room.specs &&
-                    room.specs.map((spec: string, sIdx: number) => (
+                  {(isAr ? room.specs : room.specsEn || room.specs)?.map(
+                    (spec: string, sIdx: number) => (
                       <div key={sIdx} className="room-spec-item">
                         <CheckCircle2 size={13} color="var(--status-available)" />
                         <span>{spec}</span>
                       </div>
-                    ))}
+                    )
+                  )}
                 </div>
               </div>
 
@@ -243,6 +371,8 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                   <>
                     <button
                       className="btn-outline extend-lab-time-btn"
+                      data-testid={`extend-room-${room.id}`}
+                      disabled={isProcessing}
                       onClick={() => handleExtend(room.id)}
                       style={{
                         flex: 1,
@@ -257,6 +387,8 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                     </button>
                     <button
                       className="btn-primary release-lab-btn"
+                      data-testid={`release-room-${room.id}`}
+                      disabled={isProcessing}
                       onClick={() => handleRelease(room.id)}
                       style={{
                         flex: 1,
@@ -275,6 +407,7 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                 ) : (
                   <button
                     className="btn-primary book-room-now-btn"
+                    data-testid={`book-room-btn-${room.id}`}
                     onClick={() => {
                       soundFX.playClick();
                       setSelectedRoom(room);
@@ -301,26 +434,34 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
         isOpen={selectedRoom !== null}
         room={selectedRoom}
         isAr={isAr}
+        isAuthenticated={isAuthenticated}
         currentUser={currentUser}
         onClose={() => setSelectedRoom(null)}
-        onConfirm={(rId, tFrom, tTo, purp) => {
-          setRoomList(prev =>
-            prev.map(r =>
-              r.id === rId
-                ? {
-                    ...r,
-                    status: 'in-use',
-                    activeBooking: {
-                      teamLead: currentUser.name,
-                      teamMembers: [currentUser.name],
-                      purpose: purp,
-                      timeSlot: `${tFrom} - ${tTo}`,
-                    },
-                  }
-                : r
-            )
-          );
-          onRoomBooked?.(rId, tFrom, tTo, purp);
+        onOpenAuth={onOpenAuth}
+        onConfirm={(rId, tFrom, tTo, purp, updated) => {
+          if (updated) {
+            setRoomList(prev => prev.map(r => (r.id === rId ? updated : r)));
+            onRoomBooked?.(rId, tFrom, tTo, purp, updated);
+            onRoomUpdated?.(updated);
+          } else {
+            setRoomList(prev =>
+              prev.map(r =>
+                r.id === rId
+                  ? {
+                      ...r,
+                      status: 'in-use',
+                      activeBooking: {
+                        teamLead: currentUser.name,
+                        teamMembers: [currentUser.name],
+                        purpose: purp,
+                        timeSlot: `${tFrom} - ${tTo}`,
+                      },
+                    }
+                  : r
+              )
+            );
+            onRoomBooked?.(rId, tFrom, tTo, purp);
+          }
         }}
       />
     </div>

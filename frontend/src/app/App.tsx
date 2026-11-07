@@ -37,6 +37,7 @@ import { tutoringApi } from '../features/campus/api/tutoringApi';
 import { OfficeHoursView } from '../features/campus/components/OfficeHoursView';
 import { officeHoursApi } from '../features/campus/api/officeHoursApi';
 import { StudyRoomsView } from '../features/campus/components/StudyRoomsView';
+import { roomsApi } from '../features/campus/api/roomsApi';
 import { AnalyticsView } from '../features/analytics/components/AnalyticsView';
 import { NotificationsModal } from '../features/notifications/components/NotificationsModal';
 
@@ -64,7 +65,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [tutoringSessions, setTutoringSessions] =
     useState<TutoringSession[]>(INITIAL_TUTORING_SESSIONS);
   const [facultyList, setFacultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
-  const [studyRooms] = useState<StudyRoom[]>(INITIAL_STUDY_ROOMS);
+  const [studyRooms, setStudyRooms] = useState<StudyRoom[]>(INITIAL_STUDY_ROOMS);
   const [notifications, setNotifications] = useState<CampusNotification[]>(CAMPUS_NOTIFICATIONS);
 
   const [activeToast, setActiveToast] = useState<{
@@ -139,13 +140,25 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     }
   }, []);
 
+  const fetchStudyRooms = useCallback(async () => {
+    try {
+      const liveRooms = await roomsApi.getRooms();
+      if (liveRooms && liveRooms.length > 0) {
+        setStudyRooms(liveRooms);
+      }
+    } catch {
+      // Fallback to initial study rooms when offline or in isolated unit tests
+    }
+  }, []);
+
   useEffect(() => {
     fetchParkingData();
     fetchTutoringSessions();
     fetchFacultyOfficeHours();
+    fetchStudyRooms();
     const interval = setInterval(fetchParkingData, 30000);
     return () => clearInterval(interval);
-  }, [fetchParkingData, fetchTutoringSessions, fetchFacultyOfficeHours]);
+  }, [fetchParkingData, fetchTutoringSessions, fetchFacultyOfficeHours, fetchStudyRooms]);
 
   const handleRefreshAll = useCallback(async () => {
     await Promise.all([
@@ -153,8 +166,15 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       fetchWalletBalance(),
       fetchTutoringSessions(),
       fetchFacultyOfficeHours(),
+      fetchStudyRooms(),
     ]);
-  }, [fetchParkingData, fetchWalletBalance, fetchTutoringSessions, fetchFacultyOfficeHours]);
+  }, [
+    fetchParkingData,
+    fetchWalletBalance,
+    fetchTutoringSessions,
+    fetchFacultyOfficeHours,
+    fetchStudyRooms,
+  ]);
 
   const handleLogout = async () => {
     await logout();
@@ -299,7 +319,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     parkingSpots.find(
       s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
     )?.id ?? 1;
-  const isPreviewTab = ['rooms', 'analytics'].includes(activeTab);
+  const isPreviewTab = ['analytics'].includes(activeTab);
 
   return (
     <AppShell
@@ -526,16 +546,28 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <StudyRoomsView
             rooms={studyRooms}
             isAr={isAr}
+            isAuthenticated={isAuthenticated}
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
             }}
-            onRoomBooked={() => {
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onRoomBooked={(_roomId, _timeFrom, _timeTo, _purpose, updated) => {
+              if (updated) {
+                setStudyRooms(prev => prev.map(r => (r.id === updated.id ? updated : r)));
+              } else {
+                fetchStudyRooms();
+              }
               setActiveToast({
                 title: isAr ? 'تم حجز القاعة' : 'Room Reserved',
-                message: isAr ? 'تم تفعيل حجز القاعة بنجاح' : 'Room booking active',
+                message: isAr
+                  ? 'تم تفعيل حجز القاعة وبدء المؤقت التنازلي بنجاح'
+                  : 'Room booking active with countdown',
                 type: 'success',
               });
+            }}
+            onRoomUpdated={updated => {
+              setStudyRooms(prev => prev.map(r => (r.id === updated.id ? updated : r)));
             }}
           />
         )}

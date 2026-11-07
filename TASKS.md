@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 31 تاسك ✅
+- **المنجز بالكامل (Done):** 38 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 22 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **58%**
+- **المتبقي للبدء (Backlog):** 15 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **72%**
 
 
 
@@ -24,11 +24,11 @@
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
 | P5 | Parking | 9 | 9 | 0 | 0 |
-| P6 | Campus Services | 7 | 0 | 0 | 7 |
+| P6 | Campus Services | 7 | 7 | 0 | 0 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **31** | **0** | **22** |
+| **الإجمالي** | | **53** | **38** | **0** | **15** |
 
 ---
 
@@ -462,9 +462,9 @@
 
 ### P6-07 — Rooms UI + countdown
 - **ماذا سيعمل:** عرض القاعات والحجز والعد التنازلي والتمديد.
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P6-06، P3-05
-- **Git Branch:** `feature/P6-07-rooms-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P6-07-rooms-ui` · **Pull Request:** PR (feature/P6-07-rooms-ui)
 - **الملفات المتوقعة:** `frontend/src/features/rooms/*`
 - **Implementation Steps:** 1) Cards 2) Booking modal 3) Countdown 4) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy

@@ -63,27 +63,41 @@ export interface FacultyMember {
 
 export interface StudyRoom {
   id: string;
+  backendId?: string | undefined;
+  roomCode?: string | undefined;
   name: string;
   nameEn: string;
   building: string;
+  buildingEn?: string | undefined;
   capacity: string;
+  capacityEn?: string | undefined;
   typeBadge: string;
+  typeBadgeEn?: string | undefined;
   status: 'in-use' | 'available' | 'maintenance' | 'reserved';
   activeBooking?:
     | {
+        bookingId?: string | undefined;
+        leaderUserId?: string | undefined;
         teamLead: string;
+        teamLeadEn?: string | undefined;
         teamMembers?: string[];
         purpose: string;
-        endsAt?: string;
-        startTime?: string;
-        endTime?: string;
-        timeSlot?: string;
-        totalMinutes?: number;
-        remainingMinutes?: number;
+        endsAt?: string | undefined;
+        startTime?: string | undefined;
+        endTime?: string | undefined;
+        timeSlot?: string | undefined;
+        startLabel?: string | undefined;
+        endLabel?: string | undefined;
+        totalMinutes?: number | undefined;
+        remainingMinutes?: number | undefined;
+        extendedCount?: number | undefined;
+        status?: string | undefined;
       }
     | undefined;
-  specs?: string[];
-  availableFrom?: string;
+  specs?: string[] | undefined;
+  specsEn?: string[] | undefined;
+  availableFrom?: string | undefined;
+  availableFromEn?: string | undefined;
 }
 
 export interface CampusNotification {

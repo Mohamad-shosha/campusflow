@@ -362,6 +362,7 @@ export const tasks = [
     tests: ['Service', 'Concurrency', 'API', 'Security'], blockedBy: ['Q10'],
   }),
   T('P6-07', 'Rooms UI + countdown', {
+    status: 'Done', pr: 'PR (feature/P6-07-rooms-ui)',
     pri: 'Medium', cx: 'M', deps: ['P6-06', 'P3-05'], branch: 'feature/P6-07-rooms-ui',
     goal: 'عرض القاعات والحجز والعد التنازلي والتمديد.',
     files: ['frontend/src/features/rooms/*'],
