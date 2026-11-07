@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { type FC, type SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreditCard, Smartphone, AlertCircle } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
@@ -37,7 +37,7 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
     setErrorMessage(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!effectiveAmount || effectiveAmount <= 0) {
       setErrorMessage(

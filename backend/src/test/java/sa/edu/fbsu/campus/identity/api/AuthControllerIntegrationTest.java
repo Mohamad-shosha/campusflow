@@ -66,15 +66,14 @@ class AuthControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                 "White"
         );
 
-        MvcResult regResult = mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerReq)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty())
                 .andExpect(jsonPath("$.user.universityNumber").value(uniNumber))
-                .andExpect(jsonPath("$.user.primaryVehiclePlate").value("ط ر ق 4040"))
-                .andReturn();
+                .andExpect(jsonPath("$.user.primaryVehiclePlate").value("ط ر ق 4040"));
 
         // 2. Login
         LoginRequest loginReq = new LoginRequest("FBSU", email, password);

@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, type FC } from 'react';
 import { MapPin, Building2, ArrowUp, ArrowDown, ShieldCheck, RotateCw } from 'lucide-react';
 import type { ParkingSpot } from '../data/parkingData';
 import type { BookingResponse } from '../types/parking';

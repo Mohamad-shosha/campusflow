@@ -17,7 +17,7 @@ export const registerSchema = z.object({
     .string()
     .min(3, { message: 'الرقم الجامعي مطلوب (3 أحرف على الأقل)' })
     .max(50),
-  email: z.string().email({ message: 'يرجى إدخال بريد إلكتروني صحيح' }),
+  email: z.email({ message: 'يرجى إدخال بريد إلكتروني صحيح' }),
   password: z.string().min(8, { message: 'كلمة المرور يجب ألا تقل عن 8 خانات' }),
   fullNameAr: z.string().min(3, { message: 'الاسم بالعربية مطلوب' }),
   fullNameEn: z.string().min(3, { message: 'Full name in English is required' }),

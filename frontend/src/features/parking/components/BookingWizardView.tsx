@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, FC } from 'react';
+import { useState, useEffect, useCallback, type FC } from 'react';
 import {
   Calendar,
   ShieldCheck,

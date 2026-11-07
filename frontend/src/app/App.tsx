@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, FC } from 'react';
+import { useState, useEffect, useCallback, type FC } from 'react';
 import { AppShell } from '../shared/layout/AppShell';
 import { AppPreferencesProvider, useAppPreferences } from '../shared/context/AppPreferencesContext';
 import { AuthProvider, useAuth } from '../features/auth/context/AuthContext';
@@ -41,7 +41,7 @@ import '../shared/i18n/i18n';
 import '../styles/main.css';
 
 export interface AppContentProps {
-  initialTab?: string;
+  initialTab?: string | undefined;
 }
 
 const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
@@ -66,7 +66,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeToast, setActiveToast] = useState<{
     message: string;
     type: ToastType;
-    title?: string;
+    title?: string | undefined;
   } | null>(null);
 
   const { isAr } = useAppPreferences();

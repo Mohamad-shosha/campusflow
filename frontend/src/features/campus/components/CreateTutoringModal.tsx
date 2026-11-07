@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, type FC, type SyntheticEvent } from 'react';
 import { X, BookOpen, Plus } from 'lucide-react';
 import type { TutoringSession } from '../data/campusData';
 import { soundFX } from '../../../shared/utils/sound';
@@ -39,7 +39,7 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     soundFX.playSuccess();
     const newSession: TutoringSession = {

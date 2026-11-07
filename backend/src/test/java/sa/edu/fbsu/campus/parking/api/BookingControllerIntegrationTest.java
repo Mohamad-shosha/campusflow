@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import sa.edu.fbsu.campus.common.AbstractPostgresIntegrationTest;
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
+@ActiveProfiles("dev")
 class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
 
     @Autowired
@@ -47,10 +49,14 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
     @Autowired
     private ParkingSpotRepository spotRepository;
 
-    private String obtainAuthToken(String suffix) throws Exception {
+    private void ensureUniversity() {
         if (!universityRepository.existsByCode("FBSU")) {
             universityRepository.save(new University("FBSU", "جامعة فهد بن سلطان", "Fahad Bin Sultan University"));
         }
+    }
+
+    private String obtainAuthToken(String suffix) throws Exception {
+        ensureUniversity();
 
         String uniNumber = "BK-" + suffix;
         String email = "booker-" + suffix + "@fbsu.edu.sa";
@@ -90,8 +96,8 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         // 1. Top up wallet with 100 SAR
         TopUpRequest topUp = new TopUpRequest(
                 new BigDecimal("100.00"),
-                "MADA",
                 "TOPUP-" + suffix,
+                "MADA",
                 "Test Top-up"
         );
 
@@ -220,8 +226,8 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         // 2. Top up 50.00 SAR and book 3 hours (17.25 SAR) using frontend payload format
         TopUpRequest topUp = new TopUpRequest(
                 new BigDecimal("50.00"),
-                "APPLE_PAY",
                 "TOPUP-FE-" + suffix,
+                "APPLE_PAY",
                 "Frontend Test Top-up"
         );
         mockMvc.perform(post("/api/v1/wallet/top-up")
@@ -264,11 +270,5 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(50.00));
-    }
-
-    private void ensureUniversity() {
-        if (!universityRepository.existsByCode("FBSU")) {
-            universityRepository.save(new University("FBSU", "جامعة فهد بن سلطان", "Fahad Bin Sultan University"));
-        }
     }
 }

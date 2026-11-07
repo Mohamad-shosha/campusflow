@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { type FC, type SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, AlertCircle } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
@@ -30,7 +30,7 @@ export const TransferModal: FC<TransferModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
 

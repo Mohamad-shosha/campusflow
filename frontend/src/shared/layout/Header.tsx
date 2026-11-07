@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, FC } from 'react';
+import { useState, useRef, useEffect, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Car,
@@ -30,7 +30,7 @@ export interface HeaderProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
-  isAuthenticated?: boolean;
+  isAuthenticated?: boolean | undefined;
   onLogout?: (() => void) | undefined;
   notificationCount?: number | undefined;
   onOpenNotifications?: (() => void) | undefined;
