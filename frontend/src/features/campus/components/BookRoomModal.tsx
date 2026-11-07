@@ -1,3 +1,5 @@
+import { useState, type FC, type SyntheticEvent } from 'react';
+import { X, DoorClosed, Calendar } from 'lucide-react';
 import { useState, useEffect, type FC, type SyntheticEvent } from 'react';
 import { X, DoorClosed, Calendar, AlertCircle, LogIn } from 'lucide-react';
 import type { StudyRoom } from '../data/campusData';
@@ -14,6 +16,7 @@ export interface BookRoomModalProps {
     name: string;
   };
   onClose: () => void;
+  onConfirm: (roomId: string, timeFrom: string, timeTo: string, purpose: string) => void;
   onOpenAuth?: (() => void) | undefined;
   onConfirm: (
     roomId: string,
@@ -60,12 +63,19 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
 
   if (!isOpen || !room) return null;
 
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    soundFX.playSuccess();
+    setIsSuccess(true);
+    setTimeout(() => {
+      onConfirm(room.id, timeFrom, timeTo, purpose);
+      setIsSuccess(false);
     setErrorMessage(null);
 
     if (!isAuthenticated) {
       onClose();
+    }, 1200);
       onOpenAuth();
       return;
     }
@@ -81,14 +91,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
     const [fromH, fromM] = timeFrom.split(':').map(Number);
     const [toH, toM] = timeTo.split(':').map(Number);
 
-    const startDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-      fromH,
-      fromM,
-      0
-    );
+    const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), fromH, fromM, 0);
     let endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), toH, toM, 0);
     if (endDate <= startDate) {
       // If end time is earlier or equal, assume crossing midnight or adjust
@@ -183,8 +186,8 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
               {isAr ? 'حجز قاعة أو معمل للعمل الجماعي' : 'Reserve Lab / Study Pod'}
             </h3>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {isAr ? room.name : room.nameEn || room.name} (
-              {isAr ? room.building : room.buildingEn || room.building})
+              {room.name} ({room.building})
+              {isAr ? room.name : room.nameEn || room.name} ({isAr ? room.building : room.buildingEn || room.building})
             </span>
           </div>
         </div>
@@ -228,6 +231,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
               <span style={{ color: 'var(--text-muted)' }}>
                 {isAr ? 'السعة والتجهيزات:' : 'Capacity:'}
               </span>
+              <strong style={{ color: 'var(--text-main)' }}>{room.capacity}</strong>
               <strong style={{ color: 'var(--text-main)' }}>
                 {isAr ? room.capacity : room.capacityEn || room.capacity}
               </strong>
@@ -244,6 +248,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
             <div className="form-group">
+              <label className="form-label">{isAr ? 'وقت الدخول:' : 'Start Time:'}</label>
               <label className="form-label" htmlFor="room-time-from-input">
                 {isAr ? 'وقت الدخول:' : 'Start Time:'}
               </label>
@@ -258,6 +263,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
               />
             </div>
             <div className="form-group">
+              <label className="form-label">{isAr ? 'موعد الخروج الإلزامي:' : 'Exit Time:'}</label>
               <label className="form-label" htmlFor="room-time-to-input">
                 {isAr ? 'موعد الخروج الإلزامي:' : 'Exit Time:'}
               </label>
@@ -274,6 +280,8 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
           </div>
 
           <div className="form-group">
+            <label className="form-label">
+              {isAr ? 'الهدف من الحجز وأسماء أعضاء الفريق:' : 'Purpose & Team:'}
             <label className="form-label" htmlFor="room-purpose-input">
               {isAr ? 'الهدف من الحجز (المقرر أو المشروع):' : 'Purpose (Course / Project):'}
             </label>
@@ -288,19 +296,16 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
             />
           </div>
 
+          {isSuccess ? (
           <div className="form-group">
             <label className="form-label" htmlFor="room-team-members-input">
-              {isAr
-                ? 'أسماء أعضاء الفريق (اختياري - مفصولين بفواصل):'
-                : 'Team Members (Optional, comma-separated):'}
+              {isAr ? 'أسماء أعضاء الفريق (اختياري - مفصولين بفواصل):' : 'Team Members (Optional, comma-separated):'}
             </label>
             <input
               id="room-team-members-input"
               type="text"
               className="form-control"
-              placeholder={
-                isAr ? 'مثال: راكان المطيري، عبد العزيز البلوي' : 'e.g. Rakan, Abdulaziz'
-              }
+              placeholder={isAr ? 'مثال: راكان المطيري، عبد العزيز البلوي' : 'e.g. Rakan, Abdulaziz'}
               value={teamMembers}
               onChange={e => setTeamMembers(e.target.value)}
               disabled={isSubmitting}
@@ -319,7 +324,9 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
               }}
             >
               <LogIn size={16} color="#ffffff" />
-              <span>{isAr ? 'تسجيل الدخول لتأكيد حجز القاعة' : 'Sign In to Reserve Pod'}</span>
+              <span>
+                {isAr ? 'تسجيل الدخول لتأكيد حجز القاعة' : 'Sign In to Reserve Pod'}
+              </span>
             </button>
           ) : isSuccess ? (
             <div
@@ -348,6 +355,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
               disabled={isSubmitting}
             >
               <Calendar size={16} color="#ffffff" />
+              <span>{isAr ? 'تأكيد الحجز وتفعيل العداد التنازلي' : 'Confirm & Start Timer'}</span>
               <span>
                 {isSubmitting
                   ? isAr
