@@ -191,4 +191,3 @@ describe('StudyRoomsView (P6-07)', () => {
     });
   });
 });
-
