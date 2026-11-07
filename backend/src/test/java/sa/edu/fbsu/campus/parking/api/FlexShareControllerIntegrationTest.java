@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import sa.edu.fbsu.campus.common.AbstractPostgresIntegrationTest;
@@ -18,17 +19,16 @@ import sa.edu.fbsu.campus.parking.domain.ParkingSpot;
 import sa.edu.fbsu.campus.parking.dto.CreateFlexOfferRequest;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
+@ActiveProfiles("dev")
 class FlexShareControllerIntegrationTest extends AbstractPostgresIntegrationTest {
 
     @Autowired
@@ -64,7 +64,7 @@ class FlexShareControllerIntegrationTest extends AbstractPostgresIntegrationTest
                 UserType.STUDENT,
                 "052234" + suffix.substring(0, 4),
                 "د ر ع",
-                "5522",
+                String.valueOf(1000 + Math.abs(suffix.hashCode() % 8999)),
                 "هيونداي النترا",
                 "فضي"
         );
@@ -90,8 +90,10 @@ class FlexShareControllerIntegrationTest extends AbstractPostgresIntegrationTest
         String peerSuffix = UUID.randomUUID().toString().substring(0, 6);
         String peerToken = obtainAuthToken(peerSuffix);
 
-        // 1. Pick a spot
-        ParkingSpot spot = spotRepository.findAll().stream().findFirst()
+        // 1. Pick an occupied standard spot (Bay 4) so Bay 1 seed data remains intact
+        ParkingSpot spot = spotRepository.findAll().stream()
+                .filter(s -> s.getBayNumber() == 4)
+                .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No spot available"));
 
         // 2. Offerer posts a Flex-Share offer (60 mins)

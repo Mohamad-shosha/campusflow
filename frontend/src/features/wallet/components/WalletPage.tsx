@@ -1,6 +1,6 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { type FC, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, LogIn } from 'lucide-react';
+import { ShieldCheck, LogIn, GraduationCap } from 'lucide-react';
 import { BalanceCard } from './BalanceCard';
 import { LedgerTable } from './LedgerTable';
 import { TopUpModal } from './TopUpModal';
@@ -11,12 +11,16 @@ import { walletApi } from '../api/walletApi';
 import type { WalletResponse, LedgerEntryResponse, Page } from '../types/wallet';
 
 export interface WalletPageProps {
-  onBalanceUpdate?: (newBalance: number) => void;
-  onNavigateToTuition?: () => void;
-  onOpenAuth?: () => void;
+  onBalanceUpdate?: ((newBalance: number) => void) | undefined;
+  onNavigateToTuition?: (() => void) | undefined;
+  onOpenAuth?: (() => void) | undefined;
 }
 
-export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth }) => {
+export const WalletPage: FC<WalletPageProps> = ({
+  onBalanceUpdate,
+  onNavigateToTuition,
+  onOpenAuth,
+}) => {
   const { i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const { user, isAuthenticated } = useAuth();
@@ -40,53 +44,56 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
   const [toast, setToast] = useState<{
     message: string;
     type: ToastType;
-    title?: string;
+    title?: string | undefined;
   } | null>(null);
 
-  const fetchWalletData = useCallback(async (page = 0) => {
-    setIsLoading(true);
-    try {
-      if (isAuthenticated) {
-        const [walletData, ledgerData] = await Promise.all([
-          walletApi.getWallet(),
-          walletApi.getLedgerHistory(page, 15),
-        ]);
-        setWallet(walletData);
-        setLedgerPage(ledgerData);
-        if (onBalanceUpdate && walletData) {
-          onBalanceUpdate(Number(walletData.balance));
+  const fetchWalletData = useCallback(
+    async (page = 0) => {
+      setIsLoading(true);
+      try {
+        if (isAuthenticated) {
+          const [walletData, ledgerData] = await Promise.all([
+            walletApi.getWallet(),
+            walletApi.getLedgerHistory(page, 15),
+          ]);
+          setWallet(walletData);
+          setLedgerPage(ledgerData);
+          if (onBalanceUpdate && walletData) {
+            onBalanceUpdate(Number(walletData.balance));
+          }
+        } else {
+          // Unauthenticated state: 0.00 SAR, never display hardcoded 720.00 SAR
+          const emptyWallet: WalletResponse = {
+            id: 'unauthenticated-wallet',
+            userId: 'guest',
+            balance: 0.0,
+            currency: 'SAR',
+            status: 'ACTIVE',
+            updatedAt: new Date().toISOString(),
+          };
+          const emptyLedger: Page<LedgerEntryResponse> = {
+            content: [],
+            totalPages: 1,
+            totalElements: 0,
+            size: 15,
+            number: 0,
+            first: true,
+            last: true,
+          };
+          setWallet(emptyWallet);
+          setLedgerPage(emptyLedger);
+          if (onBalanceUpdate) {
+            onBalanceUpdate(0.0);
+          }
         }
-      } else {
-        // Unauthenticated state: 0.00 SAR, never display hardcoded 720.00 SAR
-        const emptyWallet: WalletResponse = {
-          id: 'unauthenticated-wallet',
-          userId: 'guest',
-          balance: 0.0,
-          currency: 'SAR',
-          status: 'ACTIVE',
-          updatedAt: new Date().toISOString(),
-        };
-        const emptyLedger: Page<LedgerEntryResponse> = {
-          content: [],
-          totalPages: 1,
-          totalElements: 0,
-          size: 15,
-          number: 0,
-          first: true,
-          last: true,
-        };
-        setWallet(emptyWallet);
-        setLedgerPage(emptyLedger);
-        if (onBalanceUpdate) {
-          onBalanceUpdate(0.0);
-        }
+      } catch (err: unknown) {
+        console.error('Failed to load wallet data:', err);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err: unknown) {
-      console.error('Failed to load wallet data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, onBalanceUpdate]);
+    },
+    [isAuthenticated, onBalanceUpdate]
+  );
 
   useEffect(() => {
     fetchWalletData(currentPage);
@@ -123,7 +130,11 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
   };
 
   return (
-    <div className="wallet-feature-page" data-testid="wallet-page" style={{ maxWidth: '960px', margin: '0 auto' }}>
+    <div
+      className="wallet-feature-page"
+      data-testid="wallet-page"
+      style={{ maxWidth: '960px', margin: '0 auto' }}
+    >
       {toast && (
         <div style={{ position: 'fixed', top: '1.5rem', insetInlineEnd: '1.5rem', zIndex: 999999 }}>
           <Toast
@@ -136,9 +147,25 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
       )}
 
       {/* Page header */}
-      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+      <div
+        style={{
+          marginBottom: '1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '1rem',
+        }}
+      >
         <div>
-          <h2 style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.35rem' }}>
+          <h2
+            style={{
+              fontSize: '1.65rem',
+              fontWeight: 900,
+              color: 'var(--text-main)',
+              margin: '0 0 0.35rem',
+            }}
+          >
             {isAr ? 'المحفظة الجامعية والمدفوعات الذكية' : 'Digital Campus Wallet & Smart Payments'}
           </h2>
           <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0 }}>
@@ -148,22 +175,36 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.4rem 0.8rem',
-            borderRadius: '8px',
-            background: 'rgba(17, 110, 99, 0.15)',
-            border: '1px solid rgba(17, 110, 99, 0.35)',
-            fontSize: '0.78rem',
-            color: '#34d399',
-            fontWeight: 700,
-          }}
-        >
-          <ShieldCheck size={15} />
-          <span>{isAr ? 'معتمد ومحمي بالقيود المحاسبية' : 'Audited & Immutable Ledger'}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+          {onNavigateToTuition && (
+            <button
+              type="button"
+              className="btn-gold"
+              onClick={onNavigateToTuition}
+              style={{ fontSize: '0.82rem', padding: '0.45rem 0.9rem' }}
+              data-testid="wallet-goto-tuition-btn"
+            >
+              <GraduationCap size={16} color="#0b1a17" />
+              <span>{isAr ? 'سداد الرسوم الدراسية' : 'Tuition & Invoices'}</span>
+            </button>
+          )}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '8px',
+              background: 'rgba(17, 110, 99, 0.15)',
+              border: '1px solid rgba(17, 110, 99, 0.35)',
+              fontSize: '0.78rem',
+              color: '#34d399',
+              fontWeight: 700,
+            }}
+          >
+            <ShieldCheck size={15} />
+            <span>{isAr ? 'معتمد ومحمي بالقيود المحاسبية' : 'Audited & Immutable Ledger'}</span>
+          </div>
         </div>
       </div>
 

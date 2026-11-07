@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback, FC } from 'react';
+import { useState, useEffect, useCallback, type FC } from 'react';
 import { AppShell } from '../shared/layout/AppShell';
 import { AppPreferencesProvider, useAppPreferences } from '../shared/context/AppPreferencesContext';
 import { AuthProvider, useAuth } from '../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
 import { AuthModal } from '../features/auth/components/AuthModal';
+import { ProfileModal } from '../features/auth/components/ProfileModal';
 import { WalletPage } from '../features/wallet';
 import { TuitionPage } from '../features/tuition';
 import { walletApi } from '../features/wallet/api/walletApi';
@@ -41,13 +42,14 @@ import '../shared/i18n/i18n';
 import '../styles/main.css';
 
 export interface AppContentProps {
-  initialTab?: string;
+  initialTab?: string | undefined;
 }
 
 const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [liveBalance, setLiveBalance] = useState<number>(0.0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
   const [isNotifModalOpen, setIsNotifModalOpen] = useState<boolean>(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
 
@@ -66,7 +68,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [activeToast, setActiveToast] = useState<{
     message: string;
     type: ToastType;
-    title?: string;
+    title?: string | undefined;
   } | null>(null);
 
   const { isAr } = useAppPreferences();
@@ -161,8 +163,11 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       };
 
   const totalSpots = parkingSummary?.totalSpots ?? parkingSpots.length;
-  const availableCount = parkingSummary?.availableSpots ?? parkingSpots.filter(s => s.status === 'available').length;
-  const flexCount = parkingSummary?.flexSpots ?? parkingSpots.filter(s => s.status === 'flex' || s.status === 'flex-share').length;
+  const availableCount =
+    parkingSummary?.availableSpots ?? parkingSpots.filter(s => s.status === 'available').length;
+  const flexCount =
+    parkingSummary?.flexSpots ??
+    parkingSpots.filter(s => s.status === 'flex' || s.status === 'flex-share').length;
 
   const handleReserveSpot = (spotId: number) => {
     setParkingSpots(prev =>
@@ -198,7 +203,6 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   };
 
   const handleTutoringBooked = (session: TutoringSession) => {
-    setLiveBalance(prev => Math.max(0, prev - session.totalPrice));
     setTutoringSessions(prev =>
       prev.map(s =>
         s.id === session.id
@@ -210,11 +214,11 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       )
     );
     setActiveToast({
-      title: isAr ? 'تم تأكيد حجز الجلسة' : 'Tutoring Session Confirmed',
+      title: isAr ? 'معاينة حجز الجلسة (المرحلة P6)' : 'Tutoring Preview Enrolled (Phase P6)',
       message: isAr
-        ? `تم خصم ${session.totalPrice} ر.س وتحويلها كرصيد جامعي للأقران`
-        : `Fee of ${session.totalPrice} SAR settled successfully`,
-      type: 'success',
+        ? 'تمت محاكاة التسجيل في الجلسة ضمن معاينة المرحلة السادسة دون خصم رصيد فعلي من المحفظة.'
+        : 'Preview enrollment recorded for Phase 6 showcase without deducting live wallet funds.',
+      type: 'info',
     });
   };
 
@@ -237,6 +241,29 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
+  const primaryVehicle = user?.vehicles?.find(v => v.primary) ?? user?.vehicles?.[0];
+  const primaryPlate = primaryVehicle
+    ? `${primaryVehicle.plateLettersAr} ${primaryVehicle.plateDigits}`
+    : isAuthenticated
+      ? isAr
+        ? 'غير مسجلة'
+        : 'Unregistered'
+      : 'أ ب ح 1234';
+  const primaryCarModel =
+    primaryVehicle?.makeModel ||
+    (isAuthenticated
+      ? isAr
+        ? 'مركبة جامعية مسجلة'
+        : 'Registered Campus Vehicle'
+      : isAr
+        ? 'مركبة زائر (يرجى تسجيل الدخول)'
+        : 'Guest Vehicle (Sign in required)');
+  const userAssignedBay =
+    parkingSpots.find(
+      s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
+    )?.id ?? 1;
+  const isPreviewTab = ['tutoring', 'office-hours', 'rooms', 'analytics'].includes(activeTab);
+
   return (
     <AppShell
       activeTab={activeTab}
@@ -245,11 +272,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       isAuthenticated={isAuthenticated}
       onLogout={handleLogout}
       notificationCount={notifications.length}
+      flexCount={flexCount}
       onOpenNotifications={() => setIsNotifModalOpen(true)}
       onOpenAuth={() => {
         setAuthModalTab('login');
         setIsAuthModalOpen(true);
       }}
+      onOpenProfile={() => setIsProfileModalOpen(true)}
       onOpenWallet={() => setActiveTab('wallet')}
     >
       {activeToast && (
@@ -274,9 +303,43 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         />
       )}
 
-      <div className="container" style={{ marginTop: '2.5rem', minHeight: '60vh', paddingBottom: '3rem' }}>
+      <div
+        className="container"
+        style={{ marginTop: '2.5rem', minHeight: '60vh', paddingBottom: '3rem' }}
+      >
         {/* Category Subnav chips */}
         <CategorySubnav activeTab={activeTab} isAr={isAr} onTabChange={setActiveTab} />
+
+        {isPreviewTab && (
+          <div
+            className="glass-panel"
+            style={{
+              padding: '0.85rem 1.25rem',
+              marginBottom: '1.5rem',
+              border: '1px solid var(--fbsu-gold-border)',
+              background: 'var(--fbsu-gold-light)',
+              fontSize: '0.84rem',
+              color: 'var(--text-main)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+            }}
+            data-testid="roadmap-preview-banner"
+          >
+            <strong>
+              {isAr
+                ? '📋 معاينة تفاعلية للمراحل القادمة (Phase 6 & 7 Backlog)'
+                : '📋 Interactive UI Preview (Scheduled for Phase 6 & 7)'}
+            </strong>
+            <span style={{ color: 'var(--text-muted)' }}>
+              {isAr
+                ? 'بيانات هذا القسم للعرض التصميمي فقط لحين ربط واجهات البرمجة الخاصة به في المرحلة القادمة.'
+                : 'Showcase prototype data; live backend persistence is scheduled in Phase 6–7.'}
+            </span>
+          </div>
+        )}
 
         {/* Tab 1: Live Map */}
         {activeTab === 'map' && (
@@ -286,10 +349,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
-              plate: user?.vehicles?.[0]
-                ? user.vehicles[0].plateLettersAr + ' ' + user.vehicles[0].plateDigits
-                : 'ب ط ك 1234',
-              primarySpot: 1,
+              plate: primaryPlate,
+              primarySpot: userAssignedBay,
             }}
             isAuthenticated={isAuthenticated}
             onOpenAuth={() => setIsAuthModalOpen(true)}
@@ -328,11 +389,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
-              car: 'تويوتا كامري 2023',
-              plate: user?.vehicles?.[0]
-                ? user.vehicles[0].plateLettersAr + ' ' + user.vehicles[0].plateDigits
-                : 'أ ب ح 1234',
-              primarySpot: 2,
+              car: primaryCarModel,
+              plate: primaryPlate,
+              primarySpot: userAssignedBay,
             }}
             isAuthenticated={isAuthenticated}
             onOpenGate={() => setActiveTab('gate')}
@@ -342,8 +401,16 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               setActiveToast({
                 title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
                 message: isAr
-                  ? 'تم تأكيد حجز موقف #' + booking.bayNumber + ' بنجاح، وخصم ' + Number(booking.totalAmount).toFixed(2) + ' ر.س من محفظتك.'
-                  : 'Bay #' + booking.bayNumber + ' booked. ' + Number(booking.totalAmount).toFixed(2) + ' SAR debited from wallet.',
+                  ? 'تم تأكيد حجز موقف #' +
+                    booking.bayNumber +
+                    ' بنجاح، وخصم ' +
+                    Number(booking.totalAmount).toFixed(2) +
+                    ' ر.س من محفظتك.'
+                  : 'Bay #' +
+                    booking.bayNumber +
+                    ' booked. ' +
+                    Number(booking.totalAmount).toFixed(2) +
+                    ' SAR debited from wallet.',
                 type: 'success',
               });
             }}
@@ -374,7 +441,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               id: currentUser.id,
               name: currentUser.name,
               role: currentUser.role,
-              primarySpot: 1,
+              primarySpot: userAssignedBay,
               walletBalance: currentUser.walletBalance,
             }}
             onShareConfirmed={handleShareConfirmed}
@@ -452,6 +519,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
             <TuitionPage
               onBalanceUpdate={b => setLiveBalance(b)}
               onOpenTopUp={() => setActiveTab('wallet')}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
             />
           </div>
         )}
@@ -469,7 +537,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               }}
               data-testid="admin-panel-content"
             >
-              <h3 style={{ color: 'var(--fbsu-primary)', marginBottom: '0.75rem', fontWeight: 800 }}>
+              <h3
+                style={{ color: 'var(--fbsu-primary)', marginBottom: '0.75rem', fontWeight: 800 }}
+              >
                 {isAr ? 'لوحة التحكم الإدارية المصرحة' : 'Authorized Campus Admin Panel'}
               </h3>
               <p style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>
@@ -496,6 +566,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
             type: 'success',
           });
         }}
+      />
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        onOpenAdminPanel={() => setActiveTab('admin-panel')}
+        onProfileUpdated={handleRefreshAll}
       />
 
       <NotificationsModal

@@ -1,6 +1,13 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight, History } from 'lucide-react';
+import {
+  Search,
+  ArrowDownLeft,
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  History,
+} from 'lucide-react';
 import { Badge, type BadgeVariant } from '../../../shared/components/Badge';
 import type { LedgerEntryResponse, Page, TransactionType } from '../types/wallet';
 
@@ -30,7 +37,9 @@ export const LedgerTable: FC<LedgerTableProps> = ({
     );
   });
 
-  const getTransactionLabel = (type: TransactionType): { labelAr: string; labelEn: string; variant: BadgeVariant } => {
+  const getTransactionLabel = (
+    type: TransactionType
+  ): { labelAr: string; labelEn: string; variant: BadgeVariant } => {
     switch (type) {
       case 'TOP_UP':
         return { labelAr: 'شحن رصيد', labelEn: 'Top-Up', variant: 'available' };
@@ -139,21 +148,43 @@ export const LedgerTable: FC<LedgerTableProps> = ({
           data-testid="ledger-table"
         >
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
-              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>{isAr ? 'التاريخ والوقت' : 'Date & Time'}</th>
-              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>{isAr ? 'نوع الحركة' : 'Type'}</th>
-              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>{isAr ? 'البيان والرمز المرجعي' : 'Description / Reference'}</th>
-              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>{isAr ? 'المبلغ' : 'Amount'}</th>
-              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>{isAr ? 'الرصيد بعد الحركة' : 'Balance After'}</th>
+            <tr
+              style={{
+                borderBottom: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>
+                {isAr ? 'التاريخ والوقت' : 'Date & Time'}
+              </th>
+              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>
+                {isAr ? 'نوع الحركة' : 'Type'}
+              </th>
+              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>
+                {isAr ? 'البيان والرمز المرجعي' : 'Description / Reference'}
+              </th>
+              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>
+                {isAr ? 'المبلغ' : 'Amount'}
+              </th>
+              <th style={{ padding: '0.75rem 0.6rem', fontWeight: 700 }}>
+                {isAr ? 'الرصيد بعد الحركة' : 'Balance After'}
+              </th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td
+                  colSpan={5}
+                  style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}
+                >
                   {isLoading
-                    ? isAr ? 'جاري تحميل سجل المعاملات...' : 'Loading transaction ledger...'
-                    : isAr ? 'لا توجد حركات مالية مسجلة حتى الآن.' : 'No transaction records found.'}
+                    ? isAr
+                      ? 'جاري تحميل سجل المعاملات...'
+                      : 'Loading transaction ledger...'
+                    : isAr
+                      ? 'لا توجد حركات مالية مسجلة حتى الآن.'
+                      : 'No transaction records found.'}
                 </td>
               </tr>
             ) : (
@@ -170,23 +201,40 @@ export const LedgerTable: FC<LedgerTableProps> = ({
                     data-testid={`ledger-row-${entry.id}`}
                   >
                     {/* Date */}
-                    <td style={{ padding: '0.75rem 0.6rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+                    <td
+                      style={{
+                        padding: '0.75rem 0.6rem',
+                        color: 'var(--text-secondary)',
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
                       {formatDate(entry.createdAt)}
                     </td>
 
                     {/* Type badge */}
                     <td style={{ padding: '0.75rem 0.6rem', whiteSpace: 'nowrap' }}>
-                      <Badge variant={info.variant}>
-                        {isAr ? info.labelAr : info.labelEn}
-                      </Badge>
+                      <Badge variant={info.variant}>{isAr ? info.labelAr : info.labelEn}</Badge>
                     </td>
 
                     {/* Description & Reference */}
                     <td style={{ padding: '0.75rem 0.6rem' }}>
-                      <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.15rem' }}>
+                      <div
+                        style={{
+                          fontWeight: 600,
+                          color: 'var(--text-main)',
+                          marginBottom: '0.15rem',
+                        }}
+                      >
                         {entry.description}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                      <div
+                        style={{
+                          fontSize: '0.75rem',
+                          color: 'var(--text-muted)',
+                          fontFamily: 'monospace',
+                        }}
+                      >
                         Ref: {entry.referenceId}
                       </div>
                     </td>
@@ -204,12 +252,21 @@ export const LedgerTable: FC<LedgerTableProps> = ({
                         }}
                       >
                         {isCredit ? <ArrowDownLeft size={14} /> : <ArrowUpRight size={14} />}
-                        {isCredit ? '+' : '-'}{Number(entry.amount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
+                        {isCredit ? '+' : '-'}
+                        {Number(entry.amount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                       </span>
                     </td>
 
                     {/* Balance After */}
-                    <td style={{ padding: '0.75rem 0.6rem', color: 'var(--text-main)', fontWeight: 700, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+                    <td
+                      style={{
+                        padding: '0.75rem 0.6rem',
+                        color: 'var(--text-main)',
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
                       {Number(entry.balanceAfter).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                     </td>
                   </tr>
@@ -268,4 +325,3 @@ export const LedgerTable: FC<LedgerTableProps> = ({
     </div>
   );
 };
-

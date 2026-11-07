@@ -1,18 +1,8 @@
 export type BackendSpotStatus =
-  | 'AVAILABLE'
-  | 'OCCUPIED'
-  | 'RESERVED'
-  | 'FLEX_SHARE'
-  | 'FACULTY_ASSIGNED'
-  | 'MAINTENANCE';
+  'AVAILABLE' | 'OCCUPIED' | 'RESERVED' | 'FLEX_SHARE' | 'FACULTY_ASSIGNED' | 'MAINTENANCE';
 
 export type BackendSpotType =
-  | 'STANDARD'
-  | 'FACULTY'
-  | 'ACCESSIBLE'
-  | 'EV_CHARGING'
-  | 'VIP'
-  | 'SERVICE';
+  'STANDARD' | 'FACULTY' | 'ACCESSIBLE' | 'EV_CHARGING' | 'VIP' | 'SERVICE';
 
 export interface ParkingSpotResponse {
   id: string; // UUID
@@ -71,7 +61,7 @@ export interface CreateBookingRequest {
   autoDebitWallet?: boolean;
   idempotencyKey: string;
   startTime: string; // ISO-8601
-  endTime?: string;   // ISO-8601
+  endTime?: string; // ISO-8601
 }
 
 export interface BookingResponse {
@@ -168,7 +158,9 @@ export interface GateDecisionResponse {
  * Maps a backend ParkingSpotResponse to the UI ParkingSpot structure
  */
 export function mapBackendSpotToUi(backendSpot: ParkingSpotResponse) {
-  let uiStatus: 'available' | 'occupied' | 'flex' | 'flex-share' | 'reserved' | 'faculty' | 'faculty-spot' = 'available';
+  let uiStatus:
+    'available' | 'occupied' | 'flex' | 'flex-share' | 'reserved' | 'faculty' | 'faculty-spot' =
+    'available';
   switch (backendSpot.status) {
     case 'AVAILABLE':
       uiStatus = 'available';

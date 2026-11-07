@@ -59,11 +59,20 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
               <Bell size={20} color="var(--fbsu-gold)" />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+              <h3
+                style={{
+                  fontSize: '1.2rem',
+                  fontWeight: 800,
+                  color: 'var(--text-main)',
+                  margin: 0,
+                }}
+              >
                 {isAr ? 'صندوق الإشعارات المباشرة' : 'Direct Campus Alerts'}
               </h3>
               <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                {isAr ? 'إشعارات حجز الساعات المكتبية والشروحات والقاعات' : 'Faculty & Student Alerts'}
+                {isAr
+                  ? 'إشعارات حجز الساعات المكتبية والشروحات والقاعات'
+                  : 'Faculty & Student Alerts'}
               </span>
             </div>
           </div>
@@ -77,7 +86,15 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '380px', overflowY: 'auto' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+            maxHeight: '380px',
+            overflowY: 'auto',
+          }}
+        >
           {notifications.map(n => (
             <div
               key={n.id}
@@ -107,16 +124,39 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
                 <Bell size={18} color="var(--fbsu-primary)" />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>{n.title}</strong>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.25rem',
+                  }}
+                >
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>
+                    {n.title}
+                  </strong>
                   <span className="badge badge-available" style={{ fontSize: '0.65rem' }}>
                     {n.badge || (isAr ? 'جديد' : 'New')}
                   </span>
                 </div>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: '0.4rem' }}>
+                <p
+                  style={{
+                    fontSize: '0.78rem',
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.45,
+                    marginBottom: '0.4rem',
+                  }}
+                >
                   {n.message}
                 </p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-dim)' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: '0.72rem',
+                    color: 'var(--text-dim)',
+                  }}
+                >
                   <span>
                     {isAr ? 'المُرسل:' : 'From:'} <strong>{n.sender}</strong>
                   </span>
@@ -130,4 +170,3 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
     </div>
   );
 };
-

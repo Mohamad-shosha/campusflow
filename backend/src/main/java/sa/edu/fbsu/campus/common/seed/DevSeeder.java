@@ -29,6 +29,7 @@ import sa.edu.fbsu.campus.wallet.tuition.infra.TuitionInvoiceRepository;
 import sa.edu.fbsu.campus.parking.domain.ParkingZone;
 import sa.edu.fbsu.campus.parking.domain.ParkingSpot;
 import sa.edu.fbsu.campus.parking.domain.ParkingTariff;
+import sa.edu.fbsu.campus.parking.domain.SpotAssignment;
 import sa.edu.fbsu.campus.parking.domain.SpotStatus;
 import sa.edu.fbsu.campus.parking.domain.SpotType;
 import sa.edu.fbsu.campus.parking.infra.ParkingZoneRepository;
@@ -147,12 +148,12 @@ public class DevSeeder implements CommandLineRunner {
                 UserType.FACULTY, Role.FACULTY, "0561234567", ccis.getId(), "هندسة البرمجيات والذكاء الاصطناعي",
                 "ن م ر", "3301", "Audi A6 2024");
 
-        seedUser(uniId, "FAC-7700", "m.mezher@fbsu.edu.sa", defaultHashedPass,
+        User drMezher = seedUser(uniId, "FAC-7700", "m.mezher@fbsu.edu.sa", defaultHashedPass,
                 "د. محمد مزهر", "Dr. Mohammad Mezher",
                 UserType.FACULTY, Role.FACULTY, "0567654321", ccis.getId(), "حوسبة سحابية ونظم موزعة",
                 "س ع د", "7700", "BMW 520i 2023");
 
-        seedUser(uniId, "FAC-9912", "a.ghamdi@fbsu.edu.sa", defaultHashedPass,
+        User drGhamdi = seedUser(uniId, "FAC-9912", "a.ghamdi@fbsu.edu.sa", defaultHashedPass,
                 "د. عبدالله الغامدي", "Dr. Abdullah Al-Ghamdi",
                 UserType.FACULTY, Role.FACULTY, "0569876543", ccis.getId(), "شبكات الحاسب وأمن المعلومات",
                 "ط ر ق", "9912", "Mercedes E300 2023");
@@ -303,7 +304,30 @@ public class DevSeeder implements CommandLineRunner {
             seedSpot(uniId, zoneD, 30, SpotType.EV_CHARGING, SpotStatus.AVAILABLE, 65, false, null, null, null, null, null, null);
         }
 
+        // 10. Seed Dedicated Faculty Spot Assignments (Zone C)
+        seedFacultyAssignment(uniId, drGhamdi, 19);
+        seedFacultyAssignment(uniId, drMezher, 20);
+        seedFacultyAssignment(uniId, drFahad, 22);
+        seedFacultyAssignment(uniId, drSarah, 24);
+
         log.info("--- [DevSeeder] Completed FBSU dev/demo seeding successfully ---");
+    }
+
+    private void seedFacultyAssignment(UUID universityId, User faculty, int bayNumber) {
+        if (spotAssignmentRepository.findByUserIdAndActiveTrue(faculty.getId()).isEmpty()) {
+            parkingSpotRepository.findByUniversityIdAndBayNumber(universityId, bayNumber).ifPresent(spot -> {
+                if (spotAssignmentRepository.findBySpotIdAndActiveTrue(spot.getId()).isEmpty()) {
+                    spotAssignmentRepository.save(new SpotAssignment(
+                            universityId,
+                            spot.getId(),
+                            faculty.getId(),
+                            "FACULTY_DEDICATED",
+                            LocalDate.of(2026, 9, 1),
+                            LocalDate.of(2027, 6, 30)
+                    ));
+                }
+            });
+        }
     }
 
     private College seedCollege(UUID universityId, String code, String nameAr, String nameEn) {

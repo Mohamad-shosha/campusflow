@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { type FC, type SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, AlertCircle } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
@@ -30,22 +30,31 @@ export const TransferModal: FC<TransferModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
 
     if (!recipient.trim()) {
-      setErrorMessage(isAr ? 'الرجاء إدخال الرقم الجامعي للمستلم.' : 'Please enter recipient university number.');
+      setErrorMessage(
+        isAr ? 'الرجاء إدخال الرقم الجامعي للمستلم.' : 'Please enter recipient university number.'
+      );
       return;
     }
 
-    if (currentUniversityNumber && recipient.trim().toUpperCase() === currentUniversityNumber.toUpperCase()) {
-      setErrorMessage(isAr ? 'لا يمكن تحويل رصيد إلى نفس الحساب.' : 'Cannot transfer funds to yourself.');
+    if (
+      currentUniversityNumber &&
+      recipient.trim().toUpperCase() === currentUniversityNumber.toUpperCase()
+    ) {
+      setErrorMessage(
+        isAr ? 'لا يمكن تحويل رصيد إلى نفس الحساب.' : 'Cannot transfer funds to yourself.'
+      );
       return;
     }
 
     if (!numAmount || numAmount <= 0) {
-      setErrorMessage(isAr ? 'الرجاء إدخال مبلغ صحيح أكبر من صفر.' : 'Please enter a valid amount greater than 0.');
+      setErrorMessage(
+        isAr ? 'الرجاء إدخال مبلغ صحيح أكبر من صفر.' : 'Please enter a valid amount greater than 0.'
+      );
       return;
     }
 
@@ -61,9 +70,10 @@ export const TransferModal: FC<TransferModalProps> = ({
     setIsLoading(true);
     setErrorMessage(null);
 
-    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID
-      ? `xfer-${crypto.randomUUID()}`
-      : `xfer-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+    const idempotencyKey =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? `xfer-${crypto.randomUUID()}`
+        : `xfer-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
     try {
       const updated = await walletApi.transfer({
@@ -77,7 +87,12 @@ export const TransferModal: FC<TransferModalProps> = ({
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string; message?: string } } };
       const detail = axiosErr.response?.data?.detail || axiosErr.response?.data?.message;
-      setErrorMessage(detail || (isAr ? 'فشلت عملية التحويل. تأكد من الرقم الجامعي وصلاحية الرصيد.' : 'Transfer failed. Please check recipient ID and available balance.'));
+      setErrorMessage(
+        detail ||
+          (isAr
+            ? 'فشلت عملية التحويل. تأكد من الرقم الجامعي وصلاحية الرصيد.'
+            : 'Transfer failed. Please check recipient ID and available balance.')
+      );
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +106,11 @@ export const TransferModal: FC<TransferModalProps> = ({
       testId="transfer-modal"
       maxWidth="480px"
     >
-      <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+      >
         {errorMessage && (
           <div
             style={{
@@ -113,13 +132,24 @@ export const TransferModal: FC<TransferModalProps> = ({
 
         {/* Recipient */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-            {isAr ? 'الرقم الجامعي للمستلم (طالب / موظف / عضو هيئة تدريس)' : 'Recipient University Number (Student/Staff/Faculty)'}
+          <label
+            style={{
+              display: 'block',
+              fontSize: '0.85rem',
+              color: 'var(--text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            {isAr
+              ? 'الرقم الجامعي للمستلم (طالب / موظف / عضو هيئة تدريس)'
+              : 'Recipient University Number (Student/Staff/Faculty)'}
           </label>
           <div style={{ position: 'relative' }}>
             <input
               type="text"
-              placeholder={isAr ? 'مثال: STD-202410102 أو 202410102' : 'e.g. STD-202410102 or 202410102'}
+              placeholder={
+                isAr ? 'مثال: STD-202410102 أو 202410102' : 'e.g. STD-202410102 or 202410102'
+              }
               value={recipient}
               onChange={e => {
                 setRecipient(e.target.value);
@@ -147,7 +177,9 @@ export const TransferModal: FC<TransferModalProps> = ({
               {isAr ? 'المبلغ المراد تحويله (ر.س)' : 'Transfer Amount (SAR)'}
             </label>
             <span style={{ fontSize: '0.78rem', color: 'var(--fbsu-gold)' }}>
-              {isAr ? `المتاح: ${availableBalance.toFixed(2)} ر.س` : `Available: ${availableBalance.toFixed(2)} SAR`}
+              {isAr
+                ? `المتاح: ${availableBalance.toFixed(2)} ر.س`
+                : `Available: ${availableBalance.toFixed(2)} SAR`}
             </span>
           </div>
           <input
@@ -177,12 +209,23 @@ export const TransferModal: FC<TransferModalProps> = ({
 
         {/* Note */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '0.85rem',
+              color: 'var(--text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
             {isAr ? 'ملاحظة أو بيان التحويل (اختياري)' : 'Transfer Note / Reference (Optional)'}
           </label>
           <input
             type="text"
-            placeholder={isAr ? 'مثال: سداد وجبة، استرداد رسوم، مشاركة...' : 'e.g. Lunch split, notes sharing...'}
+            placeholder={
+              isAr
+                ? 'مثال: سداد وجبة، استرداد رسوم، مشاركة...'
+                : 'e.g. Lunch split, notes sharing...'
+            }
             value={note}
             onChange={e => setNote(e.target.value)}
             style={{
@@ -210,13 +253,10 @@ export const TransferModal: FC<TransferModalProps> = ({
             icon={<Send size={16} />}
             testId="btn-confirm-transfer"
           >
-            {isAr
-              ? `تأكيد تحويل ${amount || 0} ر.س`
-              : `Confirm Transfer: ${amount || 0} SAR`}
+            {isAr ? `تأكيد تحويل ${amount || 0} ر.س` : `Confirm Transfer: ${amount || 0} SAR`}
           </Button>
         </div>
       </form>
     </Modal>
   );
 };
-

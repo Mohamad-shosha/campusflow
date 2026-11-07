@@ -71,11 +71,7 @@ describe('BookingWizardView Component', () => {
   it('executes booking API and opens DigitalPassModal on confirm', async () => {
     const handleSuccess = vi.fn();
     render(
-      <BookingWizardView
-        isAr={true}
-        currentUser={dummyUser}
-        onBookingSuccess={handleSuccess}
-      />
+      <BookingWizardView isAr={true} currentUser={dummyUser} onBookingSuccess={handleSuccess} />
     );
 
     // Wait for spots to load
@@ -94,4 +90,3 @@ describe('BookingWizardView Component', () => {
     });
   });
 });
-

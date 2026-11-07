@@ -1,8 +1,21 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const Footer: FC = () => {
+export interface FooterProps {
+  onTabChange?: ((tab: string) => void) | undefined;
+}
+
+export const Footer: FC<FooterProps> = ({ onTabChange }) => {
   const { t } = useTranslation();
+
+  const handleNavClick = (tab: string) => {
+    if (onTabChange) {
+      onTabChange(tab);
+      if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
 
   return (
     <footer className="main-footer" data-testid="main-footer">
@@ -113,22 +126,58 @@ export const Footer: FC = () => {
               }}
             >
               <li>
-                <a href="#booking" style={{ color: '#e2e8f0' }}>
+                <a
+                  href="#booking"
+                  onClick={e => {
+                    if (onTabChange) {
+                      e.preventDefault();
+                      handleNavClick('booking');
+                    }
+                  }}
+                  style={{ color: '#e2e8f0' }}
+                >
                   {t('footer.bookPass')}
                 </a>
               </li>
               <li>
-                <a href="#simulator" style={{ color: '#e2e8f0' }}>
+                <a
+                  href="#simulator"
+                  onClick={e => {
+                    if (onTabChange) {
+                      e.preventDefault();
+                      handleNavClick('simulator');
+                    }
+                  }}
+                  style={{ color: '#e2e8f0' }}
+                >
                   {t('footer.flexSim')}
                 </a>
               </li>
               <li>
-                <a href="#wallet" style={{ color: '#e2e8f0' }}>
+                <a
+                  href="#wallet"
+                  onClick={e => {
+                    if (onTabChange) {
+                      e.preventDefault();
+                      handleNavClick('wallet');
+                    }
+                  }}
+                  style={{ color: '#e2e8f0' }}
+                >
                   {t('footer.walletAndFees')}
                 </a>
               </li>
               <li>
-                <a href="#gate" style={{ color: '#e2e8f0' }}>
+                <a
+                  href="#gate"
+                  onClick={e => {
+                    if (onTabChange) {
+                      e.preventDefault();
+                      handleNavClick('gate');
+                    }
+                  }}
+                  style={{ color: '#e2e8f0' }}
+                >
                   {t('footer.alprGates')}
                 </a>
               </li>

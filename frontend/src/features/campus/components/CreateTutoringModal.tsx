@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, type FC, type SyntheticEvent } from 'react';
 import { X, BookOpen, Plus } from 'lucide-react';
 import type { TutoringSession } from '../data/campusData';
 import { soundFX } from '../../../shared/utils/sound';
@@ -23,9 +23,15 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
   onSubmit,
 }) => {
   const [courseCode, setCourseCode] = useState<string>('CS 210');
-  const [courseName, setCourseName] = useState<string>('هياكل البيانات والخوارزميات (Data Structures)');
-  const [coveredLectures, setCoveredLectures] = useState<string>('المحاضرات 3 إلى 6 (Trees & Graphs)');
-  const [coveredScope, setCoveredScope] = useState<string>('حل أسئلة الواجبات وتطبيقات عملية على شجرة البحث الثنائية.');
+  const [courseName, setCourseName] = useState<string>(
+    'هياكل البيانات والخوارزميات (Data Structures)'
+  );
+  const [coveredLectures, setCoveredLectures] = useState<string>(
+    'المحاضرات 3 إلى 6 (Trees & Graphs)'
+  );
+  const [coveredScope, setCoveredScope] = useState<string>(
+    'حل أسئلة الواجبات وتطبيقات عملية على شجرة البحث الثنائية.'
+  );
   const [hourlyRate] = useState<number>(70); // Fixed 70 SAR as required!
   const [dateTime, setDateTime] = useState<string>('الأربعاء القادم - 03:00 م');
   const [location, setLocation] = useState<string>('معمل الحاسب 102 (Computer Lab 102)');
@@ -33,7 +39,7 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     soundFX.playSuccess();
     const newSession: TutoringSession = {
@@ -76,7 +82,9 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
           <X size={16} />
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}
+        >
           <div
             style={{
               width: '44px',
@@ -91,11 +99,15 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
             <BookOpen size={24} color="var(--fbsu-primary)" />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            <h3
+              style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}
+            >
               {isAr ? 'طرح جلسة شرح أكاديمي جديدة' : 'Post New Peer Tutoring Session'}
             </h3>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {isAr ? 'الرصيد المكتسب يُضاف تلقائياً لمحفظتك الجامعية' : 'Earnings credited to tuition balance'}
+              {isAr
+                ? 'الرصيد المكتسب يُضاف تلقائياً لمحفظتك الجامعية'
+                : 'Earnings credited to tuition balance'}
             </span>
           </div>
         </div>
@@ -203,7 +215,12 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
 
           <button
             className="btn-primary"
-            style={{ width: '100%', justifyContent: 'center', marginTop: '1rem', padding: '0.95rem' }}
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              marginTop: '1rem',
+              padding: '0.95rem',
+            }}
             type="submit"
           >
             <Plus size={16} color="#ffffff" />
@@ -214,4 +231,3 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
     </div>
   );
 };
-

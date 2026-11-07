@@ -84,7 +84,6 @@ public class JwtService {
         return extractAllClaims(token).get("universityNumber", String.class);
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
         List<?> rawRoles = extractAllClaims(token).get("roles", List.class);
         if (rawRoles == null) return Collections.emptyList();

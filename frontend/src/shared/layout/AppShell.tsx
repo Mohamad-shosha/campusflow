@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 import { TopRibbon } from './TopRibbon';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -9,11 +9,13 @@ export interface AppShellProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
-  isAuthenticated?: boolean;
+  isAuthenticated?: boolean | undefined;
   onLogout?: (() => void) | undefined;
-  notificationCount?: number;
+  notificationCount?: number | undefined;
+  flexCount?: number | undefined;
   onOpenNotifications?: (() => void) | undefined;
   onOpenAuth?: (() => void) | undefined;
+  onOpenProfile?: (() => void) | undefined;
   onOpenWallet?: (() => void) | undefined;
   children: ReactNode;
 }
@@ -25,8 +27,10 @@ export const AppShell: FC<AppShellProps> = ({
   isAuthenticated = false,
   onLogout,
   notificationCount = 3,
+  flexCount = 2,
   onOpenNotifications,
   onOpenAuth,
+  onOpenProfile,
   onOpenWallet,
   children,
 }) => {
@@ -38,7 +42,7 @@ export const AppShell: FC<AppShellProps> = ({
       dir={isAr ? 'rtl' : 'ltr'}
       data-testid="app-shell"
     >
-      <TopRibbon flexCount={3} />
+      <TopRibbon flexCount={flexCount} />
       <Header
         activeTab={activeTab}
         onTabChange={onTabChange}
@@ -48,10 +52,11 @@ export const AppShell: FC<AppShellProps> = ({
         notificationCount={notificationCount}
         onOpenNotifications={onOpenNotifications}
         onOpenAuth={onOpenAuth}
+        onOpenProfile={onOpenProfile}
         onOpenWallet={onOpenWallet}
       />
       <main className="main-content">{children}</main>
-      <Footer />
+      <Footer onTabChange={onTabChange} />
     </div>
   );
 };

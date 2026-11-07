@@ -399,7 +399,7 @@
 - **Priority:** High · **Complexity:** L · **Status:** Backlog
 - **Dependencies:** P2-03
 - **Git Branch:** `feature/P6-01-tutoring-api` · **Pull Request:** —
-- **الملفات المتوقعة:** `db/migration/V8__tutoring.sql`، `tutoring/**`
+- **الملفات المتوقعة:** `db/migration/V10__tutoring.sql`، `tutoring/**`
 - **Implementation Steps:** 1) Migration 2) Domain 3) API 4) اختبارات
 - **Acceptance Criteria:** الطالب المؤهل فقط ينشر · الفلترة بالتصنيف
 - **Testing Requirements:** Unit · Repository · API · Security
@@ -432,7 +432,7 @@
 - **Priority:** High · **Complexity:** L · **Status:** Backlog
 - **Dependencies:** P2-03، Q9
 - **Git Branch:** `feature/P6-04-office-hours-api` · **Pull Request:** —
-- **الملفات المتوقعة:** `db/migration/V9__office_hours.sql`، `officehours/**`
+- **الملفات المتوقعة:** `db/migration/V11__office_hours.sql`، `officehours/**`
 - **Implementation Steps:** 1) Migration + exclusion 2) Domain 3) API 4) اختبارات
 - **Acceptance Criteria:** لا تعارض في الموعد · الدكتور يدير مواعيده فقط
 - **Testing Requirements:** Service · Concurrency · API · Security
@@ -454,7 +454,7 @@
 - **Priority:** High · **Complexity:** L · **Status:** Backlog
 - **Dependencies:** P2-03، Q10
 - **Git Branch:** `feature/P6-06-rooms-api` · **Pull Request:** —
-- **الملفات المتوقعة:** `db/migration/V10__rooms.sql`، `rooms/**`
+- **الملفات المتوقعة:** `db/migration/V12__rooms.sql`، `rooms/**`
 - **Implementation Steps:** 1) Migration + exclusion 2) Domain 3) Extend/Release 4) API 5) اختبارات
 - **Acceptance Criteria:** لا تعارض · التمديد/الإخلاء حسب قواعد Q10
 - **Testing Requirements:** Service · Concurrency · API · Security
@@ -479,7 +479,7 @@
 - **Priority:** High · **Complexity:** M · **Status:** Backlog
 - **Dependencies:** P2-03
 - **Git Branch:** `feature/P7-01-notifications-api` · **Pull Request:** —
-- **الملفات المتوقعة:** `db/migration/V11__notifications.sql`، `notification/**`
+- **الملفات المتوقعة:** `db/migration/V13__notifications.sql`، `notification/**`
 - **Implementation Steps:** 1) Migration 2) Service 3) API 4) اختبارات
 - **Acceptance Criteria:** المستخدم يرى إشعاراته فقط
 - **Testing Requirements:** Service · API · Security

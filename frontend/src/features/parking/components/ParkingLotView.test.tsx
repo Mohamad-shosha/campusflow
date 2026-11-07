@@ -12,16 +12,12 @@ describe('ParkingLotView Component', () => {
   };
 
   it('renders interactive map header and all 30 parking bays', () => {
-    render(
-      <ParkingLotView
-        spots={INITIAL_PARKING_SPOTS}
-        isAr={true}
-        currentUser={dummyUser}
-      />
-    );
+    render(<ParkingLotView spots={INITIAL_PARKING_SPOTS} isAr={true} currentUser={dummyUser} />);
 
     expect(screen.getByTestId('parking-lot-view')).toBeInTheDocument();
-    expect(screen.getByText(/المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان/i)
+    ).toBeInTheDocument();
 
     // Check bay cards rendered
     const cards = screen.getAllByTestId('spot-card');
@@ -29,13 +25,7 @@ describe('ParkingLotView Component', () => {
   });
 
   it('filters spots by zone tab when clicked', () => {
-    render(
-      <ParkingLotView
-        spots={INITIAL_PARKING_SPOTS}
-        isAr={true}
-        currentUser={dummyUser}
-      />
-    );
+    render(<ParkingLotView spots={INITIAL_PARKING_SPOTS} isAr={true} currentUser={dummyUser} />);
 
     // Filter Zone A (10 spots)
     const zoneABtn = screen.getByRole('button', { name: /قطاع A/i });
@@ -46,13 +36,7 @@ describe('ParkingLotView Component', () => {
   });
 
   it('opens SpotDetailsModal when a spot card is clicked', () => {
-    render(
-      <ParkingLotView
-        spots={INITIAL_PARKING_SPOTS}
-        isAr={true}
-        currentUser={dummyUser}
-      />
-    );
+    render(<ParkingLotView spots={INITIAL_PARKING_SPOTS} isAr={true} currentUser={dummyUser} />);
 
     const firstSpotCard = screen.getAllByTestId('spot-card')[0];
     fireEvent.click(firstSpotCard);
@@ -78,4 +62,3 @@ describe('ParkingLotView Component', () => {
     expect(handleRefresh).toHaveBeenCalledTimes(1);
   });
 });
-

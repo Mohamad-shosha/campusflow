@@ -113,11 +113,7 @@ describe('ShareSpotView Component', () => {
     });
 
     render(
-      <ShareSpotView
-        isAr={true}
-        currentUser={mockUser}
-        onShareConfirmed={handleShareConfirmed}
-      />
+      <ShareSpotView isAr={true} currentUser={mockUser} onShareConfirmed={handleShareConfirmed} />
     );
 
     // Wait for spots to load

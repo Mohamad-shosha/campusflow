@@ -55,7 +55,9 @@ export const parkingApi = {
   },
 
   getDigitalPass: async (bookingId: string): Promise<DigitalPassResponse> => {
-    const response = await apiClient.get<DigitalPassResponse>(`/parking/bookings/${bookingId}/pass`);
+    const response = await apiClient.get<DigitalPassResponse>(
+      `/parking/bookings/${bookingId}/pass`
+    );
     return response.data;
   },
 
@@ -75,7 +77,9 @@ export const parkingApi = {
   },
 
   claimFlexOffer: async (offerId: string): Promise<FlexOfferResponse> => {
-    const response = await apiClient.post<FlexOfferResponse>(`/parking/flex/offers/${offerId}/claim`);
+    const response = await apiClient.post<FlexOfferResponse>(
+      `/parking/flex/offers/${offerId}/claim`
+    );
     return response.data;
   },
 
@@ -89,4 +93,3 @@ export const parkingApi = {
     return response.data;
   },
 };
-

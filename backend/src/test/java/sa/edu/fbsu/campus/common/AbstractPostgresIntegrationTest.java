@@ -19,26 +19,25 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public abstract class AbstractPostgresIntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractPostgresIntegrationTest.class);
-    protected static final PostgreSQLContainer<?> postgres;
+    protected static final PostgreSQLContainer<?> postgres = initPostgresContainer();
 
-    static {
-        PostgreSQLContainer<?> container = null;
+    @SuppressWarnings("resource")
+    private static PostgreSQLContainer<?> initPostgresContainer() {
         try {
             if (DockerClientFactory.instance().isDockerAvailable()) {
-                container = new PostgreSQLContainer<>("postgres:16-alpine")
+                PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16-alpine")
                         .withDatabaseName("fbsu_campus_test")
                         .withUsername("fbsu_test")
                         .withPassword("test_secret");
                 container.start();
                 log.info("Testcontainers PostgreSQL started on {}", container.getJdbcUrl());
-            } else {
-                log.info("Docker daemon not reachable locally; falling back to PostgreSQL-compatible H2 mode");
+                return container;
             }
+            log.info("Docker daemon not reachable locally; falling back to PostgreSQL-compatible H2 mode");
         } catch (Throwable ex) {
             log.warn("Docker environment check failed ({}); using embedded H2 fallback", ex.getMessage());
-            container = null;
         }
-        postgres = container;
+        return null;
     }
 
     @DynamicPropertySource
@@ -47,6 +46,7 @@ public abstract class AbstractPostgresIntegrationTest {
             registry.add("spring.datasource.url", postgres::getJdbcUrl);
             registry.add("spring.datasource.username", postgres::getUsername);
             registry.add("spring.datasource.password", postgres::getPassword);
+            registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
             registry.add("spring.flyway.enabled", () -> "true");
             registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
         }

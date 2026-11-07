@@ -69,7 +69,14 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                 <div className="faculty-meta-col">
                   <span className="faculty-rank-badge">{f.badge}</span>
                   <h4 className="faculty-name">{f.name}</h4>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, marginBottom: '0.25rem' }}>
+                  <div
+                    style={{
+                      fontSize: '0.8rem',
+                      color: 'var(--text-muted)',
+                      fontWeight: 700,
+                      marginBottom: '0.25rem',
+                    }}
+                  >
                     {f.rank}
                   </div>
                   <div className="faculty-office-location">
@@ -80,7 +87,14 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
               </div>
 
               {/* Supervised courses */}
-              <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-dim)', marginBottom: '0.4rem' }}>
+              <div
+                style={{
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  color: 'var(--text-dim)',
+                  marginBottom: '0.4rem',
+                }}
+              >
                 {isAr ? 'المقررات والمجالات المتاحة للنقاش:' : 'Supervised Topics & Courses:'}
               </div>
               <div className="faculty-subjects-tag-list">
@@ -112,7 +126,9 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                       type="button"
                     >
                       <div>{slot.time}</div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+                      <div
+                        style={{ fontSize: '0.65rem', color: 'var(--text-dim)', fontWeight: 600 }}
+                      >
                         {slot.duration}
                       </div>
                     </button>
@@ -125,7 +141,12 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
             <button
               className="btn-primary open-faculty-booking-btn"
               onClick={() => handleOpenModal(f)}
-              style={{ width: '100%', justifyContent: 'center', padding: '0.85rem', fontSize: '0.9rem' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.85rem',
+                fontSize: '0.9rem',
+              }}
               type="button"
             >
               <Calendar size={16} color="#ffffff" />
@@ -150,4 +171,3 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
     </div>
   );
 };
-

@@ -19,11 +19,7 @@ export interface CategorySubnavProps {
   onTabChange: (tab: string) => void;
 }
 
-export const CategorySubnav: FC<CategorySubnavProps> = ({
-  activeTab,
-  isAr,
-  onTabChange,
-}) => {
+export const CategorySubnav: FC<CategorySubnavProps> = ({ activeTab, isAr, onTabChange }) => {
   const isParkingCategory = ['map', 'booking', 'simulator', 'gate', 'share'].includes(activeTab);
   const isCampusCategory = ['tutoring', 'office-hours', 'rooms'].includes(activeTab);
 
@@ -149,4 +145,3 @@ export const CategorySubnav: FC<CategorySubnavProps> = ({
     </div>
   );
 };
-

@@ -310,7 +310,7 @@ export const tasks = [
   T('P6-01', 'Tutoring schema + API (post/list/filter)', {
     pri: 'High', cx: 'L', deps: ['P2-03'], branch: 'feature/P6-01-tutoring-api',
     goal: 'إنشاء وعرض وفلترة جلسات الشرح بين الطلاب.',
-    files: ['db/migration/V8__tutoring.sql', 'tutoring/**'],
+    files: ['db/migration/V10__tutoring.sql', 'tutoring/**'],
     steps: ['Migration', 'Domain', 'API', 'اختبارات'],
     accept: ['الطالب المؤهل فقط ينشر', 'الفلترة بالتصنيف'],
     tests: ['Unit', 'Repository', 'API', 'Security'], blockedBy: ['Q5'],
@@ -334,7 +334,7 @@ export const tasks = [
   T('P6-04', 'Office-hours schema + API (windows, appointments)', {
     pri: 'High', cx: 'L', deps: ['P2-03', 'Q9'], branch: 'feature/P6-04-office-hours-api',
     goal: 'إدارة أوقات الساعات المكتبية للدكاترة وحجز المواعيد بدون تعارض.',
-    files: ['db/migration/V9__office_hours.sql', 'officehours/**'],
+    files: ['db/migration/V11__office_hours.sql', 'officehours/**'],
     steps: ['Migration + exclusion', 'Domain', 'API', 'اختبارات'],
     accept: ['لا تعارض في الموعد', 'الدكتور يدير مواعيده فقط'],
     tests: ['Service', 'Concurrency', 'API', 'Security'], blockedBy: ['Q9'],
@@ -350,7 +350,7 @@ export const tasks = [
   T('P6-06', 'Rooms schema + booking API (extend/release)', {
     pri: 'High', cx: 'L', deps: ['P2-03', 'Q10'], branch: 'feature/P6-06-rooms-api',
     goal: 'قاعات ومعامل وحجزها مع التمديد والإخلاء ومنع التعارض.',
-    files: ['db/migration/V10__rooms.sql', 'rooms/**'],
+    files: ['db/migration/V12__rooms.sql', 'rooms/**'],
     steps: ['Migration + exclusion', 'Domain', 'Extend/Release', 'API', 'اختبارات'],
     accept: ['لا تعارض', 'التمديد/الإخلاء حسب قواعد Q10'],
     tests: ['Service', 'Concurrency', 'API', 'Security'], blockedBy: ['Q10'],
@@ -368,7 +368,7 @@ export const tasks = [
   T('P7-01', 'Notification module + API', {
     pri: 'High', cx: 'M', deps: ['P2-03'], branch: 'feature/P7-01-notifications-api',
     goal: 'خدمة الإشعارات داخل التطبيق: إنشاء وقراءة وتعليم كمقروء.',
-    files: ['db/migration/V11__notifications.sql', 'notification/**'],
+    files: ['db/migration/V13__notifications.sql', 'notification/**'],
     steps: ['Migration', 'Service', 'API', 'اختبارات'],
     accept: ['المستخدم يرى إشعاراته فقط'],
     tests: ['Service', 'API', 'Security'], blockedBy: [],

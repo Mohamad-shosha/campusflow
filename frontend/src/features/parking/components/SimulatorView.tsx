@@ -156,9 +156,7 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
                 >
                   <Camera size={14} color="var(--fbsu-primary)" />
                   <span>
-                    {isAr
-                      ? 'المستشعر الأرضي وكاميرا الرؤية الحاسوبية'
-                      : 'IoT Bay Sensor & Vision'}
+                    {isAr ? 'المستشعر الأرضي وكاميرا الرؤية الحاسوبية' : 'IoT Bay Sensor & Vision'}
                   </span>
                 </div>
 
@@ -209,9 +207,7 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
                         color: 'var(--fbsu-gold)',
                       }}
                     >
-                      {isAr
-                        ? 'الموقف شاغر ومتاح للتبادل الذكي'
-                        : 'Vacant & Open for AI Flex Share'}
+                      {isAr ? 'الموقف شاغر ومتاح للتبادل الذكي' : 'Vacant & Open for AI Flex Share'}
                     </div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                       {isAr
@@ -234,7 +230,13 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
             >
               <div className="stat-chip" style={{ padding: '0.75rem' }}>
                 <div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--status-available)' }}>
+                  <div
+                    style={{
+                      fontSize: '1.2rem',
+                      fontWeight: 800,
+                      color: 'var(--status-available)',
+                    }}
+                  >
                     +100%
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -245,7 +247,13 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
               <div className="stat-chip" style={{ padding: '0.75rem' }}>
                 <div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}>
-                    {simStep === 4 ? (isAr ? '17.25 ر.س' : '17.25 SAR') : (isAr ? '0.00 ر.س' : '0.00 SAR')}
+                    {simStep === 4
+                      ? isAr
+                        ? '17.25 ر.س'
+                        : '17.25 SAR'
+                      : isAr
+                        ? '0.00 ر.س'
+                        : '0.00 SAR'}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     {isAr ? 'أرباح إياد (محفظة)' : 'Eyad Cashback'}
@@ -254,7 +262,9 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
               </div>
               <div className="stat-chip" style={{ padding: '0.75rem' }}>
                 <div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--fbsu-primary)' }}>
+                  <div
+                    style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--fbsu-primary)' }}
+                  >
                     {isAr ? '0 دقيقة' : '0 Mins'}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -266,7 +276,9 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
           </div>
 
           {/* Narrative & Participants Status Panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+          >
             <div className="sim-narrative-box">
               <div className="sim-narrative-title">
                 <Clock size={18} color="var(--fbsu-gold)" />
@@ -274,14 +286,14 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
                   {stage.time} - {isAr ? stage.title : stage.titleEn}
                 </span>
               </div>
-              <p className="sim-narrative-text">
-                {isAr ? stage.desc : stage.descEn}
-              </p>
+              <p className="sim-narrative-text">{isAr ? stage.desc : stage.descEn}</p>
             </div>
 
             {/* Participants Status Cards */}
             <div className="sim-participants-row">
-              <div className={`participant-card ${stage.step === 0 || stage.step === 4 ? 'active' : ''}`}>
+              <div
+                className={`participant-card ${stage.step === 0 || stage.step === 4 ? 'active' : ''}`}
+              >
                 <div className="participant-avatar-icon">
                   <GraduationCap size={20} color="#ffffff" />
                 </div>
@@ -297,7 +309,9 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
                 </div>
               </div>
 
-              <div className={`participant-card ${stage.step === 2 || stage.step === 3 ? 'active' : ''}`}>
+              <div
+                className={`participant-card ${stage.step === 2 || stage.step === 3 ? 'active' : ''}`}
+              >
                 <div className="participant-avatar-icon" style={{ background: '#0b6d87' }}>
                   <User size={20} color="#ffffff" />
                 </div>
@@ -334,7 +348,11 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
               </div>
 
               <button className="btn-primary" onClick={toggleAutoPlay} type="button">
-                {isAutoPlaying ? <Pause size={16} color="#ffffff" /> : <Play size={16} color="#ffffff" />}
+                {isAutoPlaying ? (
+                  <Pause size={16} color="#ffffff" />
+                ) : (
+                  <Play size={16} color="#ffffff" />
+                )}
                 <span>
                   {isAutoPlaying
                     ? isAr
@@ -352,4 +370,3 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
     </div>
   );
 };
-

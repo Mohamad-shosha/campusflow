@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, type FC, type SyntheticEvent } from 'react';
 import { X, Calendar, UserCheck } from 'lucide-react';
 import type { FacultyMember } from '../data/campusData';
 import { soundFX } from '../../../shared/utils/sound';
@@ -29,9 +29,9 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
 
   if (!isOpen || !faculty) return null;
 
-  const activeSlot = selectedSlot || (faculty.timeSlots.find(s => s.available)?.time || '');
+  const activeSlot = selectedSlot || faculty.timeSlots.find(s => s.available)?.time || '';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     soundFX.playSuccess();
     setIsSuccess(true);
@@ -56,7 +56,9 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
           <X size={16} />
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}
+        >
           <div
             style={{
               width: '44px',
@@ -71,7 +73,9 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
             <UserCheck size={24} color="var(--fbsu-primary)" />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            <h3
+              style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}
+            >
               {isAr ? 'حجز موعد ساعة مكتبية' : 'Book Faculty Office Hour Slot'}
             </h3>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -91,12 +95,16 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
               fontSize: '0.88rem',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <div
+              style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}
+            >
               <span style={{ color: 'var(--text-muted)' }}>{isAr ? 'المكتب:' : 'Office:'}</span>
               <strong style={{ color: 'var(--text-main)' }}>{faculty.office}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-muted)' }}>{isAr ? 'الطالب المستفيد:' : 'Student:'}</span>
+              <span style={{ color: 'var(--text-muted)' }}>
+                {isAr ? 'الطالب المستفيد:' : 'Student:'}
+              </span>
               <strong style={{ color: 'var(--fbsu-primary)' }}>
                 {currentUser.name} ({currentUser.id})
               </strong>
@@ -104,7 +112,9 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label className="form-label">{isAr ? 'اختر الفترة الزمنية المتاحة:' : 'Select Available Slot:'}</label>
+            <label className="form-label">
+              {isAr ? 'اختر الفترة الزمنية المتاحة:' : 'Select Available Slot:'}
+            </label>
             <div className="time-slots-picker-grid">
               {faculty.timeSlots.map(slot => (
                 <button
@@ -136,7 +146,9 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label className="form-label">{isAr ? 'موضوع الاستفسار أو المقابلة:' : 'Discussion Topic:'}</label>
+            <label className="form-label">
+              {isAr ? 'موضوع الاستفسار أو المقابلة:' : 'Discussion Topic:'}
+            </label>
             <textarea
               className="form-control"
               rows={2}
@@ -158,7 +170,10 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
                 fontWeight: 800,
               }}
             >
-              ✓ {isAr ? 'تم تأكيد حجز الموعد وإرسال إشعار فوري للعمادة!' : 'Slot confirmed & notification sent!'}
+              ✓{' '}
+              {isAr
+                ? 'تم تأكيد حجز الموعد وإرسال إشعار فوري للعمادة!'
+                : 'Slot confirmed & notification sent!'}
             </div>
           ) : (
             <button
@@ -175,4 +190,3 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
     </div>
   );
 };
-
