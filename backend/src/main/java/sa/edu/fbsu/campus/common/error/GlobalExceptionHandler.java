@@ -2,6 +2,7 @@ package sa.edu.fbsu.campus.common.error;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -67,9 +68,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        log.warn("Database integrity or exclusion constraint conflict: {}", ex.getMostSpecificCause().getMessage());
+    @ExceptionHandler({DataIntegrityViolationException.class, ConcurrencyFailureException.class})
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(RuntimeException ex) {
+        log.warn("Database integrity or concurrency conflict: {}", ex.getMessage());
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 "Conflict: The requested slot, booking, or resource conflicts with an existing record."

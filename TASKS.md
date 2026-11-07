@@ -407,9 +407,9 @@
 
 ### P6-02 — Tutoring booking + wallet transfer
 - **ماذا سيعمل:** حجز جلسة شرح مع تحويل ذري من الطالب للمعلم حسب قواعد التسعير المعتمدة.
-- **Priority:** Critical · **Complexity:** L · **Status:** Backlog
+- **Priority:** Critical · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P6-01، P4-02، Q5
-- **Git Branch:** `feature/P6-02-tutoring-booking` · **Pull Request:** —
+- **Git Branch:** `feature/P6-02-tutoring-booking` · **Pull Request:** PR (feature/P6-02-tutoring-booking)
 - **الملفات المتوقعة:** `tutoring/application/*`، `tutoring/api/*`
 - **Implementation Steps:** 1) Enrollment 2) Transfer ذري 3) منع الحجز المكرر 4) API 5) اختبارات
 - **Acceptance Criteria:** الرصيد غير الكافي يرفض · لا حجز مكرر · التسعير حسب Q5

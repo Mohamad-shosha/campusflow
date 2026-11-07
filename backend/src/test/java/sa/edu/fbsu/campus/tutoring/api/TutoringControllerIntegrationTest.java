@@ -21,8 +21,11 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,8 +88,8 @@ class TutoringControllerIntegrationTest extends AbstractPostgresIntegrationTest 
 
         mockMvc.perform(get("/api/v1/tutoring/sessions").param("category", "hardware"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].category").value("hardware"))
-                .andExpect(jsonPath("$[0].courseCode").value("CEN 220"));
+                .andExpect(jsonPath("$[*].category", everyItem(is("hardware"))))
+                .andExpect(jsonPath("$[*].courseCode", hasItem("CEN 220")));
 
         mockMvc.perform(get("/api/v1/tutoring/sessions/TUT-104"))
                 .andExpect(status().isOk())

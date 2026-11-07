@@ -9,21 +9,29 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sa.edu.fbsu.campus.common.security.UserPrincipal;
+import sa.edu.fbsu.campus.tutoring.application.TutoringBookingService;
 import sa.edu.fbsu.campus.tutoring.application.TutoringService;
+import sa.edu.fbsu.campus.tutoring.dto.BookTutoringRequest;
 import sa.edu.fbsu.campus.tutoring.dto.CreateTutoringSessionRequest;
+import sa.edu.fbsu.campus.tutoring.dto.TutoringEnrollmentResponse;
 import sa.edu.fbsu.campus.tutoring.dto.TutoringSessionResponse;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tutoring")
-@Tag(name = "Peer Tutoring Marketplace", description = "Endpoints for listing, filtering, and publishing student peer tutoring sessions")
+@Tag(name = "Peer Tutoring Marketplace", description = "Endpoints for listing, filtering, publishing, and booking student peer tutoring sessions")
 public class TutoringController {
 
     private final TutoringService tutoringService;
+    private final TutoringBookingService bookingService;
 
-    public TutoringController(TutoringService tutoringService) {
+    public TutoringController(
+            TutoringService tutoringService,
+            TutoringBookingService bookingService
+    ) {
         this.tutoringService = tutoringService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping("/sessions")
@@ -52,5 +60,25 @@ public class TutoringController {
         TutoringSessionResponse created = tutoringService.createSession(principal.getUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
-}
 
+    @PostMapping("/sessions/{idOrCode}/book")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Enroll in a peer tutoring session with atomic wallet transfer to the student tutor")
+    public ResponseEntity<TutoringEnrollmentResponse> bookSession(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable String idOrCode,
+            @Valid @RequestBody(required = false) BookTutoringRequest request
+    ) {
+        TutoringEnrollmentResponse booked = bookingService.bookSession(principal.getUserId(), idOrCode, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(booked);
+    }
+
+    @GetMapping("/enrollments/my")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "List peer tutoring enrollments for the current authenticated student")
+    public ResponseEntity<List<TutoringEnrollmentResponse>> getMyEnrollments(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return ResponseEntity.ok(bookingService.getMyEnrollments(principal.getUserId()));
+    }
+}

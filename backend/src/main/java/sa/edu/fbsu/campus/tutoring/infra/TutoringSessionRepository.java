@@ -34,6 +34,10 @@ public interface TutoringSessionRepository extends JpaRepository<TutoringSession
     @Query("SELECT s FROM TutoringSession s JOIN FETCH s.tutor WHERE s.id = :id")
     Optional<TutoringSession> findByIdForUpdate(@Param("id") UUID id);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM TutoringSession s JOIN FETCH s.tutor WHERE s.sessionCode = :sessionCode")
+    Optional<TutoringSession> findBySessionCodeForUpdate(@Param("sessionCode") String sessionCode);
+
     boolean existsBySessionCode(String sessionCode);
 }
 

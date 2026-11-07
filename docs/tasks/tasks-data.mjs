@@ -317,6 +317,7 @@ export const tasks = [
     tests: ['Unit', 'Repository', 'API', 'Security'], blockedBy: ['Q5'],
   }),
   T('P6-02', 'Tutoring booking + wallet transfer', {
+    status: 'Done', pr: 'PR (feature/P6-02-tutoring-booking)',
     pri: 'Critical', cx: 'L', deps: ['P6-01', 'P4-02', 'Q5'], branch: 'feature/P6-02-tutoring-booking',
     goal: 'حجز جلسة شرح مع تحويل ذري من الطالب للمعلم حسب قواعد التسعير المعتمدة.',
     files: ['tutoring/application/*', 'tutoring/api/*'],
