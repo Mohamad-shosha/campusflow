@@ -440,9 +440,9 @@
 
 ### P6-05 — Office-hours UI
 - **ماذا سيعمل:** عرض الدكاترة والمواعيد المتاحة وحجز موعد.
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P6-04، P3-05
-- **Git Branch:** `feature/P6-05-office-hours-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P6-05-office-hours-ui` · **Pull Request:** PR (feature/P6-05-office-hours-ui)
 - **الملفات المتوقعة:** `frontend/src/features/office-hours/*`
 - **Implementation Steps:** 1) Cards + slots 2) Booking modal 3) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy

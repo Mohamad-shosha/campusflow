@@ -344,6 +344,7 @@ export const tasks = [
     tests: ['Service', 'Concurrency', 'API', 'Security'], blockedBy: ['Q9'],
   }),
   T('P6-05', 'Office-hours UI', {
+    status: 'Done', pr: 'PR (feature/P6-05-office-hours-ui)',
     pri: 'Medium', cx: 'M', deps: ['P6-04', 'P3-05'], branch: 'feature/P6-05-office-hours-ui',
     goal: 'عرض الدكاترة والمواعيد المتاحة وحجز موعد.',
     files: ['frontend/src/features/office-hours/*'],

@@ -35,6 +35,7 @@ import { ShareSpotView } from '../features/parking/components/ShareSpotView';
 import { TutoringView } from '../features/campus/components/TutoringView';
 import { tutoringApi } from '../features/campus/api/tutoringApi';
 import { OfficeHoursView } from '../features/campus/components/OfficeHoursView';
+import { officeHoursApi } from '../features/campus/api/officeHoursApi';
 import { StudyRoomsView } from '../features/campus/components/StudyRoomsView';
 import { AnalyticsView } from '../features/analytics/components/AnalyticsView';
 import { NotificationsModal } from '../features/notifications/components/NotificationsModal';
@@ -62,7 +63,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
 
   const [tutoringSessions, setTutoringSessions] =
     useState<TutoringSession[]>(INITIAL_TUTORING_SESSIONS);
-  const [facultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
+  const [facultyList, setFacultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
   const [studyRooms] = useState<StudyRoom[]>(INITIAL_STUDY_ROOMS);
   const [notifications, setNotifications] = useState<CampusNotification[]>(CAMPUS_NOTIFICATIONS);
 
@@ -127,16 +128,33 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     }
   }, []);
 
+  const fetchFacultyOfficeHours = useCallback(async () => {
+    try {
+      const liveFaculty = await officeHoursApi.getFaculty();
+      if (liveFaculty && liveFaculty.length > 0) {
+        setFacultyList(liveFaculty);
+      }
+    } catch {
+      // Fallback to initial faculty directory when offline or in isolated unit tests
+    }
+  }, []);
+
   useEffect(() => {
     fetchParkingData();
     fetchTutoringSessions();
+    fetchFacultyOfficeHours();
     const interval = setInterval(fetchParkingData, 30000);
     return () => clearInterval(interval);
-  }, [fetchParkingData, fetchTutoringSessions]);
+  }, [fetchParkingData, fetchTutoringSessions, fetchFacultyOfficeHours]);
 
   const handleRefreshAll = useCallback(async () => {
-    await Promise.all([fetchParkingData(), fetchWalletBalance(), fetchTutoringSessions()]);
-  }, [fetchParkingData, fetchWalletBalance, fetchTutoringSessions]);
+    await Promise.all([
+      fetchParkingData(),
+      fetchWalletBalance(),
+      fetchTutoringSessions(),
+      fetchFacultyOfficeHours(),
+    ]);
+  }, [fetchParkingData, fetchWalletBalance, fetchTutoringSessions, fetchFacultyOfficeHours]);
 
   const handleLogout = async () => {
     await logout();
@@ -240,7 +258,17 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
-  const handleOfficeHoursSuccess = (_facultyId: string, slotTime: string) => {
+  const handleOfficeHoursSuccess = (
+    facultyId: string,
+    slotTime: string,
+    _notes: string,
+    updatedFaculty?: FacultyMember
+  ) => {
+    if (updatedFaculty) {
+      setFacultyList(prev => prev.map(f => (f.id === facultyId ? updatedFaculty : f)));
+    } else {
+      fetchFacultyOfficeHours();
+    }
     setActiveToast({
       title: isAr ? 'تم حجز الموعد' : 'Appointment Confirmed',
       message: isAr
@@ -271,7 +299,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     parkingSpots.find(
       s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
     )?.id ?? 1;
-  const isPreviewTab = ['office-hours', 'rooms', 'analytics'].includes(activeTab);
+  const isPreviewTab = ['rooms', 'analytics'].includes(activeTab);
 
   return (
     <AppShell
@@ -483,10 +511,12 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <OfficeHoursView
             facultyList={facultyList}
             isAr={isAr}
+            isAuthenticated={isAuthenticated}
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
             }}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
             onBookSuccess={handleOfficeHoursSuccess}
           />
         )}

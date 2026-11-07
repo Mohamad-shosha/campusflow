@@ -28,25 +28,35 @@ export interface TutoringSession {
 }
 
 export interface TimeSlot {
+  id?: string | undefined;
   time: string;
+  timeEn?: string | undefined;
   duration: string;
+  durationEn?: string | undefined;
   available: boolean;
-  bookedNote?: string;
+  bookedNote?: string | undefined;
 }
 
 export interface FacultyMember {
   id: string;
+  backendId?: string | undefined;
+  facultyUserId?: string | undefined;
+  universityNumber?: string | undefined;
   name: string;
   nameEn: string;
   rank: string;
   rankEn: string;
   college: string;
+  collegeEn?: string | undefined;
   office: string;
   email: string;
   badge: string;
+  badgeEn?: string | undefined;
   avatarColor: string;
   daysText: string;
+  daysTextEn?: string | undefined;
   nextAvailable: string;
+  nextAvailableEn?: string | undefined;
   coursesSupervised: string[];
   timeSlots: TimeSlot[];
 }
