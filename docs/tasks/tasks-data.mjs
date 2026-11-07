@@ -373,6 +373,7 @@ export const tasks = [
 
   // ---------------- P7 ----------------
   T('P7-01', 'Notification module + API', {
+    status: 'Done', pr: 'PR (feature/P7-01-notifications-api)',
     pri: 'High', cx: 'M', deps: ['P2-03'], branch: 'feature/P7-01-notifications-api',
     goal: 'خدمة الإشعارات داخل التطبيق: إنشاء وقراءة وتعليم كمقروء.',
     files: ['db/migration/V13__notifications.sql', 'notification/**'],
