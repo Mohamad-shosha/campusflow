@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 @Embeddable
 public class SaudiPlate implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Pattern DIGITS_PATTERN = Pattern.compile("^\\d{1,4}$");
 
     private static final Map<Character, Character> AR_TO_EN_MAP;

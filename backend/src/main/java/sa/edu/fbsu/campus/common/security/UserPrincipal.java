@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 public class UserPrincipal implements UserDetails {
 
+    private static final long serialVersionUID = 1L;
+
     private final UUID userId;
     private final UUID universityId;
     private final String universityNumber;

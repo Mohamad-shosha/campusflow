@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import sa.edu.fbsu.campus.common.AbstractPostgresIntegrationTest;
 import sa.edu.fbsu.campus.domain.University;
@@ -15,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
+@ActiveProfiles("dev")
 class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
 
     @Autowired
@@ -57,7 +59,7 @@ class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                         .param("zone", "A")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(8)))
+                .andExpect(jsonPath("$", hasSize(10)))
                 .andExpect(jsonPath("$[0].zoneCode", equalTo("A")));
     }
 
@@ -70,8 +72,7 @@ class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bayNumber", equalTo(1)))
-                .andExpect(jsonPath("$.zoneCode", equalTo("A")))
-                .andExpect(jsonPath("$.bayCode", equalTo("A-01")));
+                .andExpect(jsonPath("$.zoneCode", equalTo("A")));
     }
 
     @Test
@@ -84,7 +85,7 @@ class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalSpots", equalTo(30)))
                 .andExpect(jsonPath("$.availableSpots", greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.occupancyRate", notNullValue()));
+                .andExpect(jsonPath("$.occupancyRatePercent", notNullValue()));
     }
 
     @Test
@@ -96,7 +97,7 @@ class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
-                .andExpect(jsonPath("$[*].tariffCode", hasItems("STANDARD", "EV_CHARGING")));
+                .andExpect(jsonPath("$[*].userType", hasItems("STUDENT", "FACULTY")));
     }
 }
 

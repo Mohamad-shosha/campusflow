@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { type FC, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck, LogIn } from 'lucide-react';
 import { BalanceCard } from './BalanceCard';
@@ -11,9 +11,9 @@ import { walletApi } from '../api/walletApi';
 import type { WalletResponse, LedgerEntryResponse, Page } from '../types/wallet';
 
 export interface WalletPageProps {
-  onBalanceUpdate?: (newBalance: number) => void;
-  onNavigateToTuition?: () => void;
-  onOpenAuth?: () => void;
+  onBalanceUpdate?: ((newBalance: number) => void) | undefined;
+  onNavigateToTuition?: (() => void) | undefined;
+  onOpenAuth?: (() => void) | undefined;
 }
 
 export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth }) => {
@@ -40,7 +40,7 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
   const [toast, setToast] = useState<{
     message: string;
     type: ToastType;
-    title?: string;
+    title?: string | undefined;
   } | null>(null);
 
   const fetchWalletData = useCallback(

@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, type FC, type SyntheticEvent } from 'react';
 import { X, DoorClosed, Calendar } from 'lucide-react';
 import type { StudyRoom } from '../data/campusData';
 import { soundFX } from '../../../shared/utils/sound';
@@ -30,7 +30,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
 
   if (!isOpen || !room) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     soundFX.playSuccess();
     setIsSuccess(true);

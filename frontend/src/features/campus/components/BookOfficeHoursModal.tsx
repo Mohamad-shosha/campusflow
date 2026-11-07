@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, type FC, type SyntheticEvent } from 'react';
 import { X, Calendar, UserCheck } from 'lucide-react';
 import type { FacultyMember } from '../data/campusData';
 import { soundFX } from '../../../shared/utils/sound';
@@ -31,7 +31,7 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
 
   const activeSlot = selectedSlot || faculty.timeSlots.find(s => s.available)?.time || '';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     soundFX.playSuccess();
     setIsSuccess(true);

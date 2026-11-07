@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { type FC } from 'react';
 import { X, Zap, AlertCircle, Loader2 } from 'lucide-react';
 import type { ParkingSpot } from '../data/parkingData';
 

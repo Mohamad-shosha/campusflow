@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 import { TopRibbon } from './TopRibbon';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -9,9 +9,9 @@ export interface AppShellProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   currentUser: AppUser;
-  isAuthenticated?: boolean;
+  isAuthenticated?: boolean | undefined;
   onLogout?: (() => void) | undefined;
-  notificationCount?: number;
+  notificationCount?: number | undefined;
   onOpenNotifications?: (() => void) | undefined;
   onOpenAuth?: (() => void) | undefined;
   onOpenWallet?: (() => void) | undefined;
