@@ -90,7 +90,8 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
         spotId: spot.backendId,
         durationHours: 3.0,
         autoDebitWallet: true,
-        idempotencyKey: 'map-booking-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+        idempotencyKey:
+          'map-booking-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
         startTime: startDate.toISOString(),
         endTime: endDate.toISOString(),
       });
@@ -112,7 +113,9 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
       onBookingSuccess?.(booking);
     } catch (err: unknown) {
       soundFX.playError();
-      const errorObj = err as { response?: { status?: number; data?: { detail?: string; message?: string } } };
+      const errorObj = err as {
+        response?: { status?: number; data?: { detail?: string; message?: string } };
+      };
       if (errorObj?.response?.status === 401) {
         setBookingError(
           isAr
@@ -142,7 +145,16 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
 
   return (
     <div data-testid="parking-lot-view">
-      <div className="section-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+      <div
+        className="section-head"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '1rem',
+        }}
+      >
         <div>
           <span className="section-eyebrow">
             <MapPin size={16} color="var(--fbsu-gold)" />
@@ -173,7 +185,15 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             title={isAr ? 'تحديث فوري من قاعدة البيانات' : 'Sync live with PostgreSQL'}
           >
             <RotateCw size={15} className={isLoading ? 'spin-anim' : ''} />
-            <span>{isAr ? (isLoading ? 'جاري المزامنة...' : 'تحديث مباشر') : (isLoading ? 'Syncing...' : 'Live Sync')}</span>
+            <span>
+              {isAr
+                ? isLoading
+                  ? 'جاري المزامنة...'
+                  : 'تحديث مباشر'
+                : isLoading
+                  ? 'Syncing...'
+                  : 'Live Sync'}
+            </span>
           </button>
         )}
       </div>
@@ -242,7 +262,8 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             <span className="legend-chip occ"></span> {isAr ? 'مشغول' : 'Occupied'}
           </div>
           <div className="legend-item">
-            <span className="legend-chip flx"></span> {isAr ? 'تبادل ذكي (بريك)' : 'AI Flex (Break)'}
+            <span className="legend-chip flx"></span>{' '}
+            {isAr ? 'تبادل ذكي (بريك)' : 'AI Flex (Break)'}
           </div>
           <div className="legend-item">
             <span className="legend-chip res"></span> {isAr ? 'محجوز لك' : 'Your Spot'}
@@ -275,22 +296,27 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             <ShieldCheck size={14} color="var(--fbsu-gold)" />
             <span>
               {isAr
-                ? (lastUpdated ? `مزامنة حية نشطة مع قاعدة البيانات (${lastUpdated.toLocaleTimeString('ar-SA')})` : 'مزامنة إنترنت الأشياء IoT نشطة')
-                : (lastUpdated ? `Live Database Sync (${lastUpdated.toLocaleTimeString()})` : 'IoT Real-time Sync Active')}
+                ? lastUpdated
+                  ? `مزامنة حية نشطة مع قاعدة البيانات (${lastUpdated.toLocaleTimeString('ar-SA')})`
+                  : 'مزامنة إنترنت الأشياء IoT نشطة'
+                : lastUpdated
+                  ? `Live Database Sync (${lastUpdated.toLocaleTimeString()})`
+                  : 'IoT Real-time Sync Active'}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <ArrowDown size={14} color="var(--fbsu-primary)" />
             <span>
-              {isAr
-                ? 'مبنى كلية الهندسة والحاسب الآلي'
-                : 'College of Engineering & Computing'}
+              {isAr ? 'مبنى كلية الهندسة والحاسب الآلي' : 'College of Engineering & Computing'}
             </span>
           </div>
         </div>
 
         {/* Bays Grid */}
-        <div className="parking-bays-container" style={{ opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
+        <div
+          className="parking-bays-container"
+          style={{ opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s ease' }}
+        >
           {filteredSpots.map(spot => (
             <SpotCard
               key={spot.id}

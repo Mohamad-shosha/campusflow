@@ -55,7 +55,9 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
           <X size={16} />
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}
+        >
           <div
             style={{
               width: '44px',
@@ -70,7 +72,9 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
             <DoorClosed size={24} color="var(--fbsu-primary)" />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            <h3
+              style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}
+            >
               {isAr ? 'حجز قاعة أو معمل للعمل الجماعي' : 'Reserve Lab / Study Pod'}
             </h3>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -90,12 +94,18 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
               fontSize: '0.88rem',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>{isAr ? 'السعة والتجهيزات:' : 'Capacity:'}</span>
+            <div
+              style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}
+            >
+              <span style={{ color: 'var(--text-muted)' }}>
+                {isAr ? 'السعة والتجهيزات:' : 'Capacity:'}
+              </span>
               <strong style={{ color: 'var(--text-main)' }}>{room.capacity}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-muted)' }}>{isAr ? 'قائد المجموعة:' : 'Team Lead:'}</span>
+              <span style={{ color: 'var(--text-muted)' }}>
+                {isAr ? 'قائد المجموعة:' : 'Team Lead:'}
+              </span>
               <strong style={{ color: 'var(--fbsu-primary)' }}>
                 {currentUser.name} ({currentUser.id})
               </strong>
@@ -126,7 +136,9 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label className="form-label">{isAr ? 'الهدف من الحجز وأسماء أعضاء الفريق:' : 'Purpose & Team:'}</label>
+            <label className="form-label">
+              {isAr ? 'الهدف من الحجز وأسماء أعضاء الفريق:' : 'Purpose & Team:'}
+            </label>
             <textarea
               className="form-control"
               rows={2}
@@ -148,7 +160,10 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
                 fontWeight: 800,
               }}
             >
-              ✓ {isAr ? 'تم تأكيد حجز القاعة وبدء المؤقت التنازلي!' : 'Reservation active with countdown!'}
+              ✓{' '}
+              {isAr
+                ? 'تم تأكيد حجز القاعة وبدء المؤقت التنازلي!'
+                : 'Reservation active with countdown!'}
             </div>
           ) : (
             <button
@@ -165,4 +180,3 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
     </div>
   );
 };
-

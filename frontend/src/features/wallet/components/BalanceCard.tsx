@@ -32,7 +32,8 @@ export const BalanceCard: FC<BalanceCardProps> = ({
       className="balance-card-container"
       data-testid="wallet-balance-card"
       style={{
-        background: 'linear-gradient(135deg, rgba(17, 110, 99, 0.45) 0%, rgba(13, 27, 42, 0.9) 100%)',
+        background:
+          'linear-gradient(135deg, rgba(17, 110, 99, 0.45) 0%, rgba(13, 27, 42, 0.9) 100%)',
         border: '1px solid rgba(215, 162, 55, 0.35)',
         borderRadius: '16px',
         padding: '1.75rem',
@@ -55,7 +56,14 @@ export const BalanceCard: FC<BalanceCardProps> = ({
         }}
       />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1.25rem',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <div
             style={{
@@ -83,9 +91,7 @@ export const BalanceCard: FC<BalanceCardProps> = ({
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Badge variant={status === 'ACTIVE' ? 'available' : 'occupied'} dot>
-            {status === 'ACTIVE'
-              ? isAr ? 'نشط' : 'Active'
-              : isAr ? 'معلق' : 'Suspended'}
+            {status === 'ACTIVE' ? (isAr ? 'نشط' : 'Active') : isAr ? 'معلق' : 'Suspended'}
           </Badge>
 
           <button
@@ -103,7 +109,9 @@ export const BalanceCard: FC<BalanceCardProps> = ({
 
       {/* Balance display */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
+        <div
+          style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}
+        >
           {isAr ? 'الرصيد المتاح' : 'Available Balance'}
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
@@ -117,7 +125,10 @@ export const BalanceCard: FC<BalanceCardProps> = ({
             }}
             data-testid="wallet-balance-amount"
           >
-            {balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {balance.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
           <span
             style={{
@@ -132,7 +143,13 @@ export const BalanceCard: FC<BalanceCardProps> = ({
       </div>
 
       {/* Action buttons */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+          gap: '0.75rem',
+        }}
+      >
         <Button
           variant="gold"
           size="md"
@@ -156,4 +173,3 @@ export const BalanceCard: FC<BalanceCardProps> = ({
     </div>
   );
 };
-

@@ -5,4 +5,3 @@ export * from './components/TopUpModal';
 export * from './components/TransferModal';
 export * from './components/LedgerTable';
 export * from './components/WalletPage';
-

@@ -92,6 +92,10 @@ public class AuthService {
         if (req.plateLettersAr() != null && !req.plateLettersAr().isBlank() 
                 && req.plateDigits() != null && !req.plateDigits().isBlank()) {
             SaudiPlate plate = SaudiPlate.fromArabic(req.plateLettersAr(), req.plateDigits());
+            if (vehicleRepository.existsByUniversityIdAndPlateLettersArAndPlateDigits(
+                    university.getId(), plate.getLettersAr(), plate.getDigits())) {
+                throw new IllegalArgumentException("لوحة المركبة مسجلة بالفعل في النظام: " + plate.toFormattedAr());
+            }
             Vehicle vehicle = new Vehicle(
                     university.getId(),
                     savedUser.getId(),

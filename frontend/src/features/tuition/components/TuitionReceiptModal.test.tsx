@@ -37,4 +37,3 @@ describe('TuitionReceiptModal Component', () => {
     printSpy.mockRestore();
   });
 });
-

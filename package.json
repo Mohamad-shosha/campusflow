@@ -1,20 +1,17 @@
 {
-  "name": "fbsu-smart-campus",
+  "name": "fbsu-smart-campus-monorepo",
   "version": "1.0.0",
-  "description": "FBSU Smart Campus & ALPR Smart Parking Enterprise Platform",
+  "description": "FBSU Smart Campus & ALPR Smart Parking Enterprise Platform (React + Spring Boot + PostgreSQL)",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:showcase": "python legacy/scripts/build/master_assembler.py",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "^8.3.0"
-  },
-  "dependencies": {
-    "canvas-confetti": "^1.9.4",
-    "lucide": "^1.48.0"
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "lint": "npm --prefix frontend run lint",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "test": "npm --prefix frontend run test",
+    "format": "npm --prefix frontend run format",
+    "tasks:build": "node docs/tasks/build.mjs"
   }
 }

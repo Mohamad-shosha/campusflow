@@ -53,17 +53,19 @@ export interface StudyRoom {
   capacity: string;
   typeBadge: string;
   status: 'in-use' | 'available' | 'maintenance' | 'reserved';
-  activeBooking?: {
-    teamLead: string;
-    teamMembers?: string[];
-    purpose: string;
-    endsAt?: string;
-    startTime?: string;
-    endTime?: string;
-    timeSlot?: string;
-    totalMinutes?: number;
-    remainingMinutes?: number;
-  } | undefined;
+  activeBooking?:
+    | {
+        teamLead: string;
+        teamMembers?: string[];
+        purpose: string;
+        endsAt?: string;
+        startTime?: string;
+        endTime?: string;
+        timeSlot?: string;
+        totalMinutes?: number;
+        remainingMinutes?: number;
+      }
+    | undefined;
   specs?: string[];
   availableFrom?: string;
 }
@@ -97,7 +99,8 @@ export const INITIAL_TUTORING_SESSIONS: TutoringSession[] = [
     courseName: 'حساب التفاضل والتكامل والرياضيات الهندسية',
     courseNameEn: 'Calculus & Engineering Mathematics',
     coveredLectures: 'المحاضرات 1 إلى 4 (Lectures 1, 2, 3, 4)',
-    coveredScope: 'شرح مبسط لمفاهيم النهايات والاشتقاق، وحل أسئلة الواجبات ونماذج الاختبارات السابقة حتى نهاية الشابتر.',
+    coveredScope:
+      'شرح مبسط لمفاهيم النهايات والاشتقاق، وحل أسئلة الواجبات ونماذج الاختبارات السابقة حتى نهاية الشابتر.',
     hourlyRate: 70, // 70 SAR as requested in audio!
     durationHours: 1,
     totalPrice: 70,
@@ -107,7 +110,7 @@ export const INITIAL_TUTORING_SESSIONS: TutoringSession[] = [
     rating: 4.96,
     reviewsCount: 28,
     status: 'open',
-    enrolledStudents: ['راكان المطيري']
+    enrolledStudents: ['راكان المطيري'],
   },
   {
     id: 'TUT-102',
@@ -119,7 +122,8 @@ export const INITIAL_TUTORING_SESSIONS: TutoringSession[] = [
     courseName: 'مبادئ البرمجة وهياكل البيانات (Python & C++)',
     courseNameEn: 'Programming & Data Structures',
     coveredLectures: 'الشابتر الأول والثاني كاملاً (Chapters 1 & 2)',
-    coveredScope: 'كتابة الأكواد العملية، خوارزميات الترتيب والبحث، وحل أسئلة الكلاس وورك والتكليف الأسبوعي.',
+    coveredScope:
+      'كتابة الأكواد العملية، خوارزميات الترتيب والبحث، وحل أسئلة الكلاس وورك والتكليف الأسبوعي.',
     hourlyRate: 70,
     durationHours: 1,
     totalPrice: 70,
@@ -129,7 +133,7 @@ export const INITIAL_TUTORING_SESSIONS: TutoringSession[] = [
     rating: 4.92,
     reviewsCount: 19,
     status: 'open',
-    enrolledStudents: ['عبد العزيز البلوي']
+    enrolledStudents: ['عبد العزيز البلوي'],
   },
   {
     id: 'TUT-103',
@@ -141,7 +145,8 @@ export const INITIAL_TUTORING_SESSIONS: TutoringSession[] = [
     courseName: 'التصميم المنطقي الرقمي (Digital Logic Design)',
     courseNameEn: 'Digital Logic & Circuit Design',
     coveredLectures: 'المحاضرات 1 إلى 4 (Lectures 1, 2, 3, 4)',
-    coveredScope: 'شرح خرائط كارنوف (K-Maps)، تبسيط الدوائر المنطقية، وبوابات NAND/NOR والتطبيق على حقائب المعمل.',
+    coveredScope:
+      'شرح خرائط كارنوف (K-Maps)، تبسيط الدوائر المنطقية، وبوابات NAND/NOR والتطبيق على حقائب المعمل.',
     hourlyRate: 70,
     durationHours: 1,
     totalPrice: 70,
@@ -151,7 +156,7 @@ export const INITIAL_TUTORING_SESSIONS: TutoringSession[] = [
     rating: 4.98,
     reviewsCount: 15,
     status: 'open',
-    enrolledStudents: []
+    enrolledStudents: [],
   },
   {
     id: 'TUT-104',
@@ -173,8 +178,8 @@ export const INITIAL_TUTORING_SESSIONS: TutoringSession[] = [
     rating: 4.95,
     reviewsCount: 31,
     status: 'open',
-    enrolledStudents: ['عبد العزيز البلوي']
-  }
+    enrolledStudents: ['عبد العزيز البلوي'],
+  },
 ];
 
 export const FACULTY_MEMBERS: FacultyMember[] = [
@@ -195,15 +200,20 @@ export const FACULTY_MEMBERS: FacultyMember[] = [
       'التصميم المنطقي (Logic Design)',
       'معمارية الحاسب (Computer Architecture)',
       'الإشراف على مشاريع التخرج',
-      'الإرشاد الأكاديمي ومعادلة المقررات'
+      'الإرشاد الأكاديمي ومعادلة المقررات',
     ],
     timeSlots: [
       { time: '11:00 ص', duration: '15 دقيقة', available: true },
       { time: '11:15 ص', duration: '15 دقيقة', available: true },
-      { time: '11:30 ص', duration: '30 دقيقة', available: false, bookedNote: 'محجوز - مناقشة مشروع تخرج' },
+      {
+        time: '11:30 ص',
+        duration: '30 دقيقة',
+        available: false,
+        bookedNote: 'محجوز - مناقشة مشروع تخرج',
+      },
       { time: '12:00 م', duration: '15 دقيقة', available: true },
-      { time: '12:15 م', duration: '15 دقيقة', available: true }
-    ]
+      { time: '12:15 م', duration: '15 دقيقة', available: true },
+    ],
   },
   {
     id: 'drMezher',
@@ -222,14 +232,14 @@ export const FACULTY_MEMBERS: FacultyMember[] = [
       'مبادرات الذكاء الاصطناعي والحوسبة المتقدمة',
       'مناقشة الأفكار البحثية ومشاريع التخرج الكبرى',
       'الشؤون الأكاديمية والخطط الدراسية',
-      'اعتماد الشراكات والهاكاثونات الطلابية'
+      'اعتماد الشراكات والهاكاثونات الطلابية',
     ],
     timeSlots: [
       { time: '01:00 م', duration: '15 دقيقة', available: true },
       { time: '01:15 م', duration: '30 دقيقة', available: true },
       { time: '01:45 م', duration: '15 دقيقة', available: false, bookedNote: 'اجتماع مجلس الكلية' },
-      { time: '02:00 م', duration: '30 دقيقة', available: true }
-    ]
+      { time: '02:00 م', duration: '30 دقيقة', available: true },
+    ],
   },
   {
     id: 'doctor',
@@ -247,15 +257,15 @@ export const FACULTY_MEMBERS: FacultyMember[] = [
     coursesSupervised: [
       'هندسة البرمجيات وتطوير النظم',
       'قواعد البيانات ونظم المعلومات',
-      'لجنة تحكيم مشاريع التخرج'
+      'لجنة تحكيم مشاريع التخرج',
     ],
     timeSlots: [
       { time: '01:00 م', duration: '15 دقيقة', available: true },
       { time: '01:15 م', duration: '15 دقيقة', available: true },
       { time: '01:30 م', duration: '15 دقيقة', available: true },
-      { time: '01:45 م', duration: '15 دقيقة', available: true }
-    ]
-  }
+      { time: '01:45 م', duration: '15 دقيقة', available: true },
+    ],
+  },
 ];
 
 export const INITIAL_STUDY_ROOMS: StudyRoom[] = [
@@ -269,20 +279,24 @@ export const INITIAL_STUDY_ROOMS: StudyRoom[] = [
     status: 'in-use', // In use by Eyad, Rakan, Abdulaziz as stated in the audio!
     activeBooking: {
       teamLead: 'إياد الحربي',
-      teamMembers: ['إياد الحربي (Classwork)', 'راكان المطيري (Assignment)', 'عبد العزيز البلوي (Homework)'],
+      teamMembers: [
+        'إياد الحربي (Classwork)',
+        'راكان المطيري (Assignment)',
+        'عبد العزيز البلوي (Homework)',
+      ],
       purpose: 'إنجاز التكاليف والمهام المشتركة (Classwork & Assignment)',
       startTime: '09:00 ص',
       endTime: '09:20 ص',
       totalMinutes: 20,
-      remainingMinutes: 11
+      remainingMinutes: 11,
     },
     specs: [
       '24 جهاز iMac و HP Workstation مجهزة بـ Python و Java و VS Code',
       'إنترنت ألياف ضوئية فائق السرعة مخصص للمشاريع والتحميل',
       'شاشة ذكية 85 بوصة للعرض والمراجعة الجماعية للأكواد',
-      'طابعة ليزر سريعة لطباعة التقارير والأبحاث'
+      'طابعة ليزر سريعة لطباعة التقارير والأبحاث',
     ],
-    availableFrom: '09:20 ص (بعد انتهاء الجلسة المحددة)'
+    availableFrom: '09:20 ص (بعد انتهاء الجلسة المحددة)',
   },
   {
     id: 'ROOM-A04',
@@ -296,9 +310,9 @@ export const INITIAL_STUDY_ROOMS: StudyRoom[] = [
       'طاولة اجتماعات تفاعلية مع منافذ طاقة وشواحن Type-C متعددة',
       'سبورة ذكية تفاعلية Interactive Whiteboard مع خاصية حفظ الملاحظات',
       'شاشة عرض لاسلكية تدعم AirPlay و Miracast',
-      'عازل صوتي متكامل لضمان هدوء المذاكرة والتركيز'
+      'عازل صوتي متكامل لضمان هدوء المذاكرة والتركيز',
     ],
-    availableFrom: 'متاحة للحجز الفوري الآن'
+    availableFrom: 'متاحة للحجز الفوري الآن',
   },
   {
     id: 'LAB-205',
@@ -312,9 +326,9 @@ export const INITIAL_STUDY_ROOMS: StudyRoom[] = [
       'حقائب تدريبية متقدمة FPGA و Digital Logic Trainers',
       'أجهزة راسم إشارة Oscilloscopes ومولدات إشارات ترددية',
       'أطقم بوابات منطقية متكاملة (AND, OR, NOT, NAND, XOR)',
-      'إشراف فني متخصص وتجهيزات سلامة مهنية'
+      'إشراف فني متخصص وتجهيزات سلامة مهنية',
     ],
-    availableFrom: 'متاحة للحجز الفوري الآن'
+    availableFrom: 'متاحة للحجز الفوري الآن',
   },
   {
     id: 'ROOM-C12',
@@ -331,15 +345,15 @@ export const INITIAL_STUDY_ROOMS: StudyRoom[] = [
       startTime: '10:00 ص',
       endTime: '11:00 ص',
       totalMinutes: 60,
-      remainingMinutes: 44
+      remainingMinutes: 44,
     },
     specs: [
       'طابعات ثلاثية الأبعاد 3D Printers ومحطات تصنيع نماذج أولية',
       'حقائب إنترنت الأشياء IoT وحساسات ESP32 وكاميرات ALPR',
-      'شاشات عرض مزدوجة Dual 4K لمراجعة البرمجيات'
+      'شاشات عرض مزدوجة Dual 4K لمراجعة البرمجيات',
     ],
-    availableFrom: '11:00 ص'
-  }
+    availableFrom: '11:00 ص',
+  },
 ];
 
 export const INITIAL_NOTIFICATIONS: CampusNotification[] = [
@@ -349,11 +363,12 @@ export const INITIAL_NOTIFICATIONS: CampusNotification[] = [
     targetName: 'د. رغد النفيعي (رئيسة القسم)',
     sender: 'إياد الحربي (20210045)',
     title: 'طلب حجز ساعة مكتبية - مناقشة مادة Logic Design',
-    message: 'قام الطالب إياد الحربي بحجز موعد لمدة 15 دقيقة (الأحد 11:15 ص) لمناقشة استفسار في مشروع مادة Logic Design.',
+    message:
+      'قام الطالب إياد الحربي بحجز موعد لمدة 15 دقيقة (الأحد 11:15 ص) لمناقشة استفسار في مشروع مادة Logic Design.',
     time: 'منذ 5 دقائق',
     read: false,
     icon: 'userCheck',
-    badge: 'موعد مؤكد'
+    badge: 'موعد مؤكد',
   },
   {
     id: 'notif-2',
@@ -361,11 +376,12 @@ export const INITIAL_NOTIFICATIONS: CampusNotification[] = [
     targetName: 'إياد الحربي',
     sender: 'النظام المالي الجامعي',
     title: 'إيداع رصيد جامعي: + 70.00 ر.س (شروحات أكاديمية)',
-    message: 'قام الزميل راكان المطيري بحجز جلسة شرح (MATH 101). تم تحويل 70.00 ر.س تلقائياً إلى رصيدك بالجامعة ويمكنك استخدامها لسداد الرسوم أو حجز المواقف.',
+    message:
+      'قام الزميل راكان المطيري بحجز جلسة شرح (MATH 101). تم تحويل 70.00 ر.س تلقائياً إلى رصيدك بالجامعة ويمكنك استخدامها لسداد الرسوم أو حجز المواقف.',
     time: 'منذ 15 دقيقة',
     read: false,
     icon: 'wallet',
-    badge: 'رصيد جديد'
+    badge: 'رصيد جديد',
   },
   {
     id: 'notif-3',
@@ -373,12 +389,13 @@ export const INITIAL_NOTIFICATIONS: CampusNotification[] = [
     targetName: 'د. محمد مزهر (عميد الكلية)',
     sender: 'راكان المطيري (20220088)',
     title: 'إشعار مقابلة عميد الكلية - مناقشة ابتكار المنظومة الذكية',
-    message: 'طلب الطالب راكان المطيري موعداً في الساعات المكتبية (الاثنين 01:15 م) لعرض مبادرة تحويل المنصة إلى نظام حرم جامعي متكامل.',
+    message:
+      'طلب الطالب راكان المطيري موعداً في الساعات المكتبية (الاثنين 01:15 م) لعرض مبادرة تحويل المنصة إلى نظام حرم جامعي متكامل.',
     time: 'منذ 25 دقيقة',
     read: false,
     icon: 'userCheck',
-    badge: 'جديد'
-  }
+    badge: 'جديد',
+  },
 ];
 
 export const CAMPUS_NOTIFICATIONS = INITIAL_NOTIFICATIONS;

@@ -12,11 +12,7 @@ export interface TuitionReceiptModalProps {
   onClose: () => void;
 }
 
-export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
-  isOpen,
-  receipt,
-  onClose,
-}) => {
+export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({ isOpen, receipt, onClose }) => {
   const { i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
 
@@ -50,7 +46,8 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
         className="receipt-printable-container"
         data-testid="tuition-receipt-card"
         style={{
-          background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(13, 27, 42, 0.95) 100%)',
+          background:
+            'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(13, 27, 42, 0.95) 100%)',
           border: '1.5px solid var(--fbsu-gold-border)',
           borderRadius: '14px',
           padding: '1.75rem',
@@ -58,8 +55,23 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
         }}
       >
         {/* Receipt Header */}
-        <div style={{ textAlign: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+        <div
+          style={{
+            textAlign: 'center',
+            borderBottom: '1px solid var(--border-color)',
+            paddingBottom: '1rem',
+            marginBottom: '1.25rem',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '0.4rem',
+            }}
+          >
             <img src="/assets/branding/fbsu-logo.png" alt="FBSU" style={{ height: '32px' }} />
             <span style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-main)' }}>
               {isAr ? 'جامعة فهد بن سلطان' : 'Fahad Bin Sultan University'}
@@ -81,17 +93,32 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
             }}
           >
             <ShieldCheck size={14} />
-            <span>{isAr ? 'إيصال إلكتروني معتمد ومسجل بالدفتر المالي' : 'Official Digitally Verified Receipt'}</span>
+            <span>
+              {isAr
+                ? 'إيصال إلكتروني معتمد ومسجل بالدفتر المالي'
+                : 'Official Digitally Verified Receipt'}
+            </span>
           </div>
         </div>
 
         {/* Receipt Key Info Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', fontSize: '0.86rem', marginBottom: '1.25rem' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '0.85rem',
+            fontSize: '0.86rem',
+            marginBottom: '1.25rem',
+          }}
+        >
           <div>
             <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: '0.78rem' }}>
               {isAr ? 'رقم الإيصال الرسمي' : 'Official Receipt No'}
             </span>
-            <strong style={{ color: 'var(--fbsu-gold)', fontFamily: 'monospace', fontSize: '0.95rem' }} data-testid="receipt-number">
+            <strong
+              style={{ color: 'var(--fbsu-gold)', fontFamily: 'monospace', fontSize: '0.95rem' }}
+              data-testid="receipt-number"
+            >
               {receipt.receiptNumber}
             </strong>
           </div>
@@ -100,7 +127,9 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
             <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: '0.78rem' }}>
               {isAr ? 'رقم الفاتورة المرتبطة' : 'Invoice Reference'}
             </span>
-            <strong style={{ color: 'var(--text-main)', fontFamily: 'monospace', fontSize: '0.92rem' }}>
+            <strong
+              style={{ color: 'var(--text-main)', fontFamily: 'monospace', fontSize: '0.92rem' }}
+            >
               {receipt.invoiceNumber}
             </strong>
           </div>
@@ -127,9 +156,7 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
             <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: '0.78rem' }}>
               {isAr ? 'الفصل الدراسي' : 'Academic Term'}
             </span>
-            <span style={{ color: 'var(--text-main)' }}>
-              {receipt.termNameEn}
-            </span>
+            <span style={{ color: 'var(--text-main)' }}>{receipt.termNameEn}</span>
           </div>
 
           <div>
@@ -153,15 +180,27 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
             marginBottom: '1.25rem',
           }}
         >
-          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem' }}>
+          <span
+            style={{
+              fontSize: '0.82rem',
+              color: 'var(--text-secondary)',
+              display: 'block',
+              marginBottom: '0.2rem',
+            }}
+          >
             {isAr ? 'المبلغ المسدد المعتمد' : 'Amount Settled'}
           </span>
-          <div style={{ fontSize: '2.1rem', fontWeight: 900, color: 'var(--fbsu-gold)', fontVariantNumeric: 'tabular-nums' }}>
+          <div
+            style={{
+              fontSize: '2.1rem',
+              fontWeight: 900,
+              color: 'var(--fbsu-gold)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {Number(receipt.amountPaid).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
           </div>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            {formattedDate}
-          </span>
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{formattedDate}</span>
         </div>
 
         {/* QR & Verification Code */}
@@ -194,7 +233,9 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
               {receipt.verificationCode}
             </span>
             <p style={{ margin: '0.35rem 0 0', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-              {isAr ? 'امسح الرمز للتحقق من صحة القيد المحاسبي.' : 'Scan QR to verify institutional ledger record.'}
+              {isAr
+                ? 'امسح الرمز للتحقق من صحة القيد المحاسبي.'
+                : 'Scan QR to verify institutional ledger record.'}
             </p>
           </div>
 
@@ -240,4 +281,3 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({
     </Modal>
   );
 };
-

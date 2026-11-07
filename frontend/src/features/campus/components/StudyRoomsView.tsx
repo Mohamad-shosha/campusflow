@@ -157,7 +157,13 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                       </span>
                     </div>
 
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                    <div
+                      style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--text-muted)',
+                        marginBottom: '0.35rem',
+                      }}
+                    >
                       {isAr ? 'المجموعة:' : 'Team:'}{' '}
                       <strong>
                         {room.activeBooking.teamMembers
@@ -193,7 +199,10 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                 {!isInUse && !isReserved && (
                   <div className="room-active-timer-box timer-available">
                     <div className="timer-header-flex">
-                      <span className="timer-team-label" style={{ color: 'var(--status-available)' }}>
+                      <span
+                        className="timer-team-label"
+                        style={{ color: 'var(--status-available)' }}
+                      >
                         {isAr ? 'القاعة جاهزة للحجز الفوري' : 'Pod Ready For Immediate Use'}
                       </span>
                       <span className="countdown-digits avail">{isAr ? 'متاحة' : 'Open'}</span>
@@ -207,7 +216,14 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                 )}
 
                 {/* Specs List */}
-                <div style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-dim)', marginBottom: '0.4rem' }}>
+                <div
+                  style={{
+                    fontSize: '0.76rem',
+                    fontWeight: 800,
+                    color: 'var(--text-dim)',
+                    marginBottom: '0.4rem',
+                  }}
+                >
                   {isAr ? 'التجهيزات والتقنيات المتوفرة:' : 'Included Tech & Equipment:'}
                 </div>
                 <div className="room-specs-list">
@@ -228,7 +244,12 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                     <button
                       className="btn-outline extend-lab-time-btn"
                       onClick={() => handleExtend(room.id)}
-                      style={{ flex: 1, justifyContent: 'center', padding: '0.75rem', fontSize: '0.8rem' }}
+                      style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        padding: '0.75rem',
+                        fontSize: '0.8rem',
+                      }}
                       type="button"
                     >
                       <Clock size={14} />
@@ -258,7 +279,12 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                       soundFX.playClick();
                       setSelectedRoom(room);
                     }}
-                    style={{ width: '100%', justifyContent: 'center', padding: '0.85rem', fontSize: '0.88rem' }}
+                    style={{
+                      width: '100%',
+                      justifyContent: 'center',
+                      padding: '0.85rem',
+                      fontSize: '0.88rem',
+                    }}
                     type="button"
                   >
                     <Calendar size={16} color="#ffffff" />

@@ -43,11 +43,20 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--status-available)' }}>
               +42%
             </div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0.35rem 0' }}>
+            <div
+              style={{
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                color: 'var(--text-main)',
+                margin: '0.35rem 0',
+              }}
+            >
               {isAr ? 'زيادة في سعة المواقف الفعلية' : 'Net Capacity Gain'}
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {isAr ? 'دون بناء أي خرسانات أو مساحات إضافية' : 'Zero additional concrete or real estate'}
+              {isAr
+                ? 'دون بناء أي خرسانات أو مساحات إضافية'
+                : 'Zero additional concrete or real estate'}
             </div>
           </div>
         </div>
@@ -57,7 +66,14 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}>
               {isAr ? '14.2 دقيقة' : '14.2 Mins'}
             </div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0.35rem 0' }}>
+            <div
+              style={{
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                color: 'var(--text-main)',
+                margin: '0.35rem 0',
+              }}
+            >
               {isAr ? 'توفير في وقت كل طالب' : 'Time Saved per Student'}
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -71,11 +87,20 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--fbsu-primary)' }}>
               98.8%
             </div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0.35rem 0' }}>
+            <div
+              style={{
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                color: 'var(--text-main)',
+                margin: '0.35rem 0',
+              }}
+            >
               {isAr ? 'مستوى رضا طلاب ودكاترة الجامعة' : 'Campus Satisfaction Rate'}
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {isAr ? 'وفق استبيان عمادة شؤون الطلاب بتبوك' : 'Student Affairs Deanship Survey (Tabuk)'}
+              {isAr
+                ? 'وفق استبيان عمادة شؤون الطلاب بتبوك'
+                : 'Student Affairs Deanship Survey (Tabuk)'}
             </div>
           </div>
         </div>
@@ -120,7 +145,14 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
                 padding: '1rem 0.5rem',
               }}
             >
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+              <div
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  color: 'var(--text-muted)',
+                  marginBottom: '0.5rem',
+                }}
+              >
                 {item.time}
               </div>
               <div
@@ -146,7 +178,14 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
               <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)' }}>
                 {item.load}%
               </div>
-              <div style={{ fontSize: '0.7rem', color: item.color, fontWeight: 700, marginTop: '0.25rem' }}>
+              <div
+                style={{
+                  fontSize: '0.7rem',
+                  color: item.color,
+                  fontWeight: 700,
+                  marginTop: '0.25rem',
+                }}
+              >
                 {item.label}
               </div>
             </div>
@@ -156,4 +195,3 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
     </div>
   );
 };
-

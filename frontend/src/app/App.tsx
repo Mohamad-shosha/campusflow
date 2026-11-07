@@ -161,8 +161,11 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       };
 
   const totalSpots = parkingSummary?.totalSpots ?? parkingSpots.length;
-  const availableCount = parkingSummary?.availableSpots ?? parkingSpots.filter(s => s.status === 'available').length;
-  const flexCount = parkingSummary?.flexSpots ?? parkingSpots.filter(s => s.status === 'flex' || s.status === 'flex-share').length;
+  const availableCount =
+    parkingSummary?.availableSpots ?? parkingSpots.filter(s => s.status === 'available').length;
+  const flexCount =
+    parkingSummary?.flexSpots ??
+    parkingSpots.filter(s => s.status === 'flex' || s.status === 'flex-share').length;
 
   const handleReserveSpot = (spotId: number) => {
     setParkingSpots(prev =>
@@ -274,7 +277,10 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         />
       )}
 
-      <div className="container" style={{ marginTop: '2.5rem', minHeight: '60vh', paddingBottom: '3rem' }}>
+      <div
+        className="container"
+        style={{ marginTop: '2.5rem', minHeight: '60vh', paddingBottom: '3rem' }}
+      >
         {/* Category Subnav chips */}
         <CategorySubnav activeTab={activeTab} isAr={isAr} onTabChange={setActiveTab} />
 
@@ -342,8 +348,16 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               setActiveToast({
                 title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
                 message: isAr
-                  ? 'تم تأكيد حجز موقف #' + booking.bayNumber + ' بنجاح، وخصم ' + Number(booking.totalAmount).toFixed(2) + ' ر.س من محفظتك.'
-                  : 'Bay #' + booking.bayNumber + ' booked. ' + Number(booking.totalAmount).toFixed(2) + ' SAR debited from wallet.',
+                  ? 'تم تأكيد حجز موقف #' +
+                    booking.bayNumber +
+                    ' بنجاح، وخصم ' +
+                    Number(booking.totalAmount).toFixed(2) +
+                    ' ر.س من محفظتك.'
+                  : 'Bay #' +
+                    booking.bayNumber +
+                    ' booked. ' +
+                    Number(booking.totalAmount).toFixed(2) +
+                    ' SAR debited from wallet.',
                 type: 'success',
               });
             }}
@@ -469,7 +483,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               }}
               data-testid="admin-panel-content"
             >
-              <h3 style={{ color: 'var(--fbsu-primary)', marginBottom: '0.75rem', fontWeight: 800 }}>
+              <h3
+                style={{ color: 'var(--fbsu-primary)', marginBottom: '0.75rem', fontWeight: 800 }}
+              >
                 {isAr ? 'لوحة التحكم الإدارية المصرحة' : 'Authorized Campus Admin Panel'}
               </h3>
               <p style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>

@@ -31,4 +31,3 @@ export const tuitionApi = {
     return response.data;
   },
 };
-

@@ -12,16 +12,15 @@ vi.mock('../api/walletApi', () => ({
 describe('TransferModal Component', () => {
   it('validates recipient and insufficient balance before submit', async () => {
     render(
-      <TransferModal
-        isOpen={true}
-        availableBalance={100}
-        onClose={vi.fn()}
-        onSuccess={vi.fn()}
-      />
+      <TransferModal isOpen={true} availableBalance={100} onClose={vi.fn()} onSuccess={vi.fn()} />
     );
 
     fireEvent.click(screen.getByTestId('btn-confirm-transfer'));
-    expect(screen.getByText(/Please enter recipient university number|الرجاء إدخال الرقم الجامعي للمستلم/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Please enter recipient university number|الرجاء إدخال الرقم الجامعي للمستلم/
+      )
+    ).toBeInTheDocument();
 
     // Fill recipient and amount exceeding balance
     fireEvent.change(screen.getByTestId('input-transfer-recipient'), {

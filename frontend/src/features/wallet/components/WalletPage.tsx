@@ -43,50 +43,53 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
     title?: string;
   } | null>(null);
 
-  const fetchWalletData = useCallback(async (page = 0) => {
-    setIsLoading(true);
-    try {
-      if (isAuthenticated) {
-        const [walletData, ledgerData] = await Promise.all([
-          walletApi.getWallet(),
-          walletApi.getLedgerHistory(page, 15),
-        ]);
-        setWallet(walletData);
-        setLedgerPage(ledgerData);
-        if (onBalanceUpdate && walletData) {
-          onBalanceUpdate(Number(walletData.balance));
+  const fetchWalletData = useCallback(
+    async (page = 0) => {
+      setIsLoading(true);
+      try {
+        if (isAuthenticated) {
+          const [walletData, ledgerData] = await Promise.all([
+            walletApi.getWallet(),
+            walletApi.getLedgerHistory(page, 15),
+          ]);
+          setWallet(walletData);
+          setLedgerPage(ledgerData);
+          if (onBalanceUpdate && walletData) {
+            onBalanceUpdate(Number(walletData.balance));
+          }
+        } else {
+          // Unauthenticated state: 0.00 SAR, never display hardcoded 720.00 SAR
+          const emptyWallet: WalletResponse = {
+            id: 'unauthenticated-wallet',
+            userId: 'guest',
+            balance: 0.0,
+            currency: 'SAR',
+            status: 'ACTIVE',
+            updatedAt: new Date().toISOString(),
+          };
+          const emptyLedger: Page<LedgerEntryResponse> = {
+            content: [],
+            totalPages: 1,
+            totalElements: 0,
+            size: 15,
+            number: 0,
+            first: true,
+            last: true,
+          };
+          setWallet(emptyWallet);
+          setLedgerPage(emptyLedger);
+          if (onBalanceUpdate) {
+            onBalanceUpdate(0.0);
+          }
         }
-      } else {
-        // Unauthenticated state: 0.00 SAR, never display hardcoded 720.00 SAR
-        const emptyWallet: WalletResponse = {
-          id: 'unauthenticated-wallet',
-          userId: 'guest',
-          balance: 0.0,
-          currency: 'SAR',
-          status: 'ACTIVE',
-          updatedAt: new Date().toISOString(),
-        };
-        const emptyLedger: Page<LedgerEntryResponse> = {
-          content: [],
-          totalPages: 1,
-          totalElements: 0,
-          size: 15,
-          number: 0,
-          first: true,
-          last: true,
-        };
-        setWallet(emptyWallet);
-        setLedgerPage(emptyLedger);
-        if (onBalanceUpdate) {
-          onBalanceUpdate(0.0);
-        }
+      } catch (err: unknown) {
+        console.error('Failed to load wallet data:', err);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err: unknown) {
-      console.error('Failed to load wallet data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, onBalanceUpdate]);
+    },
+    [isAuthenticated, onBalanceUpdate]
+  );
 
   useEffect(() => {
     fetchWalletData(currentPage);
@@ -123,7 +126,11 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
   };
 
   return (
-    <div className="wallet-feature-page" data-testid="wallet-page" style={{ maxWidth: '960px', margin: '0 auto' }}>
+    <div
+      className="wallet-feature-page"
+      data-testid="wallet-page"
+      style={{ maxWidth: '960px', margin: '0 auto' }}
+    >
       {toast && (
         <div style={{ position: 'fixed', top: '1.5rem', insetInlineEnd: '1.5rem', zIndex: 999999 }}>
           <Toast
@@ -136,9 +143,25 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
       )}
 
       {/* Page header */}
-      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+      <div
+        style={{
+          marginBottom: '1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '1rem',
+        }}
+      >
         <div>
-          <h2 style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.35rem' }}>
+          <h2
+            style={{
+              fontSize: '1.65rem',
+              fontWeight: 900,
+              color: 'var(--text-main)',
+              margin: '0 0 0.35rem',
+            }}
+          >
             {isAr ? 'المحفظة الجامعية والمدفوعات الذكية' : 'Digital Campus Wallet & Smart Payments'}
           </h2>
           <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0 }}>

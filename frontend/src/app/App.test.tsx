@@ -18,7 +18,9 @@ describe('App Full Integration & Feature Navigation Tests', () => {
     expect(screen.getByTestId('top-ribbon')).toBeInTheDocument();
     expect(screen.getByTestId('main-header')).toBeInTheDocument();
     expect(screen.getByTestId('parking-lot-view')).toBeInTheDocument();
-    expect(screen.getByText(/المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان/i)
+    ).toBeInTheDocument();
   });
 
   it('displays Sign In button and 0.00 wallet balance when unauthenticated instead of static demo persona', () => {

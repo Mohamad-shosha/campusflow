@@ -34,4 +34,3 @@ export interface PayTuitionRequest {
   amount: number;
   idempotencyKey: string;
 }
-
