@@ -308,6 +308,7 @@ export const tasks = [
 
   // ---------------- P6 ----------------
   T('P6-01', 'Tutoring schema + API (post/list/filter)', {
+    status: 'Done', pr: 'PR (feature/P6-01-tutoring-api)',
     pri: 'High', cx: 'L', deps: ['P2-03'], branch: 'feature/P6-01-tutoring-api',
     goal: 'إنشاء وعرض وفلترة جلسات الشرح بين الطلاب.',
     files: ['db/migration/V10__tutoring.sql', 'tutoring/**'],

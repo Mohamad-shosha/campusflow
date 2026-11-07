@@ -396,9 +396,9 @@
 
 ### P6-01 — Tutoring schema + API (post/list/filter)
 - **ماذا سيعمل:** إنشاء وعرض وفلترة جلسات الشرح بين الطلاب.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P2-03
-- **Git Branch:** `feature/P6-01-tutoring-api` · **Pull Request:** —
+- **Git Branch:** `feature/P6-01-tutoring-api` · **Pull Request:** PR (feature/P6-01-tutoring-api)
 - **الملفات المتوقعة:** `db/migration/V10__tutoring.sql`، `tutoring/**`
 - **Implementation Steps:** 1) Migration 2) Domain 3) API 4) اختبارات
 - **Acceptance Criteria:** الطالب المؤهل فقط ينشر · الفلترة بالتصنيف

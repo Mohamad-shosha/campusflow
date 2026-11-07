@@ -6,10 +6,10 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /build
 
 COPY pom.xml ./
-RUN mvn dependency:go-offline -B || true
+RUN mvn dependency:go-offline -B -Dhttp.keepAlive=false -Dmaven.wagon.http.retryHandler.count=3 || true
 
 COPY src/ ./src/
-RUN mvn clean package -DskipTests -B
+RUN mvn package -DskipTests -B -Dhttp.keepAlive=false -Dmaven.wagon.http.retryHandler.count=3
 
 # ==============================================================================
 # Stage 2: Minimal runtime image using Eclipse Temurin JRE
