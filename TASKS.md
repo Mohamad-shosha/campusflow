@@ -429,9 +429,9 @@
 
 ### P6-04 — Office-hours schema + API (windows, appointments)
 - **ماذا سيعمل:** إدارة أوقات الساعات المكتبية للدكاترة وحجز المواعيد بدون تعارض.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P2-03، Q9
-- **Git Branch:** `feature/P6-04-office-hours-api` · **Pull Request:** —
+- **Git Branch:** `feature/P6-04-office-hours-api` · **Pull Request:** PR (feature/P6-04-office-hours-api)
 - **الملفات المتوقعة:** `db/migration/V11__office_hours.sql`، `officehours/**`
 - **Implementation Steps:** 1) Migration + exclusion 2) Domain 3) API 4) اختبارات
 - **Acceptance Criteria:** لا تعارض في الموعد · الدكتور يدير مواعيده فقط

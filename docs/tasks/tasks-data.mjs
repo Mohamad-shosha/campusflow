@@ -335,6 +335,7 @@ export const tasks = [
     tests: ['Component', 'Form validation', 'E2E'], blockedBy: [],
   }),
   T('P6-04', 'Office-hours schema + API (windows, appointments)', {
+    status: 'Done', pr: 'PR (feature/P6-04-office-hours-api)',
     pri: 'High', cx: 'L', deps: ['P2-03', 'Q9'], branch: 'feature/P6-04-office-hours-api',
     goal: 'إدارة أوقات الساعات المكتبية للدكاترة وحجز المواعيد بدون تعارض.',
     files: ['db/migration/V11__office_hours.sql', 'officehours/**'],
