@@ -1,13 +1,24 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface TopRibbonProps {
   flexCount?: number;
-  timeString?: string;
+  timeString?: string | undefined;
 }
 
-export const TopRibbon: FC<TopRibbonProps> = ({ flexCount = 3, timeString = '08:45:00' }) => {
+export const TopRibbon: FC<TopRibbonProps> = ({ flexCount = 3, timeString }) => {
   const { t } = useTranslation();
+  const [liveClock, setLiveClock] = useState<string>(() =>
+    new Date().toLocaleTimeString('en-GB', { hour12: false })
+  );
+
+  useEffect(() => {
+    if (timeString) return;
+    const timer = setInterval(() => {
+      setLiveClock(new Date().toLocaleTimeString('en-GB', { hour12: false }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timeString]);
 
   return (
     <div className="uni-ribbon" data-testid="top-ribbon">
@@ -29,7 +40,7 @@ export const TopRibbon: FC<TopRibbonProps> = ({ flexCount = 3, timeString = '08:
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <span className="ribbon-item">📅 {t('ribbon.term')}</span>
           <span className="ribbon-item">
-            ⏰ <span id="live-time-clock">{timeString}</span>
+            ⏰ <span id="live-time-clock">{timeString ?? liveClock}</span>
           </span>
         </div>
       </div>

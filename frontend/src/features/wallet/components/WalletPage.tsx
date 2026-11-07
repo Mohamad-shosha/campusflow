@@ -1,6 +1,6 @@
 import { type FC, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, LogIn } from 'lucide-react';
+import { ShieldCheck, LogIn, GraduationCap } from 'lucide-react';
 import { BalanceCard } from './BalanceCard';
 import { LedgerTable } from './LedgerTable';
 import { TopUpModal } from './TopUpModal';
@@ -16,7 +16,11 @@ export interface WalletPageProps {
   onOpenAuth?: (() => void) | undefined;
 }
 
-export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth }) => {
+export const WalletPage: FC<WalletPageProps> = ({
+  onBalanceUpdate,
+  onNavigateToTuition,
+  onOpenAuth,
+}) => {
   const { i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const { user, isAuthenticated } = useAuth();
@@ -171,22 +175,36 @@ export const WalletPage: FC<WalletPageProps> = ({ onBalanceUpdate, onOpenAuth })
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.4rem 0.8rem',
-            borderRadius: '8px',
-            background: 'rgba(17, 110, 99, 0.15)',
-            border: '1px solid rgba(17, 110, 99, 0.35)',
-            fontSize: '0.78rem',
-            color: '#34d399',
-            fontWeight: 700,
-          }}
-        >
-          <ShieldCheck size={15} />
-          <span>{isAr ? 'معتمد ومحمي بالقيود المحاسبية' : 'Audited & Immutable Ledger'}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+          {onNavigateToTuition && (
+            <button
+              type="button"
+              className="btn-gold"
+              onClick={onNavigateToTuition}
+              style={{ fontSize: '0.82rem', padding: '0.45rem 0.9rem' }}
+              data-testid="wallet-goto-tuition-btn"
+            >
+              <GraduationCap size={16} color="#0b1a17" />
+              <span>{isAr ? 'سداد الرسوم الدراسية' : 'Tuition & Invoices'}</span>
+            </button>
+          )}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '8px',
+              background: 'rgba(17, 110, 99, 0.15)',
+              border: '1px solid rgba(17, 110, 99, 0.35)',
+              fontSize: '0.78rem',
+              color: '#34d399',
+              fontWeight: 700,
+            }}
+          >
+            <ShieldCheck size={15} />
+            <span>{isAr ? 'معتمد ومحمي بالقيود المحاسبية' : 'Audited & Immutable Ledger'}</span>
+          </div>
         </div>
       </div>
 

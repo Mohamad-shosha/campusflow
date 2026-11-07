@@ -46,6 +46,7 @@ public abstract class AbstractPostgresIntegrationTest {
             registry.add("spring.datasource.url", postgres::getJdbcUrl);
             registry.add("spring.datasource.username", postgres::getUsername);
             registry.add("spring.datasource.password", postgres::getPassword);
+            registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
             registry.add("spring.flyway.enabled", () -> "true");
             registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
         }

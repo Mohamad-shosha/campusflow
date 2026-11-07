@@ -20,6 +20,7 @@ import {
   Users,
   UserCheck,
   DoorClosed,
+  GraduationCap,
   LogIn,
   LogOut,
 } from 'lucide-react';
@@ -36,6 +37,7 @@ export interface HeaderProps {
   onOpenNotifications?: (() => void) | undefined;
   onOpenWallet?: (() => void) | undefined;
   onOpenAuth?: (() => void) | undefined;
+  onOpenProfile?: (() => void) | undefined;
 }
 
 export const Header: FC<HeaderProps> = ({
@@ -48,6 +50,7 @@ export const Header: FC<HeaderProps> = ({
   onOpenNotifications,
   onOpenWallet,
   onOpenAuth,
+  onOpenProfile,
 }) => {
   const { t } = useTranslation();
   const { isAr, soundEnabled, toggleSound, toggleLanguage, isLightTheme, toggleTheme } =
@@ -71,7 +74,7 @@ export const Header: FC<HeaderProps> = ({
   };
 
   const isParkingActive = ['map', 'booking', 'simulator', 'gate', 'share'].includes(activeTab);
-  const isCampusActive = ['tutoring', 'office-hours', 'rooms'].includes(activeTab);
+  const isCampusActive = ['tuition', 'tutoring', 'office-hours', 'rooms'].includes(activeTab);
 
   return (
     <header className="main-header" ref={headerRef} data-testid="main-header">
@@ -182,6 +185,24 @@ export const Header: FC<HeaderProps> = ({
               </button>
 
               <div className="nav-dropdown-menu">
+                <button
+                  className={`dropdown-item ${activeTab === 'tuition' ? 'active' : ''}`}
+                  onClick={() => handleDropdownItemClick('tuition')}
+                  type="button"
+                  data-testid="nav-tuition-item"
+                >
+                  <GraduationCap size={14} />
+                  <div className="dropdown-item-info">
+                    <span className="dropdown-item-title">
+                      {isAr ? 'الرسوم الدراسية والإيصالات' : 'Tuition & Receipts'}
+                    </span>
+                    <span className="dropdown-item-desc">
+                      {isAr
+                        ? 'سداد الفواتير الأكاديمية من المحفظة'
+                        : 'Academic invoices & verified receipts'}
+                    </span>
+                  </div>
+                </button>
                 <button
                   className={`dropdown-item ${activeTab === 'tutoring' ? 'active' : ''}`}
                   onClick={() => handleDropdownItemClick('tutoring')}
@@ -312,7 +333,7 @@ export const Header: FC<HeaderProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <button
                 className="auth-btn-header"
-                onClick={onOpenAuth}
+                onClick={onOpenProfile ?? onOpenAuth}
                 type="button"
                 title={t('utilities.profileTitle')}
                 data-testid="header-auth-btn"

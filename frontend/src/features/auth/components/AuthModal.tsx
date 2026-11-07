@@ -9,6 +9,7 @@ import {
   type RegisterFormData,
 } from '../schemas/authValidation';
 import { useAuth } from '../context/AuthContext';
+import { useAppPreferences } from '../../../shared/context/AppPreferencesContext';
 
 export interface AuthModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export const AuthModal: FC<AuthModalProps> = ({
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(initialTab);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login, register: registerUser } = useAuth();
+  const { isAr } = useAppPreferences();
 
   // Login form
   const {
@@ -66,7 +68,9 @@ export const AuthModal: FC<AuthModalProps> = ({
     } catch (err: unknown) {
       const errorMsg =
         (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
-        'بيانات الدخول غير صحيحة. يرجى التحقق من الرقم الجامعي وكلمة المرور.';
+        (isAr
+          ? 'بيانات الدخول غير صحيحة. يرجى التحقق من الرقم الجامعي وكلمة المرور.'
+          : 'Invalid credentials. Please verify your university ID/email and password.');
       setErrorMessage(errorMsg);
     }
   };
@@ -93,7 +97,9 @@ export const AuthModal: FC<AuthModalProps> = ({
     } catch (err: unknown) {
       const errorMsg =
         (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
-        'فشل إنشاء الحساب. قد يكون الرقم الجامعي أو البريد مسجلاً مسبقاً.';
+        (isAr
+          ? 'فشل إنشاء الحساب. قد يكون الرقم الجامعي أو البريد مسجلاً مسبقاً.'
+          : 'Registration failed. University ID or email may already be registered.');
       setErrorMessage(errorMsg);
     }
   };
@@ -118,10 +124,14 @@ export const AuthModal: FC<AuthModalProps> = ({
             alt="FBSU"
           />
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)' }}>
-            بوابة الدخول الموحد لجامعة فهد بن سلطان
+            {isAr
+              ? 'بوابة الدخول الموحد لجامعة فهد بن سلطان'
+              : 'Fahad Bin Sultan University Unified SSO'}
           </h3>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            نظام إدارة وتصاريح المواقف الذكية بالذكاء الاصطناعي
+            {isAr
+              ? 'نظام إدارة وتصاريح المواقف الذكية بالذكاء الاصطناعي'
+              : 'AI Smart Campus Parking & Digital Permits Gateway'}
           </p>
         </div>
 
@@ -140,7 +150,7 @@ export const AuthModal: FC<AuthModalProps> = ({
             data-testid="tab-login"
           >
             <User size={15} />
-            <span>تسجيل الدخول</span>
+            <span>{isAr ? 'تسجيل الدخول' : 'Sign In'}</span>
           </button>
           <button
             className={`auth-tab-btn ${activeTab === 'register' ? 'active' : ''}`}
@@ -152,7 +162,7 @@ export const AuthModal: FC<AuthModalProps> = ({
             data-testid="tab-register"
           >
             <ShieldCheck size={15} />
-            <span>إنشاء حساب جديد</span>
+            <span>{isAr ? 'إنشاء حساب جديد' : 'Create Account'}</span>
           </button>
         </div>
 
@@ -178,12 +188,18 @@ export const AuthModal: FC<AuthModalProps> = ({
         {activeTab === 'login' && (
           <form onSubmit={handleLoginSubmit(onLogin)} data-testid="login-form">
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label className="form-label">الرقم الجامعي أو البريد الإلكتروني:</label>
+              <label className="form-label">
+                {isAr ? 'الرقم الجامعي أو البريد الإلكتروني:' : 'University ID or Email:'}
+              </label>
               <div style={{ position: 'relative' }}>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="مثال: 20210045 أو email@fbsu.edu.sa"
+                  placeholder={
+                    isAr
+                      ? 'مثال: 20210045 أو email@fbsu.edu.sa'
+                      : 'e.g. 20210045 or email@fbsu.edu.sa'
+                  }
                   {...loginField('identifier')}
                 />
               </div>
@@ -202,12 +218,12 @@ export const AuthModal: FC<AuthModalProps> = ({
             </div>
 
             <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label">كلمة المرور:</label>
+              <label className="form-label">{isAr ? 'كلمة المرور:' : 'Password:'}</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type="password"
                   className="form-control"
-                  placeholder="أدخل كلمة المرور"
+                  placeholder={isAr ? 'أدخل كلمة المرور' : 'Enter your password'}
                   {...loginField('password')}
                 />
               </div>
@@ -238,7 +254,15 @@ export const AuthModal: FC<AuthModalProps> = ({
               data-testid="submit-login-btn"
             >
               <Lock size={18} />
-              <span>{isLoggingIn ? 'جاري التحقق...' : 'تسجيل الدخول (FBSU SSO)'}</span>
+              <span>
+                {isLoggingIn
+                  ? isAr
+                    ? 'جاري التحقق...'
+                    : 'Verifying...'
+                  : isAr
+                    ? 'تسجيل الدخول (FBSU SSO)'
+                    : 'Sign In (FBSU SSO)'}
+              </span>
             </button>
 
             {/* Quick 1-Click Demo Personas */}
@@ -258,7 +282,9 @@ export const AuthModal: FC<AuthModalProps> = ({
                   fontWeight: 600,
                 }}
               >
-                ⚡ تجربة سريعة بنقرة واحدة (حسابات العرض التفاعلي)
+                {isAr
+                  ? '⚡ تجربة سريعة بنقرة واحدة (حسابات العرض التفاعلي)'
+                  : '⚡ 1-Click Demo Personas (Interactive Accounts)'}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                 <button
@@ -280,7 +306,8 @@ export const AuthModal: FC<AuthModalProps> = ({
                     justifyContent: 'flex-start',
                   }}
                 >
-                  🎓 <strong>إياد الحربي</strong> (طالب)
+                  🎓 <strong>{isAr ? 'إياد الحربي' : 'Eyad Al-Harbi'}</strong> (
+                  {isAr ? 'طالب' : 'Student'})
                 </button>
                 <button
                   type="button"
@@ -301,7 +328,8 @@ export const AuthModal: FC<AuthModalProps> = ({
                     justifyContent: 'flex-start',
                   }}
                 >
-                  🚗 <strong>راكان المطيري</strong> (طالب)
+                  🚗 <strong>{isAr ? 'راكان المطيري' : 'Rakan Al-Mutairi'}</strong> (
+                  {isAr ? 'طالب' : 'Student'})
                 </button>
                 <button
                   type="button"
@@ -322,7 +350,8 @@ export const AuthModal: FC<AuthModalProps> = ({
                     justifyContent: 'flex-start',
                   }}
                 >
-                  👩‍🏫 <strong>د. رغد النفيعي</strong> (أستاذ)
+                  👩‍🏫 <strong>{isAr ? 'د. رغد النفيعي' : 'Dr. Raghad'}</strong> (
+                  {isAr ? 'أستاذ' : 'Faculty'})
                 </button>
                 <button
                   type="button"
@@ -343,7 +372,7 @@ export const AuthModal: FC<AuthModalProps> = ({
                     justifyContent: 'flex-start',
                   }}
                 >
-                  🛡️ <strong>إدارة النظام</strong> (Admin)
+                  🛡️ <strong>{isAr ? 'إدارة النظام' : 'System Admin'}</strong> (Admin)
                 </button>
               </div>
             </div>
@@ -362,11 +391,13 @@ export const AuthModal: FC<AuthModalProps> = ({
               }}
             >
               <div className="form-group">
-                <label className="form-label">الاسم بالعربية:</label>
+                <label className="form-label">
+                  {isAr ? 'الاسم بالعربية:' : 'Full Name (Arabic):'}
+                </label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="مثال: أحمد العطوي"
+                  placeholder={isAr ? 'مثال: أحمد العطوي' : 'أحمد العطوي'}
                   {...regField('fullNameAr')}
                 />
                 {regErrors.fullNameAr && (
@@ -401,7 +432,7 @@ export const AuthModal: FC<AuthModalProps> = ({
               }}
             >
               <div className="form-group">
-                <label className="form-label">الرقم الجامعي:</label>
+                <label className="form-label">{isAr ? 'الرقم الجامعي:' : 'University ID:'}</label>
                 <input
                   type="text"
                   className="form-control"
@@ -416,17 +447,21 @@ export const AuthModal: FC<AuthModalProps> = ({
               </div>
 
               <div className="form-group">
-                <label className="form-label">الصفة الأكاديمية:</label>
+                <label className="form-label">
+                  {isAr ? 'الصفة الأكاديمية:' : 'Academic Role:'}
+                </label>
                 <select className="form-control" {...regField('userType')}>
-                  <option value="STUDENT">طالب جامعي</option>
-                  <option value="FACULTY">عضو هيئة تدريس</option>
-                  <option value="STAFF">موظف إداري</option>
+                  <option value="STUDENT">{isAr ? 'طالب جامعي' : 'University Student'}</option>
+                  <option value="FACULTY">{isAr ? 'عضو هيئة تدريس' : 'Faculty Member'}</option>
+                  <option value="STAFF">{isAr ? 'موظف إداري' : 'Administrative Staff'}</option>
                 </select>
               </div>
             </div>
 
             <div className="form-group" style={{ marginBottom: '0.85rem' }}>
-              <label className="form-label">البريد الإلكتروني الجامعي:</label>
+              <label className="form-label">
+                {isAr ? 'البريد الإلكتروني الجامعي:' : 'University Email:'}
+              </label>
               <input
                 type="email"
                 className="form-control"
@@ -449,11 +484,11 @@ export const AuthModal: FC<AuthModalProps> = ({
               }}
             >
               <div className="form-group">
-                <label className="form-label">كلمة المرور:</label>
+                <label className="form-label">{isAr ? 'كلمة المرور:' : 'Password:'}</label>
                 <input
                   type="password"
                   className="form-control"
-                  placeholder="8 خانات على الأقل"
+                  placeholder={isAr ? '8 خانات على الأقل' : 'At least 8 characters'}
                   {...regField('password')}
                 />
                 {regErrors.password && (
@@ -464,7 +499,9 @@ export const AuthModal: FC<AuthModalProps> = ({
               </div>
 
               <div className="form-group">
-                <label className="form-label">رقم الجوال (اختياري):</label>
+                <label className="form-label">
+                  {isAr ? 'رقم الجوال (اختياري):' : 'Mobile Phone (Optional):'}
+                </label>
                 <input
                   type="tel"
                   className="form-control"
@@ -493,19 +530,23 @@ export const AuthModal: FC<AuthModalProps> = ({
                   marginBottom: '0.4rem',
                 }}
               >
-                بيانات المركبة لدخول البوابات التلقائي (اختياري):
+                {isAr
+                  ? 'بيانات المركبة لدخول البوابات التلقائي (اختياري):'
+                  : 'Vehicle Details for Automated ALPR Gate Access (Optional):'}
               </span>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="حروف اللوحة (مثال: أ ب ح)"
+                  placeholder={
+                    isAr ? 'حروف اللوحة (مثال: أ ب ح)' : 'Arabic Plate Letters (e.g. أ ب ح)'
+                  }
                   {...regField('plateLettersAr')}
                 />
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="أرقام اللوحة (مثال: 1234)"
+                  placeholder={isAr ? 'أرقام اللوحة (مثال: 1234)' : 'Plate Digits (e.g. 1234)'}
                   {...regField('plateDigits')}
                 />
               </div>
@@ -524,7 +565,15 @@ export const AuthModal: FC<AuthModalProps> = ({
               data-testid="submit-register-btn"
             >
               <ShieldCheck size={18} />
-              <span>{isRegistering ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب وتفعيل البوابة'}</span>
+              <span>
+                {isRegistering
+                  ? isAr
+                    ? 'جاري إنشاء الحساب...'
+                    : 'Creating Account...'
+                  : isAr
+                    ? 'إنشاء الحساب وتفعيل البوابة'
+                    : 'Create Account & Activate Portal'}
+              </span>
             </button>
           </form>
         )}

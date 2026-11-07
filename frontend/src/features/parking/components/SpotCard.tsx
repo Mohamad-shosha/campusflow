@@ -22,6 +22,11 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
     badgeText = isAr ? 'مشغول' : 'Occupied';
     statusColor = 'var(--status-occupied)';
     subInfo = spot.timeLeft || (isAr ? 'حتى نهاية المحاضرة' : 'Until class end');
+  } else if (spot.status === 'reserved') {
+    statusClass = 'occupied';
+    badgeText = isAr ? 'محجوز' : 'Reserved';
+    statusColor = 'var(--status-occupied)';
+    subInfo = spot.timeLeft || (isAr ? 'محجوز مسبقاً' : 'Reserved');
   } else if (spot.status === 'flex' || spot.status === 'flex-share') {
     statusClass = 'flex-share';
     badgeText = isAr ? 'تبادل ذكي' : 'AI Flex Share';
@@ -39,7 +44,12 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
   }
 
   let visualCenter;
-  if (spot.status === 'occupied' || spot.status === 'faculty' || spot.status === 'faculty-spot') {
+  if (
+    spot.status === 'occupied' ||
+    spot.status === 'reserved' ||
+    spot.status === 'faculty' ||
+    spot.status === 'faculty-spot'
+  ) {
     const carColor =
       spot.id === 1
         ? '#116E63'

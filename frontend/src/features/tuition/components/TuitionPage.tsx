@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap, FileCheck2, FileText, RefreshCw } from 'lucide-react';
+import { GraduationCap, FileCheck2, FileText, RefreshCw, Wallet, LogIn } from 'lucide-react';
 import { TuitionInvoiceCard } from './TuitionInvoiceCard';
 import { PayTuitionModal } from './PayTuitionModal';
 import { TuitionReceiptModal } from './TuitionReceiptModal';
@@ -14,9 +14,10 @@ import type { TuitionInvoiceResponse, TuitionReceiptResponse } from '../types/tu
 export interface TuitionPageProps {
   onBalanceUpdate?: ((newBalance: number) => void) | undefined;
   onOpenTopUp?: (() => void) | undefined;
+  onOpenAuth?: (() => void) | undefined;
 }
 
-export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp }) => {
+export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp, onOpenAuth }) => {
   const { i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const { isAuthenticated } = useAuth();
@@ -132,7 +133,21 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {onOpenTopUp && (
+            <button
+              onClick={onOpenTopUp}
+              className="utility-pill-btn"
+              type="button"
+              style={{ padding: '0.45rem 0.8rem', borderRadius: '8px' }}
+              data-testid="tuition-goto-wallet-btn"
+            >
+              <Wallet size={14} color="var(--fbsu-gold)" />
+              <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                {isAr ? 'المحفظة الجامعية' : 'Campus Wallet'}
+              </span>
+            </button>
+          )}
           <button
             onClick={loadData}
             disabled={isLoading}
@@ -148,6 +163,41 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
           </button>
         </div>
       </div>
+
+      {!isAuthenticated && (
+        <div
+          className="glass-panel"
+          style={{
+            padding: '1.15rem 1.4rem',
+            marginBottom: '1.25rem',
+            border: '1px solid var(--fbsu-gold-border)',
+            background: 'var(--fbsu-gold-light)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+          data-testid="tuition-auth-prompt"
+        >
+          <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-main)' }}>
+            {isAr
+              ? 'يرجى تسجيل الدخول بحسابك الجامعي لعرض فواتير الرسوم الدراسية وسجل الإيصالات المعتمدة.'
+              : 'Please sign in with your university account to view your tuition invoices and verified receipts.'}
+          </span>
+          {onOpenAuth && (
+            <button
+              type="button"
+              className="btn-gold"
+              onClick={onOpenAuth}
+              data-testid="tuition-signin-btn"
+            >
+              <LogIn size={15} color="#0b1a17" />
+              <span>{isAr ? 'تسجيل الدخول' : 'Sign In'}</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Mode Tabs */}
       <div

@@ -78,9 +78,8 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
       if (available.length > 0) {
         setSelectedSpotId(available[0].id);
         setSelectedBayNumber(available[0].bayNumber);
-      } else if (spots.length > 0) {
-        setSelectedSpotId(spots[0].id);
-        setSelectedBayNumber(spots[0].bayNumber);
+      } else {
+        setSelectedSpotId('');
       }
     } catch (err) {
       console.warn('Could not load spots for zone', targetZone, err);
@@ -155,11 +154,17 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
       const startDate = new Date();
       const endDate = new Date(startDate.getTime() + durationHours * 60 * 60 * 1000);
 
-      // If no spot selected yet, fallback to fetching any available
+      // If no spot selected in this zone, auto-assign closest available bay across campus
       let targetSpotId = selectedSpotId;
       if (!targetSpotId) {
-        const spots = await parkingApi.getSpots(targetZone);
-        const avail = spots.find(s => s.status === 'AVAILABLE') || spots[0];
+        const zoneSpots = await parkingApi.getSpots(targetZone);
+        let avail = zoneSpots.find(s => s.status === 'AVAILABLE');
+        if (!avail) {
+          const allSpots = await parkingApi.getSpots();
+          avail = allSpots
+            .filter(s => s.status === 'AVAILABLE' && s.spotType !== 'FACULTY')
+            .sort((a, b) => a.distanceMeters - b.distanceMeters)[0];
+        }
         if (avail) {
           targetSpotId = avail.id;
           setSelectedBayNumber(avail.bayNumber);

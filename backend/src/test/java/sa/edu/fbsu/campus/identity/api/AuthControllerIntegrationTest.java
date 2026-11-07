@@ -49,6 +49,7 @@ class AuthControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         String uniNumber = "STD-" + uniqueSuffix;
         String email = "student-" + uniqueSuffix + "@fbsu.edu.sa";
         String password = "SecureStudentPass2026!";
+        String plateDigits = String.valueOf(6100 + Math.abs(uniqueSuffix.hashCode() % 899));
 
         // 1. Register
         RegisterRequest registerReq = new RegisterRequest(
@@ -61,7 +62,7 @@ class AuthControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                 UserType.STUDENT,
                 "0512345678",
                 "ط ر ق",
-                "4040",
+                plateDigits,
                 "Camry",
                 "White"
         );
@@ -73,7 +74,7 @@ class AuthControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty())
                 .andExpect(jsonPath("$.user.universityNumber").value(uniNumber))
-                .andExpect(jsonPath("$.user.primaryVehiclePlate").value("ط ر ق 4040"));
+                .andExpect(jsonPath("$.user.primaryVehiclePlate").value("ط ر ق " + plateDigits));
 
         // 2. Login
         LoginRequest loginReq = new LoginRequest("FBSU", email, password);

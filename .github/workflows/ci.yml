@@ -2,13 +2,22 @@ name: CI Pipeline
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - 'audit/**'
+      - 'feature/**'
+      - 'fix/**'
+      - 'chore/**'
+      - 'ci/**'
+      - 'test/**'
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   # ============================================================================
-  # 1. Frontend Verification (Lint, Typecheck, Test, Build)
+  # 1. Frontend Verification (Formatting, Lint, Typecheck, Test, Build)
   # ============================================================================
   frontend-ci:
     name: Frontend Quality & Test Checks
@@ -30,6 +39,9 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm ci
 
+      - name: Check Prettier Formatting
+        run: npx prettier --check "src/**/*.{ts,tsx,css}"
+
       - name: Run ESLint
         run: npm run lint
 
@@ -43,7 +55,7 @@ jobs:
         run: npm run build
 
   # ============================================================================
-  # 2. Backend Verification (Java 21, ArchUnit, Unit & Integration Tests, Build)
+  # 2. Backend Verification (Java 21, ArchUnit, Testcontainers PostgreSQL, Build)
   # ============================================================================
   backend-ci:
     name: Backend Quality & Architecture Tests
@@ -65,14 +77,14 @@ jobs:
       - name: Grant Execute Permissions to Maven Wrapper
         run: chmod +x ./mvnw
 
-      - name: Run Backend Architecture & Unit Tests
+      - name: Run Backend Architecture, Unit & PostgreSQL Integration Tests
         run: ./mvnw test
 
       - name: Package Backend Application JAR
         run: ./mvnw package -DskipTests
 
   # ============================================================================
-  # 3. Docker Verification (Dockerfiles Build & Compose Orchestration Check)
+  # 3. Docker Verification (Full-Stack Compose Build, Health & Live Smoke Test)
   # ============================================================================
   docker-smoke-ci:
     name: Docker Build & Compose Smoke Test
@@ -82,23 +94,22 @@ jobs:
       - name: Checkout Codebase
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Validate Docker Compose Configuration
         run: docker compose config
 
-      - name: Build Backend Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: false
-          tags: fbsu-campus-backend:test
+      - name: Build & Boot Full-Stack Containers (PostgreSQL, Backend, Frontend)
+        run: |
+          cp .env.example .env
+          docker compose up -d --build --wait
+          docker compose ps
 
-      - name: Build Frontend Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: false
-          tags: fbsu-campus-frontend:test
+      - name: Execute Live HTTP End-to-End Smoke Verification
+        run: |
+          curl -fsS http://localhost:8080/actuator/health | grep '"status":"UP"'
+          curl -fsS http://localhost/api/v1/parking/summary | grep '"totalSpots":30'
+          curl -fsS http://localhost/ | grep -i '<!doctype html>'
+
+      - name: Tear Down Smoke Stack
+        if: always()
+        run: docker compose down
 
