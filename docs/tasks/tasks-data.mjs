@@ -353,6 +353,7 @@ export const tasks = [
     tests: ['Component', 'E2E'], blockedBy: [],
   }),
   T('P6-06', 'Rooms schema + booking API (extend/release)', {
+    status: 'Done', pr: 'PR (feature/P6-06-rooms-api)',
     pri: 'High', cx: 'L', deps: ['P2-03', 'Q10'], branch: 'feature/P6-06-rooms-api',
     goal: 'قاعات ومعامل وحجزها مع التمديد والإخلاء ومنع التعارض.',
     files: ['db/migration/V12__rooms.sql', 'rooms/**'],

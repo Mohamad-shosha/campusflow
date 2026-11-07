@@ -451,9 +451,9 @@
 
 ### P6-06 — Rooms schema + booking API (extend/release)
 - **ماذا سيعمل:** قاعات ومعامل وحجزها مع التمديد والإخلاء ومنع التعارض.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P2-03، Q10
-- **Git Branch:** `feature/P6-06-rooms-api` · **Pull Request:** —
+- **Git Branch:** `feature/P6-06-rooms-api` · **Pull Request:** PR (feature/P6-06-rooms-api)
 - **الملفات المتوقعة:** `db/migration/V12__rooms.sql`، `rooms/**`
 - **Implementation Steps:** 1) Migration + exclusion 2) Domain 3) Extend/Release 4) API 5) اختبارات
 - **Acceptance Criteria:** لا تعارض · التمديد/الإخلاء حسب قواعد Q10
