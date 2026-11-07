@@ -326,6 +326,7 @@ export const tasks = [
     tests: ['Service', 'Concurrency', 'API'], blockedBy: ['Q5'],
   }),
   T('P6-03', 'Tutoring UI', {
+    status: 'Done', pr: 'PR (feature/P6-03-tutoring-ui)',
     pri: 'High', cx: 'M', deps: ['P6-02', 'P3-05'], branch: 'feature/P6-03-tutoring-ui',
     goal: 'سوق الشروحات: فلترة وحجز ونشر جلسة.',
     files: ['frontend/src/features/tutoring/*'],

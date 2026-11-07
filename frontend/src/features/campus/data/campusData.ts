@@ -1,8 +1,11 @@
 export interface TutoringSession {
   id: string;
+  backendId?: string | undefined;
   tutorId: string;
   tutorName: string;
+  tutorNameEn?: string | undefined;
   tutorRole: string;
+  tutorRoleEn?: string | undefined;
   tutorAvatarColor: string;
   courseCode: string;
   courseName: string;
@@ -19,6 +22,9 @@ export interface TutoringSession {
   reviewsCount: number;
   status: 'open' | 'booked' | 'completed';
   enrolledStudents: string[];
+  enrolledStudentNumbers?: string[] | undefined;
+  maxCapacity?: number | undefined;
+  enrolledCount?: number | undefined;
 }
 
 export interface TimeSlot {

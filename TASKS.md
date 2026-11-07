@@ -418,9 +418,9 @@
 
 ### P6-03 — Tutoring UI
 - **ماذا سيعمل:** سوق الشروحات: فلترة وحجز ونشر جلسة.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P6-02، P3-05
-- **Git Branch:** `feature/P6-03-tutoring-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P6-03-tutoring-ui` · **Pull Request:** PR (feature/P6-03-tutoring-ui)
 - **الملفات المتوقعة:** `frontend/src/features/tutoring/*`
 - **Implementation Steps:** 1) Hub + Filters 2) Booking modal 3) Create modal 4) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy

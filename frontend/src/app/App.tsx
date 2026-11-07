@@ -33,6 +33,7 @@ import { AlprGateView } from '../features/parking/components/AlprGateView';
 import { ShareSpotView } from '../features/parking/components/ShareSpotView';
 
 import { TutoringView } from '../features/campus/components/TutoringView';
+import { tutoringApi } from '../features/campus/api/tutoringApi';
 import { OfficeHoursView } from '../features/campus/components/OfficeHoursView';
 import { StudyRoomsView } from '../features/campus/components/StudyRoomsView';
 import { AnalyticsView } from '../features/analytics/components/AnalyticsView';
@@ -115,15 +116,27 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     }
   }, []);
 
+  const fetchTutoringSessions = useCallback(async () => {
+    try {
+      const liveSessions = await tutoringApi.getSessions();
+      if (liveSessions && liveSessions.length > 0) {
+        setTutoringSessions(liveSessions);
+      }
+    } catch {
+      // Fallback to initial showcase sessions when offline or in isolated unit tests
+    }
+  }, []);
+
   useEffect(() => {
     fetchParkingData();
+    fetchTutoringSessions();
     const interval = setInterval(fetchParkingData, 30000);
     return () => clearInterval(interval);
-  }, [fetchParkingData]);
+  }, [fetchParkingData, fetchTutoringSessions]);
 
   const handleRefreshAll = useCallback(async () => {
-    await Promise.all([fetchParkingData(), fetchWalletBalance()]);
-  }, [fetchParkingData, fetchWalletBalance]);
+    await Promise.all([fetchParkingData(), fetchWalletBalance(), fetchTutoringSessions()]);
+  }, [fetchParkingData, fetchWalletBalance, fetchTutoringSessions]);
 
   const handleLogout = async () => {
     await logout();
@@ -202,23 +215,19 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
-  const handleTutoringBooked = (session: TutoringSession) => {
-    setTutoringSessions(prev =>
-      prev.map(s =>
-        s.id === session.id
-          ? {
-              ...s,
-              enrolledStudents: [...s.enrolledStudents, currentUser.name],
-            }
-          : s
-      )
-    );
+  const handleTutoringBooked = (updatedSession: TutoringSession, updatedBalance?: number) => {
+    setTutoringSessions(prev => prev.map(s => (s.id === updatedSession.id ? updatedSession : s)));
+    if (updatedBalance !== undefined) {
+      setLiveBalance(updatedBalance);
+    } else {
+      fetchWalletBalance();
+    }
     setActiveToast({
-      title: isAr ? 'معاينة حجز الجلسة (المرحلة P6)' : 'Tutoring Preview Enrolled (Phase P6)',
+      title: isAr ? 'تم تأكيد حجز جلسة الشرح' : 'Tutoring Session Booked',
       message: isAr
-        ? 'تمت محاكاة التسجيل في الجلسة ضمن معاينة المرحلة السادسة دون خصم رصيد فعلي من المحفظة.'
-        : 'Preview enrollment recorded for Phase 6 showcase without deducting live wallet funds.',
-      type: 'info',
+        ? `تم تسجيلك في مقرر ${updatedSession.courseCode} وتحويل ${updatedSession.totalPrice.toFixed(2)} ر.س للمعلم الأقران.`
+        : `Enrolled in ${updatedSession.courseCode}; ${updatedSession.totalPrice.toFixed(2)} SAR transferred to peer tutor.`,
+      type: 'success',
     });
   };
 
@@ -262,7 +271,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     parkingSpots.find(
       s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
     )?.id ?? 1;
-  const isPreviewTab = ['tutoring', 'office-hours', 'rooms', 'analytics'].includes(activeTab);
+  const isPreviewTab = ['office-hours', 'rooms', 'analytics'].includes(activeTab);
 
   return (
     <AppShell
@@ -455,12 +464,14 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <TutoringView
             sessions={tutoringSessions}
             isAr={isAr}
+            isAuthenticated={isAuthenticated}
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
               role: currentUser.role,
               walletBalance: currentUser.walletBalance,
             }}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
             onOpenTuition={() => setActiveTab('tuition')}
             onBookSuccess={handleTutoringBooked}
             onAddSession={handleAddTutoringSession}

@@ -1,6 +1,7 @@
 import { useState, type FC, type SyntheticEvent } from 'react';
-import { X, BookOpen, Plus } from 'lucide-react';
+import { X, BookOpen, Plus, AlertCircle } from 'lucide-react';
 import type { TutoringSession } from '../data/campusData';
+import { tutoringApi } from '../api/tutoringApi';
 import { soundFX } from '../../../shared/utils/sound';
 
 export interface CreateTutoringModalProps {
@@ -18,7 +19,6 @@ export interface CreateTutoringModalProps {
 export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
   isOpen,
   isAr,
-  currentUser,
   onClose,
   onSubmit,
 }) => {
@@ -32,40 +32,48 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
   const [coveredScope, setCoveredScope] = useState<string>(
     'حل أسئلة الواجبات وتطبيقات عملية على شجرة البحث الثنائية.'
   );
-  const [hourlyRate] = useState<number>(70); // Fixed 70 SAR as required!
+  const [hourlyRate] = useState<number>(70);
+  const [durationHours, setDurationHours] = useState<number>(1);
   const [dateTime, setDateTime] = useState<string>('الأربعاء القادم - 03:00 م');
   const [location, setLocation] = useState<string>('معمل الحاسب 102 (Computer Lab 102)');
   const [category, setCategory] = useState<string>('programming');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
+  const totalPrice = hourlyRate * durationHours;
+
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    soundFX.playSuccess();
-    const newSession: TutoringSession = {
-      id: `TUT-${Date.now()}`,
-      tutorId: currentUser.id,
-      tutorName: currentUser.name,
-      tutorRole: currentUser.role,
-      tutorAvatarColor: '#116E63',
-      courseCode,
-      courseName,
-      courseNameEn: courseName,
-      coveredLectures,
-      coveredScope,
-      hourlyRate,
-      durationHours: 1,
-      totalPrice: hourlyRate,
-      dateTime,
-      location,
-      category,
-      rating: 5.0,
-      reviewsCount: 1,
-      status: 'open',
-      enrolledStudents: [],
-    };
-    onSubmit(newSession);
-    onClose();
+    setErrorMsg(null);
+    setIsSubmitting(true);
+    try {
+      const created = await tutoringApi.createSession({
+        courseCode,
+        courseNameAr: courseName,
+        courseNameEn: courseName,
+        coveredLectures,
+        coveredScope,
+        category,
+        durationHours,
+        scheduleText: dateTime,
+        location,
+        maxCapacity: 10,
+      });
+      soundFX.playSuccess();
+      onSubmit(created);
+      setIsSubmitting(false);
+      onClose();
+    } catch (err: unknown) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+        (isAr
+          ? 'تعذر نشر الجلسة. يُسمح فقط للطلاب المؤهلين بنشر جلسات الشرح.'
+          : 'Unable to publish session. Only eligible student accounts may post tutoring sessions.');
+      setErrorMsg(detail);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,12 +81,23 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
       className="modal-overlay open"
       id="create-tutoring-backdrop"
       onClick={e => {
-        if ((e.target as HTMLElement).id === 'create-tutoring-backdrop') onClose();
+        if ((e.target as HTMLElement).id === 'create-tutoring-backdrop') {
+          setErrorMsg(null);
+          onClose();
+        }
       }}
       data-testid="create-tutoring-modal"
     >
       <div className="modal-content-box" style={{ maxWidth: '540px' }}>
-        <button className="modal-close-btn" onClick={onClose} type="button" aria-label="Close">
+        <button
+          className="modal-close-btn"
+          onClick={() => {
+            setErrorMsg(null);
+            onClose();
+          }}
+          type="button"
+          aria-label="Close"
+        >
           <X size={16} />
         </button>
 
@@ -112,6 +131,28 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
           </div>
         </div>
 
+        {errorMsg && (
+          <div
+            role="alert"
+            style={{
+              padding: '0.8rem 1rem',
+              marginBottom: '1rem',
+              background: 'rgba(239,68,68,0.12)',
+              border: '1px solid rgba(239,68,68,0.4)',
+              borderRadius: 'var(--radius-md)',
+              color: '#fca5a5',
+              fontSize: '0.84rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+            data-testid="create-tutoring-error"
+          >
+            <AlertCircle size={16} />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">{isAr ? 'رمز المقرر:' : 'Course Code:'}</label>
@@ -135,7 +176,7 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
             <div className="form-group">
               <label className="form-label">{isAr ? 'التصنيف:' : 'Category:'}</label>
               <select
@@ -150,15 +191,26 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label className="form-label">
-                {isAr ? 'سعر الساعة (رسمي):' : 'Rate (Official):'}
-              </label>
+              <label className="form-label">{isAr ? 'المدة:' : 'Duration:'}</label>
+              <select
+                className="form-control"
+                value={durationHours}
+                onChange={e => setDurationHours(Number(e.target.value))}
+              >
+                <option value={1}>{isAr ? '1 ساعة' : '1.0 Hour'}</option>
+                <option value={1.5}>{isAr ? '1.5 ساعة' : '1.5 Hours'}</option>
+                <option value={2}>{isAr ? '2 ساعتان' : '2.0 Hours'}</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">{isAr ? 'إجمالي الجلسة:' : 'Total Fee:'}</label>
               <input
                 type="text"
                 className="form-control"
-                value={`${hourlyRate} SAR`}
+                value={`${totalPrice} SAR`}
                 disabled
-                style={{ opacity: 0.8 }}
+                style={{ opacity: 0.85 }}
               />
             </div>
           </div>
@@ -215,6 +267,7 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
 
           <button
             className="btn-primary"
+            disabled={isSubmitting}
             style={{
               width: '100%',
               justifyContent: 'center',
@@ -222,9 +275,18 @@ export const CreateTutoringModal: FC<CreateTutoringModalProps> = ({
               padding: '0.95rem',
             }}
             type="submit"
+            data-testid="publish-tutoring-submit-btn"
           >
             <Plus size={16} color="#ffffff" />
-            <span>{isAr ? 'نشر الجلسة وإتاحتها للطلاب' : 'Publish Tutoring Session'}</span>
+            <span>
+              {isSubmitting
+                ? isAr
+                  ? 'جارٍ النشر...'
+                  : 'Publishing...'
+                : isAr
+                  ? 'نشر الجلسة وإتاحتها للطلاب'
+                  : 'Publish Tutoring Session'}
+            </span>
           </button>
         </form>
       </div>
