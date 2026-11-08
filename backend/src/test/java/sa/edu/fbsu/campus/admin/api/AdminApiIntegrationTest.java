@@ -55,6 +55,9 @@ class AdminApiIntegrationTest extends AbstractPostgresIntegrationTest {
     @Autowired
     private UniversityRepository universityRepository;
 
+    @Autowired
+    private sa.edu.fbsu.campus.identity.infra.UserRepository userRepository;
+
     private String getAdminToken() throws Exception {
         LoginRequest req = new LoginRequest("FBSU", "admin@fbsu.edu.sa", "FbsuDev2026!");
         MvcResult res = mockMvc.perform(post("/api/v1/auth/login")
@@ -351,13 +354,10 @@ class AdminApiIntegrationTest extends AbstractPostgresIntegrationTest {
                 .andExpect(jsonPath("$.roles", hasItems("STUDENT", "FACULTY")));
 
         // 5. Admin cannot suspend self
-        LoginRequest req = new LoginRequest("FBSU", "admin@fbsu.edu.sa", "FbsuDev2026!");
-        MvcResult loginRes = mockMvc.perform(post("/api/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk())
-                .andReturn();
-        String adminUserId = objectMapper.readTree(loginRes.getResponse().getContentAsString()).get("userId").asText();
+        String adminUserId = userRepository.findByEmail("admin@fbsu.edu.sa")
+                .orElseThrow()
+                .getId()
+                .toString();
 
         mockMvc.perform(patch("/api/v1/admin/users/" + adminUserId + "/status")
                         .header("Authorization", "Bearer " + adminToken)
