@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 38 تاسك ✅
+- **المنجز بالكامل (Done):** 39 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 15 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **72%**
+- **المتبقي للبدء (Backlog):** 14 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **74%**
 
 
 
@@ -25,10 +25,10 @@
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
 | P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 7 | 0 | 0 |
-| P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
+| P7 | Notifications, Admin, Analytics | 6 | 1 | 0 | 5 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **38** | **0** | **15** |
+| **الإجمالي** | | **53** | **39** | **0** | **14** |
 
 ---
 
@@ -476,9 +476,9 @@
 
 ### P7-01 — Notification module + API
 - **ماذا سيعمل:** خدمة الإشعارات داخل التطبيق: إنشاء وقراءة وتعليم كمقروء.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P2-03
-- **Git Branch:** `feature/P7-01-notifications-api` · **Pull Request:** —
+- **Git Branch:** `feature/P7-01-notifications-api` · **Pull Request:** PR (feature/P7-01-notifications-api)
 - **الملفات المتوقعة:** `db/migration/V13__notifications.sql`، `notification/**`
 - **Implementation Steps:** 1) Migration 2) Service 3) API 4) اختبارات
 - **Acceptance Criteria:** المستخدم يرى إشعاراته فقط
