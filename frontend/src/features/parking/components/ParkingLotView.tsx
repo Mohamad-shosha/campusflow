@@ -162,8 +162,8 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
           </span>
           <h3 className="section-title">
             {isAr
-              ? 'المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان (30 موقف)'
-              : 'FBSU Live Digital Parking Lot (30 Bays)'}
+              ? `المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان (${spots.length} موقف)`
+              : `FBSU Live Digital Parking Lot (${spots.length} Bays)`}
           </h3>
           <p className="section-subtitle">
             {isAr
@@ -210,7 +210,9 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             type="button"
           >
             <Building2 size={14} />
-            <span>{isAr ? 'جميع القطاعات (30 موقف)' : 'All Zones (30)'}</span>
+            <span>
+              {isAr ? `جميع القطاعات (${spots.length} موقف)` : `All Zones (${spots.length})`}
+            </span>
           </button>
           <button
             className={`zone-btn ${activeZone === 'A' ? 'active' : ''}`}
@@ -251,6 +253,16 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             type="button"
           >
             <span>{isAr ? 'قطاع D - شحن كهربائي EV' : 'Zone D - EV Charging'}</span>
+          </button>
+          <button
+            className={`zone-btn ${activeZone === 'E' ? 'active' : ''}`}
+            onClick={() => {
+              soundFX.playClick();
+              setActiveZone('E');
+            }}
+            type="button"
+          >
+            <span>{isAr ? 'قطاع E - البوابة المركزية' : 'Zone E - Main Gate'}</span>
           </button>
         </div>
 

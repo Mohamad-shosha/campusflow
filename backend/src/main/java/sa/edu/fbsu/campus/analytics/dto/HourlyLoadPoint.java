@@ -7,3 +7,4 @@ public record HourlyLoadPoint(
         String labelAr,
         String labelEn
 ) {}
+

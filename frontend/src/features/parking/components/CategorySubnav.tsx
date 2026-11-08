@@ -4,7 +4,6 @@ import {
   BookOpen,
   MapPin,
   Calendar,
-  Zap,
   Camera,
   RefreshCw,
   Users,
@@ -20,7 +19,7 @@ export interface CategorySubnavProps {
 }
 
 export const CategorySubnav: FC<CategorySubnavProps> = ({ activeTab, isAr, onTabChange }) => {
-  const isParkingCategory = ['map', 'booking', 'simulator', 'gate', 'share'].includes(activeTab);
+  const isParkingCategory = ['map', 'booking', 'gate', 'share'].includes(activeTab);
   const isCampusCategory = ['tutoring', 'office-hours', 'rooms'].includes(activeTab);
 
   if (!isParkingCategory && !isCampusCategory) return null;
@@ -56,18 +55,6 @@ export const CategorySubnav: FC<CategorySubnavProps> = ({ activeTab, isAr, onTab
           >
             <Calendar size={13} />
             <span>{isAr ? 'حجز موقف وتصريح' : 'Book Spot'}</span>
-          </button>
-
-          <button
-            className={`subnav-chip-btn ${activeTab === 'simulator' ? 'active' : ''}`}
-            onClick={() => {
-              soundFX.playClick();
-              onTabChange('simulator');
-            }}
-            type="button"
-          >
-            <Zap size={13} />
-            <span>{isAr ? 'محاكاة التبادل Flex-Share' : 'Flex Swap Demo'}</span>
           </button>
 
           <button

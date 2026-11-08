@@ -52,10 +52,10 @@ describe('App Full Integration & Feature Navigation Tests', () => {
   it('navigates seamlessly between parking and campus views via category subnav', () => {
     render(<App initialTab="map" />);
 
-    // Click simulator
-    const simBtn = screen.getByRole('button', { name: /محاكاة التبادل Flex-Share/i });
-    fireEvent.click(simBtn);
-    expect(screen.getByTestId('simulator-view')).toBeInTheDocument();
+    // Click Book Spot
+    const bookBtn = screen.getByRole('button', { name: /حجز موقف وتصريح/i });
+    fireEvent.click(bookBtn);
+    expect(screen.getByTestId('booking-wizard-view')).toBeInTheDocument();
 
     // Click Gate ALPR
     const gateBtn = screen.getByRole('button', { name: /بوابة وكاميرات ALPR/i });

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.common.events.StudyRoomBookingEvent;
-import sa.edu.fbsu.campus.domain.University;
 import sa.edu.fbsu.campus.identity.domain.Role;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
@@ -63,7 +62,7 @@ public class RoomsService {
             return List.of();
         }
 
-        List<UUID> roomIds = rooms.stream().map(StudyRoom::getId).toList();
+        List<UUID> roomIds = rooms.stream().map(r -> r.getId()).toList();
         Map<UUID, RoomBooking> activeBookings = bookingRepository.findActiveOrReservedByRoomIds(roomIds)
                 .stream()
                 .collect(Collectors.toMap(
@@ -307,10 +306,10 @@ public class RoomsService {
 
     private UUID resolveDefaultUniversityId() {
         return universityRepository.findByCode("FBSU")
-                .map(University::getId)
+                .map(u -> u.getId())
                 .orElseGet(() -> universityRepository.findAll().stream()
                         .findFirst()
-                        .map(University::getId)
+                        .map(u -> u.getId())
                         .orElseThrow(() -> new ResourceNotFoundException("Default FBSU university tenant not initialized")));
     }
 }

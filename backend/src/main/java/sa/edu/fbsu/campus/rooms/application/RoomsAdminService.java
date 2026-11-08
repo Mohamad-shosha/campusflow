@@ -6,7 +6,6 @@ import sa.edu.fbsu.campus.common.audit.application.AdminAuditService;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.common.security.UserPrincipal;
 import sa.edu.fbsu.campus.rooms.domain.RoomBooking;
-import sa.edu.fbsu.campus.rooms.domain.RoomBookingStatus;
 import sa.edu.fbsu.campus.rooms.domain.RoomStatus;
 import sa.edu.fbsu.campus.rooms.domain.StudyRoom;
 import sa.edu.fbsu.campus.rooms.dto.CreateRoomRequest;
@@ -15,7 +14,6 @@ import sa.edu.fbsu.campus.rooms.dto.UpdateRoomRequest;
 import sa.edu.fbsu.campus.rooms.infra.RoomBookingRepository;
 import sa.edu.fbsu.campus.rooms.infra.StudyRoomRepository;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

@@ -91,7 +91,7 @@ export const HeroSection: FC<HeroSectionProps> = ({
                 type="button"
               >
                 <UserCheck size={18} />
-                <span>{isAr ? 'الساعات المكتبية (د. رغد ود. محمد مزهر)' : 'Office Hours'}</span>
+                <span>{isAr ? 'الساعات المكتبية والاستشارات' : 'Faculty Office Hours'}</span>
               </button>
               <button
                 className="btn-outline"

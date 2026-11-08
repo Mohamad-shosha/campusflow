@@ -6,7 +6,8 @@ export interface FooterProps {
 }
 
 export const Footer: FC<FooterProps> = ({ onTabChange }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language ? i18n.language.startsWith('ar') : true;
 
   const handleNavClick = (tab: string) => {
     if (onTabChange) {
@@ -141,16 +142,16 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
               </li>
               <li>
                 <a
-                  href="#simulator"
+                  href="#share"
                   onClick={e => {
                     if (onTabChange) {
                       e.preventDefault();
-                      handleNavClick('simulator');
+                      handleNavClick('share');
                     }
                   }}
                   style={{ color: '#e2e8f0' }}
                 >
-                  {t('footer.flexSim')}
+                  {isAr ? 'منظومة التبادل الذكي Flex Share' : 'AI Flex Share'}
                 </a>
               </li>
               <li>

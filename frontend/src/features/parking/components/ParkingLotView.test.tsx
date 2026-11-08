@@ -19,9 +19,9 @@ describe('ParkingLotView Component', () => {
       screen.getByText(/المخطط الرقمي المباشر لمواقف جامعة فهد بن سلطان/i)
     ).toBeInTheDocument();
 
-    // Check bay cards rendered
+    // Check bay cards rendered (40 spots across 5 campus zones)
     const cards = screen.getAllByTestId('spot-card');
-    expect(cards.length).toBe(30);
+    expect(cards.length).toBe(INITIAL_PARKING_SPOTS.length);
   });
 
   it('filters spots by zone tab when clicked', () => {

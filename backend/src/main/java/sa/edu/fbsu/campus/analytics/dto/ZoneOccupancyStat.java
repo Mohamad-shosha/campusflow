@@ -8,3 +8,4 @@ public record ZoneOccupancyStat(
         int occupiedSpots,
         double occupancyRate
 ) {}
+

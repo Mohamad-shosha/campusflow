@@ -27,9 +27,9 @@ import { HeroSection } from '../features/parking/components/HeroSection';
 import { CategorySubnav } from '../features/parking/components/CategorySubnav';
 import { ParkingLotView } from '../features/parking/components/ParkingLotView';
 import { BookingWizardView } from '../features/parking/components/BookingWizardView';
-import { SimulatorView } from '../features/parking/components/SimulatorView';
 import { AlprGateView } from '../features/parking/components/AlprGateView';
 import { ShareSpotView } from '../features/parking/components/ShareSpotView';
+import { CampusShowcaseHub } from '../features/campus/components/CampusShowcaseHub';
 
 import { TutoringView } from '../features/campus/components/TutoringView';
 import { tutoringApi } from '../features/campus/api/tutoringApi';
@@ -401,7 +401,6 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     parkingSpots.find(
       s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
     )?.id ?? 1;
-  const isPreviewTab = ['analytics'].includes(activeTab);
 
   return (
     <AppShell
@@ -454,76 +453,55 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         {/* Category Subnav chips */}
         <CategorySubnav activeTab={activeTab} isAr={isAr} onTabChange={setActiveTab} />
 
-        {isPreviewTab && (
-          <div
-            className="glass-panel"
-            style={{
-              padding: '0.85rem 1.25rem',
-              marginBottom: '1.5rem',
-              border: '1px solid var(--fbsu-gold-border)',
-              background: 'var(--fbsu-gold-light)',
-              fontSize: '0.84rem',
-              color: 'var(--text-main)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '0.5rem',
-            }}
-            data-testid="roadmap-preview-banner"
-          >
-            <strong>
-              {isAr
-                ? '📋 معاينة تفاعلية للمراحل القادمة (Phase 6 & 7 Backlog)'
-                : '📋 Interactive UI Preview (Scheduled for Phase 6 & 7)'}
-            </strong>
-            <span style={{ color: 'var(--text-muted)' }}>
-              {isAr
-                ? 'بيانات هذا القسم للعرض التصميمي فقط لحين ربط واجهات البرمجة الخاصة به في المرحلة القادمة.'
-                : 'Showcase prototype data; live backend persistence is scheduled in Phase 6–7.'}
-            </span>
-          </div>
-        )}
-
-        {/* Tab 1: Live Map */}
+        {/* Tab 1: Live Map & Campus Showcase Hub */}
         {activeTab === 'map' && (
-          <ParkingLotView
-            spots={parkingSpots}
-            isAr={isAr}
-            currentUser={{
-              id: currentUser.id,
-              name: currentUser.name,
-              plate: primaryPlate,
-              primarySpot: userAssignedBay,
-            }}
-            isAuthenticated={isAuthenticated}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
-            onReserveSpot={handleReserveSpot}
-            onBookingSuccess={booking => {
-              handleRefreshAll();
-              setActiveToast({
-                title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
-                message: isAr
-                  ? `تم حجز موقف #${booking.bayNumber} وخصم ${Number(booking.totalAmount).toFixed(2)} ر.س من محفظتك الجامعية.`
-                  : `Bay #${booking.bayNumber} reserved and ${Number(booking.totalAmount).toFixed(2)} SAR debited from your wallet.`,
-                type: 'success',
-              });
-            }}
-            onBookingCancelled={() => {
-              handleRefreshAll();
-              setActiveToast({
-                title: isAr ? 'تم إلغاء الحجز واسترداد المبلغ' : 'Booking Cancelled & Refunded',
-                message: isAr
-                  ? 'تم إلغاء الحجز وإعادة المبلغ المخصوم إلى محفظتك الجامعية فوراً.'
-                  : 'Reservation cancelled and full amount refunded to your wallet.',
-                type: 'info',
-              });
-            }}
-            onOpenGate={() => setActiveTab('gate')}
-            isLoading={isParkingLoading}
-            onRefresh={handleRefreshAll}
-            lastUpdated={parkingLastUpdated}
-          />
+          <>
+            <ParkingLotView
+              spots={parkingSpots}
+              isAr={isAr}
+              currentUser={{
+                id: currentUser.id,
+                name: currentUser.name,
+                plate: primaryPlate,
+                primarySpot: userAssignedBay,
+              }}
+              isAuthenticated={isAuthenticated}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+              onReserveSpot={handleReserveSpot}
+              onBookingSuccess={booking => {
+                handleRefreshAll();
+                setActiveToast({
+                  title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
+                  message: isAr
+                    ? `تم حجز موقف #${booking.bayNumber} وخصم ${Number(booking.totalAmount).toFixed(2)} ر.س من محفظتك الجامعية.`
+                    : `Bay #${booking.bayNumber} reserved and ${Number(booking.totalAmount).toFixed(2)} SAR debited from your wallet.`,
+                  type: 'success',
+                });
+              }}
+              onBookingCancelled={() => {
+                handleRefreshAll();
+                setActiveToast({
+                  title: isAr ? 'تم إلغاء الحجز واسترداد المبلغ' : 'Booking Cancelled & Refunded',
+                  message: isAr
+                    ? 'تم إلغاء الحجز وإعادة المبلغ المخصوم إلى محفظتك الجامعية فوراً.'
+                    : 'Reservation cancelled and full amount refunded to your wallet.',
+                  type: 'info',
+                });
+              }}
+              onOpenGate={() => setActiveTab('gate')}
+              isLoading={isParkingLoading}
+              onRefresh={handleRefreshAll}
+              lastUpdated={parkingLastUpdated}
+            />
+
+            {/* Comprehensive University Showcase: Labs, Faculty Advising, Tutoring & Shuttles */}
+            <CampusShowcaseHub
+              isAr={isAr}
+              onNavigate={setActiveTab}
+              isAuthenticated={isAuthenticated}
+              walletBalance={currentUser.walletBalance}
+            />
+          </>
         )}
 
         {/* Tab 2: Booking Wizard */}
@@ -570,9 +548,6 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
             }}
           />
         )}
-
-        {/* Tab 3: Simulator */}
-        {activeTab === 'simulator' && <SimulatorView isAr={isAr} />}
 
         {/* Tab 4: Gate ALPR */}
         {activeTab === 'gate' && <AlprGateView isAr={isAr} />}

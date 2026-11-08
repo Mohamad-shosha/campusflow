@@ -16,6 +16,7 @@
   "java.import.maven.enabled": true,
   "java.autobuild.enabled": true,
   "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "disabled",
   "editor.formatOnSave": false,
   "files.eol": "\n",
   "search.exclude": {

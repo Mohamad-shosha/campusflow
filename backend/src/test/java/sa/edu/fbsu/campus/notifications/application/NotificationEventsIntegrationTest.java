@@ -56,6 +56,7 @@ class NotificationEventsIntegrationTest extends AbstractPostgresIntegrationTest 
 
         List<CampusNotification> list = notificationRepository.findAllByRecipientIdOrderByCreatedAtDesc(student.getId());
         assertThat(list).isNotEmpty();
+        assertThat(notificationRepository.countUnreadByRecipientId(student.getId())).isGreaterThanOrEqualTo(beforeCount);
 
         CampusNotification latest = list.stream()
                 .filter(n -> n.getType() == NotificationType.WALLET && n.getTitleEn().contains("Top-Up"))

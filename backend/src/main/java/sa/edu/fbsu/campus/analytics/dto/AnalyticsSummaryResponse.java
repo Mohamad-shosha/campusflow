@@ -16,3 +16,4 @@ public record AnalyticsSummaryResponse(
         List<HourlyLoadPoint> hourlyLoad,
         List<ZoneOccupancyStat> zoneStats
 ) {}
+

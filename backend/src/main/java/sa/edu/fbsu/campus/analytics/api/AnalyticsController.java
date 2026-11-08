@@ -54,3 +54,4 @@ public class AnalyticsController {
         return ResponseEntity.ok(analyticsService.getSummary(uniId).zoneStats());
     }
 }
+

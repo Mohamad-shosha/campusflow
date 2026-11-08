@@ -33,7 +33,6 @@ public class TutoringBookingService {
 
     private final TutoringSessionRepository sessionRepository;
     private final TutoringEnrollmentRepository enrollmentRepository;
-    private final TutoringService tutoringService;
     private final UserRepository userRepository;
     private final WalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
@@ -41,14 +40,12 @@ public class TutoringBookingService {
     public TutoringBookingService(
             TutoringSessionRepository sessionRepository,
             TutoringEnrollmentRepository enrollmentRepository,
-            TutoringService tutoringService,
             UserRepository userRepository,
             WalletService walletService,
             ApplicationEventPublisher eventPublisher
     ) {
         this.sessionRepository = sessionRepository;
         this.enrollmentRepository = enrollmentRepository;
-        this.tutoringService = tutoringService;
         this.userRepository = userRepository;
         this.walletService = walletService;
         this.eventPublisher = eventPublisher;

@@ -92,7 +92,7 @@ public class BookingService {
         } else {
             List<Vehicle> vehicles = vehicleRepository.findByUserId(userId);
             if (!vehicles.isEmpty()) {
-                vehicle = vehicles.stream().filter(Vehicle::isPrimary).findFirst().orElse(vehicles.get(0));
+                vehicle = vehicles.stream().filter(v -> v.isPrimary()).findFirst().orElse(vehicles.get(0));
             }
         }
 
@@ -225,6 +225,7 @@ public class BookingService {
 
         booking.cancel();
         ParkingBooking updated = bookingRepository.save(booking);
+        log.info("Cancelled booking {} by user {} (Reason: {})", booking.getId(), userId, cancelReason != null ? cancelReason : "N/A");
 
         // Refund wallet if amount > 0
         if (booking.getTotalAmount().compareTo(BigDecimal.ZERO) > 0) {

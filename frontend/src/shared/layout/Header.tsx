@@ -14,7 +14,6 @@ import {
   Wallet,
   MapPin,
   Calendar,
-  Zap,
   Camera,
   RefreshCw,
   Users,
@@ -73,7 +72,7 @@ export const Header: FC<HeaderProps> = ({
     setOpenDropdown(null);
   };
 
-  const isParkingActive = ['map', 'booking', 'simulator', 'gate', 'share'].includes(activeTab);
+  const isParkingActive = ['map', 'booking', 'gate', 'share'].includes(activeTab);
   const isCampusActive = ['tuition', 'tutoring', 'office-hours', 'rooms'].includes(activeTab);
 
   return (
@@ -129,17 +128,6 @@ export const Header: FC<HeaderProps> = ({
                   <div className="dropdown-item-info">
                     <span className="dropdown-item-title">{t('nav.bookParking')}</span>
                     <span className="dropdown-item-desc">{t('nav.bookParkingDesc')}</span>
-                  </div>
-                </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'simulator' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('simulator')}
-                  type="button"
-                >
-                  <Zap size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.flexDemo')}</span>
-                    <span className="dropdown-item-desc">{t('nav.flexDemoDesc')}</span>
                   </div>
                 </button>
                 <button

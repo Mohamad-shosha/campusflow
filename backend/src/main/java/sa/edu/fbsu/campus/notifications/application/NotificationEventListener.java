@@ -29,6 +29,7 @@ public class NotificationEventListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onParkingBookingEvent(ParkingBookingEvent event) {
         if (event == null || event.recipientUserId() == null) return;
+        log.debug("Processing parking booking event for recipient {}", event.recipientUserId());
 
         boolean isBooked = "BOOKED".equalsIgnoreCase(event.action());
         String titleAr = isBooked ? "تأكيد حجز موقف مسبق" : "إلغاء حجز الموقف";

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { OfficeHoursView } from './OfficeHoursView';
 import { FACULTY_MEMBERS, type FacultyMember } from '../data/campusData';
 import { officeHoursApi } from '../api/officeHoursApi';
@@ -30,9 +30,10 @@ describe('OfficeHoursView (P6-05)', () => {
 
     expect(screen.getByTestId('faculty-card-drRaghad')).toBeInTheDocument();
     expect(screen.getByTestId('faculty-card-drMezher')).toBeInTheDocument();
-    expect(screen.getByTestId('faculty-card-doctor')).toBeInTheDocument();
+    expect(screen.getByTestId('faculty-card-drGhamdi')).toBeInTheDocument();
 
-    const bookedSlotBtn = screen.getByRole('button', { name: /11:30 ص/i });
+    const drRaghadCard = screen.getByTestId('faculty-card-drRaghad');
+    const bookedSlotBtn = within(drRaghadCard).getByRole('button', { name: /11:30 ص/i });
     expect(bookedSlotBtn).toBeDisabled();
   });
 
@@ -57,7 +58,7 @@ describe('OfficeHoursView (P6-05)', () => {
 
   it('books a live backend office-hour slot and passes updated faculty to onBookSuccess', async () => {
     const onBookSuccess = vi.fn();
-    const baseFaculty = FACULTY_MEMBERS[0]!;
+    const baseFaculty = FACULTY_MEMBERS.find(f => f.id === 'drRaghad')!;
     const liveFaculty: FacultyMember = {
       ...baseFaculty,
       backendId: 'prof-uuid-1',

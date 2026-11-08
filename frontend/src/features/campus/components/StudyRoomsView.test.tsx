@@ -58,7 +58,7 @@ describe('StudyRoomsView (P6-07)', () => {
 
   it('submits a booking via roomsApi.bookRoom and updates room to in-use', async () => {
     const onRoomBooked = vi.fn();
-    const targetRoom = INITIAL_STUDY_ROOMS[1]!; // ROOM-A04 (available)
+    const targetRoom = INITIAL_STUDY_ROOMS.find(r => r.id === 'ROOM-A04')!; // ROOM-A04 (available)
 
     const updatedRoom: StudyRoom = {
       ...targetRoom,
@@ -117,10 +117,11 @@ describe('StudyRoomsView (P6-07)', () => {
 
   it('extends an active room booking (+10 mins) via roomsApi.extendBooking', async () => {
     const onRoomUpdated = vi.fn();
+    const lab102Base = INITIAL_STUDY_ROOMS.find(r => r.id === 'LAB-102')!;
     const inUseRoom: StudyRoom = {
-      ...INITIAL_STUDY_ROOMS[0]!,
+      ...lab102Base,
       activeBooking: {
-        ...INITIAL_STUDY_ROOMS[0]!.activeBooking!,
+        ...lab102Base.activeBooking!,
         bookingId: 'book-lab-102',
         remainingMinutes: 11,
       },
@@ -157,10 +158,11 @@ describe('StudyRoomsView (P6-07)', () => {
 
   it('releases an active room booking via roomsApi.releaseBooking', async () => {
     const onRoomUpdated = vi.fn();
+    const lab102Base = INITIAL_STUDY_ROOMS.find(r => r.id === 'LAB-102')!;
     const inUseRoom: StudyRoom = {
-      ...INITIAL_STUDY_ROOMS[0]!,
+      ...lab102Base,
       activeBooking: {
-        ...INITIAL_STUDY_ROOMS[0]!.activeBooking!,
+        ...lab102Base.activeBooking!,
         bookingId: 'book-lab-102',
       },
     };
