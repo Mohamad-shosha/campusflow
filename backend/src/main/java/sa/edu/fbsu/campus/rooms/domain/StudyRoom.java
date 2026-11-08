@@ -140,6 +140,50 @@ public class StudyRoom extends BaseTenantEntity {
         return splitPipe(specsEn);
     }
 
+    public void setNameAr(String nameAr) {
+        this.nameAr = nameAr;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
+    public void setBuildingAr(String buildingAr) {
+        this.buildingAr = buildingAr;
+    }
+
+    public void setBuildingEn(String buildingEn) {
+        this.buildingEn = buildingEn;
+    }
+
+    public void setCapacityAr(String capacityAr) {
+        this.capacityAr = capacityAr;
+    }
+
+    public void setCapacityEn(String capacityEn) {
+        this.capacityEn = capacityEn;
+    }
+
+    public void setTypeBadgeAr(String typeBadgeAr) {
+        this.typeBadgeAr = typeBadgeAr;
+    }
+
+    public void setTypeBadgeEn(String typeBadgeEn) {
+        this.typeBadgeEn = typeBadgeEn;
+    }
+
+    public void setSpecsArList(List<String> specs) {
+        this.specsAr = specs != null ? String.join("|", specs) : "";
+    }
+
+    public void setSpecsEnList(List<String> specs) {
+        this.specsEn = specs != null ? String.join("|", specs) : "";
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
     public String getAvailableFromAr() {
         return availableFromAr;
     }

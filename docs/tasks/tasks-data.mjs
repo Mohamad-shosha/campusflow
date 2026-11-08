@@ -400,12 +400,13 @@ export const tasks = [
     tests: ['Component', 'E2E'], blockedBy: [],
   }),
   T('P7-04', 'Admin API (spots, rooms, tariffs, users)', {
-    pri: 'Medium', cx: 'L', deps: ['P5-01', 'P6-06', 'Q13'], branch: 'feature/P7-04-admin-api',
+    status: 'Done', pr: 'PR (feature/P7-04-admin-api)',
+    pri: 'Medium', cx: 'L', deps: ['P5-01', 'P6-06'], branch: 'feature/P7-04-admin-api',
     goal: 'إدارة المواقف والقاعات والتعرفات والمستخدمين لدور Admin.',
     files: ['admin endpoints داخل كل module'],
     steps: ['Endpoints', 'Authorization', 'Audit log', 'اختبارات'],
     accept: ['غير الـ Admin = 403', 'كل تعديل يُسجل'],
-    tests: ['API', 'Security matrix'], blockedBy: ['Q13'],
+    tests: ['API', 'Security matrix'], blockedBy: [],
   }),
   T('P7-05', 'Admin UI', {
     pri: 'Medium', cx: 'L', deps: ['P7-04'], branch: 'feature/P7-05-admin-ui',
