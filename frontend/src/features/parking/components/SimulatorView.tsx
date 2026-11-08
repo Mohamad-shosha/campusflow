@@ -163,7 +163,7 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
                 {stage.carColor ? (
                   <>
                     <div style={{ width: '120px', height: '180px', margin: '0.85rem auto' }}>
-                      <CarSvg color={stage.carColor} />
+                      <CarSvg color={stage.carColor} style={{ width: '100px', height: '160px' }} />
                     </div>
                     <div
                       style={{
