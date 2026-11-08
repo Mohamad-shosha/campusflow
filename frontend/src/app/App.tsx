@@ -7,6 +7,7 @@ import { AuthModal } from '../features/auth/components/AuthModal';
 import { ProfileModal } from '../features/auth/components/ProfileModal';
 import { WalletPage } from '../features/wallet';
 import { TuitionPage } from '../features/tuition';
+import { AdminDashboard } from '../features/admin/components/AdminDashboard';
 import { walletApi } from '../features/wallet/api/walletApi';
 import { Toast, type ToastType } from '../shared/components/Toast';
 import type { AppUser } from '../shared/types/navigation';
@@ -686,27 +687,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         {/* Tab 12: Admin Panel */}
         {activeTab === 'admin-panel' && (
           <ProtectedRoute requiredRoles={['CAMPUS_ADMIN']}>
-            <div
-              className="glass-panel"
-              style={{
-                padding: '2.5rem',
-                borderColor: 'var(--fbsu-primary)',
-                background: 'rgba(17, 110, 99, 0.1)',
-                textAlign: 'center',
-              }}
-              data-testid="admin-panel-content"
-            >
-              <h3
-                style={{ color: 'var(--fbsu-primary)', marginBottom: '0.75rem', fontWeight: 800 }}
-              >
-                {isAr ? 'لوحة التحكم الإدارية المصرحة' : 'Authorized Campus Admin Panel'}
-              </h3>
-              <p style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>
-                {isAr
-                  ? 'أهلاً بك يا مسؤول النظام. هذه المنطقة محمية بقواعد RBAC ولا يمكن لغير فئة CAMPUS_ADMIN الوصول إليها.'
-                  : 'Welcome, Campus Administrator. This area is strictly protected by RBAC.'}
-              </p>
-            </div>
+            <AdminDashboard isAr={isAr} onRefreshAll={handleRefreshAll} />
           </ProtectedRoute>
         )}
       </div>
