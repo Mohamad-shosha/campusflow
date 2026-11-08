@@ -57,3 +57,4 @@
 | `P7-03` | `F-13` | Notifications UI (bell/drawer) | `feature/P7-03-notifications-ui` | PR #39 | جرس التنبيهات مع العداد وقائمة الإشعارات المنزلقة. |
 | `P7-04` | `F-14` | Admin API + Immutable Audit Log | `feature/P7-04-admin-api` | PR #40 | الهجرة V14 ومسارات إدارة المواقف والغرف والمستخدمين واللوج. |
 | *Extra* | `F-06` | Realistic Parked Cars & Bays Visual Design | `design/realistic-parking-cars-ui` | **PR #41** | محرك رسم سيارات واقعي (Top-Down SVG) وحواجز مطاطية ومصابيح سقفية. |
+

@@ -94,3 +94,4 @@ flowchart TD
 1. **عزل الموديولات (Module Isolation):** منع أي استيراد دائري (Cyclic Dependency) بين الموديولات.
 2. **قواعد الطبقات (Layer Rules):** الـ Controllers لا تتصل بالـ Repositories مباشرة بل تمر عبر الـ Services حصراً.
 3. **سلامة الكيانات (Entity Encapsulation):** حظر تعديل الحقول المالية دون قيد محاسبي مقابل في الدفتر.
+

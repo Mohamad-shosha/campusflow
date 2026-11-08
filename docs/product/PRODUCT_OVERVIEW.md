@@ -47,3 +47,4 @@
 - **الخلفية (Backend):** مبنية بـ Java 21 و Spring Boot 3.3.4 بنمط Modular Monolith عالي التماسك (High Cohesion, Loose Coupling) مقسم لموديولات استقلالية: `identity`, `wallet`, `parking`, `rooms`, `tutoring`, `officehours`, `notifications`, `admin`, `common`.
 - **قاعدة البيانات (Database):** PostgreSQL 15 مدعومة بـ 14 Flyway Migration تؤمن التناسق الصارم (ACID transactions) مع فهارس محسوبة ومحددات قيد (Constraints & Foreign Keys).
 - **التشغيل والحاويات (DevOps):** تشغيل كامل عبر Docker Compose بحاويات معزولة ومحمية، واختبارات تكامل مستمرة (CI Pipeline) على GitHub Actions تشمل الفحص المعماري ArchUnit واختبارات Vitest و Maven.
+

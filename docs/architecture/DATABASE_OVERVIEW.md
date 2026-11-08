@@ -59,3 +59,4 @@
   - سجل غير قابل للحذف (Immutable Log).
   - الأعمدة: `id UUID`, `actor_id`, `actor_email`, `action_type`, `entity_type`, `entity_id`, `old_value JSONB`, `new_value JSONB`, `ip_address`, `created_at`.
   - الفهارس: `idx_admin_audit_log_actor`, `idx_admin_audit_log_entity`, `idx_admin_audit_log_created_at`.
+
