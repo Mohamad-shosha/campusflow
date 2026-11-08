@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Wallet,
   Plus,
+  Users,
 } from 'lucide-react';
 import type { TutoringSession } from '../data/campusData';
 import { BookTutoringModal } from './BookTutoringModal';
@@ -17,21 +18,25 @@ import { soundFX } from '../../../shared/utils/sound';
 export interface TutoringViewProps {
   sessions: TutoringSession[];
   isAr: boolean;
+  isAuthenticated?: boolean | undefined;
   currentUser: {
     id: string;
     name: string;
     role: string;
     walletBalance: number;
   };
+  onOpenAuth?: (() => void) | undefined;
   onOpenTuition: () => void;
-  onBookSuccess: (session: TutoringSession) => void;
+  onBookSuccess: (session: TutoringSession, updatedBalance?: number) => void;
   onAddSession: (session: TutoringSession) => void;
 }
 
 export const TutoringView: FC<TutoringViewProps> = ({
   sessions,
   isAr,
+  isAuthenticated = false,
   currentUser,
+  onOpenAuth = () => {},
   onOpenTuition,
   onBookSuccess,
   onAddSession,
@@ -125,9 +130,14 @@ export const TutoringView: FC<TutoringViewProps> = ({
             className="btn-primary"
             onClick={() => {
               soundFX.playClick();
+              if (!isAuthenticated) {
+                onOpenAuth();
+                return;
+              }
               setIsCreateOpen(true);
             }}
             type="button"
+            data-testid="open-create-tutoring-btn"
           >
             <Plus size={16} color="#ffffff" />
             <span>{isAr ? 'طرح جلسة شرح جديدة' : 'Post New Session'}</span>
@@ -188,127 +198,173 @@ export const TutoringView: FC<TutoringViewProps> = ({
 
       {/* Tutoring Cards Grid */}
       <div className="tutoring-grid">
-        {filteredSessions.map(s => (
-          <div key={s.id} className="tutoring-card">
-            <div>
-              <div className="tutoring-top-bar">
-                <span className="course-code-badge">
-                  <Award size={13} color="var(--fbsu-primary)" />
-                  <span>{s.courseCode}</span>
-                </span>
+        {filteredSessions.map(s => {
+          const isEnrolled =
+            isAuthenticated &&
+            ((s.enrolledStudentNumbers && s.enrolledStudentNumbers.includes(currentUser.id)) ||
+              s.enrolledStudents.includes(currentUser.name));
+          const isOwn = isAuthenticated && s.tutorId === currentUser.id;
+          const displayTutorName = isAr ? s.tutorName : s.tutorNameEn || s.tutorName;
+          const displayTutorRole = isAr ? s.tutorRole : s.tutorRoleEn || s.tutorRole;
 
-                <div className="tutor-rate-badge">
-                  <span className="tutor-rate-num">
-                    {s.hourlyRate} {isAr ? 'ر.س' : 'SAR'}
+          return (
+            <div key={s.id} className="tutoring-card" data-testid={`tutoring-card-${s.id}`}>
+              <div>
+                <div className="tutoring-top-bar">
+                  <span className="course-code-badge">
+                    <Award size={13} color="var(--fbsu-primary)" />
+                    <span>{s.courseCode}</span>
                   </span>
-                  <span className="tutor-rate-unit">{isAr ? 'للساعة الواحدة' : 'per hour'}</span>
-                </div>
-              </div>
 
-              {/* Tutor Profile Info */}
-              <div className="tutor-profile-strip">
-                <div className="tutor-avatar-circle" style={{ background: s.tutorAvatarColor }}>
-                  {s.tutorName.charAt(0)}
-                </div>
-                <div className="tutor-info-meta">
-                  <div className="tutor-title-row">
-                    <span className="tutor-name">{s.tutorName}</span>
-                    <span className="tutor-badge-tag">{isAr ? 'طالب متميز' : 'Honor Tutor'}</span>
+                  <div className="tutor-rate-badge">
+                    <span className="tutor-rate-num">
+                      {s.hourlyRate} {isAr ? 'ر.س' : 'SAR'}
+                    </span>
+                    <span className="tutor-rate-unit">{isAr ? 'للساعة الواحدة' : 'per hour'}</span>
                   </div>
-                  <div className="tutor-college-text">{s.tutorRole}</div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      fontSize: '0.75rem',
-                      color: 'var(--fbsu-gold)',
-                      marginTop: '0.25rem',
-                    }}
-                  >
-                    <span>★ {s.rating}</span>
-                    <span style={{ color: 'var(--text-dim)' }}>
-                      ({s.reviewsCount} {isAr ? 'تقييم طالب' : 'reviews'})
+                </div>
+
+                {/* Tutor Profile Info */}
+                <div className="tutor-profile-strip">
+                  <div className="tutor-avatar-circle" style={{ background: s.tutorAvatarColor }}>
+                    {displayTutorName.charAt(0)}
+                  </div>
+                  <div className="tutor-info-meta">
+                    <div className="tutor-title-row">
+                      <span className="tutor-name">{displayTutorName}</span>
+                      <span className="tutor-badge-tag">{isAr ? 'طالب متميز' : 'Honor Tutor'}</span>
+                    </div>
+                    <div className="tutor-college-text">{displayTutorRole}</div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        fontSize: '0.75rem',
+                        color: 'var(--fbsu-gold)',
+                        marginTop: '0.25rem',
+                      }}
+                    >
+                      <span>★ {s.rating}</span>
+                      <span style={{ color: 'var(--text-dim)' }}>
+                        ({s.reviewsCount} {isAr ? 'تقييم طالب' : 'reviews'})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <h4
+                  style={{
+                    fontSize: '1.1rem',
+                    fontWeight: 800,
+                    color: 'var(--text-main)',
+                    marginBottom: '0.65rem',
+                  }}
+                >
+                  {isAr ? s.courseName : s.courseNameEn}
+                </h4>
+
+                {/* Scope Box */}
+                <div className="tutoring-content-box">
+                  <div className="lectures-scope-title">
+                    <BookOpen size={14} color="var(--fbsu-gold)" />
+                    <span>{s.coveredLectures}</span>
+                  </div>
+                  <div className="lectures-scope-desc">{s.coveredScope}</div>
+                </div>
+
+                {/* Meta details */}
+                <div className="tutoring-meta-row">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Clock size={14} color="var(--text-dim)" />
+                    <span>
+                      {s.dateTime} ({s.durationHours}h)
                     </span>
                   </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <MapPin size={14} color="var(--text-dim)" />
+                    <span>{s.location}</span>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    fontSize: '0.76rem',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    marginBottom: '0.65rem',
+                  }}
+                >
+                  <Users size={13} color="var(--fbsu-primary)" />
+                  <span>
+                    {isAr
+                      ? `المسجلون حالياً: ${s.enrolledStudents.length}`
+                      : `Enrolled peers: ${s.enrolledStudents.length}`}
+                    {s.maxCapacity ? ` / ${s.maxCapacity}` : ''}
+                  </span>
+                </div>
+
+                {/* University Balance routing notice */}
+                <div className="wallet-routing-notice">
+                  <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                  <span>
+                    {isAr
+                      ? `يتم تحويل ${s.totalPrice} ر.س كرصيد جامعي للطالب ${s.tutorName.split(' ')[0]} لسداد رسوم جامعته.`
+                      : `${s.totalPrice} SAR transfers directly to official university tuition credit.`}
+                  </span>
                 </div>
               </div>
 
-              <h4
-                style={{
-                  fontSize: '1.1rem',
-                  fontWeight: 800,
-                  color: 'var(--text-main)',
-                  marginBottom: '0.65rem',
+              {/* Action Button */}
+              <button
+                className="btn-gold book-tutoring-btn"
+                onClick={() => {
+                  soundFX.playClick();
+                  setSelectedSession(s);
                 }}
+                disabled={s.status === 'booked' && !isEnrolled}
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  padding: '0.85rem',
+                  fontSize: '0.9rem',
+                }}
+                type="button"
               >
-                {isAr ? s.courseName : s.courseNameEn}
-              </h4>
-
-              {/* Scope Box */}
-              <div className="tutoring-content-box">
-                <div className="lectures-scope-title">
-                  <BookOpen size={14} color="var(--fbsu-gold)" />
-                  <span>{s.coveredLectures}</span>
-                </div>
-                <div className="lectures-scope-desc">{s.coveredScope}</div>
-              </div>
-
-              {/* Meta details */}
-              <div className="tutoring-meta-row">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Clock size={14} color="var(--text-dim)" />
-                  <span>{s.dateTime}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <MapPin size={14} color="var(--text-dim)" />
-                  <span>{s.location}</span>
-                </div>
-              </div>
-
-              {/* University Balance routing notice */}
-              <div className="wallet-routing-notice">
-                <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                <Wallet size={16} color="#0b1a17" />
                 <span>
-                  {isAr
-                    ? `يتم تحويل ${s.hourlyRate} ر.س كرصيد جامعي للطالب ${s.tutorName.split(' ')[0]} لسداد رسوم جامعته.`
-                    : 'Payment converted to official university tuition credit.'}
+                  {isEnrolled
+                    ? isAr
+                      ? 'مسجل بالفعل في الجلسة ✓'
+                      : 'Enrolled ✓'
+                    : isOwn
+                      ? isAr
+                        ? 'جلستك المنشورة'
+                        : 'Your Published Session'
+                      : s.status === 'booked'
+                        ? isAr
+                          ? 'اكتمل العدد'
+                          : 'Session Full'
+                        : isAr
+                          ? `حجز الجلسة وسداد ${s.totalPrice} ر.س`
+                          : `Book & Settle ${s.totalPrice} SAR`}
                 </span>
-              </div>
+              </button>
             </div>
-
-            {/* Action Button */}
-            <button
-              className="btn-gold book-tutoring-btn"
-              onClick={() => {
-                soundFX.playClick();
-                setSelectedSession(s);
-              }}
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-                padding: '0.85rem',
-                fontSize: '0.9rem',
-              }}
-              type="button"
-            >
-              <Wallet size={16} color="#0b1a17" />
-              <span>
-                {isAr
-                  ? `حجز الجلسة وسداد ${s.hourlyRate} ر.س`
-                  : `Book & Settle ${s.hourlyRate} SAR`}
-              </span>
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <BookTutoringModal
         isOpen={selectedSession !== null}
         session={selectedSession}
         isAr={isAr}
+        isAuthenticated={isAuthenticated}
         currentUser={currentUser}
         onClose={() => setSelectedSession(null)}
+        onOpenAuth={onOpenAuth}
         onConfirmBooking={onBookSuccess}
       />
 

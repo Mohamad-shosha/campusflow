@@ -308,6 +308,7 @@ export const tasks = [
 
   // ---------------- P6 ----------------
   T('P6-01', 'Tutoring schema + API (post/list/filter)', {
+    status: 'Done', pr: 'PR (feature/P6-01-tutoring-api)',
     pri: 'High', cx: 'L', deps: ['P2-03'], branch: 'feature/P6-01-tutoring-api',
     goal: 'إنشاء وعرض وفلترة جلسات الشرح بين الطلاب.',
     files: ['db/migration/V10__tutoring.sql', 'tutoring/**'],
@@ -316,6 +317,7 @@ export const tasks = [
     tests: ['Unit', 'Repository', 'API', 'Security'], blockedBy: ['Q5'],
   }),
   T('P6-02', 'Tutoring booking + wallet transfer', {
+    status: 'Done', pr: 'PR (feature/P6-02-tutoring-booking)',
     pri: 'Critical', cx: 'L', deps: ['P6-01', 'P4-02', 'Q5'], branch: 'feature/P6-02-tutoring-booking',
     goal: 'حجز جلسة شرح مع تحويل ذري من الطالب للمعلم حسب قواعد التسعير المعتمدة.',
     files: ['tutoring/application/*', 'tutoring/api/*'],
@@ -324,6 +326,7 @@ export const tasks = [
     tests: ['Service', 'Concurrency', 'API'], blockedBy: ['Q5'],
   }),
   T('P6-03', 'Tutoring UI', {
+    status: 'Done', pr: 'PR (feature/P6-03-tutoring-ui)',
     pri: 'High', cx: 'M', deps: ['P6-02', 'P3-05'], branch: 'feature/P6-03-tutoring-ui',
     goal: 'سوق الشروحات: فلترة وحجز ونشر جلسة.',
     files: ['frontend/src/features/tutoring/*'],
@@ -332,6 +335,7 @@ export const tasks = [
     tests: ['Component', 'Form validation', 'E2E'], blockedBy: [],
   }),
   T('P6-04', 'Office-hours schema + API (windows, appointments)', {
+    status: 'Done', pr: 'PR (feature/P6-04-office-hours-api)',
     pri: 'High', cx: 'L', deps: ['P2-03', 'Q9'], branch: 'feature/P6-04-office-hours-api',
     goal: 'إدارة أوقات الساعات المكتبية للدكاترة وحجز المواعيد بدون تعارض.',
     files: ['db/migration/V11__office_hours.sql', 'officehours/**'],
@@ -340,6 +344,7 @@ export const tasks = [
     tests: ['Service', 'Concurrency', 'API', 'Security'], blockedBy: ['Q9'],
   }),
   T('P6-05', 'Office-hours UI', {
+    status: 'Done', pr: 'PR (feature/P6-05-office-hours-ui)',
     pri: 'Medium', cx: 'M', deps: ['P6-04', 'P3-05'], branch: 'feature/P6-05-office-hours-ui',
     goal: 'عرض الدكاترة والمواعيد المتاحة وحجز موعد.',
     files: ['frontend/src/features/office-hours/*'],
@@ -348,6 +353,7 @@ export const tasks = [
     tests: ['Component', 'E2E'], blockedBy: [],
   }),
   T('P6-06', 'Rooms schema + booking API (extend/release)', {
+    status: 'Done', pr: 'PR (feature/P6-06-rooms-api)',
     pri: 'High', cx: 'L', deps: ['P2-03', 'Q10'], branch: 'feature/P6-06-rooms-api',
     goal: 'قاعات ومعامل وحجزها مع التمديد والإخلاء ومنع التعارض.',
     files: ['db/migration/V12__rooms.sql', 'rooms/**'],
@@ -356,6 +362,7 @@ export const tasks = [
     tests: ['Service', 'Concurrency', 'API', 'Security'], blockedBy: ['Q10'],
   }),
   T('P6-07', 'Rooms UI + countdown', {
+    status: 'Done', pr: 'PR (feature/P6-07-rooms-ui)',
     pri: 'Medium', cx: 'M', deps: ['P6-06', 'P3-05'], branch: 'feature/P6-07-rooms-ui',
     goal: 'عرض القاعات والحجز والعد التنازلي والتمديد.',
     files: ['frontend/src/features/rooms/*'],

@@ -33,8 +33,11 @@ import { AlprGateView } from '../features/parking/components/AlprGateView';
 import { ShareSpotView } from '../features/parking/components/ShareSpotView';
 
 import { TutoringView } from '../features/campus/components/TutoringView';
+import { tutoringApi } from '../features/campus/api/tutoringApi';
 import { OfficeHoursView } from '../features/campus/components/OfficeHoursView';
+import { officeHoursApi } from '../features/campus/api/officeHoursApi';
 import { StudyRoomsView } from '../features/campus/components/StudyRoomsView';
+import { roomsApi } from '../features/campus/api/roomsApi';
 import { AnalyticsView } from '../features/analytics/components/AnalyticsView';
 import { NotificationsModal } from '../features/notifications/components/NotificationsModal';
 
@@ -61,8 +64,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
 
   const [tutoringSessions, setTutoringSessions] =
     useState<TutoringSession[]>(INITIAL_TUTORING_SESSIONS);
-  const [facultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
-  const [studyRooms] = useState<StudyRoom[]>(INITIAL_STUDY_ROOMS);
+  const [facultyList, setFacultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
+  const [studyRooms, setStudyRooms] = useState<StudyRoom[]>(INITIAL_STUDY_ROOMS);
   const [notifications, setNotifications] = useState<CampusNotification[]>(CAMPUS_NOTIFICATIONS);
 
   const [activeToast, setActiveToast] = useState<{
@@ -115,15 +118,63 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     }
   }, []);
 
+  const fetchTutoringSessions = useCallback(async () => {
+    try {
+      const liveSessions = await tutoringApi.getSessions();
+      if (liveSessions && liveSessions.length > 0) {
+        setTutoringSessions(liveSessions);
+      }
+    } catch {
+      // Fallback to initial showcase sessions when offline or in isolated unit tests
+    }
+  }, []);
+
+  const fetchFacultyOfficeHours = useCallback(async () => {
+    try {
+      const liveFaculty = await officeHoursApi.getFaculty();
+      if (liveFaculty && liveFaculty.length > 0) {
+        setFacultyList(liveFaculty);
+      }
+    } catch {
+      // Fallback to initial faculty directory when offline or in isolated unit tests
+    }
+  }, []);
+
+  const fetchStudyRooms = useCallback(async () => {
+    try {
+      const liveRooms = await roomsApi.getRooms();
+      if (liveRooms && liveRooms.length > 0) {
+        setStudyRooms(liveRooms);
+      }
+    } catch {
+      // Fallback to initial study rooms when offline or in isolated unit tests
+    }
+  }, []);
+
   useEffect(() => {
     fetchParkingData();
+    fetchTutoringSessions();
+    fetchFacultyOfficeHours();
+    fetchStudyRooms();
     const interval = setInterval(fetchParkingData, 30000);
     return () => clearInterval(interval);
-  }, [fetchParkingData]);
+  }, [fetchParkingData, fetchTutoringSessions, fetchFacultyOfficeHours, fetchStudyRooms]);
 
   const handleRefreshAll = useCallback(async () => {
-    await Promise.all([fetchParkingData(), fetchWalletBalance()]);
-  }, [fetchParkingData, fetchWalletBalance]);
+    await Promise.all([
+      fetchParkingData(),
+      fetchWalletBalance(),
+      fetchTutoringSessions(),
+      fetchFacultyOfficeHours(),
+      fetchStudyRooms(),
+    ]);
+  }, [
+    fetchParkingData,
+    fetchWalletBalance,
+    fetchTutoringSessions,
+    fetchFacultyOfficeHours,
+    fetchStudyRooms,
+  ]);
 
   const handleLogout = async () => {
     await logout();
@@ -202,23 +253,19 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
-  const handleTutoringBooked = (session: TutoringSession) => {
-    setTutoringSessions(prev =>
-      prev.map(s =>
-        s.id === session.id
-          ? {
-              ...s,
-              enrolledStudents: [...s.enrolledStudents, currentUser.name],
-            }
-          : s
-      )
-    );
+  const handleTutoringBooked = (updatedSession: TutoringSession, updatedBalance?: number) => {
+    setTutoringSessions(prev => prev.map(s => (s.id === updatedSession.id ? updatedSession : s)));
+    if (updatedBalance !== undefined) {
+      setLiveBalance(updatedBalance);
+    } else {
+      fetchWalletBalance();
+    }
     setActiveToast({
-      title: isAr ? 'معاينة حجز الجلسة (المرحلة P6)' : 'Tutoring Preview Enrolled (Phase P6)',
+      title: isAr ? 'تم تأكيد حجز جلسة الشرح' : 'Tutoring Session Booked',
       message: isAr
-        ? 'تمت محاكاة التسجيل في الجلسة ضمن معاينة المرحلة السادسة دون خصم رصيد فعلي من المحفظة.'
-        : 'Preview enrollment recorded for Phase 6 showcase without deducting live wallet funds.',
-      type: 'info',
+        ? `تم تسجيلك في مقرر ${updatedSession.courseCode} وتحويل ${updatedSession.totalPrice.toFixed(2)} ر.س للمعلم الأقران.`
+        : `Enrolled in ${updatedSession.courseCode}; ${updatedSession.totalPrice.toFixed(2)} SAR transferred to peer tutor.`,
+      type: 'success',
     });
   };
 
@@ -231,7 +278,17 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
-  const handleOfficeHoursSuccess = (_facultyId: string, slotTime: string) => {
+  const handleOfficeHoursSuccess = (
+    facultyId: string,
+    slotTime: string,
+    _notes: string,
+    updatedFaculty?: FacultyMember
+  ) => {
+    if (updatedFaculty) {
+      setFacultyList(prev => prev.map(f => (f.id === facultyId ? updatedFaculty : f)));
+    } else {
+      fetchFacultyOfficeHours();
+    }
     setActiveToast({
       title: isAr ? 'تم حجز الموعد' : 'Appointment Confirmed',
       message: isAr
@@ -262,7 +319,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     parkingSpots.find(
       s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
     )?.id ?? 1;
-  const isPreviewTab = ['tutoring', 'office-hours', 'rooms', 'analytics'].includes(activeTab);
+  const isPreviewTab = ['analytics'].includes(activeTab);
 
   return (
     <AppShell
@@ -455,12 +512,14 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <TutoringView
             sessions={tutoringSessions}
             isAr={isAr}
+            isAuthenticated={isAuthenticated}
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
               role: currentUser.role,
               walletBalance: currentUser.walletBalance,
             }}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
             onOpenTuition={() => setActiveTab('tuition')}
             onBookSuccess={handleTutoringBooked}
             onAddSession={handleAddTutoringSession}
@@ -472,10 +531,12 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <OfficeHoursView
             facultyList={facultyList}
             isAr={isAr}
+            isAuthenticated={isAuthenticated}
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
             }}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
             onBookSuccess={handleOfficeHoursSuccess}
           />
         )}
@@ -485,16 +546,28 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <StudyRoomsView
             rooms={studyRooms}
             isAr={isAr}
+            isAuthenticated={isAuthenticated}
             currentUser={{
               id: currentUser.id,
               name: currentUser.name,
             }}
-            onRoomBooked={() => {
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onRoomBooked={(_roomId, _timeFrom, _timeTo, _purpose, updated) => {
+              if (updated) {
+                setStudyRooms(prev => prev.map(r => (r.id === updated.id ? updated : r)));
+              } else {
+                fetchStudyRooms();
+              }
               setActiveToast({
                 title: isAr ? 'تم حجز القاعة' : 'Room Reserved',
-                message: isAr ? 'تم تفعيل حجز القاعة بنجاح' : 'Room booking active',
+                message: isAr
+                  ? 'تم تفعيل حجز القاعة وبدء المؤقت التنازلي بنجاح'
+                  : 'Room booking active with countdown',
                 type: 'success',
               });
+            }}
+            onRoomUpdated={updated => {
+              setStudyRooms(prev => prev.map(r => (r.id === updated.id ? updated : r)));
             }}
           />
         )}

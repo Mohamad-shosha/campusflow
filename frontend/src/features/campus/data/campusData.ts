@@ -1,8 +1,11 @@
 export interface TutoringSession {
   id: string;
+  backendId?: string | undefined;
   tutorId: string;
   tutorName: string;
+  tutorNameEn?: string | undefined;
   tutorRole: string;
+  tutorRoleEn?: string | undefined;
   tutorAvatarColor: string;
   courseCode: string;
   courseName: string;
@@ -19,55 +22,82 @@ export interface TutoringSession {
   reviewsCount: number;
   status: 'open' | 'booked' | 'completed';
   enrolledStudents: string[];
+  enrolledStudentNumbers?: string[] | undefined;
+  maxCapacity?: number | undefined;
+  enrolledCount?: number | undefined;
 }
 
 export interface TimeSlot {
+  id?: string | undefined;
   time: string;
+  timeEn?: string | undefined;
   duration: string;
+  durationEn?: string | undefined;
   available: boolean;
-  bookedNote?: string;
+  bookedNote?: string | undefined;
 }
 
 export interface FacultyMember {
   id: string;
+  backendId?: string | undefined;
+  facultyUserId?: string | undefined;
+  universityNumber?: string | undefined;
   name: string;
   nameEn: string;
   rank: string;
   rankEn: string;
   college: string;
+  collegeEn?: string | undefined;
   office: string;
   email: string;
   badge: string;
+  badgeEn?: string | undefined;
   avatarColor: string;
   daysText: string;
+  daysTextEn?: string | undefined;
   nextAvailable: string;
+  nextAvailableEn?: string | undefined;
   coursesSupervised: string[];
   timeSlots: TimeSlot[];
 }
 
 export interface StudyRoom {
   id: string;
+  backendId?: string | undefined;
+  roomCode?: string | undefined;
   name: string;
   nameEn: string;
   building: string;
+  buildingEn?: string | undefined;
   capacity: string;
+  capacityEn?: string | undefined;
   typeBadge: string;
+  typeBadgeEn?: string | undefined;
   status: 'in-use' | 'available' | 'maintenance' | 'reserved';
   activeBooking?:
     | {
+        bookingId?: string | undefined;
+        leaderUserId?: string | undefined;
         teamLead: string;
+        teamLeadEn?: string | undefined;
         teamMembers?: string[];
         purpose: string;
-        endsAt?: string;
-        startTime?: string;
-        endTime?: string;
-        timeSlot?: string;
-        totalMinutes?: number;
-        remainingMinutes?: number;
+        endsAt?: string | undefined;
+        startTime?: string | undefined;
+        endTime?: string | undefined;
+        timeSlot?: string | undefined;
+        startLabel?: string | undefined;
+        endLabel?: string | undefined;
+        totalMinutes?: number | undefined;
+        remainingMinutes?: number | undefined;
+        extendedCount?: number | undefined;
+        status?: string | undefined;
       }
     | undefined;
-  specs?: string[];
-  availableFrom?: string;
+  specs?: string[] | undefined;
+  specsEn?: string[] | undefined;
+  availableFrom?: string | undefined;
+  availableFromEn?: string | undefined;
 }
 
 export interface CampusNotification {

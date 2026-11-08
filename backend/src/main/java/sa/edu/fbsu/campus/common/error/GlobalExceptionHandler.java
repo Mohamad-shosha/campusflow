@@ -2,6 +2,8 @@ package sa.edu.fbsu.campus.common.error;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.ConcurrencyFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +66,19 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/forbidden"));
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
+    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class, ConcurrencyFailureException.class})
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(RuntimeException ex) {
+        log.warn("Database integrity or concurrency conflict: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                "Conflict: The requested slot, booking, or resource conflicts with an existing record."
+        );
+        problemDetail.setTitle("Resource Conflict");
+        problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/conflict"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})

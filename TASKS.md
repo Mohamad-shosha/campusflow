@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 31 تاسك ✅
+- **المنجز بالكامل (Done):** 38 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 22 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **58%**
+- **المتبقي للبدء (Backlog):** 15 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **72%**
 
 
 
@@ -24,11 +24,11 @@
 | P3 | Frontend Foundation (React) | 5 | 5 | 0 | 0 |
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
 | P5 | Parking | 9 | 9 | 0 | 0 |
-| P6 | Campus Services | 7 | 0 | 0 | 7 |
+| P6 | Campus Services | 7 | 7 | 0 | 0 |
 | P7 | Notifications, Admin, Analytics | 6 | 0 | 0 | 6 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **31** | **0** | **22** |
+| **الإجمالي** | | **53** | **38** | **0** | **15** |
 
 ---
 
@@ -396,9 +396,9 @@
 
 ### P6-01 — Tutoring schema + API (post/list/filter)
 - **ماذا سيعمل:** إنشاء وعرض وفلترة جلسات الشرح بين الطلاب.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P2-03
-- **Git Branch:** `feature/P6-01-tutoring-api` · **Pull Request:** —
+- **Git Branch:** `feature/P6-01-tutoring-api` · **Pull Request:** PR (feature/P6-01-tutoring-api)
 - **الملفات المتوقعة:** `db/migration/V10__tutoring.sql`، `tutoring/**`
 - **Implementation Steps:** 1) Migration 2) Domain 3) API 4) اختبارات
 - **Acceptance Criteria:** الطالب المؤهل فقط ينشر · الفلترة بالتصنيف
@@ -407,9 +407,9 @@
 
 ### P6-02 — Tutoring booking + wallet transfer
 - **ماذا سيعمل:** حجز جلسة شرح مع تحويل ذري من الطالب للمعلم حسب قواعد التسعير المعتمدة.
-- **Priority:** Critical · **Complexity:** L · **Status:** Backlog
+- **Priority:** Critical · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P6-01، P4-02، Q5
-- **Git Branch:** `feature/P6-02-tutoring-booking` · **Pull Request:** —
+- **Git Branch:** `feature/P6-02-tutoring-booking` · **Pull Request:** PR (feature/P6-02-tutoring-booking)
 - **الملفات المتوقعة:** `tutoring/application/*`، `tutoring/api/*`
 - **Implementation Steps:** 1) Enrollment 2) Transfer ذري 3) منع الحجز المكرر 4) API 5) اختبارات
 - **Acceptance Criteria:** الرصيد غير الكافي يرفض · لا حجز مكرر · التسعير حسب Q5
@@ -418,9 +418,9 @@
 
 ### P6-03 — Tutoring UI
 - **ماذا سيعمل:** سوق الشروحات: فلترة وحجز ونشر جلسة.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P6-02، P3-05
-- **Git Branch:** `feature/P6-03-tutoring-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P6-03-tutoring-ui` · **Pull Request:** PR (feature/P6-03-tutoring-ui)
 - **الملفات المتوقعة:** `frontend/src/features/tutoring/*`
 - **Implementation Steps:** 1) Hub + Filters 2) Booking modal 3) Create modal 4) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy
@@ -429,9 +429,9 @@
 
 ### P6-04 — Office-hours schema + API (windows, appointments)
 - **ماذا سيعمل:** إدارة أوقات الساعات المكتبية للدكاترة وحجز المواعيد بدون تعارض.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P2-03، Q9
-- **Git Branch:** `feature/P6-04-office-hours-api` · **Pull Request:** —
+- **Git Branch:** `feature/P6-04-office-hours-api` · **Pull Request:** PR (feature/P6-04-office-hours-api)
 - **الملفات المتوقعة:** `db/migration/V11__office_hours.sql`، `officehours/**`
 - **Implementation Steps:** 1) Migration + exclusion 2) Domain 3) API 4) اختبارات
 - **Acceptance Criteria:** لا تعارض في الموعد · الدكتور يدير مواعيده فقط
@@ -440,9 +440,9 @@
 
 ### P6-05 — Office-hours UI
 - **ماذا سيعمل:** عرض الدكاترة والمواعيد المتاحة وحجز موعد.
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P6-04، P3-05
-- **Git Branch:** `feature/P6-05-office-hours-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P6-05-office-hours-ui` · **Pull Request:** PR (feature/P6-05-office-hours-ui)
 - **الملفات المتوقعة:** `frontend/src/features/office-hours/*`
 - **Implementation Steps:** 1) Cards + slots 2) Booking modal 3) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy
@@ -451,9 +451,9 @@
 
 ### P6-06 — Rooms schema + booking API (extend/release)
 - **ماذا سيعمل:** قاعات ومعامل وحجزها مع التمديد والإخلاء ومنع التعارض.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P2-03، Q10
-- **Git Branch:** `feature/P6-06-rooms-api` · **Pull Request:** —
+- **Git Branch:** `feature/P6-06-rooms-api` · **Pull Request:** PR (feature/P6-06-rooms-api)
 - **الملفات المتوقعة:** `db/migration/V12__rooms.sql`، `rooms/**`
 - **Implementation Steps:** 1) Migration + exclusion 2) Domain 3) Extend/Release 4) API 5) اختبارات
 - **Acceptance Criteria:** لا تعارض · التمديد/الإخلاء حسب قواعد Q10
@@ -462,9 +462,9 @@
 
 ### P6-07 — Rooms UI + countdown
 - **ماذا سيعمل:** عرض القاعات والحجز والعد التنازلي والتمديد.
-- **Priority:** Medium · **Complexity:** M · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P6-06، P3-05
-- **Git Branch:** `feature/P6-07-rooms-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P6-07-rooms-ui` · **Pull Request:** PR (feature/P6-07-rooms-ui)
 - **الملفات المتوقعة:** `frontend/src/features/rooms/*`
 - **Implementation Steps:** 1) Cards 2) Booking modal 3) Countdown 4) اختبارات
 - **Acceptance Criteria:** تطابق مع legacy
