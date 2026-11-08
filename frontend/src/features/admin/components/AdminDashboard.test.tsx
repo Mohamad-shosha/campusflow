@@ -1,0 +1,242 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { AdminDashboard } from './AdminDashboard';
+import { adminApi } from '../api/adminApi';
+import type { AdminSpot, AdminTariff, AdminRoom, AdminUser, AdminAuditLog } from '../types/admin';
+
+// Mock the adminApi functions
+vi.mock('../api/adminApi', () => ({
+  adminApi: {
+    getSpots: vi.fn(),
+    updateSpotStatus: vi.fn(),
+    updateSpotType: vi.fn(),
+    getTariffs: vi.fn(),
+    updateTariff: vi.fn(),
+    getRooms: vi.fn(),
+    updateRoomStatus: vi.fn(),
+    getUsers: vi.fn(),
+    updateUserStatus: vi.fn(),
+    updateUserRoles: vi.fn(),
+    getAuditLogs: vi.fn(),
+  },
+}));
+
+describe('AdminDashboard Component Tests', () => {
+  const mockSpots: AdminSpot[] = [
+    {
+      id: 'spot-uuid-1',
+      bayNumber: 1,
+      zoneCode: 'A',
+      spotType: 'STANDARD',
+      status: 'AVAILABLE',
+      occupantName: null,
+      currentVehiclePlate: null,
+    },
+    {
+      id: 'spot-uuid-2',
+      bayNumber: 2,
+      zoneCode: 'A',
+      spotType: 'FACULTY',
+      status: 'MAINTENANCE',
+      occupantName: null,
+      currentVehiclePlate: null,
+    },
+  ];
+
+  const mockTariffs: AdminTariff[] = [
+    { userType: 'STUDENT', hourlyRate: 2.0, dailyRate: 15.0, semesterRate: 250.0 },
+    { userType: 'FACULTY', hourlyRate: 1.0, dailyRate: 10.0, semesterRate: 150.0 },
+  ];
+
+  const mockRooms: AdminRoom[] = [
+    {
+      id: 'room-uuid-1',
+      roomCode: 'LIB-101',
+      nameAr: 'غرفة ابن الهيثم',
+      nameEn: 'Ibn Al-Haytham Room',
+      capacity: 6,
+      floorNumber: 1,
+      roomType: 'DISCUSSION',
+      status: 'AVAILABLE',
+      hasProjector: true,
+      hasWhiteboard: true,
+      isQuietZone: false,
+    },
+  ];
+
+  const mockUsers: AdminUser[] = [
+    {
+      id: 'user-uuid-1',
+      universityNumber: '202401',
+      email: 'student@fbsu.edu.sa',
+      fullNameAr: 'سعود الشمري',
+      fullNameEn: 'Saud Al-Shammari',
+      userType: 'STUDENT',
+      status: 'ACTIVE',
+      roles: ['STUDENT'],
+      createdAt: '2026-01-01T10:00:00Z',
+    },
+  ];
+
+  const mockAuditLogs: AdminAuditLog[] = [
+    {
+      id: 'audit-uuid-1',
+      actorEmail: 'admin@fbsu.edu.sa',
+      actorName: 'Admin',
+      action: 'UPDATE_SPOT_STATUS',
+      entityType: 'PARKING_SPOT',
+      entityId: 'spot-uuid-1',
+      descriptionAr: 'تحويل الموقف للصيانة',
+      descriptionEn: 'Converted spot to maintenance',
+      createdAt: '2026-11-08T12:00:00Z',
+    },
+  ];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(adminApi.getSpots).mockResolvedValue(mockSpots);
+    vi.mocked(adminApi.getTariffs).mockResolvedValue(mockTariffs);
+    vi.mocked(adminApi.getRooms).mockResolvedValue(mockRooms);
+    vi.mocked(adminApi.getUsers).mockResolvedValue(mockUsers);
+    vi.mocked(adminApi.getAuditLogs).mockResolvedValue(mockAuditLogs);
+  });
+
+  it('renders admin dashboard header, badges, and default spots tab with spot data', async () => {
+    render(<AdminDashboard isAr={true} />);
+
+    expect(screen.getByText('لوحة الحوكمة والتحكم الإداري المركزي')).toBeInTheDocument();
+    expect(screen.getByText('CAMPUS_ADMIN')).toBeInTheDocument();
+    expect(screen.getByTestId('admin-tab-spots')).toBeInTheDocument();
+    expect(screen.getByTestId('admin-tab-tariffs')).toBeInTheDocument();
+    expect(screen.getByTestId('admin-tab-rooms')).toBeInTheDocument();
+    expect(screen.getByTestId('admin-tab-users')).toBeInTheDocument();
+    expect(screen.getByTestId('admin-tab-audit')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('#01')).toBeInTheDocument();
+      expect(screen.getByText('#02')).toBeInTheDocument();
+    });
+  });
+
+  it('toggles spot maintenance status and updates UI feedback banner', async () => {
+    vi.mocked(adminApi.updateSpotStatus).mockResolvedValueOnce({
+      ...mockSpots[0],
+      status: 'MAINTENANCE',
+    });
+
+    render(<AdminDashboard isAr={true} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('#01')).toBeInTheDocument();
+    });
+
+    const maintenanceButtons = screen.getAllByRole('button', { name: /صيانة/i });
+    fireEvent.click(maintenanceButtons[0]);
+
+    await waitFor(() => {
+      expect(adminApi.updateSpotStatus).toHaveBeenCalledWith('spot-uuid-1', {
+        status: 'MAINTENANCE',
+        reason: 'Routine admin maintenance inspection',
+      });
+      expect(screen.getByTestId('admin-feedback-banner')).toBeInTheDocument();
+    });
+  });
+
+  it('switches to tariffs tab and saves tariff updates successfully', async () => {
+    vi.mocked(adminApi.updateTariff).mockResolvedValueOnce({
+      userType: 'STUDENT',
+      hourlyRate: 3.0,
+      dailyRate: 20.0,
+      semesterRate: 300.0,
+    });
+
+    render(<AdminDashboard isAr={true} />);
+
+    const tariffsTab = screen.getByTestId('admin-tab-tariffs');
+    fireEvent.click(tariffsTab);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('admin-tariffs-panel')).toBeInTheDocument();
+      expect(screen.getByText('STUDENT')).toBeInTheDocument();
+    });
+
+    const saveButtons = screen.getAllByRole('button', { name: /حفظ التسعيرة/i });
+    fireEvent.click(saveButtons[0]);
+
+    await waitFor(() => {
+      expect(adminApi.updateTariff).toHaveBeenCalled();
+      expect(screen.getByTestId('admin-feedback-banner')).toBeInTheDocument();
+    });
+  });
+
+  it('switches to rooms tab and allows toggling room status', async () => {
+    vi.mocked(adminApi.updateRoomStatus).mockResolvedValueOnce({
+      ...mockRooms[0],
+      status: 'MAINTENANCE',
+    });
+
+    render(<AdminDashboard isAr={true} />);
+
+    const roomsTab = screen.getByTestId('admin-tab-rooms');
+    fireEvent.click(roomsTab);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('admin-rooms-panel')).toBeInTheDocument();
+      expect(screen.getByText('LIB-101')).toBeInTheDocument();
+      expect(screen.getByText('غرفة ابن الهيثم')).toBeInTheDocument();
+    });
+
+    const maintenanceBtn = screen.getByRole('button', { name: /صيانة الغرفة/i });
+    fireEvent.click(maintenanceBtn);
+
+    await waitFor(() => {
+      expect(adminApi.updateRoomStatus).toHaveBeenCalledWith('room-uuid-1', {
+        status: 'MAINTENANCE',
+        reason: 'Scheduled sanitization / maintenance',
+      });
+    });
+  });
+
+  it('switches to users tab, renders user search, and toggles user suspension', async () => {
+    vi.mocked(adminApi.updateUserStatus).mockResolvedValueOnce({
+      ...mockUsers[0],
+      status: 'SUSPENDED',
+    });
+
+    render(<AdminDashboard isAr={true} />);
+
+    const usersTab = screen.getByTestId('admin-tab-users');
+    fireEvent.click(usersTab);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('admin-users-panel')).toBeInTheDocument();
+      expect(screen.getByText('سعود الشمري')).toBeInTheDocument();
+      expect(screen.getByText('student@fbsu.edu.sa')).toBeInTheDocument();
+    });
+
+    const suspendBtn = screen.getByRole('button', { name: /تجميد/i });
+    fireEvent.click(suspendBtn);
+
+    await waitFor(() => {
+      expect(adminApi.updateUserStatus).toHaveBeenCalledWith('user-uuid-1', {
+        status: 'SUSPENDED',
+        reason: 'Administrative suspension',
+      });
+      expect(screen.getByTestId('admin-feedback-banner')).toBeInTheDocument();
+    });
+  });
+
+  it('switches to audit log tab and displays recorded admin actions', async () => {
+    render(<AdminDashboard isAr={true} />);
+
+    const auditTab = screen.getByTestId('admin-tab-audit');
+    fireEvent.click(auditTab);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('admin-audit-panel')).toBeInTheDocument();
+      expect(screen.getByText('admin@fbsu.edu.sa')).toBeInTheDocument();
+      expect(screen.getByText('UPDATE_SPOT_STATUS')).toBeInTheDocument();
+      expect(screen.getByText('تحويل الموقف للصيانة')).toBeInTheDocument();
+    });
+  });
+});

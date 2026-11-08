@@ -409,6 +409,7 @@ export const tasks = [
     tests: ['API', 'Security matrix'], blockedBy: [],
   }),
   T('P7-05', 'Admin UI', {
+    status: 'Done', pr: 'PR (feature/P7-05-admin-ui)',
     pri: 'Medium', cx: 'L', deps: ['P7-04'], branch: 'feature/P7-05-admin-ui',
     goal: 'لوحة إدارة بسيطة للـ Admin.',
     files: ['frontend/src/features/admin/*'],
