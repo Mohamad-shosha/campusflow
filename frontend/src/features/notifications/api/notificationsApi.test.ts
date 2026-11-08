@@ -55,4 +55,3 @@ describe('notificationsApi Service', () => {
     expect(result).toEqual(mockRes);
   });
 });
-

@@ -230,4 +230,3 @@ describe('NotificationsModal Component (P7-03)', () => {
     expect(handleClose).toHaveBeenCalledTimes(2);
   });
 });
-
