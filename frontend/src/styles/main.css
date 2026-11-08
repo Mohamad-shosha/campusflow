@@ -1493,6 +1493,107 @@ body.theme-light .campus-road-header {
   width: 100%;
 }
 
+.realistic-flex-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+/* Stall Boundary Lines on Asphalt */
+.stall-line-left,
+.stall-line-right {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2.5px;
+  background: rgba(250, 204, 21, 0.45);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.25);
+  pointer-events: none;
+}
+.stall-line-left {
+  left: 6px;
+}
+.stall-line-right {
+  right: 6px;
+}
+
+.parking-spot-card.available .stall-line-left,
+.parking-spot-card.available .stall-line-right {
+  background: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.25);
+}
+
+.parking-spot-card.faculty-spot .stall-line-left,
+.parking-spot-card.faculty-spot .stall-line-right {
+  background: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.25);
+}
+
+.parking-spot-card.reserved-user .stall-line-left,
+.parking-spot-card.reserved-user .stall-line-right {
+  background: rgba(59, 130, 246, 0.65);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.45);
+}
+
+/* Headlight Projection Beams */
+.car-headlight-beams {
+  opacity: 0.12;
+  transition:
+    opacity 0.35s ease,
+    filter 0.35s ease;
+  filter: blur(1.5px);
+}
+
+.parking-spot-card:hover .car-headlight-beams,
+.car-headlight-beams.always-on {
+  opacity: 0.95;
+  filter: blur(1px) drop-shadow(0 0 10px rgba(254, 240, 138, 0.85));
+}
+
+/* User Reserved Spot Pill */
+.user-reserved-spot-badge {
+  position: absolute;
+  top: -8px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  border: 1px solid #60a5fa;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.65);
+  z-index: 2;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* Flex Model Pill */
+.flex-model-pill {
+  position: absolute;
+  bottom: -4px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 12px;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.6rem;
+  color: var(--fbsu-gold);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 95%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
 .car-model-pill {
   position: absolute;
   bottom: -4px;

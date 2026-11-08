@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { RefreshCw, Zap, ShieldCheck, UserCheck, Clock, Car } from 'lucide-react';
+import { RefreshCw, Zap, ShieldCheck, UserCheck, Clock, Car, Star } from 'lucide-react';
 import type { ParkingSpot } from '../data/parkingData';
 import { CarSvg } from './CarSvg';
 import { getCarVisualTheme } from '../utils/carTheme';
@@ -63,6 +63,18 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
   if (isOccupied) {
     visualCenter = (
       <div className="realistic-parked-car-wrapper">
+        {/* Stall Boundary Lines on pavement */}
+        <div className="stall-line-left" />
+        <div className="stall-line-right" />
+
+        {/* User Reservation Glowing Badge */}
+        {isCurrentUserSpot && (
+          <div className="user-reserved-spot-badge">
+            <Star size={10} fill="#f59e0b" color="#f59e0b" />
+            <span>{isAr ? 'محجوز لك' : 'Your Spot'}</span>
+          </div>
+        )}
+
         <CarSvg
           color={carTheme.color}
           gradientStart={carTheme.gradientStart}
@@ -71,8 +83,9 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
           type={carTheme.type}
           plate={spot.plate || carTheme.plateLabel}
         />
-        {/* Car Model Floating Pill */}
-        <div className="car-model-pill">
+
+        {/* Car Model Floating Pill with Brand Tag */}
+        <div className="car-model-pill" title={spot.car || carTheme.modelLabel}>
           <Car size={11} />
           <span>{spot.car || carTheme.modelLabel}</span>
         </div>
@@ -81,42 +94,36 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
   } else if (isFlex) {
     visualCenter = (
       <div className="realistic-flex-wrapper">
-        {spot.car ? (
-          <div style={{ opacity: 0.85, position: 'relative' }}>
-            <CarSvg
-              color={carTheme.color}
-              gradientStart={carTheme.gradientStart}
-              gradientMid={carTheme.gradientMid}
-              gradientEnd={carTheme.gradientEnd}
-              type={carTheme.type}
-              plate={spot.plate || carTheme.plateLabel}
-            />
-            <div className="flex-pulse-overlay">
-              <RefreshCw size={24} color="var(--fbsu-gold)" className="animate-spin-slow" />
-            </div>
+        <div className="stall-line-left" />
+        <div className="stall-line-right" />
+
+        <div style={{ opacity: 0.9, position: 'relative' }}>
+          <CarSvg
+            color={carTheme.color}
+            gradientStart={carTheme.gradientStart}
+            gradientMid={carTheme.gradientMid}
+            gradientEnd={carTheme.gradientEnd}
+            type={carTheme.type}
+            plate={spot.plate || carTheme.plateLabel}
+          />
+          <div className="flex-pulse-overlay">
+            <RefreshCw size={26} color="var(--fbsu-gold)" className="animate-spin-slow" />
           </div>
-        ) : (
-          <div style={{ textAlign: 'center', padding: '0.6rem 0' }}>
-            <RefreshCw size={32} color="var(--fbsu-gold)" className="animate-spin-slow" />
-            <span
-              style={{
-                fontSize: '0.72rem',
-                color: 'var(--fbsu-gold)',
-                fontWeight: 800,
-                display: 'block',
-                marginTop: '0.35rem',
-              }}
-            >
-              AI FLEX SHARE
-            </span>
-          </div>
-        )}
+        </div>
+
+        <div className="flex-model-pill">
+          <RefreshCw size={10} color="var(--fbsu-gold)" />
+          <span>{isAr ? 'في بريك (متاح للتبادل)' : 'On Break (Flex Swappable)'}</span>
+        </div>
       </div>
     );
   } else {
     // Empty Authentic Parking Bay
     visualCenter = (
       <div className="empty-parking-bay-stencil">
+        <div className="stall-line-left" />
+        <div className="stall-line-right" />
+
         {/* Road Surface Demarcation */}
         <div className="bay-pavement-marking">
           {spot.zone === 'D' || spot.isEV ? (
