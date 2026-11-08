@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 39 تاسك ✅
+- **المنجز بالكامل (Done):** 40 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 14 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **74%**
+- **المتبقي للبدء (Backlog):** 13 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **75%**
 
 
 
@@ -25,10 +25,10 @@
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
 | P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 7 | 0 | 0 |
-| P7 | Notifications, Admin, Analytics | 6 | 1 | 0 | 5 |
+| P7 | Notifications, Admin, Analytics | 6 | 2 | 0 | 4 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **39** | **0** | **14** |
+| **الإجمالي** | | **53** | **40** | **0** | **13** |
 
 ---
 
@@ -487,9 +487,9 @@
 
 ### P7-02 — Wire events (bookings, payments) → notifications
 - **ماذا سيعمل:** ربط أحداث الحجز والدفع بإنشاء إشعارات تلقائيًا.
-- **Priority:** High · **Complexity:** M · **Status:** Backlog
+- **Priority:** High · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P7-01، P4-02، P5-03، P6-02، P6-04
-- **Git Branch:** `feature/P7-02-notification-events` · **Pull Request:** —
+- **Git Branch:** `feature/P7-02-notification-events` · **Pull Request:** PR (feature/P7-02-notification-events)
 - **الملفات المتوقعة:** `كل module: event publishers`، `notification/application/listeners`
 - **Implementation Steps:** 1) Application events 2) Listeners 3) اختبارات
 - **Acceptance Criteria:** كل حدث رئيسي ينتج إشعارًا

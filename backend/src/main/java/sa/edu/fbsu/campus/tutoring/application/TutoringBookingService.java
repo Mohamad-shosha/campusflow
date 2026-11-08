@@ -2,9 +2,11 @@ package sa.edu.fbsu.campus.tutoring.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
+import sa.edu.fbsu.campus.common.events.TutoringBookingEvent;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.tutoring.domain.TutoringEnrollment;
@@ -34,19 +36,22 @@ public class TutoringBookingService {
     private final TutoringService tutoringService;
     private final UserRepository userRepository;
     private final WalletService walletService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public TutoringBookingService(
             TutoringSessionRepository sessionRepository,
             TutoringEnrollmentRepository enrollmentRepository,
             TutoringService tutoringService,
             UserRepository userRepository,
-            WalletService walletService
+            WalletService walletService,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.sessionRepository = sessionRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.tutoringService = tutoringService;
         this.userRepository = userRepository;
         this.walletService = walletService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -145,6 +150,17 @@ public class TutoringBookingService {
                 session.getCourseCode(),
                 session.getTotalPrice(),
                 session.getTutor().getUniversityNumber());
+
+        eventPublisher.publishEvent(new TutoringBookingEvent(
+                student.getId(),
+                session.getTutor().getId(),
+                student.getUniversityId(),
+                session.getCourseCode(),
+                session.getCourseNameAr(),
+                session.getCourseNameEn(),
+                student.getFullNameAr(),
+                session.getTutor().getFullNameAr()
+        ));
 
         return TutoringEnrollmentResponse.fromEntity(
                 enrollment,

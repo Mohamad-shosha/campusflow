@@ -3,6 +3,7 @@ package sa.edu.fbsu.campus.notifications.application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.identity.domain.User;
@@ -64,7 +65,7 @@ public class NotificationService {
         return count;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public NotificationResponse createNotification(CreateNotificationCommand cmd) {
         User recipient = userRepository.findById(cmd.recipientUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recipient user not found: " + cmd.recipientUserId()));

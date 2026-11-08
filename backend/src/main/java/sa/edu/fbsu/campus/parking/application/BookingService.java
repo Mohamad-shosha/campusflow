@@ -2,9 +2,11 @@ package sa.edu.fbsu.campus.parking.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
+import sa.edu.fbsu.campus.common.events.ParkingBookingEvent;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.domain.UserType;
 import sa.edu.fbsu.campus.identity.domain.Vehicle;
@@ -43,6 +45,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final WalletService walletService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public BookingService(
             ParkingBookingRepository bookingRepository,
@@ -50,7 +53,8 @@ public class BookingService {
             ParkingTariffRepository tariffRepository,
             UserRepository userRepository,
             VehicleRepository vehicleRepository,
-            WalletService walletService
+            WalletService walletService,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.bookingRepository = bookingRepository;
         this.spotRepository = spotRepository;
@@ -58,6 +62,7 @@ public class BookingService {
         this.userRepository = userRepository;
         this.vehicleRepository = vehicleRepository;
         this.walletService = walletService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -172,6 +177,16 @@ public class BookingService {
         spotRepository.save(spot);
 
         log.info("Created parking booking {} for user {} on bay {} (Amount: {} SAR)", saved.getId(), userId, spot.getBayCode(), totalAmount);
+
+        eventPublisher.publishEvent(new ParkingBookingEvent(
+                user.getId(),
+                user.getUniversityId(),
+                spot.getBayCode(),
+                "BOOKED",
+                startTime.toString(),
+                endTime.toString()
+        ));
+
         return BookingResponse.fromEntity(saved);
     }
 
@@ -239,6 +254,15 @@ public class BookingService {
             spot.setSessionEndsAt(null);
             spotRepository.save(spot);
         }
+
+        eventPublisher.publishEvent(new ParkingBookingEvent(
+                userId,
+                booking.getUniversityId(),
+                booking.getSpot().getBayCode(),
+                "CANCELLED",
+                booking.getStartTime().toString(),
+                booking.getEndTime().toString()
+        ));
 
         return BookingResponse.fromEntity(updated);
     }

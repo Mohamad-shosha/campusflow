@@ -2,10 +2,12 @@ package sa.edu.fbsu.campus.officehours.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
+import sa.edu.fbsu.campus.common.events.OfficeHoursBookingEvent;
 import sa.edu.fbsu.campus.domain.University;
 import sa.edu.fbsu.campus.identity.domain.Role;
 import sa.edu.fbsu.campus.identity.domain.User;
@@ -39,19 +41,22 @@ public class OfficeHoursService {
     private final OfficeHourAppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public OfficeHoursService(
             FacultyOfficeProfileRepository profileRepository,
             OfficeHourSlotRepository slotRepository,
             OfficeHourAppointmentRepository appointmentRepository,
             UserRepository userRepository,
-            UniversityRepository universityRepository
+            UniversityRepository universityRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.profileRepository = profileRepository;
         this.slotRepository = slotRepository;
         this.appointmentRepository = appointmentRepository;
         this.userRepository = userRepository;
         this.universityRepository = universityRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -175,6 +180,17 @@ public class OfficeHoursService {
         log.info("Booked office-hour appointment {} for student {} with faculty {}",
                 saved.getId(), student.getUniversityNumber(), slot.getProfile().getFaculty().getUniversityNumber());
 
+        eventPublisher.publishEvent(new OfficeHoursBookingEvent(
+                student.getId(),
+                slot.getProfile().getFaculty().getId(),
+                student.getUniversityId(),
+                slot.getProfile().getFaculty().getFullNameAr(),
+                slot.getProfile().getFaculty().getFullNameEn(),
+                student.getFullNameAr(),
+                slot.getTimeLabelEn() != null ? slot.getTimeLabelEn() : slot.getTimeLabelAr(),
+                "BOOKED"
+        ));
+
         return OfficeHourAppointmentResponse.fromEntity(saved, updatedFaculty);
     }
 
@@ -215,6 +231,17 @@ public class OfficeHoursService {
         slot.setAvailable(true);
         slot.setBookedNote(null);
         slotRepository.saveAndFlush(slot);
+
+        eventPublisher.publishEvent(new OfficeHoursBookingEvent(
+                appt.getStudent().getId(),
+                appt.getProfile().getFaculty().getId(),
+                appt.getUniversityId(),
+                appt.getProfile().getFaculty().getFullNameAr(),
+                appt.getProfile().getFaculty().getFullNameEn(),
+                appt.getStudent().getFullNameAr(),
+                appt.getSlot().getTimeLabelEn() != null ? appt.getSlot().getTimeLabelEn() : appt.getSlot().getTimeLabelAr(),
+                "CANCELLED"
+        ));
 
         List<OfficeHourSlot> updatedSlots = slotRepository.findByProfileIdOrderByStartTimeAsc(appt.getProfile().getId());
         return OfficeHourAppointmentResponse.fromEntity(appt, FacultyOfficeResponse.fromEntity(appt.getProfile(), updatedSlots));

@@ -2,9 +2,11 @@ package sa.edu.fbsu.campus.wallet.tuition.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
+import sa.edu.fbsu.campus.common.events.WalletTransactionEvent;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.wallet.application.WalletService;
@@ -37,19 +39,22 @@ public class TuitionService {
     private final WalletService walletService;
     private final LedgerEntryRepository ledgerEntryRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public TuitionService(
             TuitionInvoiceRepository invoiceRepository,
             TuitionReceiptRepository receiptRepository,
             WalletService walletService,
             LedgerEntryRepository ledgerEntryRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.invoiceRepository = invoiceRepository;
         this.receiptRepository = receiptRepository;
         this.walletService = walletService;
         this.ledgerEntryRepository = ledgerEntryRepository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -127,6 +132,14 @@ public class TuitionService {
 
         log.info("Tuition settlement finalized: Receipt {} issued for student {} [{} SAR, Invoice {}]",
                 receiptNumber, student.getUniversityNumber(), amount, savedInvoice.getInvoiceNumber());
+
+        eventPublisher.publishEvent(new WalletTransactionEvent(
+                studentId,
+                student.getUniversityId(),
+                amount,
+                "TUITION_PAYMENT",
+                savedInvoice.getInvoiceNumber()
+        ));
 
         return TuitionReceiptResponse.fromEntity(savedReceipt);
     }
