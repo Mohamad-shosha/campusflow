@@ -418,6 +418,7 @@ export const tasks = [
     tests: ['Component', 'E2E'], blockedBy: [],
   }),
   T('P7-06', 'Analytics endpoints + UI', {
+    status: 'Done', pr: 'PR (feature/P7-06-analytics)',
     pri: 'Low', cx: 'M', deps: ['P5-03'], branch: 'feature/P7-06-analytics',
     goal: 'مؤشرات حقيقية بدل الأرقام الثابتة (حمل المواقف بالساعة، إلخ).',
     files: ['analytics/**', 'frontend/src/features/analytics/*'],

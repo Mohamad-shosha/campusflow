@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 43 تاسك ✅
+- **المنجز بالكامل (Done):** 44 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 10 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **81%**
+- **المتبقي للبدء (Backlog):** 9 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **83%**
 
 
 
@@ -25,10 +25,10 @@
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
 | P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 7 | 0 | 0 |
-| P7 | Notifications, Admin, Analytics | 6 | 5 | 0 | 1 |
+| P7 | Notifications, Admin, Analytics | 6 | 6 | 0 | 0 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **43** | **0** | **10** |
+| **الإجمالي** | | **53** | **44** | **0** | **9** |
 
 ---
 
@@ -531,9 +531,9 @@
 
 ### P7-06 — Analytics endpoints + UI
 - **ماذا سيعمل:** مؤشرات حقيقية بدل الأرقام الثابتة (حمل المواقف بالساعة، إلخ).
-- **Priority:** Low · **Complexity:** M · **Status:** Backlog
+- **Priority:** Low · **Complexity:** M · **Status:** ✅ Done
 - **Dependencies:** P5-03
-- **Git Branch:** `feature/P7-06-analytics` · **Pull Request:** —
+- **Git Branch:** `feature/P7-06-analytics` · **Pull Request:** PR (feature/P7-06-analytics)
 - **الملفات المتوقعة:** `analytics/**`، `frontend/src/features/analytics/*`
 - **Implementation Steps:** 1) Queries 2) API 3) UI 4) اختبارات
 - **Acceptance Criteria:** الأرقام من بيانات فعلية
