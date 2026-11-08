@@ -28,3 +28,4 @@ CREATE TABLE campus_notification (
 
 CREATE INDEX idx_notif_recipient ON campus_notification(recipient_user_id, read, created_at DESC);
 CREATE INDEX idx_notif_uni_created ON campus_notification(university_id, created_at DESC);
+

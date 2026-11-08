@@ -19,3 +19,4 @@ public record CreateNotificationCommand(
         String targetRoute
 ) {
 }
+

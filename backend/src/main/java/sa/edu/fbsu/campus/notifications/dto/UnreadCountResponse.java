@@ -4,3 +4,4 @@ public record UnreadCountResponse(
         long unreadCount
 ) {
 }
+

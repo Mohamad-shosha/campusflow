@@ -189,3 +189,4 @@ public class CampusNotification extends BaseTenantEntity {
         this.readAt = readAt;
     }
 }
+

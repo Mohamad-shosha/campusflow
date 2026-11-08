@@ -30,3 +30,4 @@ public interface NotificationRepository extends JpaRepository<CampusNotification
     @Query("UPDATE CampusNotification n SET n.read = true, n.readAt = :now, n.updatedAt = :now WHERE n.recipient.id = :recipientId AND n.read = false")
     int markAllAsReadForRecipient(@Param("recipientId") UUID recipientId, @Param("now") Instant now);
 }
+

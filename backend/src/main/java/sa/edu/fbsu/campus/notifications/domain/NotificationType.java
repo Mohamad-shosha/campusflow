@@ -9,3 +9,4 @@ public enum NotificationType {
     ROOM,
     SYSTEM
 }
+

@@ -126,3 +126,4 @@ public class NotificationsDataSeeder implements CommandLineRunner {
         notificationRepository.save(n);
     }
 }
+
