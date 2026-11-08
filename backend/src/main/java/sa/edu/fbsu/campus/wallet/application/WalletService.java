@@ -2,11 +2,13 @@ package sa.edu.fbsu.campus.wallet.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
+import sa.edu.fbsu.campus.common.events.WalletTransactionEvent;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.wallet.domain.*;
@@ -27,15 +29,18 @@ public class WalletService {
     private final WalletRepository walletRepository;
     private final LedgerEntryRepository ledgerEntryRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public WalletService(
             WalletRepository walletRepository,
             LedgerEntryRepository ledgerEntryRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.walletRepository = walletRepository;
         this.ledgerEntryRepository = ledgerEntryRepository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -93,6 +98,14 @@ public class WalletService {
 
         log.info("Wallet top-up successful: {} SAR credited to user {}, new balance: {} SAR",
                 amount, userId, savedWallet.getBalance());
+
+        eventPublisher.publishEvent(new WalletTransactionEvent(
+                userId,
+                savedWallet.getUniversityId(),
+                amount,
+                "TOP_UP",
+                "MADA"
+        ));
 
         return WalletResponse.fromEntity(savedWallet);
     }
@@ -261,6 +274,21 @@ public class WalletService {
 
         log.info("P2P transfer completed: {} SAR from {} to {}",
                 amount, sender.getUniversityNumber(), recipient.getUniversityNumber());
+
+        eventPublisher.publishEvent(new WalletTransactionEvent(
+                senderUserId,
+                senderWallet.getUniversityId(),
+                amount,
+                "TRANSFER_OUT",
+                recipient.getFullNameAr()
+        ));
+        eventPublisher.publishEvent(new WalletTransactionEvent(
+                recipient.getId(),
+                recipientWallet.getUniversityId(),
+                amount,
+                "TRANSFER_IN",
+                sender.getFullNameAr()
+        ));
 
         return WalletResponse.fromEntity(senderWallet);
     }

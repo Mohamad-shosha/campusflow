@@ -2,10 +2,12 @@ package sa.edu.fbsu.campus.rooms.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
+import sa.edu.fbsu.campus.common.events.StudyRoomBookingEvent;
 import sa.edu.fbsu.campus.domain.University;
 import sa.edu.fbsu.campus.identity.domain.Role;
 import sa.edu.fbsu.campus.identity.domain.User;
@@ -37,17 +39,20 @@ public class RoomsService {
     private final RoomBookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RoomsService(
             StudyRoomRepository roomRepository,
             RoomBookingRepository bookingRepository,
             UserRepository userRepository,
-            UniversityRepository universityRepository
+            UniversityRepository universityRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.universityRepository = universityRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -158,6 +163,16 @@ public class RoomsService {
         log.info("Booked room {} ({}) for user {} from {} to {}",
                 room.getRoomCode(), room.getNameEn(), actor.getUniversityNumber(), startLabel, endLabel);
 
+        eventPublisher.publishEvent(new StudyRoomBookingEvent(
+                actor.getId(),
+                actor.getUniversityId(),
+                room.getRoomCode(),
+                room.getNameAr(),
+                room.getNameEn(),
+                "BOOKED",
+                startLabel + " - " + endLabel
+        ));
+
         return StudyRoomResponse.fromEntity(room, booking);
     }
 
@@ -209,6 +224,16 @@ public class RoomsService {
         log.info("Extended room {} booking {} (+10 mins) new end {}",
                 room.getRoomCode(), booking.getId(), newEndLabel);
 
+        eventPublisher.publishEvent(new StudyRoomBookingEvent(
+                actor.getId(),
+                booking.getUniversityId(),
+                room.getRoomCode(),
+                room.getNameAr(),
+                room.getNameEn(),
+                "EXTENDED",
+                booking.getStartLabel() + " - " + newEndLabel
+        ));
+
         return StudyRoomResponse.fromEntity(room, booking);
     }
 
@@ -242,6 +267,16 @@ public class RoomsService {
 
         log.info("Released room {} booking {} by user {}",
                 room.getRoomCode(), booking.getId(), actor.getUniversityNumber());
+
+        eventPublisher.publishEvent(new StudyRoomBookingEvent(
+                actor.getId(),
+                booking.getUniversityId(),
+                room.getRoomCode(),
+                room.getNameAr(),
+                room.getNameEn(),
+                "RELEASED",
+                booking.getStartLabel() + " - " + booking.getEndLabel()
+        ));
 
         return StudyRoomResponse.fromEntity(room, null);
     }

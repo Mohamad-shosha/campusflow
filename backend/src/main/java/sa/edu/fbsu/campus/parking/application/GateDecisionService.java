@@ -2,8 +2,10 @@ package sa.edu.fbsu.campus.parking.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sa.edu.fbsu.campus.common.events.GateAccessEvent;
 import sa.edu.fbsu.campus.identity.domain.SaudiPlate;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.domain.UserType;
@@ -34,6 +36,7 @@ public class GateDecisionService {
     private final SpotAssignmentRepository spotAssignmentRepository;
     private final FlexOfferRepository flexOfferRepository;
     private final GateEventLogRepository gateEventLogRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public GateDecisionService(
             VehicleRepository vehicleRepository,
@@ -42,7 +45,8 @@ public class GateDecisionService {
             ParkingBookingRepository bookingRepository,
             SpotAssignmentRepository spotAssignmentRepository,
             FlexOfferRepository flexOfferRepository,
-            GateEventLogRepository gateEventLogRepository
+            GateEventLogRepository gateEventLogRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.vehicleRepository = vehicleRepository;
         this.userRepository = userRepository;
@@ -51,6 +55,7 @@ public class GateDecisionService {
         this.spotAssignmentRepository = spotAssignmentRepository;
         this.flexOfferRepository = flexOfferRepository;
         this.gateEventLogRepository = gateEventLogRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -259,5 +264,18 @@ public class GateDecisionService {
         gateEventLogRepository.save(logEntry);
         log.info("[ALPR-GATE] Gate: {} | Plate: {} {} | Decision: {} ({}) | Bay: {}",
                 gateId, lettersAr, digits, decision, reason, bayCode);
+
+        if ("GRANTED".equalsIgnoreCase(decision) && user != null) {
+            String gateNameAr = "GATE-01-NORTH".equalsIgnoreCase(gateId) ? "البوابة الشمالية الرئيسية" : "بوابة الحرم الجامعي";
+            String gateNameEn = "GATE-01-NORTH".equalsIgnoreCase(gateId) ? "Main North Gate" : "Campus Gate";
+            eventPublisher.publishEvent(new GateAccessEvent(
+                    user.getId(),
+                    universityId,
+                    lettersAr + " " + digits,
+                    gateNameAr,
+                    gateNameEn,
+                    true
+            ));
+        }
     }
 }

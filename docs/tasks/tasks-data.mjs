@@ -382,6 +382,7 @@ export const tasks = [
     tests: ['Service', 'API', 'Security'], blockedBy: [],
   }),
   T('P7-02', 'Wire events (bookings, payments) → notifications', {
+    status: 'Done', pr: 'PR (feature/P7-02-notification-events)',
     pri: 'High', cx: 'M', deps: ['P7-01', 'P4-02', 'P5-03', 'P6-02', 'P6-04'], branch: 'feature/P7-02-notification-events',
     goal: 'ربط أحداث الحجز والدفع بإنشاء إشعارات تلقائيًا.',
     files: ['كل module: event publishers', 'notification/application/listeners'],

@@ -2,9 +2,11 @@ package sa.edu.fbsu.campus.parking.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
+import sa.edu.fbsu.campus.common.events.WalletTransactionEvent;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.parking.domain.FlexOffer;
@@ -37,19 +39,22 @@ public class FlexShareService {
     private final ParkingTariffRepository tariffRepository;
     private final UserRepository userRepository;
     private final WalletService walletService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public FlexShareService(
             FlexOfferRepository flexOfferRepository,
             ParkingSpotRepository spotRepository,
             ParkingTariffRepository tariffRepository,
             UserRepository userRepository,
-            WalletService walletService
+            WalletService walletService,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.flexOfferRepository = flexOfferRepository;
         this.spotRepository = spotRepository;
         this.tariffRepository = tariffRepository;
         this.userRepository = userRepository;
         this.walletService = walletService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -137,6 +142,14 @@ public class FlexShareService {
             );
             offer.markRewardPaid();
             log.info("Credited {} SAR Flex reward to offerer {}", offer.getRewardAmount(), offer.getOfferer().getUniversityNumber());
+
+            eventPublisher.publishEvent(new WalletTransactionEvent(
+                    offer.getOfferer().getId(),
+                    offer.getUniversityId(),
+                    offer.getRewardAmount(),
+                    "FLEX_REWARD",
+                    offer.getSpot().getBayCode()
+            ));
         }
 
         // Update parking spot to show claimer's session
