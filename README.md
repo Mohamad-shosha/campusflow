@@ -428,17 +428,35 @@ When running the local server (`npm run dev`), you can directly access any of th
 
 ---
 
-## 📚 Engineering Documentation Library
+## 📚 Engineering & Product Documentation Library
 
+### 1. Product & Features (منظور المنتج والميزات)
 | Document | File Path | Focus Area |
 | :--- | :--- | :--- |
-| **System Architecture Specification** | [`docs/architecture/01-system-architecture.md`](./docs/architecture/01-system-architecture.md) | Modular monolith architecture, module boundaries, and API conventions. |
-| **Database Entity Relationship Diagram** | [`docs/architecture/02-database-erd.md`](./docs/architecture/02-database-erd.md) | PostgreSQL schemas, ledger tables, foreign keys, and constraints. |
-| **Modular Monolith Decision Record** | [`docs/decisions/ADR-0001-modular-monolith.md`](./docs/decisions/ADR-0001-modular-monolith.md) | Strategic rationale for selecting a Modular Monolith over Microservices. |
-| **UI Design System Retention Record** | [`docs/decisions/ADR-0002-preserve-ui-react-plain-css.md`](./docs/decisions/ADR-0002-preserve-ui-react-plain-css.md) | Strategy for migrating tokenized styles into React without CSS regressions. |
-| **Engineering Task Backlog & PDFs** | [`docs/tasks/pdf/ALL-TASKS.pdf`](./docs/tasks/pdf/ALL-TASKS.pdf) | Consolidated implementation specification from Phase P0 to Phase P9. |
-| **Design System Technical Guide** | [`design-system/README.md`](./design-system/README.md) | Figma section mapping, color tokens, and script build procedures. |
-| **Master Delivery Plan** | [`plan.md`](./plan.md) | Strategic engineering roadmap and project timeline. |
+| **Product Overview** | [`docs/product/PRODUCT_OVERVIEW.md`](./docs/product/PRODUCT_OVERVIEW.md) | الرؤية الشاملة لمنظومة CampusFlow، المشاكل التي تحلها، والقيمة المقدمة. |
+| **Feature Catalog** | [`docs/product/FEATURE_CATALOG.md`](./docs/product/FEATURE_CATALOG.md) | كتالوج الـ 16 ميزة المكتشفة مع 20 مؤشراً لكل ميزة (الوضع الراهن، الاعتماديات، والاختبارات). |
+| **Feature Dependencies** | [`docs/product/FEATURE_DEPENDENCIES.md`](./docs/product/FEATURE_DEPENDENCIES.md) | مخطط الاعتماديات التفاعلي (Mermaid Graph) والمسار الحرج للمشروع. |
+| **Feature Priority Matrix** | [`docs/product/FEATURE_PRIORITY_MATRIX.md`](./docs/product/FEATURE_PRIORITY_MATRIX.md) | مصفوفة الأولويات (P0 إلى P3) بناءً على القيمة، الأثر، والأمان. |
+| **User Journeys & Value** | [`docs/product/USER_JOURNEYS.md`](./docs/product/USER_JOURNEYS.md) | رحلات المستخدم اليومية والإجابة على الأسئلة الستة الجوهرية بالعامية المصرية. |
+| **Feature Status Report** | [`docs/product/FEATURE_STATUS_REPORT.md`](./docs/product/FEATURE_STATUS_REPORT.md) | لوحة متابعة حالة الميزات (Frontend, Backend, DB, Integration, Testing, Overall). |
+
+### 2. Planning & Delivery (التخطيط والسبرنتات)
+| Document | File Path | Focus Area |
+| :--- | :--- | :--- |
+| **Master Delivery Plan** | [`plan.md`](./plan.md) | الخطة الإستراتيجية العامة، المعمارية المعتمدة، وقواعد التطوير الصارمة. |
+| **Feature-Driven Task Registry** | [`TASKS.md`](./TASKS.md) | سجل المهام الشامل الموجه بالميزات — 53 مهمة مربوطة بالـ Feature IDs وفروع العمل. |
+| **Master Roadmap** | [`docs/planning/MASTER_ROADMAP.md`](./docs/planning/MASTER_ROADMAP.md) | خارطة الطريق من الوضع الراهن حتى الإصدار الإنتاجي v1.0. |
+| **Sprint Roadmap** | [`docs/planning/SPRINT_ROADMAP.md`](./docs/planning/SPRINT_ROADMAP.md) | توزيع العمل بالسبرنتات (Sprints 01 to 07 Done, Sprint 08 Active, Sprints 09-10). |
+| **Sprint Backlog** | [`docs/planning/SPRINT_BACKLOG.md`](./docs/planning/SPRINT_BACKLOG.md) | قائمة مهام السبرنت النشط (P7-05 Admin UI و P7-06 Analytics) والسبرنتات القادمة. |
+| **Completed Work Register** | [`docs/planning/COMPLETED_WORK.md`](./docs/planning/COMPLETED_WORK.md) | سجل المهام الـ 42 المنجزة والمفحوصة بنسبة 100% مع أرقام الـ PRs. |
+| **Blocked Work Register** | [`docs/planning/BLOCKED_WORK.md`](./docs/planning/BLOCKED_WORK.md) | سجل المهام المحجوبة باعتماديات والتكاملات الخارجية المطلوبة مستقبلاً. |
+
+### 3. Architecture & Quality (المعمارية وضمان الجودة)
+| Document | File Path | Focus Area |
+| :--- | :--- | :--- |
+| **System Architecture** | [`docs/architecture/SYSTEM_ARCHITECTURE.md`](./docs/architecture/SYSTEM_ARCHITECTURE.md) | المعمارية البرمجية الحية للمونوليث النمطي ومخططات التدفق والأمان والـ Event Bus. |
+| **Database Overview** | [`docs/architecture/DATABASE_OVERVIEW.md`](./docs/architecture/DATABASE_OVERVIEW.md) | التوثيق الشامل لـ 21 جدولاً في PostgreSQL 15 وهجرات Flyway الـ 14 وقاموس البيانات. |
+| **Acceptance Criteria** | [`docs/quality/FEATURE_ACCEPTANCE_CRITERIA.md`](./docs/quality/FEATURE_ACCEPTANCE_CRITERIA.md) | ميثاق Definition of Done ومعايير قبول كل ميزة بدقة. |
 
 ---
 

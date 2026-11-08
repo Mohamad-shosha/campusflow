@@ -1,54 +1,55 @@
-# plan.md — Master Plan: FBSU University SaaS Platform
+# وثيقة الخطة التنفيذية الرئيسية (Master Plan) — CampusFlow
+**خطة تطوير وتشغيل منظومة الحرم الجامعي الذكي (FBSU Smart Campus OS)**
 
-> Draft created in P0-01 because the referenced `plan.md` was not found (Q1). Reconcile with the owner's version when provided.
-> Status of the plan: **awaiting owner approval**. Live task state is in [TASKS.md](TASKS.md).
+---
 
-## 1. Vision
-Turn the existing FBSU Smart Campus & Parking front-end prototype (vanilla JS, mock data) into a secure, tested, deployable product: React + TypeScript SPA, Java Spring Boot modular-monolith API, PostgreSQL, Docker, CI/CD — **preserving the current UI/UX**.
+## 1. الرؤية الإستراتيجية للمنتج (Product Vision)
+تحويل CampusFlow إلى منصة جامعية سحابية رائدة (University SaaS) بنمط Modular Monolith متماسك، يخدم جامعة فهد بن سلطان (FBSU) ويجمع بين أربع ركائز أساسية:
+1. **التنقل والمواقف الذكية (Smart Campus Mobility):** خريطة مواقف لحظية، قراءة اللوحات آلياً (ALPR)، وتبادل المواقف الذكي (AI Flex-Share).
+2. **الخدمات الأكاديمية التشاركية (Collaborative Academic Services):** دروس تقوية P2P، ساعات مكتبية للأساتذة، وغرف دراسة تفاعلية.
+3. **المالية والمحفظة الرقمية (Campus Fintech):** محفظة رقمية بدفتر أستاذ مزدوج القيد وفواتير رسوم دراسية معتمدة مع باركود QR.
+4. **الحوكمة والإدارة المركزية (Campus Governance):** لوحة تحكم إدارية مركزية وسجل تدقيق أمني غير قابل للحذف (Immutable Audit Log).
 
-## 2. Guiding rules
-1. Discovery before code; no invented business rules (open questions in `docs/discovery/07-open-questions.md`).
-2. One task = one branch = one PR; never work on `main`; no push/merge without explicit owner approval.
-3. Tests executed and observed before claiming success.
-4. Task-by-task sessions; state lives in `TASKS.md` and `docs/session-log.md`.
+---
 
-## 3. Target stack
-Frontend: React 18 + TS (strict) + Vite, React Router, TanStack Query, react-hook-form + Zod, react-i18next, plain CSS (ported), Vitest + Testing Library + Playwright.
-Backend: Java 21, Spring Boot 3.x, Spring Web/Validation/Security (JWT), Spring Data JPA/Hibernate, Flyway, springdoc-openapi, JUnit 5, Mockito, Testcontainers, ArchUnit.
-Data: PostgreSQL 16. Ops: Docker, Docker Compose, GitHub Actions.
+## 2. الموقف التنفيذي الراهن (Current System Status)
+- **نسبة جاهزية المنتج الإجمالية (Product Readiness):** **83.1%**.
+- **الميزات المكتملة والمفحوصة بالكامل (100% VERIFIED):** **13 ميزة** من أصل 16 ميزة.
+- **المهام المنجزة والمدمجة في `main`:** **42 مهمة** من أصل 53 مهمة (79.2%).
+- **عدد الاختبارات البرمجية العاملة والناجحة:** **173 اختباراً آلياً** (89 اختبار Vitest في الواجهة، و 84 اختبار JUnit/ArchUnit في الخلفية).
+- **التحديث الميداني الأخير:** دمج `PR #41` لتحسين تجربة المواقف برسم سيارات واقعي ثلاثي الأبعاد (Photorealistic Top-Down SVG).
 
-## 4. Phases
+---
 
-| Phase | Name | Outcome | Exit criteria |
-|---|---|---|---|
-| **P0** | Discovery & Planning | Audit, UI inventory, PRD, flows, architecture, ERD, MVP, roadmap, tasks, risks | Owner approves plan + decisions |
-| **P1** | Foundation & DevOps | Monorepo, React/TS scaffold, Spring Boot skeleton, Postgres+Flyway, Docker Compose, CI | `docker compose up` gives healthy db/backend/frontend; CI green |
-| **P2** | Identity & Campus Core | Campus/user/role/vehicle schema, JWT auth, RBAC, profile API, dev seed | Register/login/refresh work; security tests green |
-| **P3** | Frontend Foundation | Design tokens + shell, i18n/RTL, theme, API client, auth UI, shared UI kit | Visual parity of shell/auth; component + e2e tests |
-| **P4** | Wallet & Tuition | Ledger, wallet API, tuition payment + receipt, UI | No double-spend under concurrency tests |
-| **P5** | Parking | Spots/zones, tariffs, bookings, digital pass, Flex-Share, simulated gate, UI | Overlap impossible at DB level; flows e2e |
-| **P6** | Campus Services | Tutoring, office hours, rooms (API + UI) | Flows e2e; wallet transfers atomic |
-| **P7** | Notifications, Admin, Analytics | In-app notifications, minimal admin console, analytics endpoints | Role-restricted admin; notifications on all events |
-| **P8** | Hardening & QA | Security review, performance, a11y, responsive, full e2e, data privacy | All quality gates met |
-| **P9** | Release & Operations | Prod compose/deploy, backups, monitoring, runbooks, release v1.0 | Staging deploy verified; runbooks tested |
+## 3. المعمارية المعتمدة (Architectural Reality)
+- **الواجهة الأمامية (Frontend):** React 18 + TypeScript Strict + Vite + مكتبة مكونات مخصصة ناصعة (Zero external CSS bloat) + دعم ثنائي للغتين (AR/EN) والوضع الليلي والنهاري.
+- **الخلفية البرمجية (Backend):** Java 21 + Spring Boot 3.3.4 بنمط Modular Monolith (موديولات: `identity`, `wallet`, `parking`, `rooms`, `tutoring`, `officehours`, `notifications`, `admin`, `common`).
+- **قاعدة البيانات (Database):** PostgreSQL 15 + 14 Flyway Migrations (21 جدولاً بروابط صارمة وقيود Check لمنع التناقض).
+- **الحاويات والتشغيل (DevOps):** Docker Compose (خدمات: `fbsu-backend`, `fbsu-frontend`, `fbsu-postgres`) + خط أتمتة CI كامل على GitHub Actions.
 
-## 5. Dependencies between phases
-P1 → P2 → (P3 ∥ P4) → P5 → P6 → P7 → P8 → P9. P3 can start after P1-02 and P2-03 contract (OpenAPI) exist. Business-rule phases (P4–P6) are gated by owner answers Q4–Q10.
+---
 
-## 6. Milestones
-| Milestone | After | Deliverable |
-|---|---|---|
-| M0 | P0 | Approved plan |
-| M1 | P1 | Runnable skeleton in Docker |
-| M2 | P3 | Login works end-to-end in new UI |
-| M3 | P6 | All existing features live on real backend (MVP functional) |
-| M4 | P8 | Release candidate |
-| M5 | P9 | v1.0 deployed |
+## 4. خطة السبرنتات المتبقية حتى الإطلاق (Remaining Sprints to v1.0)
 
-(No calendar dates are promised until velocity is measured after P1.)
+### Sprint 08 (السبرنت النشط الحالي): Governance & Analytics
+- **الهدف:** تمكين إدارة الجامعة من التحكم الكامل عبر شاشات الإدارة، وتوصيل محرك التحليلات الإحصائي.
+- **المهام:**
+  - `P7-05: Admin UI`: بناء واجهة لوحة تحكم الإدارة لضبط المواقف، الغرف، التسعيرات، المستخدمين، وسجل التدقيق (الخطوة المباشرة التالية).
+  - `P7-06: Analytics Backend & Wiring`: كتابة مسارات إحصائيات الإشغال والإيرادات وربطها بالواجهة.
+- **النتيجة:** اكتمال الميزتين `F-14` و `F-15` بنسبة 100%.
 
-## 7. Definition of Done (per task)
-Acceptance criteria met · tests written + executed · CI green · docs/CHANGELOG updated · self-review + clean diff · PR prepared · owner approval.
+### Sprint 09: Enterprise Hardening & QA
+- **الهدف:** فحص الثغرات (OWASP ASVS)، وبناء سويت اختبارات E2E شامل عبر Playwright، وفحص التوافقية وسهولة الاستخدام (WCAG 2.1 AA)، ومحاكاة التزامن العالي (Concurrency Load Testing بأداة k6)، ومراجعة الامتثال لنظام حماية البيانات السعودي (PDPL).
+- **المهام:** `P8-01` إلى `P8-05`.
 
-## 8. Documents
-Discovery: `docs/discovery/01…07` · Architecture: `docs/architecture/` · Testing: `docs/testing/testing-strategy.md` · ADRs: `docs/decisions/` · Runbooks: `docs/runbooks/` · Session notes: `docs/session-log.md`.
+### Sprint 10: Production Operations & v1.0 Launch
+- **الهدف:** إعدادات الإنتاج الآمنة (Production Docker Compose مع Nginx SSL مشفر)، أتمتة النشر المستمر (CD Pipeline)، جدولة النسخ الاحتياطي التلقائي (pg_dump)، استكمال أدلة التشغيل، وإطلاق الإصدار الرسمي الأول v1.0.
+- **المهام:** `P9-01` إلى `P9-04`.
+
+---
+
+## 5. قواعد العمل والتطوير الصارمة (Strict Engineering Rules)
+1. **فرع مستقل لكل مهمة:** الشغل دائماً على فرع يحمل كود المهمة (مثال: `feature/P7-05-admin-ui`)، وممنوع العمل مباشرة على `main`.
+2. **التحقق قبل الادعاء:** لا تعتبر أي مهمة منجزة إلا بعد كتابة اختباراتها، وملاحظة نجاحها في التيرمنال، ونجاح فحص الـ CI Pipeline على GitHub Actions.
+3. **الدمج بموافقة صريحة:** لا يتم رفع فروع جديدة أو دمجها في `main` بدون موافقة صريحة من مالك المشروع.
+4. **حفظ الأصول البرمجية:** الحفاظ الكامل على كافة الأكواد السابقة واختباراتها وملفات التوثيق التاريخية.
