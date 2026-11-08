@@ -58,7 +58,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/error"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/parking/**", "/api/v1/tutoring/**", "/api/v1/office-hours/**", "/api/v1/rooms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/parking/**", "/api/v1/tutoring/**", "/api/v1/office-hours/**", "/api/v1/rooms/**", "/api/v1/analytics/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/parking/gate/scan").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("CAMPUS_ADMIN")
                         .anyRequest().authenticated()
