@@ -60,6 +60,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/parking/**", "/api/v1/tutoring/**", "/api/v1/office-hours/**", "/api/v1/rooms/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/parking/gate/scan").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("CAMPUS_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

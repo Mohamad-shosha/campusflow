@@ -5,6 +5,7 @@ public enum SpotStatus {
     OCCUPIED,
     RESERVED,
     FLEX_SHARE,
-    FACULTY_ASSIGNED
+    FACULTY_ASSIGNED,
+    MAINTENANCE
 }
 

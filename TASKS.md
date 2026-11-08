@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 41 تاسك ✅
+- **المنجز بالكامل (Done):** 42 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 12 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **77%**
+- **المتبقي للبدء (Backlog):** 11 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **79%**
 
 
 
@@ -25,10 +25,10 @@
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
 | P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 7 | 0 | 0 |
-| P7 | Notifications, Admin, Analytics | 6 | 3 | 0 | 3 |
+| P7 | Notifications, Admin, Analytics | 6 | 4 | 0 | 2 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **41** | **0** | **12** |
+| **الإجمالي** | | **53** | **42** | **0** | **11** |
 
 ---
 
@@ -509,14 +509,14 @@
 
 ### P7-04 — Admin API (spots, rooms, tariffs, users)
 - **ماذا سيعمل:** إدارة المواقف والقاعات والتعرفات والمستخدمين لدور Admin.
-- **Priority:** Medium · **Complexity:** L · **Status:** Backlog
-- **Dependencies:** P5-01، P6-06، Q13
-- **Git Branch:** `feature/P7-04-admin-api` · **Pull Request:** —
+- **Priority:** Medium · **Complexity:** L · **Status:** ✅ Done
+- **Dependencies:** P5-01، P6-06
+- **Git Branch:** `feature/P7-04-admin-api` · **Pull Request:** PR (feature/P7-04-admin-api)
 - **الملفات المتوقعة:** `admin endpoints داخل كل module`
 - **Implementation Steps:** 1) Endpoints 2) Authorization 3) Audit log 4) اختبارات
 - **Acceptance Criteria:** غير الـ Admin = 403 · كل تعديل يُسجل
 - **Testing Requirements:** API · Security matrix
-- **ينتظر قرارات:** Q13
+- **ينتظر قرارات:** لا يوجد
 
 ### P7-05 — Admin UI
 - **ماذا سيعمل:** لوحة إدارة بسيطة للـ Admin.
