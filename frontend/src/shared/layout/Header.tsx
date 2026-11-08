@@ -301,6 +301,7 @@ export const Header: FC<HeaderProps> = ({
             onClick={onOpenNotifications}
             type="button"
             title={t('utilities.notificationsTitle')}
+            data-testid="header-notifications-btn"
             style={{
               background: 'rgba(215, 162, 55, 0.12)',
               borderColor: 'var(--fbsu-gold-border)',
@@ -308,7 +309,10 @@ export const Header: FC<HeaderProps> = ({
             }}
           >
             <Bell size={14} color="var(--fbsu-gold)" />
-            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}>
+            <span
+              data-testid="header-unread-badge"
+              style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}
+            >
               {notificationCount}
             </span>
           </button>

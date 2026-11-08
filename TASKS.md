@@ -9,10 +9,10 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 40 تاسك ✅
+- **المنجز بالكامل (Done):** 41 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 13 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **75%**
+- **المتبقي للبدء (Backlog):** 12 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **77%**
 
 
 
@@ -25,10 +25,10 @@
 | P4 | Wallet & Tuition | 5 | 5 | 0 | 0 |
 | P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 7 | 0 | 0 |
-| P7 | Notifications, Admin, Analytics | 6 | 2 | 0 | 4 |
+| P7 | Notifications, Admin, Analytics | 6 | 3 | 0 | 3 |
 | P8 | Hardening & QA | 5 | 0 | 0 | 5 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **40** | **0** | **13** |
+| **الإجمالي** | | **53** | **41** | **0** | **12** |
 
 ---
 
@@ -498,9 +498,9 @@
 
 ### P7-03 — Notifications UI (bell/drawer)
 - **ماذا سيعمل:** الجرس ودرج الإشعارات مع عدّاد غير المقروء.
-- **Priority:** Medium · **Complexity:** S · **Status:** Backlog
+- **Priority:** Medium · **Complexity:** S · **Status:** ✅ Done
 - **Dependencies:** P7-01
-- **Git Branch:** `feature/P7-03-notifications-ui` · **Pull Request:** —
+- **Git Branch:** `feature/P7-03-notifications-ui` · **Pull Request:** PR (feature/P7-03-notifications-ui)
 - **الملفات المتوقعة:** `frontend/src/features/notifications/*`
 - **Implementation Steps:** 1) Bell + drawer 2) Polling 3) اختبارات
 - **Acceptance Criteria:** العدّاد صحيح

@@ -17,11 +17,9 @@ import {
   INITIAL_TUTORING_SESSIONS,
   FACULTY_MEMBERS,
   INITIAL_STUDY_ROOMS,
-  CAMPUS_NOTIFICATIONS,
   type TutoringSession,
   type FacultyMember,
   type StudyRoom,
-  type CampusNotification,
 } from '../features/campus/data/campusData';
 
 import { HeroSection } from '../features/parking/components/HeroSection';
@@ -40,6 +38,8 @@ import { StudyRoomsView } from '../features/campus/components/StudyRoomsView';
 import { roomsApi } from '../features/campus/api/roomsApi';
 import { AnalyticsView } from '../features/analytics/components/AnalyticsView';
 import { NotificationsModal } from '../features/notifications/components/NotificationsModal';
+import { notificationsApi } from '../features/notifications/api/notificationsApi';
+import type { NotificationResponse } from '../features/notifications/types/notification';
 
 import '../shared/i18n/i18n';
 import '../styles/main.css';
@@ -66,7 +66,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     useState<TutoringSession[]>(INITIAL_TUTORING_SESSIONS);
   const [facultyList, setFacultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
   const [studyRooms, setStudyRooms] = useState<StudyRoom[]>(INITIAL_STUDY_ROOMS);
-  const [notifications, setNotifications] = useState<CampusNotification[]>(CAMPUS_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [isNotificationsLoading, setIsNotificationsLoading] = useState<boolean>(false);
 
   const [activeToast, setActiveToast] = useState<{
     message: string;
@@ -76,6 +78,83 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
 
   const { isAr } = useAppPreferences();
   const { user, isAuthenticated, logout } = useAuth();
+
+  // Fetch live notifications and unread count from backend
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+    setIsNotificationsLoading(true);
+    try {
+      const [list, countRes] = await Promise.all([
+        notificationsApi.getMyNotifications().catch(() => []),
+        notificationsApi.getUnreadCount().catch(() => ({ unreadCount: 0 })),
+      ]);
+      setNotifications(list);
+      setUnreadCount(countRes.unreadCount);
+    } catch {
+      // Non-blocking
+    } finally {
+      setIsNotificationsLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+
+    fetchNotifications();
+
+    const interval = setInterval(() => {
+      notificationsApi
+        .getUnreadCount()
+        .then(res => setUnreadCount(res.unreadCount))
+        .catch(() => {});
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, fetchNotifications, user?.id]);
+
+  const handleMarkNotificationRead = useCallback(async (id: string) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === id ? { ...n, read: true, readAt: new Date().toISOString() } : n))
+    );
+    setUnreadCount(prev => Math.max(0, prev - 1));
+    try {
+      await notificationsApi.markAsRead(id);
+    } catch {
+      // Non-blocking
+    }
+  }, []);
+
+  const handleMarkAllNotificationsRead = useCallback(async () => {
+    setNotifications(prev =>
+      prev.map(n => ({ ...n, read: true, readAt: new Date().toISOString() }))
+    );
+    setUnreadCount(0);
+    try {
+      await notificationsApi.markAllAsRead();
+    } catch {
+      // Non-blocking
+    }
+  }, []);
+
+  const handleNavigateFromNotification = useCallback((route: string) => {
+    if (route.includes('booking')) setActiveTab('booking');
+    else if (route.includes('gate')) setActiveTab('gate');
+    else if (route.includes('tutoring')) setActiveTab('tutoring');
+    else if (route.includes('office-hours')) setActiveTab('office-hours');
+    else if (route.includes('rooms')) setActiveTab('rooms');
+    else if (route.includes('tuition')) setActiveTab('tuition');
+    else if (route.includes('wallet')) setActiveTab('wallet');
+    else if (route.includes('admin')) setActiveTab('admin-panel');
+    setIsNotifModalOpen(false);
+  }, []);
 
   // Fetch live wallet balance from backend whenever user is authenticated
   const fetchWalletBalance = useCallback(async () => {
@@ -167,6 +246,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       fetchTutoringSessions(),
       fetchFacultyOfficeHours(),
       fetchStudyRooms(),
+      fetchNotifications(),
     ]);
   }, [
     fetchParkingData,
@@ -174,6 +254,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     fetchTutoringSessions,
     fetchFacultyOfficeHours,
     fetchStudyRooms,
+    fetchNotifications,
   ]);
 
   const handleLogout = async () => {
@@ -328,9 +409,14 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
       currentUser={currentUser}
       isAuthenticated={isAuthenticated}
       onLogout={handleLogout}
-      notificationCount={notifications.length}
+      notificationCount={isAuthenticated ? unreadCount : 0}
       flexCount={flexCount}
-      onOpenNotifications={() => setIsNotifModalOpen(true)}
+      onOpenNotifications={() => {
+        setIsNotifModalOpen(true);
+        if (isAuthenticated) {
+          fetchNotifications();
+        }
+      }}
       onOpenAuth={() => {
         setAuthModalTab('login');
         setIsAuthModalOpen(true);
@@ -652,8 +738,12 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         isOpen={isNotifModalOpen}
         isAr={isAr}
         notifications={notifications}
+        unreadCount={unreadCount}
+        isLoading={isNotificationsLoading}
         onClose={() => setIsNotifModalOpen(false)}
-        onMarkAllRead={() => setNotifications([])}
+        onMarkRead={handleMarkNotificationRead}
+        onMarkAllRead={handleMarkAllNotificationsRead}
+        onNavigate={handleNavigateFromNotification}
       />
     </AppShell>
   );

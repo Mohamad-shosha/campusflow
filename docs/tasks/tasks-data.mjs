@@ -391,6 +391,7 @@ export const tasks = [
     tests: ['Integration'], blockedBy: [],
   }),
   T('P7-03', 'Notifications UI (bell/drawer)', {
+    status: 'Done', pr: 'PR (feature/P7-03-notifications-ui)',
     pri: 'Medium', cx: 'S', deps: ['P7-01'], branch: 'feature/P7-03-notifications-ui',
     goal: 'الجرس ودرج الإشعارات مع عدّاد غير المقروء.',
     files: ['frontend/src/features/notifications/*'],
