@@ -451,15 +451,15 @@ public class DevSeeder implements CommandLineRunner {
             String plateLetters,
             String plateDigits,
             String timeLeft) {
-        if (!parkingSpotRepository.existsByUniversityIdAndBayNumber(universityId, bayNumber)) {
-            ParkingSpot s = new ParkingSpot(universityId, zone, bayNumber, type, status, distance, isFlex);
-            s.setOccupantNameAr(occupantAr);
-            s.setOccupantNameEn(occupantEn);
-            s.setVehicleModel(car);
-            s.setPlateLettersAr(plateLetters);
-            s.setPlateDigits(plateDigits);
-            s.setTimeLeftText(timeLeft);
-            parkingSpotRepository.save(s);
-        }
+        ParkingSpot s = parkingSpotRepository.findByUniversityIdAndBayNumber(universityId, bayNumber)
+                .orElseGet(() -> new ParkingSpot(universityId, zone, bayNumber, type, status, distance, isFlex));
+        if (occupantAr != null) s.setOccupantNameAr(occupantAr);
+        if (occupantEn != null) s.setOccupantNameEn(occupantEn);
+        if (car != null) s.setVehicleModel(car);
+        if (plateLetters != null) s.setPlateLettersAr(plateLetters);
+        if (plateDigits != null) s.setPlateDigits(plateDigits);
+        if (timeLeft != null) s.setTimeLeftText(timeLeft);
+        if (isFlex) s.setFlexEligible(true);
+        parkingSpotRepository.save(s);
     }
 }

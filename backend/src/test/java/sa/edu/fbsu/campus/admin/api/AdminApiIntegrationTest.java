@@ -211,6 +211,18 @@ class AdminApiIntegrationTest extends AbstractPostgresIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userType").value("STUDENT"))
                 .andExpect(jsonPath("$.hourlyRate").value(6.50));
+
+        // Reset tariff back to 5.75 SAR to maintain test isolation
+        UpdateTariffRequest resetTariffReq = new UpdateTariffRequest(
+                new BigDecimal("5.75"),
+                new BigDecimal("25.00"),
+                new BigDecimal("5.75")
+        );
+        mockMvc.perform(put("/api/v1/admin/parking/tariffs/STUDENT")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(resetTariffReq)))
+                .andExpect(status().isOk());
     }
 
     // =========================================================================
@@ -357,7 +369,10 @@ class AdminApiIntegrationTest extends AbstractPostgresIntegrationTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andReturn();
-        String adminUserId = objectMapper.readTree(loginRes.getResponse().getContentAsString()).get("userId").asText();
+        JsonNode loginJson = objectMapper.readTree(loginRes.getResponse().getContentAsString());
+        String adminUserId = loginJson.has("userId")
+                ? loginJson.get("userId").asText()
+                : loginJson.get("user").get("id").asText();
 
         mockMvc.perform(patch("/api/v1/admin/users/" + adminUserId + "/status")
                         .header("Authorization", "Bearer " + adminToken)

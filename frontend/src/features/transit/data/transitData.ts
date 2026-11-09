@@ -224,4 +224,3 @@ export const INITIAL_SHUTTLE_BUSES: ShuttleBus[] = [
     batteryPercentage: 78,
   },
 ];
-

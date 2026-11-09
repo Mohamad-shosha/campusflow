@@ -1044,7 +1044,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
           <div className="section-header-centered">
             <span className="section-eyebrow">
               <Bus size={14} />
-              <span>{isAr ? 'منظومة النقل الترددي الصديق للبيئة' : 'Eco-Shuttle Transit System'}</span>
+              <span>
+                {isAr ? 'منظومة النقل الترددي الصديق للبيئة' : 'Eco-Shuttle Transit System'}
+              </span>
             </span>
             <h3 className="section-title">
               {isAr

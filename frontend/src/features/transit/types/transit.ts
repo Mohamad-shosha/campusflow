@@ -84,4 +84,3 @@ export interface BookTransitPassRequest {
   pickupStopId: string;
   dropoffStopId: string;
 }
-

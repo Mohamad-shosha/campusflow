@@ -2,13 +2,13 @@ import { useState, FC } from 'react';
 import {
   BookOpen,
   GraduationCap,
-  Award,
   Clock,
   MapPin,
   ShieldCheck,
   Wallet,
   Plus,
   Users,
+  Search,
 } from 'lucide-react';
 import type { TutoringSession } from '../data/campusData';
 import { BookTutoringModal } from './BookTutoringModal';
@@ -44,10 +44,22 @@ export const TutoringView: FC<TutoringViewProps> = ({
   const [filter, setFilter] = useState<string>('all');
   const [selectedSession, setSelectedSession] = useState<TutoringSession | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const filteredSessions = sessions.filter(s => {
-    if (filter === 'all') return true;
-    return s.category === filter;
+    if (filter !== 'all' && s.category !== filter) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchName =
+        (s.courseName && s.courseName.toLowerCase().includes(q)) ||
+        (s.courseNameEn && s.courseNameEn.toLowerCase().includes(q));
+      const matchCode = s.courseCode && s.courseCode.toLowerCase().includes(q);
+      const matchTutor =
+        (s.tutorName && s.tutorName.toLowerCase().includes(q)) ||
+        (s.tutorNameEn && s.tutorNameEn.toLowerCase().includes(q));
+      return matchName || matchCode || matchTutor;
+    }
+    return true;
   });
 
   return (
@@ -66,8 +78,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
         </h3>
         <p className="section-subtitle">
           {isAr
-            ? 'منصة رسمية تتيح للطلاب المتميزين (مثل إياد في الرياضيات وراكان في البرمجة) تقديم شروحات للمحاضرات والشباتر بأسعار محددة (70 ر.س / ساعة). لا تُحول المبالغ كاش؛ بل تتحول تلقائياً إلى "رصيد جامعي" معتمد في محفظة الطالب يُسدد به رسوم جامعته أو مواقفه!'
-            : 'Distinguished students (e.g. Eyad in Math, Rakan in Coding) provide peer tutoring at 70 SAR/hour. Earnings transfer directly into University Balance to settle tuition fees or parking!'}
+            ? 'منصة رسمية تتيح للطلاب المتميزين (مثل إياد في الرياضيات وراكان في البرمجة وفاطمة في المنطق الرقمي) تقديم شروحات للمحاضرات والشباتر بأسعار محددة (70 ر.س / ساعة). لا تُحول المبالغ كاش؛ بل تتحول تلقائياً إلى "رصيد جامعي" معتمد في محفظة الطالب يُسدد به رسوم جامعته أو مواقفه!'
+            : 'Distinguished students (e.g. Eyad in Math, Rakan in Coding, Fatima in Logic) provide peer tutoring at 70 SAR/hour. Earnings transfer directly into University Balance to settle tuition fees or parking!'}
         </p>
       </div>
 
@@ -146,8 +158,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
       </div>
 
       {/* Tutoring Hub Filter Toolbar */}
-      <div className="campus-hub-toolbar">
-        <div className="hub-filter-pills">
+      <div className="campus-hub-toolbar" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+        <div className="hub-filter-pills" style={{ flexWrap: 'wrap' }}>
           <button
             className={`hub-filter-btn ${filter === 'all' ? 'active' : ''}`}
             onClick={() => {
@@ -157,16 +169,6 @@ export const TutoringView: FC<TutoringViewProps> = ({
             type="button"
           >
             <span>{isAr ? 'جميع الشروحات الأكاديمية' : 'All Sessions'}</span>
-          </button>
-          <button
-            className={`hub-filter-btn ${filter === 'math' ? 'active' : ''}`}
-            onClick={() => {
-              soundFX.playClick();
-              setFilter('math');
-            }}
-            type="button"
-          >
-            <span>{isAr ? 'الرياضيات والهندسة (إياد الحربي)' : 'Math & Calculus'}</span>
           </button>
           <button
             className={`hub-filter-btn ${filter === 'programming' ? 'active' : ''}`}
@@ -186,17 +188,60 @@ export const TutoringView: FC<TutoringViewProps> = ({
             }}
             type="button"
           >
-            <span>{isAr ? 'التصميم المنطقي (Logic Design)' : 'Digital Logic Design'}</span>
+            <span>{isAr ? 'التصميم المنطقي (فاطمة العنزي)' : 'Digital Logic (Fatima)'}</span>
+          </button>
+          <button
+            className={`hub-filter-btn ${filter === 'math' ? 'active' : ''}`}
+            onClick={() => {
+              soundFX.playClick();
+              setFilter('math');
+            }}
+            type="button"
+          >
+            <span>{isAr ? 'الفيزياء والرياضيات (إياد الحربي)' : 'Physics & Math (Eyad)'}</span>
           </button>
         </div>
 
-        <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-          {isAr ? 'المستخدم الحالي الحاجز:' : 'Current User:'} <strong>{currentUser.name}</strong> (
-          {currentUser.walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'})
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* Quick Search */}
+          <div style={{ position: 'relative', width: '220px' }}>
+            <Search
+              size={14}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                [isAr ? 'right' : 'left']: '0.65rem',
+                color: 'var(--text-dim)',
+                pointerEvents: 'none',
+              }}
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder={isAr ? 'ابحث بالمقرر أو الطالب...' : 'Search course or tutor...'}
+              style={{
+                width: '100%',
+                padding: '0.45rem 1.8rem',
+                background: 'rgba(2, 35, 31, 0.65)',
+                border: '1px solid rgba(215, 162, 55, 0.25)',
+                borderRadius: '8px',
+                color: 'var(--text-main)',
+                fontSize: '0.78rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+            {isAr ? 'المستخدم الحالي:' : 'Current User:'} <strong>{currentUser.name}</strong> (
+            {currentUser.walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'})
+          </div>
         </div>
       </div>
 
-      {/* Tutoring Cards Grid */}
+      {/* Tutoring Cards Grid (Pixel-Perfect Alignment with Attachment Image 1) */}
       <div className="tutoring-grid">
         {filteredSessions.map(s => {
           const isEnrolled =
@@ -206,13 +251,19 @@ export const TutoringView: FC<TutoringViewProps> = ({
           const isOwn = isAuthenticated && s.tutorId === currentUser.id;
           const displayTutorName = isAr ? s.tutorName : s.tutorNameEn || s.tutorName;
           const displayTutorRole = isAr ? s.tutorRole : s.tutorRoleEn || s.tutorRole;
+          const avatarInitial = displayTutorName.includes('إياد')
+            ? '!'
+            : displayTutorName.charAt(0);
+          const isDistinguishedFemale =
+            displayTutorName.includes('فاطمة') || displayTutorName.includes('سارة');
 
           return (
             <div key={s.id} className="tutoring-card" data-testid={`tutoring-card-${s.id}`}>
               <div>
+                {/* Top Bar: Rate on Left, Course Code on Right in RTL */}
                 <div className="tutoring-top-bar">
                   <span className="course-code-badge">
-                    <Award size={13} color="var(--fbsu-primary)" />
+                    <GraduationCap size={13} color="var(--fbsu-primary)" />
                     <span>{s.courseCode}</span>
                   </span>
 
@@ -224,15 +275,27 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   </div>
                 </div>
 
-                {/* Tutor Profile Info */}
+                {/* Tutor Profile Strip */}
                 <div className="tutor-profile-strip">
-                  <div className="tutor-avatar-circle" style={{ background: s.tutorAvatarColor }}>
-                    {displayTutorName.charAt(0)}
+                  <div
+                    className="tutor-avatar-circle"
+                    style={{
+                      background: s.tutorAvatarColor,
+                      fontSize: avatarInitial === '!' ? '1.25rem' : '1.1rem',
+                    }}
+                  >
+                    {avatarInitial}
                   </div>
                   <div className="tutor-info-meta">
                     <div className="tutor-title-row">
                       <span className="tutor-name">{displayTutorName}</span>
-                      <span className="tutor-badge-tag">{isAr ? 'طالب متميز' : 'Honor Tutor'}</span>
+                      <span className="tutor-badge-tag">
+                        {isAr
+                          ? isDistinguishedFemale
+                            ? 'طالبة متميزة'
+                            : 'طالب متميز'
+                          : 'Honor Tutor'}
+                      </span>
                     </div>
                     <div className="tutor-college-text">{displayTutorRole}</div>
                     <div
@@ -253,12 +316,14 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   </div>
                 </div>
 
+                {/* Main Course Title */}
                 <h4
                   style={{
-                    fontSize: '1.1rem',
+                    fontSize: '1.12rem',
                     fontWeight: 800,
                     color: 'var(--text-main)',
-                    marginBottom: '0.65rem',
+                    marginBottom: '0.75rem',
+                    lineHeight: 1.35,
                   }}
                 >
                   {isAr ? s.courseName : s.courseNameEn}
@@ -273,7 +338,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   <div className="lectures-scope-desc">{s.coveredScope}</div>
                 </div>
 
-                {/* Meta details */}
+                {/* Meta details (Date/Time & Location) */}
                 <div className="tutoring-meta-row">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                     <Clock size={14} color="var(--text-dim)" />
@@ -287,6 +352,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   </div>
                 </div>
 
+                {/* Enrolled peer capacity */}
                 <div
                   style={{
                     fontSize: '0.76rem',
@@ -300,9 +366,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   <Users size={13} color="var(--fbsu-primary)" />
                   <span>
                     {isAr
-                      ? `المسجلون حالياً: ${s.enrolledStudents.length}`
-                      : `Enrolled peers: ${s.enrolledStudents.length}`}
-                    {s.maxCapacity ? ` / ${s.maxCapacity}` : ''}
+                      ? `المسجلون حالياً: ${s.enrolledStudents.length} / ${s.maxCapacity || 10}`
+                      : `Enrolled: ${s.enrolledStudents.length} / ${s.maxCapacity || 10}`}
                   </span>
                 </div>
 
@@ -311,13 +376,13 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   <ShieldCheck size={14} color="var(--fbsu-primary)" />
                   <span>
                     {isAr
-                      ? `يتم تحويل ${s.totalPrice} ر.س كرصيد جامعي للطالب ${s.tutorName.split(' ')[0]} لسداد رسوم جامعته.`
+                      ? `يتم تحويل ${s.totalPrice} ر.س كرصيد جامعي للطالب ${isDistinguishedFemale ? 'فاطمة' : displayTutorName.split(' ')[0]} لسداد رسوم جامعته.`
                       : `${s.totalPrice} SAR transfers directly to official university tuition credit.`}
                   </span>
                 </div>
               </div>
 
-              {/* Action Button */}
+              {/* Golden Action Button */}
               <button
                 className="btn-gold book-tutoring-btn"
                 onClick={() => {
