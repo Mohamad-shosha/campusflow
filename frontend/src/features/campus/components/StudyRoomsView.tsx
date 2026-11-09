@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, useMemo, FC } from 'react';
 import {
   DoorClosed,
   Monitor,
@@ -9,6 +9,14 @@ import {
   Calendar,
   Plus,
   AlertCircle,
+  Search,
+  RotateCw,
+  Cpu,
+  ShieldCheck,
+  Terminal,
+  Users,
+  Sparkles,
+  X,
 } from 'lucide-react';
 import type { StudyRoom } from '../data/campusData';
 import { BookRoomModal } from './BookRoomModal';
@@ -47,7 +55,10 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
   const [selectedRoom, setSelectedRoom] = useState<StudyRoom | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [countdownMap, setCountdownMap] = useState<Record<string, number>>({});
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   useEffect(() => {
     setRoomList(rooms);
@@ -59,6 +70,63 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
     });
     setCountdownMap(initialCounts);
   }, [rooms]);
+
+  const handleSyncRooms = async () => {
+    setIsSyncing(true);
+    setActionError(null);
+    try {
+      const live = await roomsApi.getRooms();
+      if (live && live.length > 0) {
+        setRoomList(live);
+        soundFX.playSuccess();
+      }
+    } catch {
+      setActionError(isAr ? 'تعذر مزامنة بيانات المعامل من الخادم.' : 'Unable to sync live rooms.');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Filtered rooms based on Category and Search Query
+  const filteredRooms = useMemo(() => {
+    return roomList.filter(room => {
+      // Category match
+      if (activeCategory !== 'all') {
+        const code = room.roomCode || room.id;
+        if (activeCategory === 'software' && !code.startsWith('LAB-101') && !code.startsWith('LAB-102')) {
+          return false;
+        }
+        if (activeCategory === 'cyber' && !code.startsWith('LAB-103')) {
+          return false;
+        }
+        if (activeCategory === 'hardware' && !code.startsWith('LAB-104') && !code.startsWith('LAB-205')) {
+          return false;
+        }
+        if (activeCategory === 'discussion' && !code.startsWith('ROOM-')) {
+          return false;
+        }
+        if (activeCategory === 'focus' && !code.startsWith('POD-')) {
+          return false;
+        }
+      }
+
+      // Search query match
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const nameMatch = (room.name && room.name.toLowerCase().includes(q)) ||
+          (room.nameEn && room.nameEn.toLowerCase().includes(q));
+        const codeMatch = (room.roomCode && room.roomCode.toLowerCase().includes(q)) ||
+          room.id.toLowerCase().includes(q);
+        const bldgMatch = (room.building && room.building.toLowerCase().includes(q)) ||
+          (room.buildingEn && room.buildingEn.toLowerCase().includes(q));
+        const specsMatch = (room.specs && room.specs.some(s => s.toLowerCase().includes(q))) ||
+          (room.specsEn && room.specsEn.some(s => s.toLowerCase().includes(q)));
+        return nameMatch || codeMatch || bldgMatch || specsMatch;
+      }
+
+      return true;
+    });
+  }, [roomList, activeCategory, searchQuery]);
 
   // Live countdown timer for active sessions
   useEffect(() => {
@@ -216,9 +284,181 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
         </button>
       </div>
 
+      {/* Search, Filter Toolbar & Live Sync */}
+      <div
+        className="rooms-search-filter-bar"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          marginBottom: '1.5rem',
+          padding: '1.1rem 1.25rem',
+          background: 'var(--surface-card, rgba(11, 59, 54, 0.25))',
+          borderRadius: 'var(--radius-lg, 14px)',
+          border: '1px solid var(--border-subtle, rgba(215, 162, 55, 0.2))',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Search Input Box */}
+          <div style={{ position: 'relative', flex: '1 1 300px', maxWidth: '480px' }}>
+            <Search
+              size={16}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                [isAr ? 'right' : 'left']: '0.85rem',
+                color: 'var(--text-dim, #94a3b8)',
+                pointerEvents: 'none',
+              }}
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder={
+                isAr
+                  ? 'ابحث باسم المعمل، الرمز (LAB-101)، التجهيزات (RTX 4090، Cisco)...'
+                  : 'Search by room code, name, or equipment (RTX 4090, Cisco)...'
+              }
+              style={{
+                width: '100%',
+                padding: '0.65rem 2.4rem',
+                background: 'rgba(2, 35, 31, 0.65)',
+                border: '1px solid rgba(215, 162, 55, 0.25)',
+                borderRadius: '8px',
+                color: 'var(--text-main, #f8fafc)',
+                fontSize: '0.85rem',
+                outline: 'none',
+              }}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  [isAr ? 'left' : 'right']: '0.75rem',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  cursor: 'pointer',
+                  padding: 2,
+                }}
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Sync Button & Count */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-dim, #94a3b8)', fontWeight: 600 }}>
+              {isAr ? `عرض ${filteredRooms.length} من ${roomList.length} مرفق` : `Showing ${filteredRooms.length} of ${roomList.length} facilities`}
+            </span>
+            <button
+              type="button"
+              className="btn-glass"
+              onClick={handleSyncRooms}
+              disabled={isSyncing}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.5rem 0.9rem',
+                fontSize: '0.8rem',
+              }}
+              title={isAr ? 'تحديث فوري من قاعدة بيانات PostgreSQL' : 'Sync live with PostgreSQL'}
+            >
+              <RotateCw size={14} className={isSyncing ? 'spin-anim' : ''} />
+              <span>{isAr ? (isSyncing ? 'جاري المزامنة...' : 'تحديث مباشر') : (isSyncing ? 'Syncing...' : 'Live Sync')}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Category Pills */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', overflowX: 'auto', paddingBottom: '2px' }}>
+          {[
+            { id: 'all', labelAr: `الكل (${roomList.length})`, labelEn: `All (${roomList.length})`, icon: Sparkles },
+            { id: 'software', labelAr: 'معامل البرمجيات و AI', labelEn: 'Software & AI Labs', icon: Terminal },
+            { id: 'cyber', labelAr: 'أمن سيبراني NOC', labelEn: 'Cyber & NOC', icon: ShieldCheck },
+            { id: 'hardware', labelAr: 'عتاد وروبوتات ودوائر', labelEn: 'Robotics & Hardware', icon: Cpu },
+            { id: 'discussion', labelAr: 'قاعات عمل ونقاش جماعي', labelEn: 'Discussion Pods', icon: Users },
+            { id: 'focus', labelAr: 'كبائن تركيز ومقابلات', labelEn: 'Quiet & Interview Pods', icon: DoorClosed },
+          ].map(cat => {
+            const Icon = cat.icon;
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  soundFX.playClick();
+                  setActiveCategory(cat.id);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  padding: '0.4rem 0.85rem',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: isActive ? '1px solid var(--fbsu-gold, #d7a237)' : '1px solid rgba(255, 255, 255, 0.1)',
+                  background: isActive ? 'rgba(215, 162, 55, 0.18)' : 'rgba(11, 59, 54, 0.25)',
+                  color: isActive ? 'var(--fbsu-gold, #d7a237)' : 'var(--text-dim, #94a3b8)',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <Icon size={13} />
+                <span>{isAr ? cat.labelAr : cat.labelEn}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Empty State when filter yields 0 matches */}
+      {filteredRooms.length === 0 && (
+        <div
+          style={{
+            padding: '3rem 2rem',
+            textAlign: 'center',
+            background: 'rgba(11, 59, 54, 0.15)',
+            border: '1px dashed rgba(215, 162, 55, 0.3)',
+            borderRadius: 'var(--radius-lg, 14px)',
+            marginBottom: '2rem',
+          }}
+        >
+          <Search size={36} color="var(--fbsu-gold)" style={{ margin: '0 auto 1rem', opacity: 0.7 }} />
+          <h4 style={{ color: 'var(--text-main)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+            {isAr ? 'لم يتم العثور على أي قاعة أو معمل يطابق بحثك' : 'No study rooms or labs match your criteria'}
+          </h4>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
+            {isAr
+              ? 'جرّب البحث بكلمات أخرى أو اختر قطاعاً مختلفاً من التصنيفات أعلاه.'
+              : 'Try different keywords or clear the category filters to see all available campus spaces.'}
+          </p>
+          <button
+            type="button"
+            className="btn-outline"
+            onClick={() => {
+              setSearchQuery('');
+              setActiveCategory('all');
+            }}
+          >
+            {isAr ? 'عرض جميع المعامل والقاعات' : 'Reset All Filters'}
+          </button>
+        </div>
+      )}
+
       {/* Rooms Grid */}
       <div className="rooms-grid">
-        {roomList.map(room => {
+        {filteredRooms.map(room => {
           const isInUse = room.status === 'in-use';
           const isReserved = room.status === 'reserved';
           const displayName = isAr ? room.name : room.nameEn || room.name;

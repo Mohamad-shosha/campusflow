@@ -85,8 +85,9 @@ services:
 volumes:
   postgres_data:
     name: fbsu_postgres_data
+    external: true
 
 networks:
   fbsu-network:
     name: fbsu-campus-network
-    driver: bridge
+    external: true

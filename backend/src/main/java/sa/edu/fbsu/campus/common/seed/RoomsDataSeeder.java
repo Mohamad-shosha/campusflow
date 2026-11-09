@@ -215,6 +215,198 @@ public class RoomsDataSeeder implements CommandLineRunner {
             }
         }
 
+        // 5. LAB-101 (AI & Deep Learning)
+        if (!roomRepository.existsByRoomCode("LAB-101")) {
+            roomRepository.save(new StudyRoom(
+                    uniId,
+                    "LAB-101",
+                    "معمل الذكاء الاصطناعي وتعلم الآلة (AI & Deep Learning Lab 101)",
+                    "Artificial Intelligence & Deep Learning Lab 101",
+                    "مبنى كلية الحاسب - الدور الأرضي",
+                    "College of Computing - Ground Floor",
+                    "30 محطة عمل مجهزة بـ GPU",
+                    "30 Workstations with GPU",
+                    "معمل ذكاء اصطناعي",
+                    "AI & ML Lab",
+                    List.of(
+                            "30 محطة عمل مزودة بكروت شاشة NVIDIA RTX 4090 لتدريب النماذج العصبية",
+                            "بيئة برمجية جاهزة: PyTorch, TensorFlow, CUDA Toolkit, JupyterHub",
+                            "شاشة عرض تفاعلية 98 بوصة لمناقشة أداء نماذج الرؤية الحاسوبية",
+                            "اتصال شبكي فائق السرعة بسرعة 10 Gbps مع خوادم الحوسبة السحابية"
+                    ),
+                    List.of(
+                            "30 High-end Workstations with NVIDIA RTX 4090 GPUs",
+                            "Preloaded environments: PyTorch, TensorFlow, CUDA, JupyterHub",
+                            "98-inch 4K interactive whiteboard for deep learning discussions",
+                            "Dedicated 10 Gbps low-latency link to campus compute cluster"
+                    ),
+                    "متاح للحجز الفوري الآن",
+                    "Available for immediate reservation",
+                    RoomStatus.AVAILABLE,
+                    5
+            ));
+        }
+
+        // 6. LAB-103 (Cybersecurity & NOC)
+        if (!roomRepository.existsByRoomCode("LAB-103")) {
+            roomRepository.save(new StudyRoom(
+                    uniId,
+                    "LAB-103",
+                    "معمل الأمن السيبراني وعمليات الشبكات (Cybersecurity & NOC 103)",
+                    "Cybersecurity & Network Operations Center (NOC) 103",
+                    "مبنى كلية الحاسب - الدور الأول",
+                    "College of Computing - 1st Floor",
+                    "20 محطة هجوم ودفاع سيبراني",
+                    "20 Red/Blue Team Stations",
+                    "معمل أمن سيبراني",
+                    "Cyber & NOC Lab",
+                    List.of(
+                            "شبكة معزولة Air-Gapped لمحاكاة الهجمات السيبرانية واختبار الاختراق",
+                            "أجهزة راوتر وسويتشات Cisco Catalyst مع جدران حماية فورتينت Fortinet",
+                            "شاشة مركز عمليات الأمن (SOC Wall) لمراقبة حركة حزم البيانات اللحظية",
+                            "توزيعات كالي لينكس Kali Linux وأدوات تحليل الحزم Wireshark و Metasploit"
+                    ),
+                    List.of(
+                            "Air-gapped cyber sandbox for attack/defense simulation",
+                            "Cisco Catalyst routers & switches with Fortinet firewalls",
+                            "SOC Wall multi-monitor dashboard for live packet traffic analysis",
+                            "Preloaded Kali Linux, Wireshark, Metasploit, and SIEM tooling"
+                    ),
+                    "متاح للحجز الفوري الآن",
+                    "Available for immediate reservation",
+                    RoomStatus.AVAILABLE,
+                    6
+            ));
+        }
+
+        // 7. LAB-104 (Robotics & Embedded Systems)
+        if (!roomRepository.existsByRoomCode("LAB-104")) {
+            roomRepository.save(new StudyRoom(
+                    uniId,
+                    "LAB-104",
+                    "معمل النظم المدمجة والروبوتات (Robotics & Embedded Workshop 104)",
+                    "Robotics & Embedded Systems Workshop 104",
+                    "مبنى كلية الهندسة - الدور الأرضي",
+                    "College of Engineering - Ground Floor",
+                    "18 طاولة تصنيع وتجارب",
+                    "18 Prototyping Workbenches",
+                    "معمل روبوتات وعتاذة",
+                    "Robotics Workshop",
+                    List.of(
+                            "حقائب تطوير أردوينو Arduino و STM32 و Raspberry Pi 5",
+                            "أذرع روبوتية سداسية المحاور 6-DOF Robotic Arms قابلة للبرمجة",
+                            "محطات لحام رقمية مجهزة بشفاطات أدخنة وفاحصات دوائر إلكترونية",
+                            "طابعات ثلاثية الأبعاد Resin & FDM لصناعة هياكل الروبوتات"
+                    ),
+                    List.of(
+                            "Arduino, STM32, and Raspberry Pi 5 development toolkits",
+                            "6-DOF programmable robotic arms for industrial automation labs",
+                            "Digital soldering stations with fume extractors and multimeters",
+                            "Resin and FDM 3D printers for custom robotic chassis printing"
+                    ),
+                    "متاح للحجز الفوري الآن",
+                    "Available for immediate reservation",
+                    RoomStatus.AVAILABLE,
+                    7
+            ));
+        }
+
+        // 8. ROOM-B08 (Academic Seminar Pod)
+        if (!roomRepository.existsByRoomCode("ROOM-B08")) {
+            roomRepository.save(new StudyRoom(
+                    uniId,
+                    "ROOM-B08",
+                    "قاعة النقاش الأكاديمي والسيمنار (Academic Seminar Pod B-08)",
+                    "Academic Seminar & Discussion Pod B-08",
+                    "مبنى كلية إدارة الأعمال - الدور الثاني",
+                    "College of Business - 2nd Floor",
+                    "10 طلاب وباحثين",
+                    "10 Students & Researchers",
+                    "قاعة نقاش أكاديمي",
+                    "Seminar Pod",
+                    List.of(
+                            "نظام مؤتمرات فيديو متكامل Logitech Rally يدعم Zoom و Microsoft Teams",
+                            "طاولة نقاش بيضاوية مزودة بميكروفونات مدمجة لكل مقعد",
+                            "شاشة عرض تفاعلية 75 بوصة تدعم اللمس المتعدد ومشاركة الشاشات اللاسلكية",
+                            "نظام عزل صوتي مزدوج يمنع تسرب الصوت للقاعات المجاورة"
+                    ),
+                    List.of(
+                            "Logitech Rally 4K conference system for Zoom & MS Teams meetings",
+                            "Executive boardroom oval table with integrated array microphones",
+                            "75-inch touch screen with seamless multi-device screen mirroring",
+                            "Double acoustic glazing ensuring complete sound isolation"
+                    ),
+                    "متاح للحجز الفوري الآن",
+                    "Available for immediate reservation",
+                    RoomStatus.AVAILABLE,
+                    8
+            ));
+        }
+
+        // 9. POD-D01 (Silent Focus Pod)
+        if (!roomRepository.existsByRoomCode("POD-D01")) {
+            roomRepository.save(new StudyRoom(
+                    uniId,
+                    "POD-D01",
+                    "كابينة التركيز الفردي والمذاكرة الهادئة (Silent Focus Pod D-01)",
+                    "Silent Focus & Solo Study Pod D-01",
+                    "المكتبة المركزية - الدور الأول",
+                    "Central Library - 1st Floor",
+                    "طالب واحد (فردي)",
+                    "1 Student (Solo)",
+                    "كابينة تركيز فردي",
+                    "Quiet Pod",
+                    List.of(
+                            "عزل صوتي فائق الدرجة 40dB يمنع أي ضوضاء خارجية تماماً",
+                            "كرسي مريح معتمد صحياً Ergonomic Chair مع طاولة قابلة لتعديل الارتفاع",
+                            "إضاءة دراسة قابلة لتعديل درجة الحرارة اللونية (دافئة / طبيعية / بيضاء)",
+                            "منافذ طاقة وشحن سريع Type-C PD 100W للابتوب والهواتف الذكية"
+                    ),
+                    List.of(
+                            "Ultra-high acoustic isolation rated at 40dB sound attenuation",
+                            "Ergonomic mesh chair with height-adjustable sit/stand study desk",
+                            "Circadian study lamp with adjustable warm-to-cool color temperatures",
+                            "High-output 100W USB-C PD power ports for laptops and mobile devices"
+                    ),
+                    "متاح للحجز الفوري الآن",
+                    "Available for immediate reservation",
+                    RoomStatus.AVAILABLE,
+                    9
+            ));
+        }
+
+        // 10. POD-D02 (Virtual Interview Pod)
+        if (!roomRepository.existsByRoomCode("POD-D02")) {
+            roomRepository.save(new StudyRoom(
+                    uniId,
+                    "POD-D02",
+                    "كابينة المقابلات الافتراضية والتسجيل (Virtual Interview Pod D-02)",
+                    "Virtual Interview & Media Recording Pod D-02",
+                    "المكتبة المركزية - الدور الأول",
+                    "Central Library - 1st Floor",
+                    "طالب واحد (فردي)",
+                    "1 Student (Solo)",
+                    "كابينة مقابلات افتراضية",
+                    "Media / Interview Pod",
+                    List.of(
+                            "كاميرا احترافية 4K مع إضاءة استوديو دائرية Ring Light مخصصة للمقابلات الوظيفية",
+                            "ميكروفون مكتبي مكثف بنمط إلغاء الضجيج المحيط Studio Condenser Mic",
+                            "خلفية استوديو أنيقة ومحايدة تتوافق مع معايير المقابلات والتقديم الوظيفي",
+                            "اتصال إنترنت سلكي مباشر Gigabit Ethernet لضمان عدم انقطاع البث والمقابلات"
+                    ),
+                    List.of(
+                            "Professional 4K webcam with dual dimmable ring lights for job interviews",
+                            "Studio condenser microphone with active noise cancellation",
+                            "Professional acoustic backdrop tailored for high-stakes video interviews",
+                            "Direct wired Gigabit Ethernet connection ensuring zero streaming latency"
+                    ),
+                    "متاح للحجز الفوري الآن",
+                    "Available for immediate reservation",
+                    RoomStatus.AVAILABLE,
+                    10
+            ));
+        }
+
         log.info("--- [RoomsDataSeeder] Initialized collaborative study rooms and lab bookings ---");
     }
 }
