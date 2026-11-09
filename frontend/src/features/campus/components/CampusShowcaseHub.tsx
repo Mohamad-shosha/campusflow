@@ -199,7 +199,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                           alignItems: 'center',
                           gap: '0.35rem',
                           fontSize: '0.75rem',
-                          color: 'var(--fbsu-gold)',
+                          color: 'var(--gold-text)',
                           marginTop: '0.25rem',
                         }}
                       >
@@ -397,7 +397,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                color: 'var(--fbsu-gold)',
+                color: 'var(--gold-text)',
                 fontWeight: 700,
                 fontSize: '0.85rem',
               }}
@@ -505,7 +505,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                           alignItems: 'center',
                           gap: '0.35rem',
                           fontSize: '0.75rem',
-                          color: 'var(--fbsu-gold)',
+                          color: 'var(--gold-text)',
                           marginTop: '0.25rem',
                         }}
                       >
@@ -543,7 +543,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                       <Clock size={14} color="var(--fbsu-gold)" />
-                      <strong style={{ color: 'var(--fbsu-gold)' }}>
+                      <strong style={{ color: 'var(--gold-text)' }}>
                         {isAr
                           ? faculty.nextAvailable
                           : faculty.nextAvailableEn || faculty.nextAvailable}
@@ -724,7 +724,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                         alignItems: 'center',
                         gap: '0.35rem',
                         fontSize: '0.75rem',
-                        color: 'var(--fbsu-gold)',
+                        color: 'var(--gold-text)',
                         marginTop: '0.25rem',
                       }}
                     >
@@ -864,7 +864,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                 </span>
 
                 <div className="tutor-rate-badge">
-                  <span className="tutor-rate-num" style={{ color: '#10b981', fontSize: '1.1rem' }}>
+                  <span className="tutor-rate-num" style={{ color: 'var(--success-text)', fontSize: '1.1rem' }}>
                     {isAr ? 'مباشر GPS' : 'Live GPS'}
                   </span>
                   <span className="tutor-rate-unit">{isAr ? 'مجاني للطلاب' : 'Free for All'}</span>
@@ -899,7 +899,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                       alignItems: 'center',
                       gap: '0.35rem',
                       fontSize: '0.75rem',
-                      color: 'var(--fbsu-gold)',
+                      color: 'var(--gold-text)',
                       marginTop: '0.25rem',
                     }}
                   >
@@ -981,7 +981,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                 <div className="tutor-rate-badge">
                   <span
                     className="tutor-rate-num"
-                    style={{ color: 'var(--fbsu-gold)', fontSize: '1.1rem' }}
+                    style={{ color: 'var(--gold-text)', fontSize: '1.1rem' }}
                   >
                     {isAr ? 'خصم 20%' : '20% OFF'}
                   </span>
@@ -1015,7 +1015,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                       alignItems: 'center',
                       gap: '0.35rem',
                       fontSize: '0.75rem',
-                      color: 'var(--fbsu-gold)',
+                      color: 'var(--gold-text)',
                       marginTop: '0.25rem',
                     }}
                   >
@@ -1095,7 +1095,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                 </span>
 
                 <div className="tutor-rate-badge">
-                  <span className="tutor-rate-num" style={{ color: '#10b981', fontSize: '1.1rem' }}>
+                  <span className="tutor-rate-num" style={{ color: 'var(--success-text)', fontSize: '1.1rem' }}>
                     {walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                   </span>
                   <span className="tutor-rate-unit">{isAr ? 'الرصيد المتاح' : 'Balance'}</span>
@@ -1130,7 +1130,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                       alignItems: 'center',
                       gap: '0.35rem',
                       fontSize: '0.75rem',
-                      color: 'var(--fbsu-gold)',
+                      color: 'var(--gold-text)',
                       marginTop: '0.25rem',
                     }}
                   >

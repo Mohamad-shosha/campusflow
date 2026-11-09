@@ -204,7 +204,7 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
                       style={{
                         fontWeight: 800,
                         fontSize: '1.1rem',
-                        color: 'var(--fbsu-gold)',
+                        color: 'var(--gold-text)',
                       }}
                     >
                       {isAr ? 'الموقف شاغر ومتاح للتبادل الذكي' : 'Vacant & Open for AI Flex Share'}
@@ -246,7 +246,7 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
               </div>
               <div className="stat-chip" style={{ padding: '0.75rem' }}>
                 <div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--gold-text)' }}>
                     {simStep === 4
                       ? isAr
                         ? '17.25 ر.س'
@@ -303,7 +303,7 @@ export const SimulatorView: FC<SimulatorViewProps> = ({ isAr }) => {
                     {isAr ? 'الحالة: ' : 'Status: '}
                     <strong>{stage.eyadStatus}</strong>
                   </p>
-                  <p style={{ color: 'var(--fbsu-gold)' }}>
+                  <p style={{ color: 'var(--gold-text)' }}>
                     {isAr ? 'موقفه الأساسي: #01' : 'Primary Spot: #01'}
                   </p>
                 </div>

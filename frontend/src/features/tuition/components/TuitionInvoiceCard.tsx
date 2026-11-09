@@ -93,8 +93,8 @@ export const TuitionInvoiceCard: FC<TuitionInvoiceCardProps> = ({
           gap: '1rem',
           padding: '1rem',
           borderRadius: '10px',
-          background: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          background: 'var(--surface-soft)',
+          border: '1px solid var(--border-soft)',
           marginBottom: '1.25rem',
         }}
       >
@@ -132,7 +132,7 @@ export const TuitionInvoiceCard: FC<TuitionInvoiceCardProps> = ({
             {isAr ? 'المبلغ المسدد' : 'Paid Amount'}
           </span>
           <strong
-            style={{ fontSize: '1.15rem', color: '#10b981', fontVariantNumeric: 'tabular-nums' }}
+            style={{ fontSize: '1.15rem', color: 'var(--success-text)', fontVariantNumeric: 'tabular-nums' }}
           >
             {Number(invoice.paidAmount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
           </strong>

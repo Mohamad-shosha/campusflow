@@ -23,49 +23,21 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
       <div className="container">
         <div className="footer-grid">
           <div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1rem',
-              }}
-            >
-              <img
-                src="/assets/branding/fbsu-logo.png"
-                style={{ height: '40px' }}
-                alt="FBSU Logo"
-              />
-              <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>
-                {t('common.universityName')}
-              </h4>
+            <div className="footer-brand-row">
+              <img src="/assets/branding/fbsu-logo.png" alt="FBSU Logo" />
+              <h4>{t('common.universityName')}</h4>
             </div>
-            <p
-              style={{ fontSize: '0.85rem', lineHeight: 1.8, color: '#e2e8f0', maxWidth: '380px' }}
-            >
-              {t('footer.description')}
-            </p>
+            <p className="footer-desc">{t('footer.description')}</p>
           </div>
 
           <div>
-            <h5 style={{ color: '#ffffff', fontWeight: 800, marginBottom: '1rem' }}>
-              {t('footer.collegesTitle')}
-            </h5>
-            <ul
-              style={{
-                listStyle: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.55rem',
-                fontSize: '0.85rem',
-              }}
-            >
+            <h5>{t('footer.collegesTitle')}</h5>
+            <ul className="footer-links">
               <li>
                 <a
                   href="https://fbsu.edu.sa/Ar/All/computing-college"
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.computingCollege')}
                 </a>
@@ -75,7 +47,6 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                   href="https://fbsu.edu.sa/Ar/All/engineering-college"
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.engineeringCollege')}
                 </a>
@@ -85,7 +56,6 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                   href="https://fbsu.edu.sa/Ar/All/College-of-Business-and-Management"
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.businessCollege')}
                 </a>
@@ -95,7 +65,6 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                   href="https://fbsu.edu.sa/Ar/All/College-of-Medicine"
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.medicineCollege')}
                 </a>
@@ -105,7 +74,6 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                   href="https://fbsu.edu.sa/Ar/All/College-of-Sciences-and-Humanities"
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.sciencesCollege')}
                 </a>
@@ -114,18 +82,8 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
           </div>
 
           <div>
-            <h5 style={{ color: '#ffffff', fontWeight: 800, marginBottom: '1rem' }}>
-              {t('footer.linksTitle')}
-            </h5>
-            <ul
-              style={{
-                listStyle: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.55rem',
-                fontSize: '0.85rem',
-              }}
-            >
+            <h5>{t('footer.linksTitle')}</h5>
+            <ul className="footer-links">
               <li>
                 <a
                   href="#booking"
@@ -135,7 +93,6 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                       handleNavClick('booking');
                     }
                   }}
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.bookPass')}
                 </a>
@@ -149,7 +106,6 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                       handleNavClick('share');
                     }
                   }}
-                  style={{ color: '#e2e8f0' }}
                 >
                   {isAr ? 'منظومة التبادل الذكي Flex Share' : 'AI Flex Share'}
                 </a>
@@ -163,7 +119,6 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                       handleNavClick('wallet');
                     }
                   }}
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.walletAndFees')}
                 </a>
@@ -177,41 +132,29 @@ export const Footer: FC<FooterProps> = ({ onTabChange }) => {
                       handleNavClick('gate');
                     }
                   }}
-                  style={{ color: '#e2e8f0' }}
                 >
                   {t('footer.alprGates')}
                 </a>
               </li>
               <li>
-                <a
-                  href="https://fbsu.edu.sa"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ color: '#e2e8f0' }}
-                >
+                <a href="https://fbsu.edu.sa" target="_blank" rel="noreferrer">
                   {t('footer.officialPortal')}
                 </a>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h5 style={{ color: '#ffffff', fontWeight: 800, marginBottom: '1rem' }}>
-              {t('footer.contactTitle')}
-            </h5>
-            <p style={{ fontSize: '0.85rem', color: '#e2e8f0', marginBottom: '0.5rem' }}>
-              {t('footer.address')}
-            </p>
-            <p style={{ fontSize: '0.85rem', color: '#e2e8f0', marginBottom: '0.5rem' }}>
-              {t('footer.phone')}
-            </p>
-            <p style={{ fontSize: '0.85rem', color: '#e2e8f0' }}>{t('footer.email')}</p>
+          <div className="footer-contact">
+            <h5>{t('footer.contactTitle')}</h5>
+            <p>{t('footer.address')}</p>
+            <p>{t('footer.phone')}</p>
+            <p>{t('footer.email')}</p>
           </div>
         </div>
 
         <div className="footer-bottom">
           <div>{t('footer.copyright')}</div>
-          <div style={{ display: 'flex', gap: '1.25rem' }}>
+          <div className="footer-legal-links">
             <span>{t('footer.privacy')}</span>
             <span>{t('footer.terms')}</span>
             <span>{t('footer.institutionalContact')}</span>

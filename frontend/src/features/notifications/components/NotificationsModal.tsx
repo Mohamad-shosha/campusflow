@@ -199,7 +199,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
                 height: '40px',
                 borderRadius: 'var(--radius-md)',
                 background: 'var(--fbsu-gold-light)',
-                color: 'var(--fbsu-gold)',
+                color: 'var(--gold-text)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -275,7 +275,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
               padding: '0.3rem 0.85rem',
               fontSize: '0.78rem',
               borderRadius: 'var(--radius-full)',
-              background: filterTab === 'all' ? 'var(--fbsu-primary)' : 'rgba(255,255,255,0.05)',
+              background: filterTab === 'all' ? 'var(--fbsu-primary)' : 'var(--surface-soft)',
               color: filterTab === 'all' ? '#fff' : 'var(--text-muted)',
               border: 'none',
               cursor: 'pointer',
@@ -293,7 +293,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
               padding: '0.3rem 0.85rem',
               fontSize: '0.78rem',
               borderRadius: 'var(--radius-full)',
-              background: filterTab === 'unread' ? 'var(--fbsu-gold)' : 'rgba(255,255,255,0.05)',
+              background: filterTab === 'unread' ? 'var(--fbsu-gold)' : 'var(--surface-soft)',
               color: filterTab === 'unread' ? '#111' : 'var(--text-muted)',
               border: 'none',
               cursor: 'pointer',
@@ -344,7 +344,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
                   width: '54px',
                   height: '54px',
                   borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.04)',
+                  background: 'var(--surface-soft)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -377,7 +377,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
                 <div
                   key={n.id}
                   style={{
-                    background: isUnread ? 'rgba(215, 162, 55, 0.07)' : 'rgba(255,255,255,0.03)',
+                    background: isUnread ? 'rgba(215, 162, 55, 0.07)' : 'var(--surface-soft)',
                     border: isUnread
                       ? '1px solid rgba(215, 162, 55, 0.35)'
                       : '1px solid var(--border-subtle)',
@@ -406,7 +406,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
                       width: '38px',
                       height: '38px',
                       borderRadius: 'var(--radius-md)',
-                      background: 'rgba(255,255,255,0.05)',
+                      background: 'var(--surface-soft)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -463,7 +463,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
                         style={{
                           fontSize: '0.65rem',
                           padding: '0.15rem 0.45rem',
-                          background: 'rgba(255,255,255,0.06)',
+                          background: 'var(--surface-soft-2)',
                           color: 'var(--text-muted)',
                         }}
                       >
@@ -510,7 +510,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
                             style={{
                               background: 'none',
                               border: 'none',
-                              color: 'var(--fbsu-gold)',
+                              color: 'var(--gold-text)',
                               fontSize: '0.72rem',
                               fontWeight: 700,
                               cursor: 'pointer',

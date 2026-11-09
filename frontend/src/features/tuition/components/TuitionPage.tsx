@@ -323,13 +323,13 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
                     <strong
                       style={{
                         fontSize: '0.88rem',
-                        color: 'var(--fbsu-gold)',
+                        color: 'var(--gold-text)',
                         fontFamily: 'monospace',
                       }}
                     >
                       {rct.receiptNumber}
                     </strong>
-                    <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--success-text)', fontWeight: 700 }}>
                       ✓ {isAr ? 'معتمد' : 'Verified'}
                     </span>
                   </div>

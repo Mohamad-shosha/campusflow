@@ -90,7 +90,7 @@ export const CategorySubnav: FC<CategorySubnavProps> = ({ activeTab, isAr, onTab
         <div className="category-subnav-strip">
           <div className="subnav-category-badge" style={{ borderColor: 'var(--fbsu-gold-border)' }}>
             <BookOpen size={14} color="var(--fbsu-gold)" />
-            <span style={{ color: 'var(--fbsu-gold)' }}>
+            <span style={{ color: 'var(--gold-text)' }}>
               {isAr ? 'الحرم الجامعي والأنشطة الطلابية' : 'Smart Campus Hub'}
             </span>
           </div>

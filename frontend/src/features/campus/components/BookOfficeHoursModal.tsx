@@ -192,7 +192,7 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
         <form onSubmit={handleSubmit}>
           <div
             style={{
-              background: 'rgba(255,255,255,0.03)',
+              background: 'var(--surface-soft)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
               padding: '1rem',
@@ -239,7 +239,7 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
                         ? {
                             borderColor: 'var(--fbsu-primary)',
                             background: 'rgba(17,110,99,0.2)',
-                            color: '#fff',
+                            color: 'var(--text-strong)',
                           }
                         : {}
                     }

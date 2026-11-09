@@ -58,7 +58,7 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({
         style={{ padding: '2rem', textAlign: 'center', margin: '2rem auto', maxWidth: '480px' }}
         data-testid="auth-forbidden"
       >
-        <h3 style={{ color: 'var(--fbsu-gold)', marginBottom: '0.5rem' }}>صلاحية غير كافية</h3>
+        <h3 style={{ color: 'var(--gold-text)', marginBottom: '0.5rem' }}>صلاحية غير كافية</h3>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
           حسابك الحالي لا يمتلك الصلاحيات المطلوبة لعرض هذا المورد.
         </p>

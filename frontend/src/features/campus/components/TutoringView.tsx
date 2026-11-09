@@ -105,7 +105,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
               height: '46px',
               borderRadius: 'var(--radius-lg)',
               background: 'var(--fbsu-gold-light)',
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -304,7 +304,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
                         alignItems: 'center',
                         gap: '0.35rem',
                         fontSize: '0.75rem',
-                        color: 'var(--fbsu-gold)',
+                        color: 'var(--gold-text)',
                         marginTop: '0.25rem',
                       }}
                     >

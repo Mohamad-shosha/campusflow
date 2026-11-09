@@ -32,12 +32,11 @@ export const BalanceCard: FC<BalanceCardProps> = ({
       className="balance-card-container"
       data-testid="wallet-balance-card"
       style={{
-        background:
-          'linear-gradient(135deg, rgba(17, 110, 99, 0.45) 0%, rgba(13, 27, 42, 0.9) 100%)',
+        background: 'var(--brand-card-gradient)',
         border: '1px solid rgba(215, 162, 55, 0.35)',
         borderRadius: '16px',
         padding: '1.75rem',
-        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
+        boxShadow: 'var(--shadow-md)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -134,7 +133,7 @@ export const BalanceCard: FC<BalanceCardProps> = ({
             style={{
               fontSize: '1.15rem',
               fontWeight: 800,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             }}
           >
             {currency}

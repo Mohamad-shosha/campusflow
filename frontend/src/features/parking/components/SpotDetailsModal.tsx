@@ -94,7 +94,7 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
 
         <div
           style={{
-            background: 'rgba(255,255,255,0.03)',
+            background: 'var(--surface-soft)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
             padding: '1.25rem',
@@ -140,7 +140,7 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
               <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.8rem' }}>
                 {isAr ? 'الوقت المتبقي:' : 'Time Left:'}
               </span>
-              <strong style={{ color: 'var(--fbsu-gold)' }}>
+              <strong style={{ color: 'var(--gold-text)' }}>
                 {spot.timeLeft || (isAr ? 'متاح فوري' : 'Instant Availability')}
               </strong>
             </div>

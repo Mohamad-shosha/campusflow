@@ -46,8 +46,7 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({ isOpen, rece
         className="receipt-printable-container"
         data-testid="tuition-receipt-card"
         style={{
-          background:
-            'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(13, 27, 42, 0.95) 100%)',
+          background: 'var(--brand-card-gradient)',
           border: '1.5px solid var(--fbsu-gold-border)',
           borderRadius: '14px',
           padding: '1.75rem',
@@ -87,7 +86,7 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({ isOpen, rece
               borderRadius: '20px',
               background: 'rgba(16, 185, 129, 0.15)',
               border: '1px solid rgba(16, 185, 129, 0.3)',
-              color: '#10b981',
+              color: 'var(--success-text)',
               fontSize: '0.78rem',
               fontWeight: 800,
             }}
@@ -116,7 +115,7 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({ isOpen, rece
               {isAr ? 'رقم الإيصال الرسمي' : 'Official Receipt No'}
             </span>
             <strong
-              style={{ color: 'var(--fbsu-gold)', fontFamily: 'monospace', fontSize: '0.95rem' }}
+              style={{ color: 'var(--gold-text)', fontFamily: 'monospace', fontSize: '0.95rem' }}
               data-testid="receipt-number"
             >
               {receipt.receiptNumber}
@@ -163,7 +162,7 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({ isOpen, rece
             <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: '0.78rem' }}>
               {isAr ? 'وسيلة السداد' : 'Payment Method'}
             </span>
-            <span style={{ color: '#10b981', fontWeight: 700 }}>
+            <span style={{ color: 'var(--success-text)', fontWeight: 700 }}>
               {isAr ? 'المحفظة الجامعية الرقمية' : 'Digital Campus Wallet'}
             </span>
           </div>
@@ -194,7 +193,7 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({ isOpen, rece
             style={{
               fontSize: '2.1rem',
               fontWeight: 900,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -211,8 +210,8 @@ export const TuitionReceiptModal: FC<TuitionReceiptModalProps> = ({ isOpen, rece
             justifyContent: 'space-between',
             padding: '0.85rem 1rem',
             borderRadius: '10px',
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
+            background: 'var(--surface-soft)',
+            border: '1px solid var(--border-soft)',
             marginBottom: '1.25rem',
           }}
         >

@@ -132,7 +132,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
           style={{
             padding: '1rem',
             borderRadius: '10px',
-            background: 'rgba(255, 255, 255, 0.03)',
+            background: 'var(--surface-soft)',
             border: '1px solid var(--border-color)',
           }}
         >
@@ -160,14 +160,14 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
             style={{
               display: 'flex',
               justifyContent: 'space-between',
-              borderTop: '1px solid rgba(255,255,255,0.05)',
+              borderTop: '1px solid var(--border-soft)',
               paddingTop: '0.5rem',
             }}
           >
             <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               {isAr ? 'المبلغ المتبقي المطلوب:' : 'Remaining Balance Due:'}
             </span>
-            <strong style={{ fontSize: '1.1rem', color: 'var(--fbsu-gold)' }}>
+            <strong style={{ fontSize: '1.1rem', color: 'var(--gold-text)' }}>
               {remaining.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
             </strong>
           </div>
@@ -191,7 +191,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
               {isAr ? 'رصيد محفظتك المتاح:' : 'Your Wallet Balance:'}
             </span>
           </div>
-          <strong style={{ fontSize: '1rem', color: hasEnoughBalance ? '#10b981' : '#f87171' }}>
+          <strong style={{ fontSize: '1rem', color: hasEnoughBalance ? 'var(--success-text)' : 'var(--danger-text)' }}>
             {walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
           </strong>
         </div>
@@ -223,7 +223,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
                     ? '1.5px solid var(--fbsu-gold)'
                     : '1px solid var(--border-color)',
                 background:
-                  paymentMode === 'FULL' ? 'rgba(215, 162, 55, 0.18)' : 'rgba(255, 255, 255, 0.03)',
+                  paymentMode === 'FULL' ? 'rgba(215, 162, 55, 0.18)' : 'var(--surface-soft)',
                 color: paymentMode === 'FULL' ? 'var(--fbsu-gold)' : 'var(--text-main)',
                 fontWeight: 700,
                 fontSize: '0.82rem',
@@ -252,7 +252,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
                 background:
                   paymentMode === 'CUSTOM'
                     ? 'rgba(215, 162, 55, 0.18)'
-                    : 'rgba(255, 255, 255, 0.03)',
+                    : 'var(--surface-soft)',
                 color: paymentMode === 'CUSTOM' ? 'var(--fbsu-gold)' : 'var(--text-main)',
                 fontWeight: 700,
                 fontSize: '0.82rem',
@@ -292,7 +292,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
                 width: '100%',
                 padding: '0.75rem 1rem',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.04)',
+                background: 'var(--surface-soft)',
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-main)',
                 fontSize: '0.95rem',

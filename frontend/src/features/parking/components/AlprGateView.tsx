@@ -319,7 +319,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                       style={{
                         fontSize: '0.72rem',
                         background: 'var(--fbsu-gold-light)',
-                        color: 'var(--fbsu-gold)',
+                        color: 'var(--gold-text)',
                         padding: '0.1rem 0.4rem',
                         borderRadius: '4px',
                       }}
@@ -459,7 +459,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                 {isCustomMode && (
                   <div
                     style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
+                      background: 'var(--surface-soft)',
                       padding: '0.85rem',
                       borderRadius: 'var(--radius-md)',
                       border: '1px solid var(--border-subtle)',
@@ -482,7 +482,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                             width: '100%',
                             background: 'var(--bg-glass)',
                             border: '1px solid var(--border-subtle)',
-                            color: '#fff',
+                            color: 'var(--text-strong)',
                             padding: '0.4rem 0.6rem',
                             borderRadius: 'var(--radius-sm)',
                             fontSize: '0.85rem',
@@ -503,7 +503,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                             width: '100%',
                             background: 'var(--bg-glass)',
                             border: '1px solid var(--border-subtle)',
-                            color: '#fff',
+                            color: 'var(--text-strong)',
                             padding: '0.4rem 0.6rem',
                             borderRadius: 'var(--radius-sm)',
                             fontSize: '0.85rem',
@@ -552,7 +552,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
           {/* Real AI Decision Result Box */}
           <div
             style={{
-              background: 'rgba(255,255,255,0.03)',
+              background: 'var(--surface-soft)',
               border: `1px solid ${
                 lastDecision?.decision === 'GRANTED'
                   ? 'var(--status-available-border)'
@@ -604,7 +604,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                         <span>
                           {' '}
                           | {isAr ? 'الموقف:' : 'Bay:'}{' '}
-                          <strong style={{ color: 'var(--fbsu-gold)' }}>
+                          <strong style={{ color: 'var(--gold-text)' }}>
                             #{lastDecision.bayNumber}
                           </strong>{' '}
                           ({isAr ? lastDecision.zoneNameAr : lastDecision.zoneNameEn})
@@ -633,7 +633,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                     }}
                   >
                     {isAr ? 'رمز الحالة:' : 'Code:'}{' '}
-                    <code style={{ color: 'var(--fbsu-gold)' }}>{lastDecision.reasonCode}</code>
+                    <code style={{ color: 'var(--gold-text)' }}>{lastDecision.reasonCode}</code>
                   </span>
                 </div>
               </div>
@@ -703,7 +703,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                     <td style={{ fontWeight: 800, color: 'var(--text-main)' }}>{entry.plate}</td>
                     <td>{entry.driverName}</td>
                     <td>
-                      <span style={{ color: 'var(--fbsu-gold)', fontWeight: 700 }}>
+                      <span style={{ color: 'var(--gold-text)', fontWeight: 700 }}>
                         {entry.bayInfo}
                       </span>
                     </td>

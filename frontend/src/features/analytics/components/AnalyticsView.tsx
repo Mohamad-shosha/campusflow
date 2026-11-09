@@ -10,13 +10,13 @@ export interface AnalyticsViewProps {
 const DEFAULT_PEAK_DATA: HourlyLoadPoint[] = [
   { time: '08:00', load: 85, color: '#f59e0b', labelAr: 'ذروة 1', labelEn: 'Peak 1' },
   { time: '09:00', load: 95, color: '#ef4444', labelAr: 'ذروة قصوى', labelEn: 'Max Peak' },
-  { time: '10:00', load: 70, color: '#10b981', labelAr: 'فترة خروج البريك', labelEn: 'Break Exit' },
+  { time: '10:00', load: 70, color: 'var(--success-text)', labelAr: 'فترة خروج البريك', labelEn: 'Break Exit' },
   { time: '11:00', load: 90, color: '#ef4444', labelAr: 'محاضرات الظهر', labelEn: 'Midday' },
   { time: '12:00', load: 80, color: '#f59e0b', labelAr: 'صلاة الظهر', labelEn: 'Prayer' },
-  { time: '01:00', load: 65, color: '#10b981', labelAr: 'تبادل المواقف', labelEn: 'Flex Swap' },
+  { time: '01:00', load: 65, color: 'var(--success-text)', labelAr: 'تبادل المواقف', labelEn: 'Flex Swap' },
   { time: '02:00', load: 75, color: '#f59e0b', labelAr: 'عودة الطلاب', labelEn: 'Return' },
-  { time: '03:00', load: 50, color: '#10b981', labelAr: 'هدوء', labelEn: 'Calm' },
-  { time: '04:00', load: 25, color: '#10b981', labelAr: 'نهاية الدوام', labelEn: 'Dismissal' },
+  { time: '03:00', load: 50, color: 'var(--success-text)', labelAr: 'هدوء', labelEn: 'Calm' },
+  { time: '04:00', load: 25, color: 'var(--success-text)', labelAr: 'نهاية الدوام', labelEn: 'Dismissal' },
 ];
 
 export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
@@ -95,7 +95,7 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
         <div className="stat-chip" style={{ padding: '1.5rem' }}>
           <div>
             <div
-              style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}
+              style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--gold-text)' }}
               data-testid="kpi-time-saved"
             >
               {timeSaved} {isAr ? 'دقيقة' : 'Mins'}
@@ -179,7 +179,7 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
                   padding: '1.25rem',
                   border: '1px solid var(--border-color)',
                   borderRadius: '10px',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--surface-soft)',
                 }}
               >
                 <div
@@ -210,7 +210,7 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
                   style={{
                     width: '100%',
                     height: '8px',
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    background: 'var(--surface-hover)',
                     borderRadius: '4px',
                     overflow: 'hidden',
                     marginBottom: '0.75rem',
@@ -285,7 +285,7 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
             <div
               key={idx}
               style={{
-                background: 'rgba(255,255,255,0.03)',
+                background: 'var(--surface-soft)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-md)',
                 padding: '1rem 0.5rem',

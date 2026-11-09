@@ -35,7 +35,7 @@ export const HeroSection: FC<HeroSectionProps> = ({
         <div className="hero-grid">
           <div>
             <div className="hero-tag">
-              <Sparkles size={14} color="#38c2b0" />
+              <Sparkles size={14} color="var(--accent-text)" />
               <span>
                 {isAr
                   ? 'مبادرة التحول الرقمي بالذكاء الاصطناعي - جامعة فهد بن سلطان'
@@ -157,7 +157,7 @@ export const HeroSection: FC<HeroSectionProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <div
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
+                  background: 'var(--surface-soft)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: 'var(--radius-md)',
                   padding: '0.95rem',
@@ -197,7 +197,7 @@ export const HeroSection: FC<HeroSectionProps> = ({
 
               <div
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
+                  background: 'var(--surface-soft)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: 'var(--radius-md)',
                   padding: '0.95rem',
@@ -212,7 +212,7 @@ export const HeroSection: FC<HeroSectionProps> = ({
                     height: '30px',
                     borderRadius: '50%',
                     background: 'var(--fbsu-gold-light)',
-                    color: 'var(--fbsu-gold)',
+                    color: 'var(--gold-text)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -237,7 +237,7 @@ export const HeroSection: FC<HeroSectionProps> = ({
 
               <div
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
+                  background: 'var(--surface-soft)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: 'var(--radius-md)',
                   padding: '0.95rem',
@@ -312,12 +312,12 @@ export const HeroSection: FC<HeroSectionProps> = ({
           <div className="stat-chip">
             <div
               className="stat-chip-icon"
-              style={{ background: 'var(--fbsu-gold-light)', color: 'var(--fbsu-gold)' }}
+              style={{ background: 'var(--fbsu-gold-light)', color: 'var(--gold-text)' }}
             >
               <RefreshCw size={22} color="var(--fbsu-gold)" />
             </div>
             <div>
-              <div className="stat-chip-num" style={{ color: 'var(--fbsu-gold)' }}>
+              <div className="stat-chip-num" style={{ color: 'var(--gold-text)' }}>
                 {flexCount}
               </div>
               <div className="stat-chip-label">

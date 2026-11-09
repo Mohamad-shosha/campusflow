@@ -514,7 +514,7 @@ export const AuthModal: FC<AuthModalProps> = ({
             {/* Vehicle Optional */}
             <div
               style={{
-                background: 'rgba(255,255,255,0.02)',
+                background: 'var(--surface-soft)',
                 padding: '0.75rem',
                 borderRadius: '8px',
                 marginBottom: '1rem',
@@ -524,7 +524,7 @@ export const AuthModal: FC<AuthModalProps> = ({
               <span
                 style={{
                   fontSize: '0.75rem',
-                  color: 'var(--fbsu-gold)',
+                  color: 'var(--gold-text)',
                   fontWeight: 800,
                   display: 'block',
                   marginBottom: '0.4rem',

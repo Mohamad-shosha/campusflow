@@ -381,7 +381,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 tabIndex={0}
               >
                 <h5>{isAr ? 'بالساعة' : 'Hourly'}</h5>
-                <span style={{ color: 'var(--fbsu-gold)' }}>5.75 SAR/h</span>
+                <span style={{ color: 'var(--gold-text)' }}>5.75 SAR/h</span>
               </div>
               <div
                 className={`pattern-option ${tariffPlan === 'daily' ? 'selected' : ''}`}
@@ -390,7 +390,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 tabIndex={0}
               >
                 <h5>{isAr ? 'يومي كامل' : 'Daily Cap'}</h5>
-                <span style={{ color: 'var(--fbsu-gold)' }}>25.00 SAR</span>
+                <span style={{ color: 'var(--gold-text)' }}>25.00 SAR</span>
               </div>
               <div
                 className={`pattern-option ${tariffPlan === 'monthly' ? 'selected' : ''}`}
@@ -399,7 +399,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 tabIndex={0}
               >
                 <h5>{isAr ? 'اشتراك شهري' : 'Monthly'}</h5>
-                <span style={{ color: 'var(--fbsu-gold)' }}>25.00 SAR/day</span>
+                <span style={{ color: 'var(--gold-text)' }}>25.00 SAR/day</span>
               </div>
             </div>
           </div>
@@ -497,7 +497,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                 style={{ width: '18px', height: '18px', accentColor: 'var(--fbsu-gold)' }}
               />
               <div>
-                <strong style={{ color: 'var(--fbsu-gold)', fontSize: '0.9rem' }}>
+                <strong style={{ color: 'var(--gold-text)', fontSize: '0.9rem' }}>
                   {isAr
                     ? 'تفعيل ميزة التبادل الذكي التلقائي (اربح كاش باك في البريك)'
                     : 'Opt-in for AI Flex Sharing (Earn break cashback)'}
@@ -637,7 +637,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
             }}
           >
             <span>{isAr ? 'رقم اللوحة:' : 'License Plate:'}</span>
-            <strong style={{ color: 'var(--fbsu-gold)', fontFamily: 'var(--font-en)' }}>
+            <strong style={{ color: 'var(--gold-text)', fontFamily: 'var(--font-en)' }}>
               {currentUser.plate || 'ب ط ك 1234'}
             </strong>
           </div>
@@ -723,7 +723,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
               style={{
                 fontSize: '1.6rem',
                 fontWeight: 900,
-                color: 'var(--fbsu-gold)',
+                color: 'var(--gold-text)',
                 fontFamily: 'var(--font-en)',
               }}
               data-testid="booking-total-price"
@@ -810,7 +810,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                       flexWrap: 'wrap',
                       gap: '1rem',
                       padding: '1rem 1.25rem',
-                      background: 'rgba(255,255,255,0.03)',
+                      background: 'var(--surface-soft)',
                       border: `1px solid ${isConfirmed ? 'var(--fbsu-gold-border)' : 'var(--border-subtle)'}`,
                       borderRadius: 'var(--radius-md)',
                     }}
@@ -825,7 +825,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                           marginBottom: '0.25rem',
                         }}
                       >
-                        <strong style={{ color: 'var(--fbsu-gold)', fontSize: '1rem' }}>
+                        <strong style={{ color: 'var(--gold-text)', fontSize: '1rem' }}>
                           {isAr ? `موقف #${booking.bayNumber}` : `Bay #${booking.bayNumber}`} (
                           {isAr ? booking.zoneNameAr : booking.zoneNameEn})
                         </strong>
@@ -858,7 +858,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                         </span>
                         <span>
                           {isAr ? 'المبلغ:' : 'Amount:'}{' '}
-                          <strong style={{ color: 'var(--fbsu-gold)' }}>
+                          <strong style={{ color: 'var(--gold-text)' }}>
                             {Number(booking.totalAmount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                           </strong>
                         </span>

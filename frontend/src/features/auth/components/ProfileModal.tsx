@@ -337,7 +337,7 @@ export const ProfileModal: FC<ProfileModalProps> = ({
               style={{
                 fontSize: '0.75rem',
                 fontWeight: 800,
-                color: 'var(--fbsu-gold)',
+                color: 'var(--gold-text)',
                 marginBottom: '0.2rem',
               }}
             >
@@ -579,7 +579,7 @@ export const ProfileModal: FC<ProfileModalProps> = ({
                     padding: '1.25rem',
                     textAlign: 'center',
                     color: 'var(--text-muted)',
-                    background: 'rgba(255,255,255,0.02)',
+                    background: 'var(--surface-soft)',
                     borderRadius: '8px',
                     border: '1px dashed var(--border-subtle)',
                     fontSize: '0.85rem',
@@ -601,7 +601,7 @@ export const ProfileModal: FC<ProfileModalProps> = ({
                       gap: '0.85rem',
                       padding: '0.85rem 1rem',
                       borderRadius: '10px',
-                      background: 'rgba(255,255,255,0.03)',
+                      background: 'var(--surface-soft)',
                       border: v.primary
                         ? '1px solid var(--status-available)'
                         : '1px solid var(--border-subtle)',
@@ -668,7 +668,7 @@ export const ProfileModal: FC<ProfileModalProps> = ({
               style={{
                 padding: '1rem',
                 borderRadius: '10px',
-                background: 'rgba(255,255,255,0.02)',
+                background: 'var(--surface-soft)',
                 border: '1px solid var(--border-subtle)',
               }}
               data-testid="add-vehicle-form"
@@ -677,7 +677,7 @@ export const ProfileModal: FC<ProfileModalProps> = ({
                 style={{
                   fontSize: '0.92rem',
                   fontWeight: 800,
-                  color: 'var(--fbsu-gold)',
+                  color: 'var(--gold-text)',
                   marginBottom: '0.75rem',
                   display: 'flex',
                   alignItems: 'center',

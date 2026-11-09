@@ -159,7 +159,7 @@ export const TransferModal: FC<TransferModalProps> = ({
                 width: '100%',
                 padding: '0.75rem 1rem',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.04)',
+                background: 'var(--surface-soft)',
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-main)',
                 fontSize: '0.95rem',
@@ -176,7 +176,7 @@ export const TransferModal: FC<TransferModalProps> = ({
             <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               {isAr ? 'المبلغ المراد تحويله (ر.س)' : 'Transfer Amount (SAR)'}
             </label>
-            <span style={{ fontSize: '0.78rem', color: 'var(--fbsu-gold)' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--gold-text)' }}>
               {isAr
                 ? `المتاح: ${availableBalance.toFixed(2)} ر.س`
                 : `Available: ${availableBalance.toFixed(2)} SAR`}
@@ -197,7 +197,7 @@ export const TransferModal: FC<TransferModalProps> = ({
               width: '100%',
               padding: '0.75rem 1rem',
               borderRadius: '8px',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--surface-soft)',
               border: '1px solid var(--border-color)',
               color: 'var(--text-main)',
               fontSize: '0.95rem',
@@ -232,7 +232,7 @@ export const TransferModal: FC<TransferModalProps> = ({
               width: '100%',
               padding: '0.75rem 1rem',
               borderRadius: '8px',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--surface-soft)',
               border: '1px solid var(--border-color)',
               color: 'var(--text-main)',
               fontSize: '0.95rem',

@@ -132,7 +132,7 @@ export const BookTutoringModal: FC<BookTutoringModalProps> = ({
         {/* Details Card */}
         <div
           style={{
-            background: 'rgba(255,255,255,0.03)',
+            background: 'var(--surface-soft)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
             padding: '1.25rem',
@@ -195,7 +195,7 @@ export const BookTutoringModal: FC<BookTutoringModalProps> = ({
                   ? `تكلفة الجلسة (${session.durationHours} ساعة × ${session.hourlyRate} ر.س):`
                   : `Session Fee (${session.durationHours}h × ${session.hourlyRate} SAR):`}
               </div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--fbsu-gold)' }}>
+              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--gold-text)' }}>
                 {session.totalPrice.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
               </div>
             </div>

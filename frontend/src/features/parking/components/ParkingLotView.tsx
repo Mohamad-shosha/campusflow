@@ -762,7 +762,7 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '0.4rem',
-            color: 'var(--fbsu-gold)',
+            color: 'var(--gold-text)',
           }}
         >
           <ShieldCheck size={14} color="var(--fbsu-gold)" />
@@ -898,7 +898,7 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
               </h4>
               <p className="sector-focus-desc">
                 {isAr ? currentFocusZone.descAr : currentFocusZone.descEn} •{' '}
-                <strong style={{ color: 'var(--fbsu-gold)' }}>
+                <strong style={{ color: 'var(--gold-text)' }}>
                   {isAr ? currentFocusZone.gateAr : currentFocusZone.gateEn}
                 </strong>
               </p>

@@ -318,7 +318,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                       onChange={e => setSelectedSpotId(e.target.value)}
                       style={{
                         background: 'var(--bg-glass)',
-                        color: 'var(--fbsu-gold)',
+                        color: 'var(--gold-text)',
                         border: '1px solid var(--border-subtle)',
                         borderRadius: 'var(--radius-sm)',
                         padding: '0.35rem 0.75rem',
@@ -342,7 +342,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                       ))}
                     </select>
                   ) : (
-                    <strong style={{ color: 'var(--fbsu-gold)' }}>
+                    <strong style={{ color: 'var(--gold-text)' }}>
                       {isAr
                         ? `موقف رقم #${currentUser.primarySpot || '01'}`
                         : `Bay #${currentUser.primarySpot || '01'}`}
@@ -355,7 +355,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   {isAr ? 'رصيدك الحالي' : 'Current Balance'}
                 </span>
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--gold-text)' }}>
                   {currentUser.walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                 </div>
               </div>
@@ -432,7 +432,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                   data-testid="break-option-3"
                 >
                   <h5>{isAr ? '3 ساعات' : '3 Hours'}</h5>
-                  <span style={{ color: 'var(--fbsu-gold)' }}>
+                  <span style={{ color: 'var(--gold-text)' }}>
                     {isAr ? 'نموذج البريك المعتاد' : 'Standard Break'}
                   </span>
                 </div>
@@ -474,7 +474,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 <div>
                   <h5
                     style={{
-                      color: 'var(--fbsu-gold)',
+                      color: 'var(--gold-text)',
                       fontSize: '1.05rem',
                       fontWeight: 800,
                       display: 'flex',
@@ -505,7 +505,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                   style={{
                     fontSize: '2rem',
                     fontWeight: 900,
-                    color: 'var(--fbsu-gold)',
+                    color: 'var(--gold-text)',
                     fontFamily: 'var(--font-en)',
                   }}
                   data-testid="flex-reward-amount"
@@ -711,7 +711,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 style={{
                   textAlign: 'center',
                   padding: '3rem 1.5rem',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--surface-soft)',
                   borderRadius: 'var(--radius-lg)',
                   border: '1px dashed var(--border-subtle)',
                 }}
@@ -796,7 +796,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                           <span
                             style={{
                               background: 'var(--fbsu-gold-light)',
-                              color: 'var(--fbsu-gold)',
+                              color: 'var(--gold-text)',
                               fontWeight: 900,
                               fontSize: '1rem',
                               padding: '0.2rem 0.65rem',
@@ -846,7 +846,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                           <Clock size={14} color="var(--text-muted)" />
                           <span>
                             {isAr ? 'المكافأة النقدية للطرفين: ' : 'Cashback: '}
-                            <strong style={{ color: 'var(--fbsu-gold)' }}>
+                            <strong style={{ color: 'var(--gold-text)' }}>
                               {reward.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                             </strong>
                           </span>

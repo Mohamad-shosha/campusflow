@@ -142,7 +142,7 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
                       : '1px solid var(--border-color)',
                     background: isSelected
                       ? 'rgba(215, 162, 55, 0.2)'
-                      : 'rgba(255, 255, 255, 0.03)',
+                      : 'var(--surface-soft)',
                     color: isSelected ? 'var(--fbsu-gold)' : 'var(--text-main)',
                     fontWeight: isSelected ? 800 : 600,
                     fontSize: '0.88rem',
@@ -183,7 +183,7 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
                 width: '100%',
                 padding: '0.75rem 1rem',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.04)',
+                background: 'var(--surface-soft)',
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-main)',
                 fontSize: '0.95rem',
@@ -234,7 +234,7 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
                     border: active
                       ? '1.5px solid var(--fbsu-gold)'
                       : '1px solid var(--border-color)',
-                    background: active ? 'rgba(215, 162, 55, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                    background: active ? 'rgba(215, 162, 55, 0.15)' : 'var(--surface-soft)',
                     color: active ? 'var(--fbsu-gold)' : 'var(--text-secondary)',
                     display: 'flex',
                     flexDirection: 'column',

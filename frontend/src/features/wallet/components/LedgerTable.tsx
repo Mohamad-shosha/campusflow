@@ -115,7 +115,7 @@ export const LedgerTable: FC<LedgerTableProps> = ({
               padding: '0.45rem 0.8rem',
               paddingInlineStart: '2rem',
               borderRadius: '8px',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--surface-soft)',
               border: '1px solid var(--border-color)',
               color: 'var(--text-main)',
               fontSize: '0.85rem',
@@ -195,7 +195,7 @@ export const LedgerTable: FC<LedgerTableProps> = ({
                   <tr
                     key={entry.id}
                     style={{
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                      borderBottom: '1px solid var(--border-soft)',
                       transition: 'background 0.15s ease',
                     }}
                     data-testid={`ledger-row-${entry.id}`}
@@ -247,7 +247,7 @@ export const LedgerTable: FC<LedgerTableProps> = ({
                           alignItems: 'center',
                           gap: '0.25rem',
                           fontWeight: 800,
-                          color: isCredit ? '#10b981' : '#f87171',
+                          color: isCredit ? 'var(--success-text)' : 'var(--danger-text)',
                           fontVariantNumeric: 'tabular-nums',
                         }}
                       >

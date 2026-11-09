@@ -549,7 +549,7 @@ export const AdminDashboard: FC<AdminDashboardProps> = ({ isAr = true, onRefresh
                     padding: '1.25rem',
                     border: '1px solid var(--border-color)',
                     borderRadius: '10px',
-                    background: 'rgba(255, 255, 255, 0.02)',
+                    background: 'var(--surface-soft)',
                   }}
                 >
                   <div

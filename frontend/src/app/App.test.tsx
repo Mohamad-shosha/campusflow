@@ -90,24 +90,30 @@ describe('App Full Integration & Feature Navigation Tests', () => {
     expect(screen.queryByTestId('auth-modal-overlay')).not.toBeInTheDocument();
   });
 
-  it('navigates seamlessly between parking and campus views via category subnav', () => {
-    render(<App initialTab="map" />);
+  // Renders three full feature views in jsdom with real CSS (css: true); runtime
+  // scales with stylesheet size, so allow more than the 5s default.
+  it(
+    'navigates seamlessly between parking and campus views via category subnav',
+    { timeout: 15000 },
+    () => {
+      render(<App initialTab="map" />);
 
-    // Click Book Spot
-    const bookBtn = screen.getByRole('button', { name: /حجز موقف وتصريح/i });
-    fireEvent.click(bookBtn);
-    expect(screen.getByTestId('booking-wizard-view')).toBeInTheDocument();
+      // Click Book Spot
+      const bookBtn = screen.getByRole('button', { name: /حجز موقف وتصريح/i });
+      fireEvent.click(bookBtn);
+      expect(screen.getByTestId('booking-wizard-view')).toBeInTheDocument();
 
-    // Click Gate ALPR
-    const gateBtn = screen.getByRole('button', { name: /بوابة وكاميرات ALPR/i });
-    fireEvent.click(gateBtn);
-    expect(screen.getByTestId('alpr-gate-view')).toBeInTheDocument();
+      // Click Gate ALPR
+      const gateBtn = screen.getByRole('button', { name: /بوابة وكاميرات ALPR/i });
+      fireEvent.click(gateBtn);
+      expect(screen.getByTestId('alpr-gate-view')).toBeInTheDocument();
 
-    // Click Share & Earn
-    const shareBtn = screen.getByRole('button', { name: /شارك موقفك واربح/i });
-    fireEvent.click(shareBtn);
-    expect(screen.getByTestId('share-spot-view')).toBeInTheDocument();
-  });
+      // Click Share & Earn
+      const shareBtn = screen.getByRole('button', { name: /شارك موقفك واربح/i });
+      fireEvent.click(shareBtn);
+      expect(screen.getByTestId('share-spot-view')).toBeInTheDocument();
+    }
+  );
 
   it('displays auth-required guard when navigating to guarded admin tab as an unauthorized user', async () => {
     render(<App initialTab="admin-panel" />);

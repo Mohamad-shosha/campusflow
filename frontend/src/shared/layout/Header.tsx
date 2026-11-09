@@ -325,7 +325,7 @@ export const Header: FC<HeaderProps> = ({
             <Bell size={14} color="var(--fbsu-gold)" />
             <span
               data-testid="header-unread-badge"
-              style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--fbsu-gold)' }}
+              style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--gold-text)' }}
             >
               {notificationCount}
             </span>

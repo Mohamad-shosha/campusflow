@@ -214,7 +214,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
         <form onSubmit={handleSubmit}>
           <div
             style={{
-              background: 'rgba(255,255,255,0.03)',
+              background: 'var(--surface-soft)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
               padding: '1rem',

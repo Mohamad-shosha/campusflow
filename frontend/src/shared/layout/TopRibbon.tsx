@@ -32,7 +32,7 @@ export const TopRibbon: FC<TopRibbonProps> = ({ flexCount = 3, timeString }) => 
             <span style={{ color: 'var(--fbsu-primary)' }}>🛡️</span>
             {t('ribbon.officialBadge')}
           </span>
-          <span className="ribbon-item" style={{ color: 'var(--fbsu-gold)' }}>
+          <span className="ribbon-item" style={{ color: 'var(--gold-text)' }}>
             <span className="pulse-dot-gold"></span>
             {t('ribbon.flexActive', { count: flexCount })}
           </span>

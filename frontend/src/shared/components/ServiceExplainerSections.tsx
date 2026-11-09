@@ -95,7 +95,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">02</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--gold-text)' }}
                 >
                   <Zap size={24} />
                 </div>
@@ -113,7 +113,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">03</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: 'var(--accent-text)' }}
                 >
                   <Cpu size={24} />
                 </div>
@@ -131,7 +131,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">04</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--gold-text)' }}
                 >
                   <Award size={24} />
                 </div>
@@ -148,7 +148,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
           </section>
 
           {/* Section 2: Sectors Guide */}
-          <section className="service-explainer-block" style={{ marginTop: '3.5rem' }}>
+          <section className="service-explainer-block">
             <div className="section-head text-center">
               <span className="section-eyebrow">
                 <Car size={14} />
@@ -166,7 +166,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="sector-card-header">
                   <span
                     className="sector-pill"
-                    style={{ background: 'rgba(17, 110, 99, 0.25)', color: '#38c2b0' }}
+                    style={{ background: 'rgba(17, 110, 99, 0.25)', color: 'var(--accent-text)' }}
                   >
                     {isAr ? 'قطاع A' : 'Sector A'}
                   </span>
@@ -188,7 +188,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="sector-card-header">
                   <span
                     className="sector-pill"
-                    style={{ background: 'rgba(56, 194, 176, 0.25)', color: '#38c2b0' }}
+                    style={{ background: 'rgba(56, 194, 176, 0.25)', color: 'var(--accent-text)' }}
                   >
                     {isAr ? 'قطاع B' : 'Sector B'}
                   </span>
@@ -210,7 +210,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="sector-card-header">
                   <span
                     className="sector-pill"
-                    style={{ background: 'rgba(215, 162, 55, 0.25)', color: 'var(--fbsu-gold)' }}
+                    style={{ background: 'rgba(215, 162, 55, 0.25)', color: 'var(--gold-text)' }}
                   >
                     {isAr ? 'قطاع C' : 'Sector C'}
                   </span>
@@ -232,7 +232,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="sector-card-header">
                   <span
                     className="sector-pill"
-                    style={{ background: 'rgba(16, 185, 129, 0.25)', color: '#10b981' }}
+                    style={{ background: 'rgba(16, 185, 129, 0.25)', color: 'var(--success-text)' }}
                   >
                     {isAr ? 'قطاع D' : 'Sector D'}
                   </span>
@@ -253,7 +253,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
           </section>
 
           {/* Section 3: Safety & Policies */}
-          <section className="service-explainer-block" style={{ marginTop: '3.5rem' }}>
+          <section className="service-explainer-block">
             <div className="explainer-guidelines-box">
               <div className="guidelines-icon-col">
                 <ShieldCheck size={36} color="var(--fbsu-gold)" />
@@ -326,7 +326,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">AI</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--gold-text)' }}
                 >
                   <Cpu size={24} />
                 </div>
@@ -362,7 +362,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">DEV</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: 'var(--accent-text)' }}
                 >
                   <Zap size={24} />
                 </div>
@@ -380,7 +380,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">POD</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--gold-text)' }}
                 >
                   <Users size={24} />
                 </div>
@@ -397,7 +397,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
           </section>
 
           {/* Section 2: Booking Policies */}
-          <section className="service-explainer-block" style={{ marginTop: '3.5rem' }}>
+          <section className="service-explainer-block">
             <div className="explainer-guidelines-box">
               <div className="guidelines-icon-col">
                 <Clock size={36} color="var(--fbsu-gold)" />
@@ -472,7 +472,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">01</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--gold-text)' }}
                 >
                   <Users size={24} />
                 </div>
@@ -508,7 +508,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">03</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: 'var(--accent-text)' }}
                 >
                   <Award size={24} />
                 </div>
@@ -525,7 +525,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
           </section>
 
           {/* Section 2: Eligibility Criteria */}
-          <section className="service-explainer-block" style={{ marginTop: '3.5rem' }}>
+          <section className="service-explainer-block">
             <div className="explainer-guidelines-box">
               <div className="guidelines-icon-col">
                 <Award size={36} color="var(--fbsu-gold)" />
@@ -612,7 +612,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">02</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--gold-text)' }}
                 >
                   <Award size={24} />
                 </div>
@@ -630,7 +630,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 <div className="step-card-num">03</div>
                 <div
                   className="step-card-icon-wrap"
-                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: 'var(--accent-text)' }}
                 >
                   <Users size={24} />
                 </div>
@@ -647,7 +647,7 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
           </section>
 
           {/* Section 2: Advising Etiquette */}
-          <section className="service-explainer-block" style={{ marginTop: '3.5rem' }}>
+          <section className="service-explainer-block">
             <div className="explainer-guidelines-box">
               <div className="guidelines-icon-col">
                 <Clock size={36} color="var(--fbsu-gold)" />

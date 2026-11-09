@@ -17,7 +17,6 @@ import { mapBackendSpotToUi, type ParkingSummaryResponse } from '../features/par
 import {
   INITIAL_TUTORING_SESSIONS,
   FACULTY_MEMBERS,
-  INITIAL_STUDY_ROOMS,
   type TutoringSession,
   type FacultyMember,
   type StudyRoom,
@@ -65,6 +64,8 @@ import type { NotificationResponse } from '../features/notifications/types/notif
 
 import '../shared/i18n/i18n';
 import '../styles/main.css';
+import '../styles/rooms-hub.css';
+import '../styles/transit-utilities.css';
 
 export interface AppContentProps {
   initialTab?: string | undefined;
@@ -87,7 +88,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [tutoringSessions, setTutoringSessions] =
     useState<TutoringSession[]>(INITIAL_TUTORING_SESSIONS);
   const [facultyList, setFacultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
-  const [studyRooms, setStudyRooms] = useState<StudyRoom[]>(INITIAL_STUDY_ROOMS);
+  // Rooms & labs come from the backend only; no mock fallback is rendered.
+  const [studyRooms, setStudyRooms] = useState<StudyRoom[]>([]);
+  const [isRoomsLoading, setIsRoomsLoading] = useState<boolean>(true);
   const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [isNotificationsLoading, setIsNotificationsLoading] = useState<boolean>(false);
@@ -244,11 +247,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const fetchStudyRooms = useCallback(async () => {
     try {
       const liveRooms = await roomsApi.getRooms();
-      if (liveRooms && liveRooms.length > 0) {
+      if (Array.isArray(liveRooms)) {
         setStudyRooms(liveRooms);
       }
     } catch {
-      // Fallback to initial study rooms when offline or in isolated unit tests
+      // Keep the last known rooms; StudyRoomsView shows an empty/retry state if none
+    } finally {
+      setIsRoomsLoading(false);
     }
   }, []);
 
@@ -488,7 +493,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'نوع التصريح الصادر' : 'Pass Format',
               value: 'QR مشفر',
               icon: ShieldCheck,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'باقات حجز مرنة' : 'Booking Plans',
@@ -500,13 +505,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'سداد فوري من المحفظة' : 'Wallet Settlement',
               value: 'فوري',
               icon: CreditCard,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'سياسة استرداد الرصيد' : 'Instant Refund Policy',
               value: 'مضمونة',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -533,7 +538,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'زمن المعالجة والاستجابة' : 'Processing Latency',
               value: '< 300 ms',
               icon: Zap,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'دقة الذكاء الاصطناعي' : 'OCR Vision Accuracy',
@@ -545,13 +550,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'دعم اللوحات الرسمية' : 'Plate Recognition',
               value: 'عربي وإنجليزي',
               icon: Car,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'فتح الحواجز تلقائياً' : 'Automated Barrier',
               value: 'دون توقف',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -578,7 +583,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'عائد نقدي في المحفظة' : 'Direct Wallet Reward',
               value: '+17.25 ر.س',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'ضمان إخلاء الموقف' : 'Vacancy Guarantee',
@@ -590,13 +595,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'زيادة السعة الاستيعابية' : 'Capacity Elevation',
               value: '+35%',
               icon: Zap,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'تنبيهات وتذكير آلي' : 'Smart Evacuation Alerts',
               value: 'نشط',
               icon: Sparkles,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -623,7 +628,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'مكافأة ساعة التدريس' : 'Hourly Tutor Reward',
               value: '70 ر.س',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'سداد فوري للرسوم' : 'Direct Tuition Offset',
@@ -635,13 +640,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'تغطية المقررات التخصصية' : 'Course Disciplines',
               value: 'CS & ENG',
               icon: BookOpen,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'متوسط تقييم المعلمين' : 'Average Peer Rating',
               value: '4.92 ★',
               icon: Sparkles,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -674,19 +679,19 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'إشعار لحظي للعمادة' : 'Deanery Notification',
               value: 'آلي',
               icon: ShieldCheck,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'جلسات حضورية وعن بعد' : 'Session Modalities',
               value: 'حضوري / عن بعد',
               icon: BookOpen,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'مشاريع التخرج والتدريب' : 'Capstone & Internships',
               value: 'NEOM & Red Sea',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -713,13 +718,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'مرفقاً بحثياً متقدماً' : 'Advanced Facilities',
               value: '10',
               icon: Cpu,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'محطات معالجة RTX 4090' : 'NVIDIA GPU Stations',
               value: '20',
               icon: Zap,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'راوترات وسويتشات Cisco' : 'Cisco Enterprise Racks',
@@ -731,7 +736,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'عزل صوتي لكبائن التركيز' : 'Acoustic Soundproofing',
               value: '42 dB',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -758,7 +763,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'مستشعرات IoT متصلة' : 'Connected IoT Sensors',
               value: '40 حساس',
               icon: Cpu,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'معدل التبادل الذكي Flex' : 'Flex Sharing Rate',
@@ -770,13 +775,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'زمن اتخاذ القرار' : 'Gate AI Decision Time',
               value: '< 0.3 ث',
               icon: ShieldCheck,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'دقة التنبؤ بالطلب' : 'Demand Forecasting',
               value: '98.2%',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -801,7 +806,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'تحويل فوري بين الطلاب' : 'Peer-to-Peer Transfers',
               value: 'P2P فوري',
               icon: Users,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'سجل محاسبي موثق' : 'Immutable Audit Ledger',
@@ -813,13 +818,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'وسائل شحن متعددة' : 'Top-Up Gateways',
               value: 'مدى / فيزا / أبل باي',
               icon: CreditCard,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'أمان مصرفي عالي' : 'Security Standards',
               value: 'مشفر 256-bit',
               icon: Zap,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -846,7 +851,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'سداد من عوائد التدريس' : 'Peer Tutoring Offset',
               value: 'تلقائي',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'إيصالات رسمية بـ QR' : 'Cryptographic Receipts',
@@ -858,13 +863,13 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'خطط تقسيط مجدولة' : 'Flexible Installments',
               value: 'ميسرة',
               icon: CreditCard,
-              color: '#38c2b0',
+              color: 'var(--accent-text)',
             },
             {
               label: isAr ? 'التحديث اللحظي للعمادة' : 'Registrar Sync',
               value: 'فوري',
               icon: Sparkles,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -897,7 +902,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'معدل التردد بين المحطات' : 'Transit Frequency',
               value: '10 دقائق',
               icon: Sparkles,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
             {
               label: isAr ? 'خطوط تغطي الحرم' : 'Active Campus Lines',
@@ -909,7 +914,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               label: isAr ? 'الركوب لجميع الطلاب' : 'Student Access',
               value: 'مجاني بالكامل',
               icon: Award,
-              color: 'var(--fbsu-gold)',
+              color: 'var(--gold-text)',
             },
           ]}
         />
@@ -1093,6 +1098,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <>
             <StudyRoomsView
               rooms={studyRooms}
+              isLoading={isRoomsLoading}
               isAr={isAr}
               isAuthenticated={isAuthenticated}
               currentUser={{

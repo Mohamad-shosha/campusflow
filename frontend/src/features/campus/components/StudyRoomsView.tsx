@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, FC } from 'react';
 import {
   DoorClosed,
-  Monitor,
+  FlaskConical,
   MapPin,
   CheckCircle2,
   Clock,
@@ -11,9 +11,6 @@ import {
   AlertCircle,
   Search,
   RotateCw,
-  Cpu,
-  ShieldCheck,
-  Terminal,
   Users,
   Sparkles,
   X,
@@ -26,9 +23,20 @@ import type { StudyRoom } from '../data/campusData';
 import { BookRoomModal } from './BookRoomModal';
 import { roomsApi } from '../api/roomsApi';
 import { soundFX } from '../../../shared/utils/sound';
+import {
+  ROOM_KINDS,
+  ROOM_KIND_LABELS,
+  type RoomKind,
+  collectLocations,
+  getRoomKind,
+  getRoomLocation,
+  matchesRoomQuery,
+} from '../utils/roomTaxonomy';
 
 export interface StudyRoomsViewProps {
   rooms: StudyRoom[];
+  /** True while the initial rooms request is in flight */
+  isLoading?: boolean | undefined;
   isAr: boolean;
   isAuthenticated?: boolean | undefined;
   currentUser: {
@@ -50,6 +58,7 @@ type LabViewMode = 'grid' | 'table' | 'colleges';
 
 export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
   rooms,
+  isLoading = false,
   isAr,
   isAuthenticated = false,
   currentUser,
@@ -64,7 +73,9 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [countdownMap, setCountdownMap] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeKind, setActiveKind] = useState<RoomKind | 'all'>('all');
+  const [activeLocation, setActiveLocation] = useState<string>('all');
+  const [onlyAvailable, setOnlyAvailable] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<LabViewMode>('grid');
 
   useEffect(() => {
@@ -94,90 +105,49 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
     }
   };
 
-  // Filtered rooms based on Category and Search Query
-  const filteredRooms = useMemo(() => {
-    return roomList.filter(room => {
-      // Category match
-      if (activeCategory !== 'all') {
-        const code = room.roomCode || room.id;
-        if (
-          activeCategory === 'software' &&
-          !code.startsWith('LAB-101') &&
-          !code.startsWith('LAB-102')
-        ) {
-          return false;
-        }
-        if (activeCategory === 'cyber' && !code.startsWith('LAB-103')) {
-          return false;
-        }
-        if (
-          activeCategory === 'hardware' &&
-          !code.startsWith('LAB-104') &&
-          !code.startsWith('LAB-205')
-        ) {
-          return false;
-        }
-        if (activeCategory === 'discussion' && !code.startsWith('ROOM-')) {
-          return false;
-        }
-        if (activeCategory === 'focus' && !code.startsWith('POD-')) {
-          return false;
-        }
-      }
+  // Filters are derived from the room data itself (code prefix, type, building)
+  const filteredRooms = useMemo(
+    () =>
+      roomList.filter(room => {
+        if (activeKind !== 'all' && getRoomKind(room) !== activeKind) return false;
+        if (activeLocation !== 'all' && getRoomLocation(room).key !== activeLocation) return false;
+        if (onlyAvailable && room.status !== 'available') return false;
+        return matchesRoomQuery(room, searchQuery);
+      }),
+    [roomList, activeKind, activeLocation, onlyAvailable, searchQuery]
+  );
 
-      // Search query match
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const nameMatch =
-          (room.name && room.name.toLowerCase().includes(q)) ||
-          (room.nameEn && room.nameEn.toLowerCase().includes(q));
-        const codeMatch =
-          (room.roomCode && room.roomCode.toLowerCase().includes(q)) ||
-          room.id.toLowerCase().includes(q);
-        const bldgMatch =
-          (room.building && room.building.toLowerCase().includes(q)) ||
-          (room.buildingEn && room.buildingEn.toLowerCase().includes(q));
-        const specsMatch =
-          (room.specs && room.specs.some(s => s.toLowerCase().includes(q))) ||
-          (room.specsEn && room.specsEn.some(s => s.toLowerCase().includes(q)));
-        return nameMatch || codeMatch || bldgMatch || specsMatch;
-      }
+  const locations = useMemo(() => collectLocations(roomList), [roomList]);
 
-      return true;
+  const stats = useMemo(() => {
+    const byKind: Record<RoomKind, number> = { lab: 0, room: 0, pod: 0 };
+    let available = 0;
+    let inUse = 0;
+    roomList.forEach(room => {
+      byKind[getRoomKind(room)] += 1;
+      if (room.status === 'available') available += 1;
+      if (room.status === 'in-use') inUse += 1;
     });
-  }, [roomList, activeCategory, searchQuery]);
+    return { byKind, available, inUse };
+  }, [roomList]);
 
-  // Grouped by Faculty
-  const facultyGroups = useMemo(() => {
-    const computing = filteredRooms.filter(
-      r => r.id.startsWith('LAB-101') || r.id.startsWith('LAB-102') || r.id.startsWith('LAB-103')
-    );
-    const engineering = filteredRooms.filter(
-      r => r.id.startsWith('LAB-104') || r.id.startsWith('LAB-205') || r.id.startsWith('ROOM-A04')
-    );
-    const businessAndLibrary = filteredRooms.filter(
-      r => !computing.includes(r) && !engineering.includes(r)
-    );
-    return [
-      {
-        id: 'computing',
-        titleAr: 'كلية الحاسب الآلي وتقنية المعلومات والذكاء الاصطناعي',
-        titleEn: 'College of Computing & Artificial Intelligence',
-        rooms: computing,
-      },
-      {
-        id: 'engineering',
-        titleAr: 'كلية الهندسة والميكاترونكس والدوائر الرقمية',
-        titleEn: 'College of Engineering & Robotics',
-        rooms: engineering,
-      },
-      {
-        id: 'shared',
-        titleAr: 'المكتبة المركزية وحاضنة مشاريع التخرج والسيمنار',
-        titleEn: 'Central Library, Capstone Hub & Seminar Halls',
-        rooms: businessAndLibrary,
-      },
-    ].filter(g => g.rooms.length > 0);
+  // Grouped by building / college, preserving first-seen order
+  const locationGroups = useMemo(() => {
+    const groups = new Map<string, { key: string; ar: string; en: string; rooms: StudyRoom[] }>();
+    filteredRooms.forEach(room => {
+      const loc = getRoomLocation(room);
+      const key = loc.key || 'other';
+      const group = groups.get(key);
+      if (group) group.rooms.push(room);
+      else
+        groups.set(key, {
+          key,
+          ar: loc.ar || 'أخرى',
+          en: loc.en || 'Other',
+          rooms: [room],
+        });
+    });
+    return Array.from(groups.values());
   }, [filteredRooms]);
 
   // Live countdown timer for active sessions
@@ -261,440 +231,278 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
     }
   };
 
-  const activeInUseRoom = roomList.find(r => r.status === 'in-use');
+  const kindIcon = (kind: RoomKind) =>
+    kind === 'lab' ? FlaskConical : kind === 'pod' ? DoorClosed : Users;
 
-  // Render a Single Smart Lab Card (Unified Card Design System matching Image 2)
-  const renderLabCard = (room: StudyRoom) => {
+  const renderStatusBadge = (room: StudyRoom, compact = false) => {
     const isInUse = room.status === 'in-use';
     const isReserved = room.status === 'reserved';
+    const isMaintenance = room.status === 'maintenance';
+    const remainingMins = countdownMap[room.id] ?? room.activeBooking?.remainingMinutes;
+    const cls = isInUse
+      ? 'badge-occupied'
+      : isReserved
+        ? 'badge-flex'
+        : isMaintenance
+          ? 'badge-faculty'
+          : 'badge-available';
+    let label: string;
+    if (isInUse) {
+      label = isAr ? 'مشغول حالياً' : 'In Session';
+      if (compact && remainingMins !== undefined) {
+        label += isAr ? ` (${remainingMins} د)` : ` (${remainingMins}m)`;
+      }
+    } else if (isReserved) {
+      label = isAr ? 'محجوز' : 'Reserved';
+    } else if (isMaintenance) {
+      label = isAr ? 'صيانة' : 'Maintenance';
+    } else {
+      label = isAr ? 'متاح الآن' : 'Available';
+    }
+    return <span className={`badge ${cls} room-status-badge`}>{label}</span>;
+  };
+
+  const renderActions = (room: StudyRoom, compact = false) => {
+    if (room.status === 'in-use') {
+      return (
+        <>
+          <button
+            className="btn-outline extend-lab-time-btn"
+            data-testid={`extend-room-${room.id}`}
+            disabled={isProcessing}
+            onClick={() => handleExtend(room.id)}
+            type="button"
+          >
+            <Clock size={14} />
+            <span>{isAr ? '+10 د' : '+10 min'}</span>
+          </button>
+          <button
+            className="btn-primary release-lab-btn"
+            data-testid={`release-room-${room.id}`}
+            disabled={isProcessing}
+            onClick={() => handleRelease(room.id)}
+            type="button"
+          >
+            <Check size={14} />
+            <span>{isAr ? (compact ? 'إخلاء' : 'إخلاء القاعة') : 'Release'}</span>
+          </button>
+        </>
+      );
+    }
+    return (
+      <button
+        className="btn-primary book-room-now-btn"
+        data-testid={`book-room-btn-${room.id}`}
+        disabled={room.status === 'maintenance'}
+        onClick={() => {
+          soundFX.playClick();
+          setSelectedRoom(room);
+        }}
+        type="button"
+      >
+        <Calendar size={14} />
+        <span>{isAr ? 'احجز الآن' : 'Reserve'}</span>
+      </button>
+    );
+  };
+
+  // Compact resource card — only shows fields that exist in the room data
+  const renderLabCard = (room: StudyRoom) => {
+    const isInUse = room.status === 'in-use';
+    const kind = getRoomKind(room);
+    const KindIcon = kindIcon(kind);
     const displayName = isAr ? room.name : room.nameEn || room.name;
     const displayBuilding = isAr ? room.building : room.buildingEn || room.building;
     const displayCapacity = isAr ? room.capacity : room.capacityEn || room.capacity;
     const displayBadge = isAr ? room.typeBadge : room.typeBadgeEn || room.typeBadge;
-    const remainingMins = countdownMap[room.id] ?? room.activeBooking?.remainingMinutes ?? 15;
-    const totalMins = room.activeBooking?.totalMinutes ?? 20;
-    const progressPercent = Math.min(100, Math.max(5, (remainingMins / totalMins) * 100));
-    const utilization = room.utilizationPercent ?? (isInUse ? 85 : 25);
-    const requirementNote = isAr
-      ? room.requirementNote || 'متاح لجميع التخصصات الهندسية والحاسوبية'
-      : room.requirementNoteEn || 'Open to all engineering & IT disciplines';
+    const availableFrom = isAr ? room.availableFrom : room.availableFromEn || room.availableFrom;
+    const requirementNote = isAr ? room.requirementNote : room.requirementNoteEn;
+    const specs = (isAr ? room.specs : room.specsEn?.length ? room.specsEn : room.specs) ?? [];
+    const remainingMins = countdownMap[room.id] ?? room.activeBooking?.remainingMinutes;
+    const totalMins = room.activeBooking?.totalMinutes;
+    const progressPercent =
+      remainingMins !== undefined && totalMins
+        ? Math.min(100, Math.max(5, (remainingMins / totalMins) * 100))
+        : undefined;
 
     return (
-      <div key={room.id} className="room-card" data-testid={`room-card-${room.id}`}>
-        <div>
-          {/* Top Head with badges */}
-          <div className="room-card-head">
-            <span className="room-badge-type">
-              <Monitor size={13} color="var(--fbsu-primary)" />
-              <span>{displayBadge}</span>
-            </span>
+      <article
+        key={room.id}
+        className={`room-card room-card--${room.status}`}
+        data-testid={`room-card-${room.id}`}
+      >
+        <header className="room-card-head">
+          <span className="room-badge-type">
+            <KindIcon size={13} />
+            <span>{displayBadge}</span>
+          </span>
+          {renderStatusBadge(room)}
+        </header>
 
-            <span
-              className={`badge ${
-                isInUse ? 'badge-occupied' : isReserved ? 'badge-flex' : 'badge-available'
-              }`}
-            >
-              {isInUse
-                ? isAr
-                  ? 'مشغول حالياً (جلسة نشطة)'
-                  : 'In Session'
-                : isReserved
-                  ? isAr
-                    ? 'محجوز'
-                    : 'Reserved'
-                  : isAr
-                    ? 'شاغر ومتاح الآن'
-                    : 'Available Now'}
-            </span>
+        <h4 className="room-title">{displayName}</h4>
+
+        <div className="room-meta">
+          <span className="room-meta-item">
+            <MapPin size={13} />
+            <span>{displayBuilding}</span>
+          </span>
+          <span className="room-meta-item">
+            <Users size={13} />
+            <span>{displayCapacity}</span>
+          </span>
+          {room.roomCode && <span className="room-code-chip">{room.roomCode}</span>}
+        </div>
+
+        {isInUse && room.activeBooking ? (
+          <div className="room-active-timer-box">
+            <div className="timer-header-flex">
+              <span className="timer-team-label">{room.activeBooking.purpose}</span>
+              {remainingMins !== undefined && (
+                <span className="countdown-digits">
+                  {remainingMins} {isAr ? 'د' : 'min'}
+                </span>
+              )}
+            </div>
+            {progressPercent !== undefined && (
+              <div className="timer-progress-track">
+                <div className="timer-progress-fill" style={{ width: `${progressPercent}%` }} />
+              </div>
+            )}
+            <div className="room-timer-meta">
+              <span>
+                {room.activeBooking.timeSlot ||
+                  [room.activeBooking.startLabel, room.activeBooking.endLabel]
+                    .filter(Boolean)
+                    .join(' - ')}
+              </span>
+              <span className="room-timer-team">
+                {room.activeBooking.teamMembers && room.activeBooking.teamMembers.length > 0
+                  ? room.activeBooking.teamMembers.join(' • ')
+                  : room.activeBooking.teamLead}
+              </span>
+            </div>
           </div>
+        ) : (
+          availableFrom &&
+          room.status !== 'available' && (
+            <div className="room-availability-line">
+              <Clock size={13} />
+              <span>
+                {isAr ? 'متاح من: ' : 'Available from: '}
+                <strong>{availableFrom}</strong>
+              </span>
+            </div>
+          )
+        )}
 
-          <h4 className="room-title">{displayName}</h4>
-          <div className="room-location-text">
-            <MapPin size={13} color="var(--text-dim)" />
-            <span>
-              {displayBuilding} • {isAr ? 'سعة: ' : 'Cap: '}
-              <strong>{displayCapacity}</strong>
-            </span>
-          </div>
-
-          {/* Unified Smart Lab Utilization & Schedule Strip (Design System - Image 2) */}
-          <div className="lab-utilization-strip">
-            <div className="lab-gauge-wrap">
+        {typeof room.utilizationPercent === 'number' && (
+          <div className="room-utilization">
+            <span>{isAr ? 'الإشغال' : 'Utilisation'}</span>
+            <div className="room-utilization-track">
               <div
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  background: `conic-gradient(var(--fbsu-gold) ${utilization * 3.6}deg, rgba(255,255,255,0.08) 0deg)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
-                }}
-              >
-                <div
-                  style={{
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    background: '#071513',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.66rem',
-                    fontWeight: 900,
-                    color: 'var(--fbsu-gold)',
-                  }}
-                >
-                  {utilization}%
-                </div>
-              </div>
-              <div className="lab-gauge-meta">
-                <span className="gauge-label">
-                  {isAr ? 'نسبة الإشغال المعملي' : 'Lab Utilisation'}
-                </span>
-                <span className="gauge-status">
-                  {isInUse
-                    ? isAr
-                      ? 'جلسة طلابية نشطة'
-                      : 'Active Session'
-                    : isAr
-                      ? 'خلال ساعات الدوام'
-                      : 'During working hours'}
-                </span>
-              </div>
+                className="room-utilization-fill"
+                style={{ width: `${Math.min(100, Math.max(0, room.utilizationPercent))}%` }}
+              />
             </div>
-
-            {/* Time Slot Availability Bar */}
-            <div className="lab-timeline-bar">
-              <div className="timeline-hours">
-                <span>09:00</span>
-                <span>13:00</span>
-                <span>17:00</span>
-              </div>
-              <div className="timeline-blocks">
-                <div
-                  className={`timeline-block ${isInUse || isReserved ? 'booked' : 'avail'}`}
-                  title={isInUse ? '09:00 Booked' : '09:00 Available'}
-                >
-                  {isInUse ? '09:00' : '09:00'}
-                </div>
-                <div className="timeline-block avail" title="13:00 Available">
-                  13:00
-                </div>
-                <div
-                  className={`timeline-block ${isReserved ? 'booked' : 'avail'}`}
-                  title="17:00 Slot"
-                >
-                  17:00
-                </div>
-              </div>
-            </div>
+            <strong>{room.utilizationPercent}%</strong>
           </div>
+        )}
 
-          {/* Requirements note badge */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              fontSize: '0.72rem',
-              color: 'var(--text-muted)',
-              marginBottom: '0.75rem',
-              padding: '0.35rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-            }}
-          >
-            <Info size={12} color="var(--fbsu-gold)" />
+        {requirementNote && (
+          <div className="room-requirement-note">
+            <Info size={12} />
             <span>{requirementNote}</span>
           </div>
+        )}
 
-          {/* Active countdown for in-use room */}
-          {isInUse && room.activeBooking && (
-            <div className="room-active-timer-box">
-              <div className="timer-header-flex">
-                <span className="timer-team-label">{room.activeBooking.purpose}</span>
-                <span className="countdown-digits">
-                  {room.activeBooking.timeSlot ||
-                    `${room.activeBooking.startLabel} - ${room.activeBooking.endLabel}`}{' '}
-                  ({remainingMins} {isAr ? 'د متبقية' : 'min left'})
-                </span>
-              </div>
+        {specs.length > 0 && (
+          <ul className="room-spec-chips" aria-label={isAr ? 'التجهيزات' : 'Equipment'}>
+            {specs.slice(0, 3).map((spec, idx) => (
+              <li key={idx} className="room-spec-chip" title={spec}>
+                <CheckCircle2 size={12} />
+                <span>{spec}</span>
+              </li>
+            ))}
+            {specs.length > 3 && (
+              <li className="room-spec-chip room-spec-more" title={specs.slice(3).join('\n')}>
+                +{specs.length - 3}
+              </li>
+            )}
+          </ul>
+        )}
 
-              <div
-                style={{
-                  fontSize: '0.75rem',
-                  color: 'var(--text-muted)',
-                  marginBottom: '0.35rem',
-                }}
-              >
-                {isAr ? 'المجموعة:' : 'Team:'}{' '}
-                <strong>
-                  {room.activeBooking.teamMembers && room.activeBooking.teamMembers.length > 0
-                    ? room.activeBooking.teamMembers.join(' • ')
-                    : room.activeBooking.teamLead}
-                </strong>
-              </div>
-
-              <div className="timer-progress-track">
-                <div className="timer-progress-fill" style={{ width: `${progressPercent}%` }}></div>
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  fontSize: '0.72rem',
-                  color: 'var(--text-dim)',
-                }}
-              >
-                <span>
-                  {isAr
-                    ? `وقت الدخول: ${room.activeBooking.startLabel || '09:00 ص'}`
-                    : `Start: ${room.activeBooking.startLabel || '09:00 AM'}`}
-                </span>
-                <span style={{ color: '#f43f5e', fontWeight: 800 }}>
-                  {isAr
-                    ? `موعد الخروج: ${room.activeBooking.endLabel || '09:40 ص'}`
-                    : `Exit: ${room.activeBooking.endLabel || '09:40 AM'}`}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {!isInUse && !isReserved && (
-            <div className="room-active-timer-box timer-available">
-              <div className="timer-header-flex">
-                <span className="timer-team-label" style={{ color: 'var(--status-available)' }}>
-                  {isAr ? 'القاعة جاهزة للحجز الفوري' : 'Pod Ready For Immediate Use'}
-                </span>
-                <span className="countdown-digits avail">{isAr ? 'متاحة' : 'Open'}</span>
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                {isAr
-                  ? 'يمكنك حجزها الآن لأداء واجباتك مع زملائك وتحديد وقت الخروج بدقة.'
-                  : 'Book for teamwork with your peers with fixed departure time.'}
-              </div>
-            </div>
-          )}
-
-          {/* Specs List */}
-          <div
-            style={{
-              fontSize: '0.76rem',
-              fontWeight: 800,
-              color: 'var(--text-dim)',
-              marginBottom: '0.4rem',
-            }}
-          >
-            {isAr ? 'التجهيزات والتقنيات المتوفرة:' : 'Included Tech & Equipment:'}
-          </div>
-          <div className="room-specs-list">
-            {(isAr ? room.specs : room.specsEn || room.specs)
-              ?.slice(0, 3)
-              .map((spec: string, sIdx: number) => (
-                <div key={sIdx} className="room-spec-item">
-                  <CheckCircle2 size={13} color="var(--status-available)" />
-                  <span>{spec}</span>
-                </div>
-              ))}
-          </div>
-        </div>
-
-        {/* Action buttons */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-          {isInUse ? (
-            <>
-              <button
-                className="btn-outline extend-lab-time-btn"
-                data-testid={`extend-room-${room.id}`}
-                disabled={isProcessing}
-                onClick={() => handleExtend(room.id)}
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  padding: '0.75rem',
-                  fontSize: '0.8rem',
-                }}
-                type="button"
-              >
-                <Clock size={14} />
-                <span>{isAr ? 'تمديد 10 د' : '+10 Mins'}</span>
-              </button>
-              <button
-                className="btn-primary release-lab-btn"
-                data-testid={`release-room-${room.id}`}
-                disabled={isProcessing}
-                onClick={() => handleRelease(room.id)}
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  padding: '0.75rem',
-                  fontSize: '0.8rem',
-                  background: 'var(--status-available)',
-                  borderColor: 'var(--status-available)',
-                }}
-                type="button"
-              >
-                <Check size={14} />
-                <span>{isAr ? 'إخلاء المعمل الآن' : 'Release Lab'}</span>
-              </button>
-            </>
-          ) : (
-            <button
-              className="btn-primary book-room-now-btn"
-              data-testid={`book-room-btn-${room.id}`}
-              onClick={() => {
-                soundFX.playClick();
-                setSelectedRoom(room);
-              }}
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-                padding: '0.85rem',
-                fontSize: '0.88rem',
-              }}
-              type="button"
-            >
-              <Calendar size={16} color="#ffffff" />
-              <span>{isAr ? 'حجز هذه القاعة لمجموعتك' : 'Book Room for Your Team'}</span>
-            </button>
-          )}
-        </div>
-      </div>
+        <footer className="room-card-actions">{renderActions(room)}</footer>
+      </article>
     );
   };
 
+  const activeInUseRoom = roomList.find(r => r.status === 'in-use');
+  const hasActiveFilters =
+    searchQuery.trim() !== '' || activeKind !== 'all' || activeLocation !== 'all' || onlyAvailable;
+
+  const resetFilters = () => {
+    setSearchQuery('');
+    setActiveKind('all');
+    setActiveLocation('all');
+    setOnlyAvailable(false);
+  };
+
   return (
-    <div data-testid="study-rooms-view">
-      <div className="section-head">
-        <span className="section-eyebrow">
-          <DoorClosed size={16} color="var(--fbsu-gold)" />
-          <span>{isAr ? 'المعامل والقاعات الدراسية' : 'Study Rooms & Labs Hub'}</span>
-        </span>
-        <h3 className="section-title">
-          {isAr
-            ? 'حجز القاعات والمعامل الطلابية للعمل الجماعي'
-            : 'FBSU Interactive Study Pods & Specialized Labs'}
-        </h3>
-        <p className="section-subtitle">
-          {isAr
-            ? 'مساحات عمل جماعية ومجهزة للطلاب لإنجاز المهام والتكاليف (Classwork, Assignment, Homework). يتم الحجز بوقت دقيق ومحدد (مثلاً من 09:00 ص إلى 09:20 ص) مع عداد تنازلي نشط لضمان إخلاء المعمل في الموعد المحدد!'
-            : 'Collaborative spaces for students to finish Classwork, Assignments & Homework with precise reservation windows (e.g. 09:00 to 09:20 AM) and live countdowns!'}
-        </p>
-      </div>
-
-      {actionError && (
-        <div
-          data-testid="study-rooms-error-banner"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.85rem 1.25rem',
-            marginBottom: '1.5rem',
-            borderRadius: 'var(--radius-md)',
-            background: 'rgba(244,63,94,0.12)',
-            border: '1px solid rgba(244,63,94,0.35)',
-            color: '#fda4af',
-            fontSize: '0.86rem',
-            fontWeight: 700,
-          }}
-        >
-          <AlertCircle size={18} />
-          <span>{actionError}</span>
-        </div>
-      )}
-
-      {/* Hub Header Action & View Mode Switcher */}
-      <div className="campus-hub-toolbar" style={{ flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span className="pulse-dot-green"></span>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 800 }}>
-            {activeInUseRoom
-              ? isAr
-                ? `${activeInUseRoom.name} مشغول حالياً بجلسة عمل جماعي لـ (${activeInUseRoom.activeBooking?.teamLead || 'الطلاب'})`
-                : `${activeInUseRoom.nameEn || activeInUseRoom.name} actively in use by ${activeInUseRoom.activeBooking?.teamLeadEn || activeInUseRoom.activeBooking?.teamLead || 'student team'}`
-              : isAr
-                ? 'جميع القاعات والمعامل جاهزة ومتاحة للحجز الفوري'
-                : 'All study pods and specialized labs are ready for immediate reservation'}
+    <div data-testid="study-rooms-view" className="rooms-hub">
+      <div className="rooms-hub-head">
+        <div>
+          <span className="section-eyebrow">
+            <DoorClosed size={15} />
+            <span>{isAr ? 'المعامل والقاعات الدراسية' : 'Study Rooms & Labs Hub'}</span>
           </span>
+          <h3 className="rooms-hub-title">
+            {isAr ? 'حجز القاعات والمعامل والمكتبة' : 'Labs, Study Rooms & Library Pods'}
+          </h3>
+          <p className="rooms-hub-subtitle">
+            {activeInUseRoom ? (
+              <>
+                <span className="pulse-dot-green" />
+                {isAr
+                  ? `${activeInUseRoom.name} مشغول حالياً بجلسة لـ ${activeInUseRoom.activeBooking?.teamLead || 'الطلاب'}`
+                  : `${activeInUseRoom.nameEn || activeInUseRoom.name} is in use by ${activeInUseRoom.activeBooking?.teamLeadEn || activeInUseRoom.activeBooking?.teamLead || 'a student team'}`}
+              </>
+            ) : isAr ? (
+              'احجز مساحة لفريقك بوقت محدد مع عداد تنازلي لضمان الإخلاء في الموعد.'
+            ) : (
+              'Reserve a space for your team with a fixed time window and live countdown.'
+            )}
+          </p>
         </div>
 
-        {/* View Mode Switcher: Grid / Compact Table / Faculty Groups */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="rooms-hub-head-actions">
           <div
-            style={{
-              display: 'flex',
-              background: 'rgba(0, 0, 0, 0.4)',
-              padding: '3px',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-subtle)',
-            }}
+            className="rooms-view-switch"
+            role="tablist"
+            aria-label={isAr ? 'طريقة العرض' : 'View mode'}
           >
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playClick();
-                setViewMode('grid');
-              }}
-              className={`hub-filter-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              style={{
-                padding: '0.4rem 0.75rem',
-                fontSize: '0.78rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}
-              title={isAr ? 'عرض بطاقات ذكية' : 'Grid View'}
-            >
-              <LayoutGrid size={14} />
-              <span>{isAr ? 'بطاقات' : 'Cards'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playClick();
-                setViewMode('table');
-              }}
-              className={`hub-filter-btn ${viewMode === 'table' ? 'active' : ''}`}
-              style={{
-                padding: '0.4rem 0.75rem',
-                fontSize: '0.78rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}
-              title={isAr ? 'جدول مضغوط بدون سكرول' : 'Compact Table View (Zero-Scroll)'}
-            >
-              <TableIcon size={14} />
-              <span>{isAr ? 'جدول مضغوط' : 'Table'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playClick();
-                setViewMode('colleges');
-              }}
-              className={`hub-filter-btn ${viewMode === 'colleges' ? 'active' : ''}`}
-              style={{
-                padding: '0.4rem 0.75rem',
-                fontSize: '0.78rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}
-              title={isAr ? 'تجميع حسب الكليات' : 'Colleges Grouped'}
-            >
-              <Building2 size={14} />
-              <span>{isAr ? 'الكليات' : 'Colleges'}</span>
-            </button>
+            {(
+              [
+                { id: 'grid', icon: LayoutGrid, ar: 'بطاقات', en: 'Cards' },
+                { id: 'table', icon: TableIcon, ar: 'جدول', en: 'Table' },
+                { id: 'colleges', icon: Building2, ar: 'حسب المبنى', en: 'By building' },
+              ] as const
+            ).map(v => (
+              <button
+                key={v.id}
+                type="button"
+                role="tab"
+                aria-selected={viewMode === v.id}
+                className={`rooms-view-btn ${viewMode === v.id ? 'active' : ''}`}
+                onClick={() => {
+                  soundFX.playClick();
+                  setViewMode(v.id);
+                }}
+              >
+                <v.icon size={14} />
+                <span>{isAr ? v.ar : v.en}</span>
+              </button>
+            ))}
           </div>
-
           <button
             className="btn-primary"
             data-testid="hub-reserve-room-btn"
@@ -705,485 +513,252 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
             }}
             type="button"
           >
-            <Plus size={16} color="#ffffff" />
-            <span>{isAr ? 'حجز قاعة أو معمل' : 'Reserve Room'}</span>
+            <Plus size={16} />
+            <span>{isAr ? 'حجز سريع' : 'Quick Reserve'}</span>
           </button>
         </div>
       </div>
 
-      {/* Search & Category Filter Toolbar */}
-      <div
-        className="rooms-search-filter-bar"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          marginBottom: '1.5rem',
-          padding: '1.1rem 1.25rem',
-          background: 'var(--surface-card, rgba(11, 59, 54, 0.25))',
-          borderRadius: 'var(--radius-lg, 14px)',
-          border: '1px solid var(--border-subtle, rgba(215, 162, 55, 0.2))',
-          backdropFilter: 'blur(10px)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Search Input Box */}
-          <div style={{ position: 'relative', flex: '1 1 300px', maxWidth: '480px' }}>
-            <Search
-              size={16}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                [isAr ? 'right' : 'left']: '0.85rem',
-                color: 'var(--text-dim, #94a3b8)',
-                pointerEvents: 'none',
-              }}
-            />
+      {/* Live summary computed from the rooms data */}
+      <div className="rooms-kpis">
+        <div className="rooms-kpi">
+          <span className="rooms-kpi-value">{roomList.length}</span>
+          <span className="rooms-kpi-label">{isAr ? 'إجمالي المرافق' : 'Facilities'}</span>
+        </div>
+        <div className="rooms-kpi rooms-kpi--ok">
+          <span className="rooms-kpi-value">{stats.available}</span>
+          <span className="rooms-kpi-label">{isAr ? 'متاح الآن' : 'Available now'}</span>
+        </div>
+        <div className="rooms-kpi rooms-kpi--busy">
+          <span className="rooms-kpi-value">{stats.inUse}</span>
+          <span className="rooms-kpi-label">{isAr ? 'جلسات نشطة' : 'In session'}</span>
+        </div>
+        {ROOM_KINDS.map(kind => (
+          <div key={kind} className="rooms-kpi">
+            <span className="rooms-kpi-value">{stats.byKind[kind]}</span>
+            <span className="rooms-kpi-label">
+              {isAr ? ROOM_KIND_LABELS[kind].ar : ROOM_KIND_LABELS[kind].en}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {actionError && (
+        <div data-testid="study-rooms-error-banner" className="rooms-error-banner" role="alert">
+          <AlertCircle size={18} />
+          <span>{actionError}</span>
+        </div>
+      )}
+
+      {/* Search & filters */}
+      <div className="rooms-toolbar">
+        <div className="rooms-toolbar-row">
+          <div className="rooms-search">
+            <Search size={16} className="rooms-search-icon" />
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              aria-label={isAr ? 'بحث في المعامل والقاعات' : 'Search rooms and labs'}
               placeholder={
                 isAr
-                  ? 'ابحث باسم المعمل، الرمز (LAB-101)، التجهيزات (RTX 4090، Cisco)...'
-                  : 'Search by room code, name, or equipment (RTX 4090, Cisco)...'
+                  ? 'ابحث بالاسم أو الرمز أو المبنى أو التجهيزات...'
+                  : 'Search by name, code, building or equipment...'
               }
-              style={{
-                width: '100%',
-                padding: '0.65rem 2.4rem',
-                background: 'rgba(2, 35, 31, 0.65)',
-                border: '1px solid rgba(215, 162, 55, 0.25)',
-                borderRadius: '8px',
-                color: 'var(--text-main, #f8fafc)',
-                fontSize: '0.85rem',
-                outline: 'none',
-              }}
             />
             {searchQuery && (
               <button
                 type="button"
+                className="rooms-search-clear"
+                aria-label={isAr ? 'مسح البحث' : 'Clear search'}
                 onClick={() => setSearchQuery('')}
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  [isAr ? 'left' : 'right']: '0.75rem',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-dim)',
-                  cursor: 'pointer',
-                  padding: 2,
-                }}
               >
                 <X size={14} />
               </button>
             )}
           </div>
 
-          {/* Sync Button & Count */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span
-              style={{ fontSize: '0.82rem', color: 'var(--text-dim, #94a3b8)', fontWeight: 600 }}
-            >
+          <label className="rooms-toggle">
+            <input
+              type="checkbox"
+              checked={onlyAvailable}
+              onChange={e => setOnlyAvailable(e.target.checked)}
+            />
+            <span>{isAr ? 'المتاح فقط' : 'Available only'}</span>
+          </label>
+
+          <div className="rooms-toolbar-meta">
+            <span>
               {isAr
-                ? `عرض ${filteredRooms.length} من ${roomList.length} مرفق`
-                : `Showing ${filteredRooms.length} of ${roomList.length} facilities`}
+                ? `${filteredRooms.length} من ${roomList.length}`
+                : `${filteredRooms.length} of ${roomList.length}`}
             </span>
             <button
               type="button"
-              className="btn-glass"
+              className="btn-glass rooms-sync-btn"
               onClick={handleSyncRooms}
               disabled={isSyncing}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                padding: '0.5rem 0.9rem',
-                fontSize: '0.8rem',
-              }}
-              title={isAr ? 'تحديث فوري من قاعدة بيانات PostgreSQL' : 'Sync live with PostgreSQL'}
+              title={isAr ? 'تحديث من الخادم' : 'Refresh from server'}
             >
               <RotateCw size={14} className={isSyncing ? 'spin-anim' : ''} />
               <span>
                 {isAr
                   ? isSyncing
-                    ? 'جاري المزامنة...'
-                    : 'تحديث مباشر'
+                    ? 'جاري التحديث...'
+                    : 'تحديث'
                   : isSyncing
                     ? 'Syncing...'
-                    : 'Live Sync'}
+                    : 'Refresh'}
               </span>
             </button>
           </div>
         </div>
 
-        {/* Category Pills */}
         <div
-          style={{
-            display: 'flex',
-            gap: '0.5rem',
-            flexWrap: 'wrap',
-            overflowX: 'auto',
-            paddingBottom: '2px',
-          }}
+          className="rooms-filter-group"
+          role="group"
+          aria-label={isAr ? 'نوع المرفق' : 'Facility type'}
         >
-          {[
-            {
-              id: 'all',
-              labelAr: `الكل (${roomList.length})`,
-              labelEn: `All (${roomList.length})`,
-              icon: Sparkles,
-            },
-            {
-              id: 'software',
-              labelAr: 'معامل البرمجيات و AI',
-              labelEn: 'Software & AI Labs',
-              icon: Terminal,
-            },
-            { id: 'cyber', labelAr: 'أمن سيبراني NOC', labelEn: 'Cyber & NOC', icon: ShieldCheck },
-            {
-              id: 'hardware',
-              labelAr: 'عتاد وروبوتات ودوائر',
-              labelEn: 'Robotics & Hardware',
-              icon: Cpu,
-            },
-            {
-              id: 'discussion',
-              labelAr: 'قاعات عمل ونقاش جماعي',
-              labelEn: 'Discussion Pods',
-              icon: Users,
-            },
-            {
-              id: 'focus',
-              labelAr: 'كبائن تركيز ومقابلات',
-              labelEn: 'Quiet & Interview Pods',
-              icon: DoorClosed,
-            },
-          ].map(cat => {
-            const Icon = cat.icon;
-            const isActive = activeCategory === cat.id;
+          <button
+            type="button"
+            className={`rooms-chip ${activeKind === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveKind('all')}
+          >
+            <Sparkles size={13} />
+            <span>{isAr ? 'الكل' : 'All'}</span>
+            <span className="rooms-chip-count">{roomList.length}</span>
+          </button>
+          {ROOM_KINDS.filter(kind => stats.byKind[kind] > 0).map(kind => {
+            const Icon = kindIcon(kind);
             return (
               <button
-                key={cat.id}
+                key={kind}
                 type="button"
+                className={`rooms-chip ${activeKind === kind ? 'active' : ''}`}
                 onClick={() => {
                   soundFX.playClick();
-                  setActiveCategory(cat.id);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  padding: '0.4rem 0.85rem',
-                  borderRadius: '20px',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  border: isActive
-                    ? '1px solid var(--fbsu-gold, #d7a237)'
-                    : '1px solid rgba(255, 255, 255, 0.1)',
-                  background: isActive ? 'rgba(215, 162, 55, 0.18)' : 'rgba(11, 59, 54, 0.25)',
-                  color: isActive ? 'var(--fbsu-gold, #d7a237)' : 'var(--text-dim, #94a3b8)',
-                  transition: 'all 0.2s ease',
+                  setActiveKind(kind);
                 }}
               >
                 <Icon size={13} />
-                <span>{isAr ? cat.labelAr : cat.labelEn}</span>
+                <span>{isAr ? ROOM_KIND_LABELS[kind].ar : ROOM_KIND_LABELS[kind].en}</span>
+                <span className="rooms-chip-count">{stats.byKind[kind]}</span>
               </button>
             );
           })}
         </div>
+
+        {locations.length > 1 && (
+          <div
+            className="rooms-filter-group rooms-filter-group--sub"
+            role="group"
+            aria-label={isAr ? 'المبنى' : 'Building'}
+          >
+            <span className="rooms-filter-label">
+              <Building2 size={13} />
+              {isAr ? 'المبنى:' : 'Building:'}
+            </span>
+            <button
+              type="button"
+              className={`rooms-chip rooms-chip--sm ${activeLocation === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveLocation('all')}
+            >
+              {isAr ? 'الكل' : 'All'}
+            </button>
+            {locations.map(loc => (
+              <button
+                key={loc.key}
+                type="button"
+                className={`rooms-chip rooms-chip--sm ${activeLocation === loc.key ? 'active' : ''}`}
+                onClick={() => setActiveLocation(loc.key)}
+              >
+                <span>{isAr ? loc.ar : loc.en}</span>
+                <span className="rooms-chip-count">{loc.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Empty State when filter yields 0 matches */}
-      {filteredRooms.length === 0 && (
-        <div
-          style={{
-            padding: '3rem 2rem',
-            textAlign: 'center',
-            background: 'rgba(11, 59, 54, 0.15)',
-            border: '1px dashed rgba(215, 162, 55, 0.3)',
-            borderRadius: 'var(--radius-lg, 14px)',
-            marginBottom: '2rem',
-          }}
-        >
-          <Search
-            size={36}
-            color="var(--fbsu-gold)"
-            style={{ margin: '0 auto 1rem', opacity: 0.7 }}
-          />
-          <h4 style={{ color: 'var(--text-main)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-            {isAr
-              ? 'لم يتم العثور على أي قاعة أو معمل يطابق بحثك'
-              : 'No study rooms or labs match your criteria'}
-          </h4>
-          <p
-            style={{
-              color: 'var(--text-dim)',
-              fontSize: '0.85rem',
-              maxWidth: '420px',
-              margin: '0 auto 1.25rem',
-            }}
-          >
-            {isAr
-              ? 'جرّب البحث بكلمات أخرى أو اختر قطاعاً مختلفاً من التصنيفات أعلاه.'
-              : 'Try different keywords or clear the category filters to see all available campus spaces.'}
-          </p>
-          <button
-            type="button"
-            className="btn-outline"
-            onClick={() => {
-              setSearchQuery('');
-              setActiveCategory('all');
-            }}
-          >
-            {isAr ? 'عرض جميع المعامل والقاعات' : 'Reset All Filters'}
-          </button>
+      {isLoading && roomList.length === 0 && (
+        <div className="rooms-grid" aria-busy="true" data-testid="rooms-loading">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="room-card room-card-skeleton" />
+          ))}
         </div>
       )}
 
-      {/* VIEW MODE 1: Compact Table View (Zero-Scroll Mode) */}
+      {!isLoading && filteredRooms.length === 0 && (
+        <div className="rooms-empty">
+          <Search size={28} />
+          <h4>
+            {roomList.length === 0
+              ? isAr
+                ? 'لا توجد مرافق متاحة حالياً'
+                : 'No facilities loaded yet'
+              : isAr
+                ? 'لا توجد نتائج مطابقة'
+                : 'No rooms or labs match your filters'}
+          </h4>
+          {roomList.length === 0 ? (
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={handleSyncRooms}
+              disabled={isSyncing}
+            >
+              <RotateCw size={14} />
+              <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+            </button>
+          ) : (
+            hasActiveFilters && (
+              <button type="button" className="btn-outline" onClick={resetFilters}>
+                {isAr ? 'مسح عوامل التصفية' : 'Reset filters'}
+              </button>
+            )
+          )}
+        </div>
+      )}
+
       {viewMode === 'table' && filteredRooms.length > 0 && (
-        <div
-          style={{
-            overflowX: 'auto',
-            background: 'rgba(7, 21, 19, 0.85)',
-            border: '1.5px solid rgba(16, 185, 129, 0.22)',
-            borderRadius: 'var(--radius-xl)',
-            boxShadow: '0 12px 34px rgba(0,0,0,0.5)',
-            marginBottom: '2rem',
-          }}
-        >
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              textAlign: isAr ? 'right' : 'left',
-            }}
-          >
+        <div className="rooms-table-wrap">
+          <table className="rooms-table">
             <thead>
-              <tr
-                style={{
-                  borderBottom: '1px solid rgba(255,255,255,0.08)',
-                  background: 'rgba(0,0,0,0.3)',
-                }}
-              >
-                <th
-                  style={{
-                    padding: '0.9rem 1.1rem',
-                    fontSize: '0.78rem',
-                    color: 'var(--fbsu-gold)',
-                  }}
-                >
-                  {isAr ? 'المعمل / القاعة والرمز' : 'Facility & Code'}
-                </th>
-                <th
-                  style={{
-                    padding: '0.9rem 1.1rem',
-                    fontSize: '0.78rem',
-                    color: 'var(--fbsu-gold)',
-                  }}
-                >
-                  {isAr ? 'الكلية والموقع' : 'College & Location'}
-                </th>
-                <th
-                  style={{
-                    padding: '0.9rem 1.1rem',
-                    fontSize: '0.78rem',
-                    color: 'var(--fbsu-gold)',
-                  }}
-                >
-                  {isAr ? 'السعة والتجهيزات' : 'Capacity & Specs'}
-                </th>
-                <th
-                  style={{
-                    padding: '0.9rem 1.1rem',
-                    fontSize: '0.78rem',
-                    color: 'var(--fbsu-gold)',
-                  }}
-                >
-                  {isAr ? 'نسبة الإشغال والجدول' : 'Utilisation & Schedule'}
-                </th>
-                <th
-                  style={{
-                    padding: '0.9rem 1.1rem',
-                    fontSize: '0.78rem',
-                    color: 'var(--fbsu-gold)',
-                  }}
-                >
-                  {isAr ? 'الحالة المباشرة' : 'Status'}
-                </th>
-                <th
-                  style={{
-                    padding: '0.9rem 1.1rem',
-                    fontSize: '0.78rem',
-                    color: 'var(--fbsu-gold)',
-                    textAlign: 'center',
-                  }}
-                >
-                  {isAr ? 'الإجراء السريع' : 'Action'}
-                </th>
+              <tr>
+                <th>{isAr ? 'المرفق' : 'Facility'}</th>
+                <th>{isAr ? 'الموقع' : 'Location'}</th>
+                <th>{isAr ? 'السعة' : 'Capacity'}</th>
+                <th>{isAr ? 'الحالة' : 'Status'}</th>
+                <th>{isAr ? 'متاح من' : 'Next free'}</th>
+                <th className="rooms-table-actions-col">{isAr ? 'إجراء' : 'Action'}</th>
               </tr>
             </thead>
             <tbody>
               {filteredRooms.map(room => {
-                const isInUse = room.status === 'in-use';
-                const isReserved = room.status === 'reserved';
                 const displayName = isAr ? room.name : room.nameEn || room.name;
                 const displayBuilding = isAr ? room.building : room.buildingEn || room.building;
                 const displayCapacity = isAr ? room.capacity : room.capacityEn || room.capacity;
-                const utilization = room.utilizationPercent ?? (isInUse ? 85 : 25);
-                const remainingMins =
-                  countdownMap[room.id] ?? room.activeBooking?.remainingMinutes ?? 15;
-
+                const availableFrom =
+                  room.status === 'available'
+                    ? isAr
+                      ? 'الآن'
+                      : 'Now'
+                    : (isAr ? room.availableFrom : room.availableFromEn || room.availableFrom) ||
+                      '—';
                 return (
-                  <tr
-                    key={room.id}
-                    data-testid={`room-card-${room.id}`}
-                    style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.04)',
-                      transition: 'background 0.2s ease',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = 'rgba(215, 162, 55, 0.05)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'transparent';
-                    }}
-                  >
-                    <td style={{ padding: '0.85rem 1.1rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span
-                          className="room-badge-type"
-                          style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}
-                        >
-                          {room.id}
-                        </span>
-                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>
-                          {displayName}
-                        </strong>
+                  <tr key={room.id} data-testid={`room-card-${room.id}`}>
+                    <td>
+                      <div className="rooms-table-name">
+                        {room.roomCode && <span className="room-code-chip">{room.roomCode}</span>}
+                        <strong>{displayName}</strong>
                       </div>
                     </td>
-                    <td
-                      style={{
-                        padding: '0.85rem 1.1rem',
-                        fontSize: '0.8rem',
-                        color: 'var(--text-dim)',
-                      }}
-                    >
-                      {displayBuilding}
-                    </td>
-                    <td
-                      style={{
-                        padding: '0.85rem 1.1rem',
-                        fontSize: '0.78rem',
-                        color: 'var(--text-muted)',
-                      }}
-                    >
-                      {displayCapacity}
-                    </td>
-                    <td style={{ padding: '0.85rem 1.1rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span
-                          style={{
-                            fontSize: '0.78rem',
-                            fontWeight: 800,
-                            color: 'var(--fbsu-gold)',
-                          }}
-                        >
-                          {utilization}%
-                        </span>
-                        <div
-                          style={{
-                            width: '60px',
-                            height: '6px',
-                            background: 'rgba(255,255,255,0.1)',
-                            borderRadius: '3px',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: `${utilization}%`,
-                              height: '100%',
-                              background: utilization > 80 ? '#f43f5e' : 'var(--fbsu-gold)',
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '0.85rem 1.1rem' }}>
-                      <span
-                        className={`badge ${
-                          isInUse ? 'badge-occupied' : isReserved ? 'badge-flex' : 'badge-available'
-                        }`}
-                        style={{ fontSize: '0.7rem' }}
-                      >
-                        {isInUse
-                          ? isAr
-                            ? `جلسة نشطة (${remainingMins} د)`
-                            : `In Session (${remainingMins}m)`
-                          : isReserved
-                            ? isAr
-                              ? 'محجوز'
-                              : 'Reserved'
-                            : isAr
-                              ? 'شاغر ومتاح'
-                              : 'Available'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '0.85rem 1.1rem', textAlign: 'center' }}>
-                      {isInUse ? (
-                        <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
-                          <button
-                            className="btn-outline extend-lab-time-btn"
-                            data-testid={`extend-room-${room.id}`}
-                            disabled={isProcessing}
-                            onClick={() => handleExtend(room.id)}
-                            style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
-                            type="button"
-                          >
-                            +10 د
-                          </button>
-                          <button
-                            className="btn-primary release-lab-btn"
-                            data-testid={`release-room-${room.id}`}
-                            disabled={isProcessing}
-                            onClick={() => handleRelease(room.id)}
-                            style={{
-                              padding: '0.35rem 0.65rem',
-                              fontSize: '0.75rem',
-                              background: 'var(--status-available)',
-                              borderColor: 'var(--status-available)',
-                            }}
-                            type="button"
-                          >
-                            إخلاء
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          className="btn-primary book-room-now-btn"
-                          data-testid={`book-room-btn-${room.id}`}
-                          onClick={() => {
-                            soundFX.playClick();
-                            setSelectedRoom(room);
-                          }}
-                          style={{ padding: '0.35rem 0.85rem', fontSize: '0.76rem' }}
-                          type="button"
-                        >
-                          {isAr ? 'احجز الآن' : 'Reserve'}
-                        </button>
-                      )}
+                    <td className="rooms-table-dim">{displayBuilding}</td>
+                    <td className="rooms-table-dim">{displayCapacity}</td>
+                    <td>{renderStatusBadge(room, true)}</td>
+                    <td className="rooms-table-dim">{availableFrom}</td>
+                    <td className="rooms-table-actions-col">
+                      <div className="rooms-table-actions">{renderActions(room, true)}</div>
                     </td>
                   </tr>
                 );
@@ -1193,63 +768,24 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
         </div>
       )}
 
-      {/* VIEW MODE 2: College Grouped View */}
-      {viewMode === 'colleges' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          {facultyGroups.map(group => (
-            <div
-              key={group.id}
-              style={{
-                background: 'rgba(7, 21, 19, 0.45)',
-                border: '1px solid rgba(215, 162, 55, 0.2)',
-                borderRadius: 'var(--radius-xl)',
-                padding: '1.25rem',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  marginBottom: '1.2rem',
-                  paddingBottom: '0.65rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
-                <Building2 size={18} color="var(--fbsu-gold)" />
-                <h4
-                  style={{
-                    fontSize: '1.05rem',
-                    fontWeight: 800,
-                    color: 'var(--text-main)',
-                    margin: 0,
-                  }}
-                >
-                  {isAr ? group.titleAr : group.titleEn}
-                </h4>
-                <span
-                  style={{
-                    marginRight: isAr ? 'auto' : undefined,
-                    marginLeft: !isAr ? 'auto' : undefined,
-                    fontSize: '0.75rem',
-                    background: 'rgba(215, 162, 55, 0.15)',
-                    color: 'var(--fbsu-gold)',
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '12px',
-                    fontWeight: 700,
-                  }}
-                >
+      {viewMode === 'colleges' && filteredRooms.length > 0 && (
+        <div className="rooms-groups">
+          {locationGroups.map(group => (
+            <section key={group.key} className="rooms-group">
+              <header className="rooms-group-head">
+                <Building2 size={16} />
+                <h4>{isAr ? group.ar : group.en}</h4>
+                <span className="rooms-group-count">
                   {group.rooms.length} {isAr ? 'مرافق' : 'facilities'}
                 </span>
-              </div>
+              </header>
               <div className="rooms-grid">{group.rooms.map(room => renderLabCard(room))}</div>
-            </div>
+            </section>
           ))}
         </div>
       )}
 
-      {/* VIEW MODE 3: Regular Compact Cards Grid */}
-      {viewMode === 'grid' && (
+      {viewMode === 'grid' && filteredRooms.length > 0 && (
         <div className="rooms-grid">{filteredRooms.map(room => renderLabCard(room))}</div>
       )}
 
