@@ -1317,176 +1317,300 @@ body.theme-light .campus-road-header {
   border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
+/* Responsive Luxury Parking Grid */
 .parking-bays-container {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.35rem;
 }
 
-@media (max-width: 1200px) {
+@media (min-width: 1500px) {
   .parking-bays-container {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1499px) and (min-width: 1080px) {
   .parking-bays-container {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1079px) and (min-width: 680px) {
   .parking-bays-container {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Individual Parking Spot */
+@media (max-width: 679px) {
+  .parking-bays-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Deluxe Parking Spot Card — CampusFlow Unified Card Design System */
 .parking-spot-card {
-  background: linear-gradient(180deg, rgba(24, 24, 27, 0.95) 0%, rgba(15, 15, 18, 0.98) 100%);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 0.65rem 0.65rem 0.65rem;
+  background: linear-gradient(180deg, rgba(13, 29, 26, 0.96) 0%, rgba(7, 18, 16, 0.98) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.22);
+  border-radius: 20px;
+  padding: 1.25rem 1.15rem 1rem 1.15rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
-  min-height: 200px;
+  min-height: 330px;
   position: relative;
   cursor: pointer;
   transition: all 0.25s var(--ease);
   overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.52);
 }
 
 .parking-spot-card:hover {
-  transform: translateY(-4px) scale(1.015);
-  border-color: var(--border-active);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  transform: translateY(-4px) scale(1.012);
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.65), 0 0 20px rgba(16, 185, 129, 0.15);
 }
 
 .parking-spot-card.available {
-  border-color: var(--status-available-border);
+  border-color: rgba(16, 185, 129, 0.26);
 }
-.parking-spot-card.available::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--status-available);
+.parking-spot-card.available:hover {
+  border-color: rgba(16, 185, 129, 0.55);
 }
 
 .parking-spot-card.occupied {
-  border-color: var(--status-occupied-border);
+  border-color: rgba(239, 68, 68, 0.22);
 }
-.parking-spot-card.occupied::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--status-occupied);
+.parking-spot-card.occupied:hover {
+  border-color: rgba(239, 68, 68, 0.45);
 }
 
 .parking-spot-card.flex-share {
-  border-color: var(--fbsu-gold-border);
-  background: var(--status-flex-bg);
+  border-color: rgba(245, 158, 11, 0.3);
 }
-.parking-spot-card.flex-share::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--fbsu-gold);
+.parking-spot-card.flex-share:hover {
+  border-color: rgba(245, 158, 11, 0.6);
 }
 
 .parking-spot-card.reserved-user {
-  border-color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.45);
 }
-.parking-spot-card.reserved-user::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #3b82f6;
+.parking-spot-card.reserved-user:hover {
+  border-color: rgba(59, 130, 246, 0.7);
 }
 
 .parking-spot-card.faculty-spot {
-  border-color: var(--status-faculty-border);
+  border-color: rgba(168, 85, 247, 0.3);
 }
-.parking-spot-card.faculty-spot::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--status-faculty);
+.parking-spot-card.faculty-spot:hover {
+  border-color: rgba(168, 85, 247, 0.6);
 }
 
-/* Rubber Wheel Stop at Top of Stall */
-.parking-bay-wheel-stop {
-  width: 54px;
-  height: 5px;
-  background: repeating-linear-gradient(90deg, #27272a 0px, #27272a 8px, #eab308 8px, #eab308 14px);
-  border-radius: 2px;
-  margin: 0.25rem auto 0.15rem auto;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+/* Card Top Strip */
+.card-top-strip {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 
-/* IoT Ceiling Ultrasonic Sensor */
-.iot-ceiling-sensor {
-  width: 13px;
-  height: 13px;
+.card-brand-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-brand-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-dim);
+  line-height: 1.2;
+}
+
+.card-model-title {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0.2rem 0 0 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-badges-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.bay-indicator-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+}
+
+.bay-num-text {
+  font-family: var(--font-en);
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: #ffffff;
+}
+
+.iot-ceiling-sensor-mini {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  transition: all 0.3s ease;
 }
 
-.iot-ceiling-sensor .sensor-core {
-  width: 6px;
-  height: 6px;
+.iot-ceiling-sensor-mini .sensor-core {
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   display: block;
 }
 
-.spot-top-meta {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.spot-number {
-  font-size: 1.05rem;
-  font-weight: 800;
-  font-family: var(--font-en);
-}
-
-.spot-zone-badge {
-  font-size: 0.68rem;
+.card-status-pill {
+  font-size: 0.65rem;
   font-weight: 700;
-  color: var(--text-dim);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  white-space: nowrap;
 }
 
+/* Center Visual */
 .spot-visual-center {
-  margin: 0.35rem 0;
+  margin: 0.85rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 96px;
+  min-height: 124px;
+  position: relative;
+}
+
+/* Minimal Metadata Strip */
+.card-minimal-meta {
+  width: 100%;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.meta-spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.meta-color-year {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.meta-plate-code {
+  font-family: var(--font-en);
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--fbsu-gold);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 4px;
+  padding: 0.08rem 0.4rem;
+}
+
+.meta-rate-chip {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--status-available);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  border-radius: 4px;
+  padding: 0.08rem 0.4rem;
+}
+
+.meta-driver-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.74rem;
+}
+
+.meta-occupant-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.driver-name {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.time-remaining-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #f87171;
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+.reward-chip {
+  color: var(--fbsu-gold);
+  font-weight: 800;
+  font-size: 0.72rem;
+}
+
+.access-info-text {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+}
+
+.vacant-ready-tag {
+  color: var(--status-available);
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+/* Bottom Full-Width Rounded Button */
+.card-cta-row {
+  width: 100%;
+  margin-top: 0.85rem;
+}
+
+.card-action-btn {
+  width: 100%;
+  height: 42px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  letter-spacing: 0.2px;
 }
 
 /* Realistic Parked Car Wrapper */
@@ -2345,6 +2469,85 @@ body.theme-light .hub-filter-btn {
   color: var(--text-main);
   margin-bottom: 0.75rem;
   line-height: 1.35;
+}
+
+/* Smart Labs Utilization & Schedule Strip (Unified Card Design System) */
+.lab-utilization-strip {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lab-gauge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.lab-gauge-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.gauge-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.gauge-status {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.lab-timeline-bar {
+  flex: 1;
+  max-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.timeline-hours {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.58rem;
+  font-family: var(--font-en);
+  color: var(--text-dim);
+}
+
+.timeline-blocks {
+  display: flex;
+  gap: 4px;
+  height: 18px;
+}
+
+.timeline-block {
+  flex: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.timeline-block.avail {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.timeline-block.booked {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .tutoring-top-bar {

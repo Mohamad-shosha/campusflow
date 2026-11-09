@@ -7,7 +7,140 @@ export interface CarVisualTheme {
   gradientEnd: string;
   type: 'sedan' | 'suv' | 'luxury' | 'ev';
   modelLabel: string;
+  brand: string;
+  model: string;
+  year: string;
+  colorNameAr: string;
+  colorNameEn: string;
   plateLabel: string;
+}
+
+export interface CarBrandModel {
+  brand: string;
+  model: string;
+  year: string;
+  colorNameAr: string;
+  colorNameEn: string;
+}
+
+export function parseVehicleBrandModel(
+  carTextRaw: string | null | undefined,
+  paletteKey: string,
+  defaultModel = 'Toyota Camry'
+): CarBrandModel {
+  const text = (carTextRaw || defaultModel).trim();
+  let brand = 'Toyota';
+  let model = 'Camry Hybrid';
+  let year = '2024';
+
+  const lower = text.toLowerCase();
+  if (lower.includes('infiniti') || lower.includes('إنفينيتي') || lower.includes('qx80')) {
+    brand = 'Infiniti';
+    model = lower.includes('qx80') ? 'QX80' : 'Q50 Sport';
+    year = '2023';
+  } else if (lower.includes('lexus') || lower.includes('لكزس')) {
+    brand = 'Lexus';
+    model = lower.includes('lx') ? 'LX 600' : 'ES 350';
+    year = '2024';
+  } else if (lower.includes('mercedes') || lower.includes('مرسيدس') || lower.includes('e300')) {
+    brand = 'Mercedes-Benz';
+    model = lower.includes('s') ? 'S-Class' : 'E300 Luxury';
+    year = '2024';
+  } else if (lower.includes('bmw') || lower.includes('بي إم دبليو') || lower.includes('x5')) {
+    brand = 'BMW';
+    model = lower.includes('x5') ? 'X5 xDrive' : '530i M-Sport';
+    year = '2024';
+  } else if (lower.includes('audi') || lower.includes('أودي') || lower.includes('a6')) {
+    brand = 'Audi';
+    model = 'A6 S-Line';
+    year = '2024';
+  } else if (lower.includes('ford') || lower.includes('فورد') || lower.includes('تورس')) {
+    brand = 'Ford';
+    model = lower.includes('f-150') || lower.includes('f150') ? 'F-150' : 'Taurus Titanium';
+    year = '2024';
+  } else if (lower.includes('chevrolet') || lower.includes('شيفروليه') || lower.includes('كابرس')) {
+    brand = 'Chevrolet';
+    model = 'Caprice SS';
+    year = '2024';
+  } else if (lower.includes('genesis') || lower.includes('جينيسيس') || lower.includes('g80')) {
+    brand = 'Genesis';
+    model = 'G80 Royal';
+    year = '2024';
+  } else if (lower.includes('lucid') || lower.includes('لوسيد')) {
+    brand = 'Lucid Motors';
+    model = 'Air Pure';
+    year = '2024';
+  } else if (lower.includes('tesla') || lower.includes('تسلا')) {
+    brand = 'Tesla';
+    model = lower.includes('y') ? 'Model Y' : 'Model 3';
+    year = '2024';
+  } else if (lower.includes('porsche') || lower.includes('بورشه') || lower.includes('تايكان')) {
+    brand = 'Porsche';
+    model = 'Taycan 4S';
+    year = '2024';
+  } else if (lower.includes('nissan') || lower.includes('نيسان')) {
+    brand = 'Nissan';
+    model = lower.includes('باترول') || lower.includes('patrol') ? 'Patrol Platinum' : 'Altima';
+    year = '2024';
+  } else if (lower.includes('kia') || lower.includes('كيا') || lower.includes('k5')) {
+    brand = 'Kia';
+    model = 'K5 GT-Line';
+    year = '2024';
+  } else if (lower.includes('honda') || lower.includes('هوندا') || lower.includes('أكورد')) {
+    brand = 'Honda';
+    model = 'Accord Sport';
+    year = '2024';
+  } else if (lower.includes('hyundai') || lower.includes('هيونداي') || lower.includes('سوناتا')) {
+    brand = 'Hyundai';
+    model = 'Sonata';
+    year = '2024';
+  } else if (lower.includes('jeep') || lower.includes('جيب') || lower.includes('wrangler')) {
+    brand = 'Jeep';
+    model = 'Wrangler';
+    year = '2023';
+  } else if (lower.includes('لاند كروزر') || lower.includes('land cruiser')) {
+    brand = 'Toyota';
+    model = 'Land Cruiser VXR';
+    year = '2024';
+  } else if (lower.includes('برادو') || lower.includes('prado')) {
+    brand = 'Toyota';
+    model = 'Prado TXL';
+    year = '2024';
+  } else if (lower.includes('أفالون') || lower.includes('avalon')) {
+    brand = 'Toyota';
+    model = 'Avalon Premium';
+    year = '2024';
+  } else if (lower.includes('كامري') || lower.includes('camry')) {
+    brand = 'Toyota';
+    model = 'Camry Hybrid';
+    year = '2024';
+  } else if (lower.includes('corolla') || lower.includes('كورولا')) {
+    brand = 'Toyota';
+    model = 'Corolla';
+    year = '2024';
+  }
+
+  const COLOR_NAMES: Record<string, { ar: string; en: string }> = {
+    emerald: { ar: 'أخضر زمردي', en: 'Emerald Green' },
+    navy: { ar: 'كحلي ياقوتي', en: 'Sapphire Navy' },
+    crimson: { ar: 'أحمر قرمزي', en: 'Ruby Crimson' },
+    silver: { ar: 'فضي تيتانيوم', en: 'Titanium Silver' },
+    white: { ar: 'أبيض لؤلؤي', en: 'Pearl White' },
+    black: { ar: 'أسود ملكي', en: 'Obsidian Black' },
+    amber: { ar: 'ذهبي كهرماني', en: 'Desert Amber' },
+    cyan: { ar: 'سماوي كهربائي', en: 'Electric Cyan' },
+    charcoal: { ar: 'رمادي داكن', en: 'Slate Charcoal' },
+  };
+
+  const colorMeta = COLOR_NAMES[paletteKey] || { ar: 'أبيض لؤلؤي', en: 'Pearl White' };
+
+  return {
+    brand,
+    model,
+    year,
+    colorNameAr: colorMeta.ar,
+    colorNameEn: colorMeta.en,
+  };
 }
 
 /**
@@ -85,7 +218,7 @@ export const CAR_PALETTES: Record<
 /**
  * Extracts or assigns authentic color and body type for any parking spot.
  */
-export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
+function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'brand' | 'model' | 'year' | 'colorNameAr' | 'colorNameEn'> {
   const carText = `${spot.car || ''} ${(spot as any).carColor || ''} ${spot.occupant || ''}`.toLowerCase();
   const occupant = (spot.occupant || '').toLowerCase();
 
@@ -364,5 +497,25 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     type: 'sedan',
     modelLabel: spot.car || (occupant ? chosenModel : 'Toyota Camry'),
     plateLabel: spot.plate || 'ب ط ك 1234',
+  };
+}
+
+export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
+  const baseTheme = getCarVisualThemeInternal(spot);
+  const foundPaletteKey =
+    Object.keys(CAR_PALETTES).find(k => CAR_PALETTES[k]?.base === baseTheme.color) || 'emerald';
+  const brandModel = parseVehicleBrandModel(
+    spot.car || baseTheme.modelLabel,
+    foundPaletteKey,
+    baseTheme.modelLabel
+  );
+
+  return {
+    ...baseTheme,
+    brand: brandModel.brand,
+    model: brandModel.model,
+    year: brandModel.year,
+    colorNameAr: brandModel.colorNameAr,
+    colorNameEn: brandModel.colorNameEn,
   };
 }

@@ -236,6 +236,76 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     </div>
                   </div>
 
+                  {/* Utilization Gauge & Timeline Schedule Row (Unified Card Design System) */}
+                  <div className="lab-utilization-strip">
+                    <div className="lab-gauge-wrap">
+                      <svg width="44" height="44" viewBox="0 0 44 44">
+                        <circle
+                          cx="22"
+                          cy="22"
+                          r="17"
+                          fill="none"
+                          stroke="rgba(255,255,255,0.08)"
+                          strokeWidth="3.5"
+                        />
+                        <circle
+                          cx="22"
+                          cy="22"
+                          r="17"
+                          fill="none"
+                          stroke={isAvailable ? '#10b981' : '#f59e0b'}
+                          strokeWidth="3.5"
+                          strokeDasharray="106"
+                          strokeDashoffset={isAvailable ? '80' : '26'}
+                          strokeLinecap="round"
+                          transform="rotate(-90 22 22)"
+                        />
+                        <text
+                          x="22"
+                          y="26"
+                          textAnchor="middle"
+                          fill="#ffffff"
+                          fontSize="9.5"
+                          fontWeight="800"
+                        >
+                          {isAvailable ? '25%' : '80%'}
+                        </text>
+                      </svg>
+                      <div className="lab-gauge-meta">
+                        <span className="gauge-label">
+                          {isAr ? 'الإشغال اللحظي' : 'Cluster Load'}
+                        </span>
+                        <span className="gauge-status">
+                          {isAr
+                            ? isAvailable
+                              ? 'محطات متاحة'
+                              : 'ضغط حوسبي عالي'
+                            : isAvailable
+                              ? 'GPU Available'
+                              : 'High Compute'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="lab-timeline-bar">
+                      <div className="timeline-hours">
+                        <span>09:00</span>
+                        <span>13:00</span>
+                        <span>17:00</span>
+                      </div>
+                      <div className="timeline-blocks">
+                        <div className={`timeline-block ${isAvailable ? 'avail' : 'booked'}`}>
+                          <span>
+                            {isAvailable ? (isAr ? 'متاح' : 'Avail') : isAr ? 'حجز' : 'Booked'}
+                          </span>
+                        </div>
+                        <div className="timeline-block avail">
+                          <span>{isAr ? 'متاح' : 'Avail'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Meta Details Row */}
                   <div className="tutoring-meta-row">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
