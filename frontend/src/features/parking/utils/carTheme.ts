@@ -10,48 +10,57 @@ export interface CarVisualTheme {
   plateLabel: string;
 }
 
-const COLOR_PALETTES: Record<string, { base: string; start: string; mid: string; end: string }> = {
-  teal: {
-    base: '#0d9488',
-    start: '#115e59',
-    mid: '#14b8a6',
-    end: '#042f2e',
-  },
-  crimson: {
-    base: '#b91c1c',
-    start: '#7f1d1d',
-    mid: '#ef4444',
-    end: '#450a0a',
+/**
+ * Authentic automotive color palette:
+ * - emerald: Matches user reference image (#10695e) — rich British Racing / Saudi Royal Green
+ * - navy: Deep Sapphire Navy metallic (#1e3a8a)
+ * - crimson: Ruby Crimson metallic (#b91c1c)
+ * - silver: Titanium Slate Silver (#64748b)
+ * - white: Alpine / Pearl White (#f1f5f9)
+ * - black: Obsidian Midnight Black (#18181b)
+ * - amber: Saudi Desert Amber / Gold (#d97706) — used for AI Flex-Share
+ * - cyan: Electric Cyan / Aqua (#0284c7) — used for EVs (Lucid, Tesla, Taycan)
+ * - charcoal: Off-Road Slate Charcoal (#334155) — used for Prado / Land Cruiser / Patrol SUVs
+ */
+export const CAR_PALETTES: Record<
+  string,
+  { base: string; start: string; mid: string; end: string }
+> = {
+  emerald: {
+    base: '#10695e',
+    start: '#0a423b',
+    mid: '#147e71',
+    end: '#062823',
   },
   navy: {
     base: '#1e3a8a',
     start: '#172554',
-    mid: '#3b82f6',
+    mid: '#2563eb',
     end: '#0f172a',
   },
+  crimson: {
+    base: '#b91c1c',
+    start: '#7f1d1d',
+    mid: '#dc2626',
+    end: '#450a0a',
+  },
   silver: {
-    base: '#94a3b8',
-    start: '#64748b',
-    mid: '#cbd5e1',
-    end: '#334155',
+    base: '#64748b',
+    start: '#334155',
+    mid: '#94a3b8',
+    end: '#1e293b',
   },
   white: {
-    base: '#f8fafc',
-    start: '#e2e8f0',
+    base: '#f1f5f9',
+    start: '#cbd5e1',
     mid: '#ffffff',
-    end: '#cbd5e1',
+    end: '#94a3b8',
   },
   black: {
     base: '#18181b',
     start: '#09090b',
     mid: '#27272a',
     end: '#000000',
-  },
-  purple: {
-    base: '#7c3aed',
-    start: '#5b21b6',
-    mid: '#a855f7',
-    end: '#2e1065',
   },
   amber: {
     base: '#d97706',
@@ -60,28 +69,59 @@ const COLOR_PALETTES: Record<string, { base: string; start: string; mid: string;
     end: '#451a03',
   },
   cyan: {
-    base: '#06b6d4',
-    start: '#0e7490',
-    mid: '#22d3ee',
-    end: '#164e63',
+    base: '#0284c7',
+    start: '#0369a1',
+    mid: '#38bdf8',
+    end: '#0c4a6e',
+  },
+  charcoal: {
+    base: '#334155',
+    start: '#1e293b',
+    mid: '#475569',
+    end: '#0f172a',
   },
 };
 
+/**
+ * Extracts or assigns authentic color and body type for any parking spot.
+ */
 export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
-  const carName = (spot.car || '').toLowerCase();
+  const carText = `${spot.car || ''} ${(spot as any).carColor || ''} ${spot.occupant || ''}`.toLowerCase();
   const occupant = (spot.occupant || '').toLowerCase();
 
-  // 1. EV Charging Zone or Electric Vehicle
+  // 1. Check explicit color keywords in description or carColor prop
+  let explicitPaletteKey: string | null = null;
+  if (carText.includes('أخضر') || carText.includes('زمرد') || carText.includes('green') || carText.includes('emerald')) {
+    explicitPaletteKey = 'emerald';
+  } else if (carText.includes('أحمر') || carText.includes('عنابي') || carText.includes('قرمزي') || carText.includes('red') || carText.includes('crimson')) {
+    explicitPaletteKey = 'crimson';
+  } else if (carText.includes('أزرق') || carText.includes('كحلي') || carText.includes('بحري') || carText.includes('blue') || carText.includes('navy')) {
+    explicitPaletteKey = 'navy';
+  } else if (carText.includes('فضي') || carText.includes('رصاصي') || carText.includes('رمادي') || carText.includes('silver') || carText.includes('gray')) {
+    explicitPaletteKey = 'silver';
+  } else if (carText.includes('أبيض') || carText.includes('لؤلؤي') || carText.includes('white') || carText.includes('pearl')) {
+    explicitPaletteKey = 'white';
+  } else if (carText.includes('أسود') || carText.includes('ملكي') || carText.includes('ليلي') || carText.includes('black')) {
+    explicitPaletteKey = 'black';
+  } else if (carText.includes('ذهبي') || carText.includes('كهرمان') || carText.includes('gold') || carText.includes('amber')) {
+    explicitPaletteKey = 'amber';
+  } else if (carText.includes('سماوي') || carText.includes('تركواز') || carText.includes('cyan') || carText.includes('aqua')) {
+    explicitPaletteKey = 'cyan';
+  }
+
+  // 2. EV Charging Zone or Electric Vehicle
   if (
     spot.isEV ||
     spot.zone === 'D' ||
-    carName.includes('تسلا') ||
-    carName.includes('tesla') ||
-    carName.includes('لوسيد') ||
-    carName.includes('lucid') ||
-    carName.includes('ev')
+    carText.includes('تسلا') ||
+    carText.includes('tesla') ||
+    carText.includes('لوسيد') ||
+    carText.includes('lucid') ||
+    carText.includes('تايكان') ||
+    carText.includes('taycan') ||
+    carText.includes('ev')
   ) {
-    const palette = COLOR_PALETTES['cyan']!;
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['cyan']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -95,10 +135,11 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     };
   }
 
-  // 2. Faculty & Staff Dedicated Spots
+  // 3. Faculty & Staff Dedicated Spots
   if (spot.isFaculty || spot.status === 'faculty' || spot.status === 'faculty-spot') {
-    if (carName.includes('bmw') || carName.includes('x5') || spot.id === 22) {
-      const palette = COLOR_PALETTES['white']!;
+    // Dr. Reem: BMW X5 (White SUV)
+    if (carText.includes('bmw') || carText.includes('x5') || spot.id === 22) {
+      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['white']!;
       return {
         color: palette.base,
         gradientStart: palette.start,
@@ -109,8 +150,22 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
         plateLabel: spot.plate || 'ر ي م 7070',
       };
     }
-    if (carName.includes('audi') || spot.id === 24) {
-      const palette = COLOR_PALETTES['black']!;
+    // Dr. Samir: Mercedes E300 (Emerald Green — Signature Reference Color)
+    if (carText.includes('مرسيدس') || carText.includes('mercedes') || spot.id === 20) {
+      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['emerald']!;
+      return {
+        color: palette.base,
+        gradientStart: palette.start,
+        gradientMid: palette.mid,
+        gradientEnd: palette.end,
+        type: 'luxury',
+        modelLabel: spot.car || 'Mercedes-Benz E300',
+        plateLabel: spot.plate || 'س م ر 2020',
+      };
+    }
+    // Dr. Tariq: Audi A6 (Black Luxury Sedan)
+    if (carText.includes('audi') || spot.id === 24) {
+      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['black']!;
       return {
         color: palette.base,
         gradientStart: palette.start,
@@ -121,8 +176,9 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
         plateLabel: spot.plate || 'ط ر ق 1111',
       };
     }
-    if (carName.includes('جينيسيس') || spot.id === 19) {
-      const palette = COLOR_PALETTES['navy']!;
+    // Dr. Abdullah: Genesis G80 (Navy Luxury Sedan)
+    if (carText.includes('جينيسيس') || spot.id === 19) {
+      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['navy']!;
       return {
         color: palette.base,
         gradientStart: palette.start,
@@ -133,64 +189,12 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
         plateLabel: spot.plate || 'أ ح م 5501',
       };
     }
-    const palette = spot.id % 2 === 0 ? COLOR_PALETTES['purple']! : COLOR_PALETTES['black']!;
-    return {
-      color: palette.base,
-      gradientStart: palette.start,
-      gradientMid: palette.mid,
-      gradientEnd: palette.end,
-      type: 'luxury',
-      modelLabel: spot.car || 'Mercedes-Benz E300',
-      plateLabel: spot.plate || 'د ك ت 2020',
-    };
-  }
 
-  // 3. SUVs & 4x4s
-  if (
-    carName.includes('لاند كروزر') ||
-    carName.includes('land cruiser') ||
-    carName.includes('باترول') ||
-    carName.includes('patrol') ||
-    carName.includes('جيب') ||
-    carName.includes('برادو') ||
-    carName.includes('prado') ||
-    carName.includes('suv') ||
-    carName.includes('x5') ||
-    spot.id === 29
-  ) {
-    const palette = spot.id % 2 === 0 ? COLOR_PALETTES['white']! : COLOR_PALETTES['silver']!;
-    return {
-      color: palette.base,
-      gradientStart: palette.start,
-      gradientMid: palette.mid,
-      gradientEnd: palette.end,
-      type: 'suv',
-      modelLabel: spot.car || (spot.id === 29 ? 'Toyota Prado TXL' : 'Toyota Land Cruiser'),
-      plateLabel: spot.plate || 'ص ح ر 9999',
-    };
-  }
-
-  // 4. Luxury Sedans (Lexus, Mercedes, Genesis, BMW, Audi, Crown)
-  if (
-    carName.includes('لكزس') ||
-    carName.includes('lexus') ||
-    carName.includes('مرسيدس') ||
-    carName.includes('mercedes') ||
-    carName.includes('bmw') ||
-    carName.includes('أودي') ||
-    carName.includes('audi') ||
-    carName.includes('جينيسيس') ||
-    carName.includes('genesis') ||
-    spot.id === 6 ||
-    occupant.includes('شوشه') ||
-    occupant.includes('shousha')
-  ) {
-    const palette =
-      spot.id % 3 === 0
-        ? COLOR_PALETTES['black']!
-        : spot.id % 3 === 1
-          ? COLOR_PALETTES['white']!
-          : COLOR_PALETTES['navy']!;
+    const palette = explicitPaletteKey
+      ? CAR_PALETTES[explicitPaletteKey]!
+      : spot.id % 2 === 0
+        ? CAR_PALETTES['emerald']!
+        : CAR_PALETTES['black']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -198,13 +202,41 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
       gradientEnd: palette.end,
       type: 'luxury',
       modelLabel: spot.car || 'Lexus ES 350',
-      plateLabel: spot.plate || 'ط ب ك 2030',
+      plateLabel: spot.plate || 'د ك ت 2020',
     };
   }
 
-  // 5. Flex-Share Spots
+  // 4. SUVs & 4x4s
+  if (
+    carText.includes('لاند كروزر') ||
+    carText.includes('land cruiser') ||
+    carText.includes('باترول') ||
+    carText.includes('patrol') ||
+    carText.includes('جيب') ||
+    carText.includes('برادو') ||
+    carText.includes('prado') ||
+    carText.includes('suv') ||
+    spot.id === 29
+  ) {
+    const palette = explicitPaletteKey
+      ? CAR_PALETTES[explicitPaletteKey]!
+      : spot.id === 29
+        ? CAR_PALETTES['charcoal']!
+        : CAR_PALETTES['white']!;
+    return {
+      color: palette.base,
+      gradientStart: palette.start,
+      gradientMid: palette.mid,
+      gradientEnd: palette.end,
+      type: 'suv',
+      modelLabel: spot.car || (spot.id === 29 ? 'Toyota Prado TXL' : 'Toyota Land Cruiser'),
+      plateLabel: spot.plate || 'أ م ل 1010',
+    };
+  }
+
+  // 5. Flex-Share Spots (AI Swappable — Warm Amber Gold)
   if (spot.status === 'flex' || spot.status === 'flex-share') {
-    const palette = COLOR_PALETTES['amber']!;
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['amber']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -216,9 +248,10 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     };
   }
 
-  // 6. Specific Spots & Dynamic Sedan Models
+  // 6. Specific Campus Spots & Drivers
+  // Spot 1: Eyad Alharbi (Toyota Camry) — Emerald Green Signature
   if (spot.id === 1 || occupant.includes('إياد') || occupant.includes('eyad')) {
-    const palette = COLOR_PALETTES['navy']!;
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['emerald']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -230,8 +263,9 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     };
   }
 
+  // Spot 4: Saud Alshehri (Caprice SS) — Ruby Crimson
   if (spot.id === 4 || occupant.includes('سعود') || occupant.includes('shehri')) {
-    const palette = COLOR_PALETTES['crimson']!;
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['crimson']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -243,8 +277,23 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     };
   }
 
+  // Spot 6: Faisal Alatawi (Lexus ES) — Titanium Silver
+  if (spot.id === 6 || occupant.includes('فيصل') || occupant.includes('atawi')) {
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['silver']!;
+    return {
+      color: palette.base,
+      gradientStart: palette.start,
+      gradientMid: palette.mid,
+      gradientEnd: palette.end,
+      type: 'luxury',
+      modelLabel: spot.car || 'Lexus ES 350',
+      plateLabel: spot.plate || 'ط ب ك 2030',
+    };
+  }
+
+  // Spot 10: Omar Albalawi (Ford Taurus) — Obsidian Black
   if (spot.id === 10 || occupant.includes('عمر') || occupant.includes('balawi')) {
-    const palette = COLOR_PALETTES['black']!;
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['black']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -256,8 +305,9 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     };
   }
 
+  // Spot 12: Khaled Alenazi (Honda Accord) — Sapphire Navy
   if (spot.id === 12 || occupant.includes('خالد') || occupant.includes('anazi')) {
-    const palette = COLOR_PALETTES['silver']!;
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['navy']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -269,8 +319,9 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     };
   }
 
+  // Spot 16: Majed Alrashidi (Kia K5) — Ruby Crimson
   if (spot.id === 16 || occupant.includes('ماجد') || occupant.includes('rashidi')) {
-    const palette = COLOR_PALETTES['crimson']!;
+    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['crimson']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -282,16 +333,19 @@ export function getCarVisualTheme(spot: ParkingSpot): CarVisualTheme {
     };
   }
 
-  // 7. Dynamic Palette fallback based on spot id
-  const sedanPalettes = [
-    COLOR_PALETTES['teal']!,
-    COLOR_PALETTES['crimson']!,
-    COLOR_PALETTES['navy']!,
-    COLOR_PALETTES['silver']!,
-    COLOR_PALETTES['white']!,
-    COLOR_PALETTES['black']!,
+  // 7. Dynamic Deterministic Palette Rotation for any other spot
+  const rotatingPalettes = [
+    CAR_PALETTES['emerald']!, // Signature Green
+    CAR_PALETTES['navy']!,    // Sapphire Navy
+    CAR_PALETTES['crimson']!, // Ruby Crimson
+    CAR_PALETTES['silver']!,  // Titanium Silver
+    CAR_PALETTES['white']!,   // Pearl White
+    CAR_PALETTES['black']!,   // Obsidian Black
+    CAR_PALETTES['charcoal']!,// Slate Charcoal
   ];
-  const chosenPalette = sedanPalettes[spot.id % sedanPalettes.length]!;
+  const chosenPalette = explicitPaletteKey
+    ? CAR_PALETTES[explicitPaletteKey]!
+    : rotatingPalettes[spot.id % rotatingPalettes.length]!;
 
   const defaultModels = [
     'Toyota Camry 2024',
