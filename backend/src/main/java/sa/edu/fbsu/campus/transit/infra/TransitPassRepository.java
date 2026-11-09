@@ -24,3 +24,4 @@ public interface TransitPassRepository extends JpaRepository<TransitPass, UUID> 
 
     Optional<TransitPass> findByPassCode(String passCode);
 }
+

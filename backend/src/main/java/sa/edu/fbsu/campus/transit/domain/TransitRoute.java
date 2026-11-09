@@ -150,3 +150,4 @@ public class TransitRoute extends BaseTenantEntity {
         this.stops = stops;
     }
 }
+

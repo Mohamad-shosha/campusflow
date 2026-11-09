@@ -6,3 +6,4 @@ public enum ShuttleStatus {
     ARRIVING,
     OUT_OF_SERVICE
 }
+

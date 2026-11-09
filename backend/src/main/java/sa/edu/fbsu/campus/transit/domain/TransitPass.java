@@ -155,3 +155,4 @@ public class TransitPass extends BaseTenantEntity {
         this.status = status;
     }
 }
+

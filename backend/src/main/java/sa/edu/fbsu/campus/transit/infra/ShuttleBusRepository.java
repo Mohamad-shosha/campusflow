@@ -25,3 +25,4 @@ public interface ShuttleBusRepository extends JpaRepository<ShuttleBus, UUID> {
 
     List<ShuttleBus> findByCurrentRouteId(UUID routeId);
 }
+

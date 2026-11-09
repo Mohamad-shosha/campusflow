@@ -12,3 +12,4 @@ public interface TransitStopRepository extends JpaRepository<TransitStop, UUID> 
 
     List<TransitStop> findByRouteIdOrderByStopOrderAsc(UUID routeId);
 }
+

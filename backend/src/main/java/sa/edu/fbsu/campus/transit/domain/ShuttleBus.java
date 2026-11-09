@@ -221,3 +221,4 @@ public class ShuttleBus extends BaseTenantEntity {
         this.batteryPercentage = batteryPercentage;
     }
 }
+

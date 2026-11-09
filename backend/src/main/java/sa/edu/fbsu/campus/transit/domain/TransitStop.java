@@ -151,3 +151,4 @@ public class TransitStop extends BaseTenantEntity {
         this.hasAc = hasAc;
     }
 }
+

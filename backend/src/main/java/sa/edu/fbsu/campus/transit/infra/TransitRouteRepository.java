@@ -18,3 +18,4 @@ public interface TransitRouteRepository extends JpaRepository<TransitRoute, UUID
 
     Optional<TransitRoute> findByRouteCode(String routeCode);
 }
+

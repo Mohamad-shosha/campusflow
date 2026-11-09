@@ -77,3 +77,4 @@ public class TransitController {
                 .orElseThrow(() -> new ResourceNotFoundException("Default university FBSU not found"));
     }
 }
+
