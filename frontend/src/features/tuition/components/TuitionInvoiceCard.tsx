@@ -132,7 +132,11 @@ export const TuitionInvoiceCard: FC<TuitionInvoiceCardProps> = ({
             {isAr ? 'المبلغ المسدد' : 'Paid Amount'}
           </span>
           <strong
-            style={{ fontSize: '1.15rem', color: 'var(--success-text)', fontVariantNumeric: 'tabular-nums' }}
+            style={{
+              fontSize: '1.15rem',
+              color: 'var(--success-text)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
           >
             {Number(invoice.paidAmount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
           </strong>

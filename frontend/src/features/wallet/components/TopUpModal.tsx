@@ -140,9 +140,7 @@ export const TopUpModal: FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) 
                     border: isSelected
                       ? '1.5px solid var(--fbsu-gold)'
                       : '1px solid var(--border-color)',
-                    background: isSelected
-                      ? 'rgba(215, 162, 55, 0.2)'
-                      : 'var(--surface-soft)',
+                    background: isSelected ? 'rgba(215, 162, 55, 0.2)' : 'var(--surface-soft)',
                     color: isSelected ? 'var(--fbsu-gold)' : 'var(--text-main)',
                     fontWeight: isSelected ? 800 : 600,
                     fontSize: '0.88rem',

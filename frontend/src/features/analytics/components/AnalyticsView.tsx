@@ -10,13 +10,31 @@ export interface AnalyticsViewProps {
 const DEFAULT_PEAK_DATA: HourlyLoadPoint[] = [
   { time: '08:00', load: 85, color: '#f59e0b', labelAr: 'ذروة 1', labelEn: 'Peak 1' },
   { time: '09:00', load: 95, color: '#ef4444', labelAr: 'ذروة قصوى', labelEn: 'Max Peak' },
-  { time: '10:00', load: 70, color: 'var(--success-text)', labelAr: 'فترة خروج البريك', labelEn: 'Break Exit' },
+  {
+    time: '10:00',
+    load: 70,
+    color: 'var(--success-text)',
+    labelAr: 'فترة خروج البريك',
+    labelEn: 'Break Exit',
+  },
   { time: '11:00', load: 90, color: '#ef4444', labelAr: 'محاضرات الظهر', labelEn: 'Midday' },
   { time: '12:00', load: 80, color: '#f59e0b', labelAr: 'صلاة الظهر', labelEn: 'Prayer' },
-  { time: '01:00', load: 65, color: 'var(--success-text)', labelAr: 'تبادل المواقف', labelEn: 'Flex Swap' },
+  {
+    time: '01:00',
+    load: 65,
+    color: 'var(--success-text)',
+    labelAr: 'تبادل المواقف',
+    labelEn: 'Flex Swap',
+  },
   { time: '02:00', load: 75, color: '#f59e0b', labelAr: 'عودة الطلاب', labelEn: 'Return' },
   { time: '03:00', load: 50, color: 'var(--success-text)', labelAr: 'هدوء', labelEn: 'Calm' },
-  { time: '04:00', load: 25, color: 'var(--success-text)', labelAr: 'نهاية الدوام', labelEn: 'Dismissal' },
+  {
+    time: '04:00',
+    load: 25,
+    color: 'var(--success-text)',
+    labelAr: 'نهاية الدوام',
+    labelEn: 'Dismissal',
+  },
 ];
 
 export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {

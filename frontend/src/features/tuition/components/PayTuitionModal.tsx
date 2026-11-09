@@ -191,7 +191,12 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
               {isAr ? 'رصيد محفظتك المتاح:' : 'Your Wallet Balance:'}
             </span>
           </div>
-          <strong style={{ fontSize: '1rem', color: hasEnoughBalance ? 'var(--success-text)' : 'var(--danger-text)' }}>
+          <strong
+            style={{
+              fontSize: '1rem',
+              color: hasEnoughBalance ? 'var(--success-text)' : 'var(--danger-text)',
+            }}
+          >
             {walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
           </strong>
         </div>
@@ -250,9 +255,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
                     ? '1.5px solid var(--fbsu-gold)'
                     : '1px solid var(--border-color)',
                 background:
-                  paymentMode === 'CUSTOM'
-                    ? 'rgba(215, 162, 55, 0.18)'
-                    : 'var(--surface-soft)',
+                  paymentMode === 'CUSTOM' ? 'rgba(215, 162, 55, 0.18)' : 'var(--surface-soft)',
                 color: paymentMode === 'CUSTOM' ? 'var(--fbsu-gold)' : 'var(--text-main)',
                 fontWeight: 700,
                 fontSize: '0.82rem',

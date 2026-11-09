@@ -82,8 +82,16 @@
   --border-soft: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.18);
   --panel-gradient: linear-gradient(180deg, rgba(13, 29, 26, 0.96) 0%, rgba(7, 18, 16, 0.98) 100%);
-  --panel-gradient-soft: linear-gradient(180deg, rgba(13, 29, 26, 0.8) 0%, rgba(7, 18, 16, 0.9) 100%);
-  --hero-gradient: radial-gradient(circle at 50% 0%, rgba(17, 110, 99, 0.18) 0%, rgba(5, 18, 16, 0.98) 75%);
+  --panel-gradient-soft: linear-gradient(
+    180deg,
+    rgba(13, 29, 26, 0.8) 0%,
+    rgba(7, 18, 16, 0.9) 100%
+  );
+  --hero-gradient: radial-gradient(
+    circle at 50% 0%,
+    rgba(17, 110, 99, 0.18) 0%,
+    rgba(5, 18, 16, 0.98) 75%
+  );
   --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 18px 45px rgba(0, 0, 0, 0.55);
@@ -92,7 +100,11 @@
   --footer-heading: #ffffff;
   --success-text: #10b981;
   --danger-text: #f87171;
-  --brand-card-gradient: linear-gradient(135deg, rgba(17, 110, 99, 0.45) 0%, rgba(13, 27, 42, 0.9) 100%);
+  --brand-card-gradient: linear-gradient(
+    135deg,
+    rgba(17, 110, 99, 0.45) 0%,
+    rgba(13, 27, 42, 0.9) 100%
+  );
 }
 
 /* Light Theme Variables */

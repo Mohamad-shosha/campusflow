@@ -864,7 +864,10 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                 </span>
 
                 <div className="tutor-rate-badge">
-                  <span className="tutor-rate-num" style={{ color: 'var(--success-text)', fontSize: '1.1rem' }}>
+                  <span
+                    className="tutor-rate-num"
+                    style={{ color: 'var(--success-text)', fontSize: '1.1rem' }}
+                  >
                     {isAr ? 'مباشر GPS' : 'Live GPS'}
                   </span>
                   <span className="tutor-rate-unit">{isAr ? 'مجاني للطلاب' : 'Free for All'}</span>
@@ -1095,7 +1098,10 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                 </span>
 
                 <div className="tutor-rate-badge">
-                  <span className="tutor-rate-num" style={{ color: 'var(--success-text)', fontSize: '1.1rem' }}>
+                  <span
+                    className="tutor-rate-num"
+                    style={{ color: 'var(--success-text)', fontSize: '1.1rem' }}
+                  >
                     {walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                   </span>
                   <span className="tutor-rate-unit">{isAr ? 'الرصيد المتاح' : 'Balance'}</span>
