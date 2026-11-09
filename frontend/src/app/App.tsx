@@ -783,9 +783,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         <ServiceHeroBanner
           isAr={isAr}
           serviceTag={
-            isAr
-              ? 'منظومة الدفع الموحدة لجامعة فهد بن سلطان'
-              : 'FBSU Unified Campus Digital Wallet'
+            isAr ? 'منظومة الدفع الموحدة لجامعة فهد بن سلطان' : 'FBSU Unified Campus Digital Wallet'
           }
           tagIcon={WalletIcon}
           title={isAr ? 'المحفظة الرقمية الجامعية' : 'Campus Digital Wallet &'}
@@ -1034,7 +1032,11 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               onOpenAuth={() => setIsAuthModalOpen(true)}
               onBookSuccess={handleOfficeHoursSuccess}
             />
-            <ServiceExplainerSections service="office-hours" isAr={isAr} onNavigate={setActiveTab} />
+            <ServiceExplainerSections
+              service="office-hours"
+              isAr={isAr}
+              onNavigate={setActiveTab}
+            />
           </>
         )}
 

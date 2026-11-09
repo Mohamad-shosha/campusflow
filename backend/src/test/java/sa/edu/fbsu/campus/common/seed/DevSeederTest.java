@@ -69,9 +69,9 @@ class DevSeederTest extends AbstractPostgresIntegrationTest {
         // 4. Verify Student vehicle
         assertThat(vehicleRepository.findByUserId(student.getId())).isNotEmpty();
 
-        // 5. Verify Parking Zones and 30 Spots
-        assertThat(parkingZoneRepository.findAllByUniversityIdOrderByCodeAsc(fbsu.getId())).hasSize(4);
-        assertThat(parkingSpotRepository.findAllByUniversityIdOrderByBayNumberAsc(fbsu.getId())).hasSize(30);
+        // 5. Verify Parking Zones and 40 Spots
+        assertThat(parkingZoneRepository.findAllByUniversityIdOrderByCodeAsc(fbsu.getId())).hasSize(5);
+        assertThat(parkingSpotRepository.findAllByUniversityIdOrderByBayNumberAsc(fbsu.getId())).hasSize(40);
 
         var spot1 = parkingSpotRepository.findByUniversityIdAndBayNumber(fbsu.getId(), 1).orElse(null);
         assertThat(spot1).isNotNull();

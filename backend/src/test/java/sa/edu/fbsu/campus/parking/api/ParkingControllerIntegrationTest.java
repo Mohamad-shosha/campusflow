@@ -32,19 +32,19 @@ class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/parking/zones returns all 4 campus zones")
+    @DisplayName("GET /api/v1/parking/zones returns all 5 campus zones")
     void shouldReturnAllParkingZones() throws Exception {
         ensureUniversity();
 
         mockMvc.perform(get("/api/v1/parking/zones")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[*].code", hasItems("A", "B", "C", "D")));
+                .andExpect(jsonPath("$", hasSize(5)))
+                .andExpect(jsonPath("$[*].code", hasItems("A", "B", "C", "D", "E")));
     }
 
     @Test
-    @DisplayName("GET /api/v1/parking/spots returns all 30 bays and supports zone filter")
+    @DisplayName("GET /api/v1/parking/spots returns all 40 bays and supports zone filter")
     void shouldReturnSpotsAndFilterByZone() throws Exception {
         ensureUniversity();
 
@@ -52,7 +52,7 @@ class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         mockMvc.perform(get("/api/v1/parking/spots")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(30)));
+                .andExpect(jsonPath("$", hasSize(40)));
 
         // Filter by zone A
         mockMvc.perform(get("/api/v1/parking/spots")
@@ -83,7 +83,7 @@ class ParkingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         mockMvc.perform(get("/api/v1/parking/summary")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalSpots", equalTo(30)))
+                .andExpect(jsonPath("$.totalSpots", equalTo(40)))
                 .andExpect(jsonPath("$.availableSpots", greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.occupancyRatePercent", notNullValue()));
     }

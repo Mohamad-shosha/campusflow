@@ -93,13 +93,21 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
       // Category match
       if (activeCategory !== 'all') {
         const code = room.roomCode || room.id;
-        if (activeCategory === 'software' && !code.startsWith('LAB-101') && !code.startsWith('LAB-102')) {
+        if (
+          activeCategory === 'software' &&
+          !code.startsWith('LAB-101') &&
+          !code.startsWith('LAB-102')
+        ) {
           return false;
         }
         if (activeCategory === 'cyber' && !code.startsWith('LAB-103')) {
           return false;
         }
-        if (activeCategory === 'hardware' && !code.startsWith('LAB-104') && !code.startsWith('LAB-205')) {
+        if (
+          activeCategory === 'hardware' &&
+          !code.startsWith('LAB-104') &&
+          !code.startsWith('LAB-205')
+        ) {
           return false;
         }
         if (activeCategory === 'discussion' && !code.startsWith('ROOM-')) {
@@ -113,13 +121,17 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
       // Search query match
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const nameMatch = (room.name && room.name.toLowerCase().includes(q)) ||
+        const nameMatch =
+          (room.name && room.name.toLowerCase().includes(q)) ||
           (room.nameEn && room.nameEn.toLowerCase().includes(q));
-        const codeMatch = (room.roomCode && room.roomCode.toLowerCase().includes(q)) ||
+        const codeMatch =
+          (room.roomCode && room.roomCode.toLowerCase().includes(q)) ||
           room.id.toLowerCase().includes(q);
-        const bldgMatch = (room.building && room.building.toLowerCase().includes(q)) ||
+        const bldgMatch =
+          (room.building && room.building.toLowerCase().includes(q)) ||
           (room.buildingEn && room.buildingEn.toLowerCase().includes(q));
-        const specsMatch = (room.specs && room.specs.some(s => s.toLowerCase().includes(q))) ||
+        const specsMatch =
+          (room.specs && room.specs.some(s => s.toLowerCase().includes(q))) ||
           (room.specsEn && room.specsEn.some(s => s.toLowerCase().includes(q)));
         return nameMatch || codeMatch || bldgMatch || specsMatch;
       }
@@ -299,7 +311,15 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
           backdropFilter: 'blur(10px)',
         }}
       >
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '0.75rem',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           {/* Search Input Box */}
           <div style={{ position: 'relative', flex: '1 1 300px', maxWidth: '480px' }}>
             <Search
@@ -356,8 +376,12 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
 
           {/* Sync Button & Count */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-dim, #94a3b8)', fontWeight: 600 }}>
-              {isAr ? `عرض ${filteredRooms.length} من ${roomList.length} مرفق` : `Showing ${filteredRooms.length} of ${roomList.length} facilities`}
+            <span
+              style={{ fontSize: '0.82rem', color: 'var(--text-dim, #94a3b8)', fontWeight: 600 }}
+            >
+              {isAr
+                ? `عرض ${filteredRooms.length} من ${roomList.length} مرفق`
+                : `Showing ${filteredRooms.length} of ${roomList.length} facilities`}
             </span>
             <button
               type="button"
@@ -374,20 +398,61 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
               title={isAr ? 'تحديث فوري من قاعدة بيانات PostgreSQL' : 'Sync live with PostgreSQL'}
             >
               <RotateCw size={14} className={isSyncing ? 'spin-anim' : ''} />
-              <span>{isAr ? (isSyncing ? 'جاري المزامنة...' : 'تحديث مباشر') : (isSyncing ? 'Syncing...' : 'Live Sync')}</span>
+              <span>
+                {isAr
+                  ? isSyncing
+                    ? 'جاري المزامنة...'
+                    : 'تحديث مباشر'
+                  : isSyncing
+                    ? 'Syncing...'
+                    : 'Live Sync'}
+              </span>
             </button>
           </div>
         </div>
 
         {/* Category Pills */}
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', overflowX: 'auto', paddingBottom: '2px' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '0.5rem',
+            flexWrap: 'wrap',
+            overflowX: 'auto',
+            paddingBottom: '2px',
+          }}
+        >
           {[
-            { id: 'all', labelAr: `الكل (${roomList.length})`, labelEn: `All (${roomList.length})`, icon: Sparkles },
-            { id: 'software', labelAr: 'معامل البرمجيات و AI', labelEn: 'Software & AI Labs', icon: Terminal },
+            {
+              id: 'all',
+              labelAr: `الكل (${roomList.length})`,
+              labelEn: `All (${roomList.length})`,
+              icon: Sparkles,
+            },
+            {
+              id: 'software',
+              labelAr: 'معامل البرمجيات و AI',
+              labelEn: 'Software & AI Labs',
+              icon: Terminal,
+            },
             { id: 'cyber', labelAr: 'أمن سيبراني NOC', labelEn: 'Cyber & NOC', icon: ShieldCheck },
-            { id: 'hardware', labelAr: 'عتاد وروبوتات ودوائر', labelEn: 'Robotics & Hardware', icon: Cpu },
-            { id: 'discussion', labelAr: 'قاعات عمل ونقاش جماعي', labelEn: 'Discussion Pods', icon: Users },
-            { id: 'focus', labelAr: 'كبائن تركيز ومقابلات', labelEn: 'Quiet & Interview Pods', icon: DoorClosed },
+            {
+              id: 'hardware',
+              labelAr: 'عتاد وروبوتات ودوائر',
+              labelEn: 'Robotics & Hardware',
+              icon: Cpu,
+            },
+            {
+              id: 'discussion',
+              labelAr: 'قاعات عمل ونقاش جماعي',
+              labelEn: 'Discussion Pods',
+              icon: Users,
+            },
+            {
+              id: 'focus',
+              labelAr: 'كبائن تركيز ومقابلات',
+              labelEn: 'Quiet & Interview Pods',
+              icon: DoorClosed,
+            },
           ].map(cat => {
             const Icon = cat.icon;
             const isActive = activeCategory === cat.id;
@@ -408,7 +473,9 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
                   fontSize: '0.78rem',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  border: isActive ? '1px solid var(--fbsu-gold, #d7a237)' : '1px solid rgba(255, 255, 255, 0.1)',
+                  border: isActive
+                    ? '1px solid var(--fbsu-gold, #d7a237)'
+                    : '1px solid rgba(255, 255, 255, 0.1)',
                   background: isActive ? 'rgba(215, 162, 55, 0.18)' : 'rgba(11, 59, 54, 0.25)',
                   color: isActive ? 'var(--fbsu-gold, #d7a237)' : 'var(--text-dim, #94a3b8)',
                   transition: 'all 0.2s ease',
@@ -434,11 +501,24 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
             marginBottom: '2rem',
           }}
         >
-          <Search size={36} color="var(--fbsu-gold)" style={{ margin: '0 auto 1rem', opacity: 0.7 }} />
+          <Search
+            size={36}
+            color="var(--fbsu-gold)"
+            style={{ margin: '0 auto 1rem', opacity: 0.7 }}
+          />
           <h4 style={{ color: 'var(--text-main)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-            {isAr ? 'لم يتم العثور على أي قاعة أو معمل يطابق بحثك' : 'No study rooms or labs match your criteria'}
+            {isAr
+              ? 'لم يتم العثور على أي قاعة أو معمل يطابق بحثك'
+              : 'No study rooms or labs match your criteria'}
           </h4>
-          <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
+          <p
+            style={{
+              color: 'var(--text-dim)',
+              fontSize: '0.85rem',
+              maxWidth: '420px',
+              margin: '0 auto 1.25rem',
+            }}
+          >
             {isAr
               ? 'جرّب البحث بكلمات أخرى أو اختر قطاعاً مختلفاً من التصنيفات أعلاه.'
               : 'Try different keywords or clear the category filters to see all available campus spaces.'}

@@ -330,9 +330,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                   >
                     <Users size={13} color="var(--fbsu-primary)" />
                     <span>
-                      {isAr
-                        ? `السعة الاستيعابية: ${room.capacity}`
-                        : `Capacity: ${room.capacity}`}
+                      {isAr ? `السعة الاستيعابية: ${room.capacity}` : `Capacity: ${room.capacity}`}
                     </span>
                   </div>
 
@@ -519,9 +517,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     </div>
                   </div>
 
-                  <h4 className="showcase-card-title">
-                    {isAr ? faculty.rank : faculty.rankEn}
-                  </h4>
+                  <h4 className="showcase-card-title">{isAr ? faculty.rank : faculty.rankEn}</h4>
 
                   {/* Inset Scope Box */}
                   <div className="tutoring-content-box">
@@ -983,7 +979,10 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                 </span>
 
                 <div className="tutor-rate-badge">
-                  <span className="tutor-rate-num" style={{ color: 'var(--fbsu-gold)', fontSize: '1.1rem' }}>
+                  <span
+                    className="tutor-rate-num"
+                    style={{ color: 'var(--fbsu-gold)', fontSize: '1.1rem' }}
+                  >
                     {isAr ? 'خصم 20%' : '20% OFF'}
                   </span>
                   <span className="tutor-rate-unit">{isAr ? 'طلب مسبق' : 'Order Ahead'}</span>
@@ -1005,9 +1004,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     <span className="tutor-name">
                       {isAr ? 'المطاعم والكافيهات الجامعية' : 'Campus Cafes & Dining'}
                     </span>
-                    <span className="tutor-badge-tag">
-                      {isAr ? 'استلام فوري' : 'Fast Pickup'}
-                    </span>
+                    <span className="tutor-badge-tag">{isAr ? 'استلام فوري' : 'Fast Pickup'}</span>
                   </div>
                   <div className="tutor-college-text">
                     {isAr ? 'ستاربكس • مطعم الحرم المركزي' : 'Starbucks & Campus Food Court'}

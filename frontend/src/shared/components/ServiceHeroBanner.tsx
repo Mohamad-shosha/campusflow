@@ -43,7 +43,11 @@ export const ServiceHeroBanner: FC<ServiceHeroBannerProps> = ({
   badgeSlot,
 }) => {
   return (
-    <section className="service-hero-banner" data-testid="service-hero-banner" dir={isAr ? 'rtl' : 'ltr'}>
+    <section
+      className="service-hero-banner"
+      data-testid="service-hero-banner"
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
       <div className="service-hero-backdrop" />
       <div className="container">
         <div className="service-hero-content-grid">

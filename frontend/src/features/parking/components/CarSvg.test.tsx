@@ -40,4 +40,3 @@ describe('CarSvg Component', () => {
     expect(svg).toHaveAttribute('aria-label', 'ev');
   });
 });
-

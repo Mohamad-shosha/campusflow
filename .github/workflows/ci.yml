@@ -106,7 +106,7 @@ jobs:
       - name: Execute Live HTTP End-to-End Smoke Verification
         run: |
           curl -fsS http://localhost:8080/actuator/health | grep '"status":"UP"'
-          curl -fsS http://localhost/api/v1/parking/summary | grep '"totalSpots":30'
+          curl -fsS http://localhost/api/v1/parking/summary | grep '"totalSpots":40'
           curl -fsS http://localhost/ | grep -i '<!doctype html>'
 
       - name: Tear Down Smoke Stack

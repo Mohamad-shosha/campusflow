@@ -218,27 +218,73 @@ export const CAR_PALETTES: Record<
 /**
  * Extracts or assigns authentic color and body type for any parking spot.
  */
-function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'brand' | 'model' | 'year' | 'colorNameAr' | 'colorNameEn'> {
-  const carText = `${spot.car || ''} ${(spot as any).carColor || ''} ${spot.occupant || ''}`.toLowerCase();
+function getCarVisualThemeInternal(
+  spot: ParkingSpot
+): Omit<CarVisualTheme, 'brand' | 'model' | 'year' | 'colorNameAr' | 'colorNameEn'> {
+  const carColorProp = (spot as { carColor?: string }).carColor || '';
+  const carText = `${spot.car || ''} ${carColorProp} ${spot.occupant || ''}`.toLowerCase();
   const occupant = (spot.occupant || '').toLowerCase();
 
   // 1. Check explicit color keywords in description or carColor prop
   let explicitPaletteKey: string | null = null;
-  if (carText.includes('أخضر') || carText.includes('زمرد') || carText.includes('green') || carText.includes('emerald')) {
+  if (
+    carText.includes('أخضر') ||
+    carText.includes('زمرد') ||
+    carText.includes('green') ||
+    carText.includes('emerald')
+  ) {
     explicitPaletteKey = 'emerald';
-  } else if (carText.includes('أحمر') || carText.includes('عنابي') || carText.includes('قرمزي') || carText.includes('red') || carText.includes('crimson')) {
+  } else if (
+    carText.includes('أحمر') ||
+    carText.includes('عنابي') ||
+    carText.includes('قرمزي') ||
+    carText.includes('red') ||
+    carText.includes('crimson')
+  ) {
     explicitPaletteKey = 'crimson';
-  } else if (carText.includes('أزرق') || carText.includes('كحلي') || carText.includes('بحري') || carText.includes('blue') || carText.includes('navy')) {
+  } else if (
+    carText.includes('أزرق') ||
+    carText.includes('كحلي') ||
+    carText.includes('بحري') ||
+    carText.includes('blue') ||
+    carText.includes('navy')
+  ) {
     explicitPaletteKey = 'navy';
-  } else if (carText.includes('فضي') || carText.includes('رصاصي') || carText.includes('رمادي') || carText.includes('silver') || carText.includes('gray')) {
+  } else if (
+    carText.includes('فضي') ||
+    carText.includes('رصاصي') ||
+    carText.includes('رمادي') ||
+    carText.includes('silver') ||
+    carText.includes('gray')
+  ) {
     explicitPaletteKey = 'silver';
-  } else if (carText.includes('أبيض') || carText.includes('لؤلؤي') || carText.includes('white') || carText.includes('pearl')) {
+  } else if (
+    carText.includes('أبيض') ||
+    carText.includes('لؤلؤي') ||
+    carText.includes('white') ||
+    carText.includes('pearl')
+  ) {
     explicitPaletteKey = 'white';
-  } else if (carText.includes('أسود') || carText.includes('ملكي') || carText.includes('ليلي') || carText.includes('black')) {
+  } else if (
+    carText.includes('أسود') ||
+    carText.includes('ملكي') ||
+    carText.includes('ليلي') ||
+    carText.includes('black')
+  ) {
     explicitPaletteKey = 'black';
-  } else if (carText.includes('ذهبي') || carText.includes('كهرمان') || carText.includes('gold') || carText.includes('amber')) {
+  } else if (
+    carText.includes('ذهبي') ||
+    carText.includes('كهرمان') ||
+    carText.includes('gold') ||
+    carText.includes('amber')
+  ) {
     explicitPaletteKey = 'amber';
-  } else if (carText.includes('سماوي') || carText.includes('تركواز') || carText.includes('cyan') || carText.includes('aqua')) {
+  } else if (
+    carText.includes('سماوي') ||
+    carText.includes('تركواز') ||
+    carText.includes('cyan') ||
+    carText.includes('aqua')
+  ) {
     explicitPaletteKey = 'cyan';
   }
 
@@ -272,7 +318,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
   if (spot.isFaculty || spot.status === 'faculty' || spot.status === 'faculty-spot') {
     // Dr. Reem: BMW X5 (White SUV)
     if (carText.includes('bmw') || carText.includes('x5') || spot.id === 22) {
-      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['white']!;
+      const palette = explicitPaletteKey
+        ? CAR_PALETTES[explicitPaletteKey]!
+        : CAR_PALETTES['white']!;
       return {
         color: palette.base,
         gradientStart: palette.start,
@@ -285,7 +333,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
     }
     // Dr. Samir: Mercedes E300 (Emerald Green — Signature Reference Color)
     if (carText.includes('مرسيدس') || carText.includes('mercedes') || spot.id === 20) {
-      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['emerald']!;
+      const palette = explicitPaletteKey
+        ? CAR_PALETTES[explicitPaletteKey]!
+        : CAR_PALETTES['emerald']!;
       return {
         color: palette.base,
         gradientStart: palette.start,
@@ -298,7 +348,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
     }
     // Dr. Tariq: Audi A6 (Black Luxury Sedan)
     if (carText.includes('audi') || spot.id === 24) {
-      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['black']!;
+      const palette = explicitPaletteKey
+        ? CAR_PALETTES[explicitPaletteKey]!
+        : CAR_PALETTES['black']!;
       return {
         color: palette.base,
         gradientStart: palette.start,
@@ -311,7 +363,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
     }
     // Dr. Abdullah: Genesis G80 (Navy Luxury Sedan)
     if (carText.includes('جينيسيس') || spot.id === 19) {
-      const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['navy']!;
+      const palette = explicitPaletteKey
+        ? CAR_PALETTES[explicitPaletteKey]!
+        : CAR_PALETTES['navy']!;
       return {
         color: palette.base,
         gradientStart: palette.start,
@@ -384,7 +438,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
   // 6. Specific Campus Spots & Drivers
   // Spot 1: Eyad Alharbi (Toyota Camry) — Emerald Green Signature
   if (spot.id === 1 || occupant.includes('إياد') || occupant.includes('eyad')) {
-    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['emerald']!;
+    const palette = explicitPaletteKey
+      ? CAR_PALETTES[explicitPaletteKey]!
+      : CAR_PALETTES['emerald']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -398,7 +454,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
 
   // Spot 4: Saud Alshehri (Caprice SS) — Ruby Crimson
   if (spot.id === 4 || occupant.includes('سعود') || occupant.includes('shehri')) {
-    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['crimson']!;
+    const palette = explicitPaletteKey
+      ? CAR_PALETTES[explicitPaletteKey]!
+      : CAR_PALETTES['crimson']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -412,7 +470,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
 
   // Spot 6: Faisal Alatawi (Lexus ES) — Titanium Silver
   if (spot.id === 6 || occupant.includes('فيصل') || occupant.includes('atawi')) {
-    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['silver']!;
+    const palette = explicitPaletteKey
+      ? CAR_PALETTES[explicitPaletteKey]!
+      : CAR_PALETTES['silver']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -454,7 +514,9 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
 
   // Spot 16: Majed Alrashidi (Kia K5) — Ruby Crimson
   if (spot.id === 16 || occupant.includes('ماجد') || occupant.includes('rashidi')) {
-    const palette = explicitPaletteKey ? CAR_PALETTES[explicitPaletteKey]! : CAR_PALETTES['crimson']!;
+    const palette = explicitPaletteKey
+      ? CAR_PALETTES[explicitPaletteKey]!
+      : CAR_PALETTES['crimson']!;
     return {
       color: palette.base,
       gradientStart: palette.start,
@@ -469,12 +531,12 @@ function getCarVisualThemeInternal(spot: ParkingSpot): Omit<CarVisualTheme, 'bra
   // 7. Dynamic Deterministic Palette Rotation for any other spot
   const rotatingPalettes = [
     CAR_PALETTES['emerald']!, // Signature Green
-    CAR_PALETTES['navy']!,    // Sapphire Navy
+    CAR_PALETTES['navy']!, // Sapphire Navy
     CAR_PALETTES['crimson']!, // Ruby Crimson
-    CAR_PALETTES['silver']!,  // Titanium Silver
-    CAR_PALETTES['white']!,   // Pearl White
-    CAR_PALETTES['black']!,   // Obsidian Black
-    CAR_PALETTES['charcoal']!,// Slate Charcoal
+    CAR_PALETTES['silver']!, // Titanium Silver
+    CAR_PALETTES['white']!, // Pearl White
+    CAR_PALETTES['black']!, // Obsidian Black
+    CAR_PALETTES['charcoal']!, // Slate Charcoal
   ];
   const chosenPalette = explicitPaletteKey
     ? CAR_PALETTES[explicitPaletteKey]!

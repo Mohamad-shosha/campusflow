@@ -1368,7 +1368,9 @@ body.theme-light .campus-road-header {
 .parking-spot-card:hover {
   transform: translateY(-4px) scale(1.012);
   border-color: rgba(16, 185, 129, 0.45);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.65), 0 0 20px rgba(16, 185, 129, 0.15);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.65),
+    0 0 20px rgba(16, 185, 129, 0.15);
 }
 
 .parking-spot-card.available {
@@ -2460,7 +2462,9 @@ body.theme-light .hub-filter-btn {
 .showcase-deluxe-card:hover {
   transform: translateY(-4px);
   border-color: rgba(245, 158, 11, 0.45);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.65), 0 0 25px rgba(16, 185, 129, 0.15);
+  box-shadow:
+    0 16px 42px rgba(0, 0, 0, 0.65),
+    0 0 25px rgba(16, 185, 129, 0.15);
 }
 
 .showcase-card-title {
@@ -3810,7 +3814,6 @@ body.theme-light .fbsu-alert-dialog {
   }
 }
 
-
 /* ==========================================================================
    Service Dedicated Hero Banners & Explainer Sections (FBSU Theme)
    ========================================================================== */
@@ -3818,7 +3821,11 @@ body.theme-light .fbsu-alert-dialog {
   position: relative;
   padding: 3rem 0 2.25rem;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 0%, rgba(17, 110, 99, 0.18) 0%, rgba(5, 18, 16, 0.98) 75%);
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(17, 110, 99, 0.18) 0%,
+    rgba(5, 18, 16, 0.98) 75%
+  );
   border-bottom: 1px solid rgba(215, 162, 55, 0.18);
   margin-bottom: 2rem;
 }

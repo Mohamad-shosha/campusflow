@@ -180,14 +180,8 @@ export const CarSvg: FC<CarSvgProps> = ({
       )}
 
       {/* 3. Front Headlights (Warm Pale-Yellow rounded corner blocks) */}
-      <path
-        d="M 31 15 C 35 13 41 14 42 16 L 41 21 C 36 21 32 19 30 17 Z"
-        fill="#dbd87f"
-      />
-      <path
-        d="M 77 15 C 73 13 67 14 66 16 L 67 21 C 72 21 76 19 78 17 Z"
-        fill="#dbd87f"
-      />
+      <path d="M 31 15 C 35 13 41 14 42 16 L 41 21 C 36 21 32 19 30 17 Z" fill="#dbd87f" />
+      <path d="M 77 15 C 73 13 67 14 66 16 L 67 21 C 72 21 76 19 78 17 Z" fill="#dbd87f" />
 
       {/* 4. Front Windshield (Deep Tinted curved trapezoid with subtle outline) */}
       <path

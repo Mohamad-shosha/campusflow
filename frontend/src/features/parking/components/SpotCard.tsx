@@ -97,7 +97,16 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
                 ? `${spot.zone} - ${spot.college}`
                 : `${spot.zone} - ${spot.collegeEn}`}
           </span>
-          <h4 className="card-model-title" title={isOccupied ? carTheme.model : (isAr ? `موقف شاغر #${String(spot.id).padStart(2, '0')}` : `Available Bay #${String(spot.id).padStart(2, '0')}`)}>
+          <h4
+            className="card-model-title"
+            title={
+              isOccupied
+                ? carTheme.model
+                : isAr
+                  ? `موقف شاغر #${String(spot.id).padStart(2, '0')}`
+                  : `Available Bay #${String(spot.id).padStart(2, '0')}`
+            }
+          >
             {isOccupied
               ? carTheme.model
               : isAr
@@ -262,7 +271,9 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
             <div className="meta-driver-row">
               <div className="meta-occupant-wrap">
                 <UserCheck size={11} color="var(--text-dim)" />
-                <span className="driver-name">{spot.occupant || (isAr ? 'طالب في بريك' : 'Student on break')}</span>
+                <span className="driver-name">
+                  {spot.occupant || (isAr ? 'طالب في بريك' : 'Student on break')}
+                </span>
               </div>
               <span className="reward-chip">{isAr ? '+5.75 ر.س' : '+5.75 SAR'}</span>
             </div>

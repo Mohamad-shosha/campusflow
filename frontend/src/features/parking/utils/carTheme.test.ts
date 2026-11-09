@@ -117,4 +117,3 @@ describe('carTheme utility', () => {
     expect(theme.color).toBe(CAR_PALETTES.amber.base);
   });
 });
-

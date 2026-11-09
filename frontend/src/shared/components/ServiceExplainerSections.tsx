@@ -34,13 +34,13 @@ export interface ServiceExplainerSectionsProps {
   onNavigate?: (tab: string) => void;
 }
 
-export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
-  service,
-  isAr,
-}) => {
-
+export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ service, isAr }) => {
   return (
-    <div className="service-explainer-wrapper" data-testid="service-explainer-sections" dir={isAr ? 'rtl' : 'ltr'}>
+    <div
+      className="service-explainer-wrapper"
+      data-testid="service-explainer-sections"
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
       {/* =========================================================================
           1. PARKING EXPLAINER SECTIONS
           ========================================================================= */}
@@ -51,10 +51,16 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             <div className="section-head text-center">
               <span className="section-eyebrow">
                 <Sparkles size={14} />
-                <span>{isAr ? 'منظومة إنترنت الأشياء والذكاء الاصطناعي' : 'IoT & AI Parking Architecture'}</span>
+                <span>
+                  {isAr
+                    ? 'منظومة إنترنت الأشياء والذكاء الاصطناعي'
+                    : 'IoT & AI Parking Architecture'}
+                </span>
               </span>
               <h3 className="section-title">
-                {isAr ? 'كيف تعمل منظومة المواقف الذكية في جامعة فهد بن سلطان؟' : 'How the Smart Parking Suite Works'}
+                {isAr
+                  ? 'كيف تعمل منظومة المواقف الذكية في جامعة فهد بن سلطان؟'
+                  : 'How the Smart Parking Suite Works'}
               </h3>
               <p className="section-subtitle">
                 {isAr
@@ -66,10 +72,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             <div className="explainer-cards-grid">
               <div className="explainer-step-card">
                 <div className="step-card-num">01</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}
+                >
                   <MapPin size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'استكشاف الخريطة وحجز الموقف' : 'Explore Map & Reserve'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'استكشاف الخريطة وحجز الموقف' : 'Explore Map & Reserve'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'استعرض المخطط التفاعلي للشواغر الموزعة على القطاعات A, B, C, D، واختر مكانك المفضل بنقرة واحدة مع إصدار تصريح رقمي فوري.'
@@ -79,10 +90,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">02</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                >
                   <Zap size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'دخول فوري بكاميرات ALPR' : 'Touchless ALPR Gate Entry'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'دخول فوري بكاميرات ALPR' : 'Touchless ALPR Gate Entry'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'كاميرات الذكاء الاصطناعي عند بوابات الحرم تقرأ لوحة سيارتك السعودية في أجزاء من الثانية وتفتح الحاجز التلقائي بدون توقف أو بطاقات.'
@@ -92,10 +108,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">03</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                >
                   <Cpu size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'مستشعرات IoT السقفية الحية' : 'Live Ceiling IoT Sensors'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'مستشعرات IoT السقفية الحية' : 'Live Ceiling IoT Sensors'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'حساسات كهرومغناطيسية وفوق صوتية مثبتة بكل موقف ترصد وقوف المركبة فوراً وتحدث الخريطة المركزية واللوحات الإرشادية لحظياً.'
@@ -105,10 +126,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">04</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                >
                   <Award size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'التبادل الذكي Flex Share' : 'AI Flex Share & Rewards'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'التبادل الذكي Flex Share' : 'AI Flex Share & Rewards'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'عند خروجك خلال فترات البريك، يتيح النظام موقفك تلقائياً لزملائك القادمين للمحاضرات ويكافئك برصيد نقدي يُضاف مباشرة لمحفظتك.'
@@ -126,19 +152,28 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
                 <span>{isAr ? 'توزيع القطاعات والتجهيزات' : 'Campus Parking Sectors'}</span>
               </span>
               <h3 className="section-title">
-                {isAr ? 'تجهيزات قطاعات المواقف داخل الحرم الجامعي' : 'Tailored Parking Sectors & Facilities'}
+                {isAr
+                  ? 'تجهيزات قطاعات المواقف داخل الحرم الجامعي'
+                  : 'Tailored Parking Sectors & Facilities'}
               </h3>
             </div>
 
             <div className="sectors-guide-grid">
               <div className="sector-guide-card">
                 <div className="sector-card-header">
-                  <span className="sector-pill" style={{ background: 'rgba(17, 110, 99, 0.25)', color: '#38c2b0' }}>
+                  <span
+                    className="sector-pill"
+                    style={{ background: 'rgba(17, 110, 99, 0.25)', color: '#38c2b0' }}
+                  >
                     {isAr ? 'قطاع A' : 'Sector A'}
                   </span>
-                  <span className="sector-bays-count">{isAr ? 'مواقف #01 إلى #10' : 'Bays #01 to #10'}</span>
+                  <span className="sector-bays-count">
+                    {isAr ? 'مواقف #01 إلى #10' : 'Bays #01 to #10'}
+                  </span>
                 </div>
-                <h4 className="sector-title">{isAr ? 'كلية الهندسة والحاسب الآلي' : 'College of Engineering & IT'}</h4>
+                <h4 className="sector-title">
+                  {isAr ? 'كلية الهندسة والحاسب الآلي' : 'College of Engineering & IT'}
+                </h4>
                 <p className="sector-desc">
                   {isAr
                     ? 'أقرب المواقف لبوابات كليات الهندسة ومعامل الذكاء الاصطناعي، مجهزة بمستشعرات سقفية ومظلات واقية من الشمس.'
@@ -148,12 +183,19 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="sector-guide-card">
                 <div className="sector-card-header">
-                  <span className="sector-pill" style={{ background: 'rgba(56, 194, 176, 0.25)', color: '#38c2b0' }}>
+                  <span
+                    className="sector-pill"
+                    style={{ background: 'rgba(56, 194, 176, 0.25)', color: '#38c2b0' }}
+                  >
                     {isAr ? 'قطاع B' : 'Sector B'}
                   </span>
-                  <span className="sector-bays-count">{isAr ? 'مواقف #11 إلى #18' : 'Bays #11 to #18'}</span>
+                  <span className="sector-bays-count">
+                    {isAr ? 'مواقف #11 إلى #18' : 'Bays #11 to #18'}
+                  </span>
                 </div>
-                <h4 className="sector-title">{isAr ? 'كلية إدارة الأعمال والعلوم الطبية' : 'Business & Health Sciences'}</h4>
+                <h4 className="sector-title">
+                  {isAr ? 'كلية إدارة الأعمال والعلوم الطبية' : 'Business & Health Sciences'}
+                </h4>
                 <p className="sector-desc">
                   {isAr
                     ? 'مواقف رحبة تواجه المجمع الأكاديمي المركزي، وتدعم مسارات المشاة السريعة للوصول إلى قاعات المحاضرات والمكتبة المركزية.'
@@ -163,12 +205,19 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="sector-guide-card">
                 <div className="sector-card-header">
-                  <span className="sector-pill" style={{ background: 'rgba(215, 162, 55, 0.25)', color: 'var(--fbsu-gold)' }}>
+                  <span
+                    className="sector-pill"
+                    style={{ background: 'rgba(215, 162, 55, 0.25)', color: 'var(--fbsu-gold)' }}
+                  >
                     {isAr ? 'قطاع C' : 'Sector C'}
                   </span>
-                  <span className="sector-bays-count">{isAr ? 'مواقف #19 إلى #24' : 'Bays #19 to #24'}</span>
+                  <span className="sector-bays-count">
+                    {isAr ? 'مواقف #19 إلى #24' : 'Bays #19 to #24'}
+                  </span>
                 </div>
-                <h4 className="sector-title">{isAr ? 'كادر التدريس والقيادات الأكاديمية' : 'Faculty & University Leadership'}</h4>
+                <h4 className="sector-title">
+                  {isAr ? 'كادر التدريس والقيادات الأكاديمية' : 'Faculty & University Leadership'}
+                </h4>
                 <p className="sector-desc">
                   {isAr
                     ? 'مواقف مخصصة ومحمية إلكترونياً لأعضاء هيئة التدريس والعمداء ورؤساء الأقسام، مع إمكانية التبادل الذكي أثناء السفر أو الإجازات.'
@@ -178,12 +227,19 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="sector-guide-card">
                 <div className="sector-card-header">
-                  <span className="sector-pill" style={{ background: 'rgba(16, 185, 129, 0.25)', color: '#10b981' }}>
+                  <span
+                    className="sector-pill"
+                    style={{ background: 'rgba(16, 185, 129, 0.25)', color: '#10b981' }}
+                  >
                     {isAr ? 'قطاع D' : 'Sector D'}
                   </span>
-                  <span className="sector-bays-count">{isAr ? 'مواقف #25 إلى #30' : 'Bays #25 to #30'}</span>
+                  <span className="sector-bays-count">
+                    {isAr ? 'مواقف #25 إلى #30' : 'Bays #25 to #30'}
+                  </span>
                 </div>
-                <h4 className="sector-title">{isAr ? 'شحن المركبات EV وذوو الهمم' : 'EV Fast Charging & Accessible'}</h4>
+                <h4 className="sector-title">
+                  {isAr ? 'شحن المركبات EV وذوو الهمم' : 'EV Fast Charging & Accessible'}
+                </h4>
                 <p className="sector-desc">
                   {isAr
                     ? 'مزودة بمحطات شحن كهربائي فائق السرعة، ومواقف بمساحات واسعة مصممة بالكامل وفق كود الوصول الشامل لأصحاب الهمم.'
@@ -200,19 +256,35 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
                 <ShieldCheck size={36} color="var(--fbsu-gold)" />
               </div>
               <div className="guidelines-text-col">
-                <h4 className="guidelines-title">{isAr ? 'قواعد وإرشادات السلامة في مواقف الجامعة' : 'Campus Parking Policies & Safety'}</h4>
+                <h4 className="guidelines-title">
+                  {isAr
+                    ? 'قواعد وإرشادات السلامة في مواقف الجامعة'
+                    : 'Campus Parking Policies & Safety'}
+                </h4>
                 <ul className="guidelines-list">
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'السرعة القصوى داخل ممرات المواقف هي 15 كم/س لضمان سلامة المشاة والطلاب.' : 'Strict 15 km/h campus speed limit enforced for pedestrian safety.'}</span>
+                    <span>
+                      {isAr
+                        ? 'السرعة القصوى داخل ممرات المواقف هي 15 كم/س لضمان سلامة المشاة والطلاب.'
+                        : 'Strict 15 km/h campus speed limit enforced for pedestrian safety.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'فترة السماح قبل موعد الحجز هي 15 دقيقة لتسهيل وصولك للموقف وحجزه مسبقاً.' : '15-minute arrival grace period applies to all reserved sessions.'}</span>
+                    <span>
+                      {isAr
+                        ? 'فترة السماح قبل موعد الحجز هي 15 دقيقة لتسهيل وصولك للموقف وحجزه مسبقاً.'
+                        : '15-minute arrival grace period applies to all reserved sessions.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'يرجى التأكد من نظافة لوحة المركبة لضمان قراءتها بنجاح عند كاميرات بوابات ALPR.' : 'Ensure clean vehicle plates for flawless touchless optical recognition.'}</span>
+                    <span>
+                      {isAr
+                        ? 'يرجى التأكد من نظافة لوحة المركبة لضمان قراءتها بنجاح عند كاميرات بوابات ALPR.'
+                        : 'Ensure clean vehicle plates for flawless touchless optical recognition.'}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -230,10 +302,14 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             <div className="section-head text-center">
               <span className="section-eyebrow">
                 <Cpu size={14} />
-                <span>{isAr ? 'البنية التحتية والقدرات البحثية' : 'Advanced Research Capabilities'}</span>
+                <span>
+                  {isAr ? 'البنية التحتية والقدرات البحثية' : 'Advanced Research Capabilities'}
+                </span>
               </span>
               <h3 className="section-title">
-                {isAr ? 'التجهيزات المتقدمة ومختبرات الأبحاث والذكاء الاصطناعي' : 'Supercomputing & Research Laboratory Facilities'}
+                {isAr
+                  ? 'التجهيزات المتقدمة ومختبرات الأبحاث والذكاء الاصطناعي'
+                  : 'Supercomputing & Research Laboratory Facilities'}
               </h3>
               <p className="section-subtitle">
                 {isAr
@@ -245,10 +321,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             <div className="explainer-cards-grid">
               <div className="explainer-step-card">
                 <div className="step-card-num">AI</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                >
                   <Cpu size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'مختبر الحوسبة الفائقة و AI' : 'AI & HPC Supercomputing Lab'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'مختبر الحوسبة الفائقة و AI' : 'AI & HPC Supercomputing Lab'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? '20 محطة عمل HP Z8 مزودة بكروت NVIDIA RTX 4090 24GB VRAM مع اتصال ألياف ضوئية 40Gbps لتدريب نماذج Deep Learning و LLMs.'
@@ -258,10 +339,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">NOC</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}
+                >
                   <ShieldCheck size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'مركز العمليات السيبرانية Cisco' : 'Cisco CyberOps NOC Lab'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'مركز العمليات السيبرانية Cisco' : 'Cisco CyberOps NOC Lab'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'جدران مراقبة أمنية Security Video Wall وراوترات Cisco Catalyst 9300 و ISR 4000 مخصصة لاختبارات الاختراق والتحليل الأمني.'
@@ -271,10 +357,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">DEV</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                >
                   <Zap size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'معمل هندسة البرمجيات السحابية' : 'Cloud & Software Engineering Lab'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'معمل هندسة البرمجيات السحابية' : 'Cloud & Software Engineering Lab'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? '24 جهاز Apple iMac و HP Workstation مجهزة بـ Java 21, Python 3.12, Docker, Node.js وسيرفرات تكامل مستمر CI/CD محلي.'
@@ -284,10 +375,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">POD</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                >
                   <Users size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'كبائن التركيز وغرف النقاش' : 'Acoustic Pods & Discussion Rooms'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'كبائن التركيز وغرف النقاش' : 'Acoustic Pods & Discussion Rooms'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'غرف دراسة معزولة صوتياً بمعيار 42dB مزودة بشاشات ذكية 4K ومنصات إضاءة تفاعلية مناسبة للعمل الجماعي والمقابلات.'
@@ -304,19 +400,35 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
                 <Clock size={36} color="var(--fbsu-gold)" />
               </div>
               <div className="guidelines-text-col">
-                <h4 className="guidelines-title">{isAr ? 'سياسة حجز واستخدام المعامل والقاعات' : 'Laboratory Reservation Guidelines'}</h4>
+                <h4 className="guidelines-title">
+                  {isAr
+                    ? 'سياسة حجز واستخدام المعامل والقاعات'
+                    : 'Laboratory Reservation Guidelines'}
+                </h4>
                 <ul className="guidelines-list">
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'الحجز الفوري متاح لجميع طلاب الكلية عبر تسجيل الدخول بالرقم الجامعي.' : 'Instant reservation accessible to all registered university students.'}</span>
+                    <span>
+                      {isAr
+                        ? 'الحجز الفوري متاح لجميع طلاب الكلية عبر تسجيل الدخول بالرقم الجامعي.'
+                        : 'Instant reservation accessible to all registered university students.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'يمكن تمديد الجلسة بحد أقصى 30 دقيقة إضافية في حال عدم وجود حجز لاحق على نفس القاعة.' : 'Sessions extendable by up to 30 minutes subject to subsequent booking availability.'}</span>
+                    <span>
+                      {isAr
+                        ? 'يمكن تمديد الجلسة بحد أقصى 30 دقيقة إضافية في حال عدم وجود حجز لاحق على نفس القاعة.'
+                        : 'Sessions extendable by up to 30 minutes subject to subsequent booking availability.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'يرجى إخلاء المعمل أو كابينة الدراسة قبل 5 دقائق من انتهاء الجلسة للحفاظ على النظافة وجاهزية الأجهزة.' : 'Please release the facility 5 minutes prior to session expiry for sanitization.'}</span>
+                    <span>
+                      {isAr
+                        ? 'يرجى إخلاء المعمل أو كابينة الدراسة قبل 5 دقائق من انتهاء الجلسة للحفاظ على النظافة وجاهزية الأجهزة.'
+                        : 'Please release the facility 5 minutes prior to session expiry for sanitization.'}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -334,10 +446,16 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             <div className="section-head text-center">
               <span className="section-eyebrow">
                 <BookOpen size={14} />
-                <span>{isAr ? 'برنامج التميز الأكاديمي والتمويل الذاتي' : 'Peer Mentorship & Financial Support'}</span>
+                <span>
+                  {isAr
+                    ? 'برنامج التميز الأكاديمي والتمويل الذاتي'
+                    : 'Peer Mentorship & Financial Support'}
+                </span>
               </span>
               <h3 className="section-title">
-                {isAr ? 'كيف يعمل برنامج التدريس بالأقران في جامعة فهد بن سلطان؟' : 'How the Peer Tutoring System Works'}
+                {isAr
+                  ? 'كيف يعمل برنامج التدريس بالأقران في جامعة فهد بن سلطان؟'
+                  : 'How the Peer Tutoring System Works'}
               </h3>
               <p className="section-subtitle">
                 {isAr
@@ -349,10 +467,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             <div className="explainer-cards-grid">
               <div className="explainer-step-card">
                 <div className="step-card-num">01</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                >
                   <Users size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'طرح الجلسة أو حجزها' : 'Publish or Book Session'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'طرح الجلسة أو حجزها' : 'Publish or Book Session'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'يقوم الطالب المتميز بنشر موعد جلسة الشرح للمقرر (CS, CEN, MATH)، أو يختار الطالب المستفيد الجلسة المناسبة لجدوله.'
@@ -362,10 +485,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">02</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}
+                >
                   <CreditCard size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'سداد رمزي (70 ر.س/ساعة)' : 'Affordable 70 SAR Fee'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'سداد رمزي (70 ر.س/ساعة)' : 'Affordable 70 SAR Fee'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'يتم سداد رسوم الجلسة مباشرة من المحفظة الجامعية برسم رمزي مدعوم يضمن التزام الحضور وجدية التعلم.'
@@ -375,10 +503,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">03</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                >
                   <Award size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'تحويل فوري لسداد الرسوم' : 'Direct Tuition Credit'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'تحويل فوري لسداد الرسوم' : 'Direct Tuition Credit'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'تتحول عوائد التدريس فورياً إلى الحساب الجامعي للطالب المعلم لخصمها مباشرة من فاتورة الرسوم الدراسية للفصل الحالي.'
@@ -395,19 +528,33 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
                 <Award size={36} color="var(--fbsu-gold)" />
               </div>
               <div className="guidelines-text-col">
-                <h4 className="guidelines-title">{isAr ? 'معايير وشروط الانضمام كمعلم أقران' : 'Peer Tutor Qualification Criteria'}</h4>
+                <h4 className="guidelines-title">
+                  {isAr ? 'معايير وشروط الانضمام كمعلم أقران' : 'Peer Tutor Qualification Criteria'}
+                </h4>
                 <ul className="guidelines-list">
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'معدل تراكمي لا يقل عن 3.5 من 4.0 مع الحصول على تقدير A أو A+ في المقرر المستهدف.' : 'Minimum 3.5/4.0 CGPA and A or A+ grade earned in the targeted course.'}</span>
+                    <span>
+                      {isAr
+                        ? 'معدل تراكمي لا يقل عن 3.5 من 4.0 مع الحصول على تقدير A أو A+ في المقرر المستهدف.'
+                        : 'Minimum 3.5/4.0 CGPA and A or A+ grade earned in the targeted course.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'تزكية أكاديمية معتمدة من أستاذ المقرر أو رئيس القسم المختص.' : 'Formal endorsement from course instructor or department chair.'}</span>
+                    <span>
+                      {isAr
+                        ? 'تزكية أكاديمية معتمدة من أستاذ المقرر أو رئيس القسم المختص.'
+                        : 'Formal endorsement from course instructor or department chair.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'الحفاظ على تقييم طلابي إيجابي (4.5+ نجوم) لضمان استمرارية صلاحية التدريس.' : 'Maintain a 4.5+ star evaluation score to retain peer tutoring privileges.'}</span>
+                    <span>
+                      {isAr
+                        ? 'الحفاظ على تقييم طلابي إيجابي (4.5+ نجوم) لضمان استمرارية صلاحية التدريس.'
+                        : 'Maintain a 4.5+ star evaluation score to retain peer tutoring privileges.'}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -428,7 +575,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
                 <span>{isAr ? 'التواصل الأكاديمي المباشر' : 'Direct Faculty Advising'}</span>
               </span>
               <h3 className="section-title">
-                {isAr ? 'منصة الساعات المكتبية والتوجيه الأكاديمي والمهني' : 'Academic Leadership & Mentorship Consultations'}
+                {isAr
+                  ? 'منصة الساعات المكتبية والتوجيه الأكاديمي والمهني'
+                  : 'Academic Leadership & Mentorship Consultations'}
               </h3>
               <p className="section-subtitle">
                 {isAr
@@ -440,10 +589,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             <div className="explainer-cards-grid">
               <div className="explainer-step-card">
                 <div className="step-card-num">01</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(17, 110, 99, 0.15)', color: 'var(--fbsu-primary)' }}
+                >
                   <BookOpen size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'الإرشاد والخطط الدراسية' : 'Curriculum & Academic Plans'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'الإرشاد والخطط الدراسية' : 'Curriculum & Academic Plans'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'مناقشة متطلبات التخرج، معادلة المقررات، حل مشاكل التعارض في الجداول، والتوجيه لاختيار المسارات التخصصية.'
@@ -453,10 +607,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">02</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(215, 162, 55, 0.15)', color: 'var(--fbsu-gold)' }}
+                >
                   <Award size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'مشاريع التخرج والأبحاث' : 'Capstone Projects & Research'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'مشاريع التخرج والأبحاث' : 'Capstone Projects & Research'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'عرض أفكار مشاريع التخرج، الحصول على إشراف مباشر من الأساتذة، ومناقشة نشر الأوراق العلمية في المجلات المحكمة.'
@@ -466,10 +625,15 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
 
               <div className="explainer-step-card">
                 <div className="step-card-num">03</div>
-                <div className="step-card-icon-wrap" style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}>
+                <div
+                  className="step-card-icon-wrap"
+                  style={{ background: 'rgba(56, 194, 176, 0.15)', color: '#38c2b0' }}
+                >
                   <Users size={24} />
                 </div>
-                <h4 className="step-card-title">{isAr ? 'التدريب التعاوني والتوظيف' : 'Internships & NEOM Placements'}</h4>
+                <h4 className="step-card-title">
+                  {isAr ? 'التدريب التعاوني والتوظيف' : 'Internships & NEOM Placements'}
+                </h4>
                 <p className="step-card-desc">
                   {isAr
                     ? 'الحصول على خطابات التوصية واستشارات التدريب الصيفي لدى الشركاء الصناعيين في نيوم ومشروع البحر الأحمر.'
@@ -486,19 +650,33 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
                 <Clock size={36} color="var(--fbsu-gold)" />
               </div>
               <div className="guidelines-text-col">
-                <h4 className="guidelines-title">{isAr ? 'إرشادات حضور الساعات المكتبية' : 'Appointment Guidelines & Protocol'}</h4>
+                <h4 className="guidelines-title">
+                  {isAr ? 'إرشادات حضور الساعات المكتبية' : 'Appointment Guidelines & Protocol'}
+                </h4>
                 <ul className="guidelines-list">
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'يصل إشعار فوري للعمادة وأستاذ المقرر فور تأكيد حجز الموعد على النظام.' : 'Immediate automated notification is dispatched to deanery upon slot booking.'}</span>
+                    <span>
+                      {isAr
+                        ? 'يصل إشعار فوري للعمادة وأستاذ المقرر فور تأكيد حجز الموعد على النظام.'
+                        : 'Immediate automated notification is dispatched to deanery upon slot booking.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'يرجى كتابة موضوع الاستفسار بوضوح في نموذج الحجز لتمكين عضو هيئة التدريس من التحضير المسبق.' : 'State consultation inquiry clearly in reservation note to allow advance faculty preparation.'}</span>
+                    <span>
+                      {isAr
+                        ? 'يرجى كتابة موضوع الاستفسار بوضوح في نموذج الحجز لتمكين عضو هيئة التدريس من التحضير المسبق.'
+                        : 'State consultation inquiry clearly in reservation note to allow advance faculty preparation.'}
+                    </span>
                   </li>
                   <li>
                     <CheckCircle2 size={15} color="var(--fbsu-primary)" />
-                    <span>{isAr ? 'في حال الرغبة بالإلغاء، يرجى الإلغاء قبل ساعتين على الأقل لإتاحة الفرصة لزميل آخر.' : 'Cancel at least 2 hours prior to liberate appointment time for fellow students.'}</span>
+                    <span>
+                      {isAr
+                        ? 'في حال الرغبة بالإلغاء، يرجى الإلغاء قبل ساعتين على الأقل لإتاحة الفرصة لزميل آخر.'
+                        : 'Cancel at least 2 hours prior to liberate appointment time for fellow students.'}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -515,10 +693,14 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
           <div className="section-head text-center">
             <span className="section-eyebrow">
               <ShieldCheck size={14} />
-              <span>{isAr ? 'الذكاء الاصطناعي للبوابات' : 'Computer Vision Gate Architecture'}</span>
+              <span>
+                {isAr ? 'الذكاء الاصطناعي للبوابات' : 'Computer Vision Gate Architecture'}
+              </span>
             </span>
             <h3 className="section-title">
-              {isAr ? 'كيف تقرأ البوابة لوحات المركبات وتتحقق من التصاريح؟' : 'How Automated License Plate Recognition Works'}
+              {isAr
+                ? 'كيف تقرأ البوابة لوحات المركبات وتتحقق من التصاريح؟'
+                : 'How Automated License Plate Recognition Works'}
             </h3>
           </div>
 
@@ -534,7 +716,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">02</div>
-              <h4 className="step-card-title">{isAr ? 'معالجة اللوحة OCR' : 'Optical Neural OCR'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'معالجة اللوحة OCR' : 'Optical Neural OCR'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'نموذج ذكاء اصطناعي مدرب على اللوحات السعودية يحلل الحروف والأرقام العربية والإنجليزية بدقة 99.4%.'
@@ -543,7 +727,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">03</div>
-              <h4 className="step-card-title">{isAr ? 'المطابقة السحابية' : 'Cloud Verification'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'المطابقة السحابية' : 'Cloud Verification'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'مطابقة اللوحة مع قاعدة بيانات التصاريح والحجوزات الحية للجامعة في أقل من 300 مللي ثانية.'
@@ -571,17 +757,23 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
           <div className="section-head text-center">
             <span className="section-eyebrow">
               <Zap size={14} />
-              <span>{isAr ? 'مبدأ التبادل الذكي واستثمار المواقف' : 'Smart Spot Sharing Principles'}</span>
+              <span>
+                {isAr ? 'مبدأ التبادل الذكي واستثمار المواقف' : 'Smart Spot Sharing Principles'}
+              </span>
             </span>
             <h3 className="section-title">
-              {isAr ? 'استثمر موقفك أثناء مغادرتك واكسب رصيداً جامعيًا' : 'Monetize Vacant Hours & Elevate Campus Capacity'}
+              {isAr
+                ? 'استثمر موقفك أثناء مغادرتك واكسب رصيداً جامعيًا'
+                : 'Monetize Vacant Hours & Elevate Campus Capacity'}
             </h3>
           </div>
 
           <div className="explainer-cards-grid">
             <div className="explainer-step-card">
               <div className="step-card-num">01</div>
-              <h4 className="step-card-title">{isAr ? 'تحديد فترة المغادرة' : 'Specify Break Interval'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'تحديد فترة المغادرة' : 'Specify Break Interval'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'حدد مدة غيابك عن الحرم الجامعي (من 1 إلى 5 ساعات) واضغط على "تفعيل التبادل الذكي".'
@@ -590,7 +782,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">02</div>
-              <h4 className="step-card-title">{isAr ? 'إتاحة الموقف للزملاء' : 'Peer Spot Allocation'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'إتاحة الموقف للزملاء' : 'Peer Spot Allocation'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'يتحول موقفك تلقائياً في الخريطة الحية إلى لون التبادل الذهبي ليتمكن زملاؤك من حجزه.'
@@ -599,7 +793,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">03</div>
-              <h4 className="step-card-title">{isAr ? 'كسب العائد المالي' : 'Instant Wallet Reward'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'كسب العائد المالي' : 'Instant Wallet Reward'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'فور وقوف المركبة البديلة، يُحول العائد المالي المحدد مباشرة إلى رصيد محفظتك الجامعية.'
@@ -646,7 +842,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">DAY</div>
-              <h4 className="step-card-title">{isAr ? 'التصريح اليومي الشامل' : 'Full-Day Campus Pass'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'التصريح اليومي الشامل' : 'Full-Day Campus Pass'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'تصريح ليوم دراسي كامل يتيح الدخول والخروج المتكرر من كافة بوابات الحرم الجامعي.'
@@ -655,7 +853,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">SEM</div>
-              <h4 className="step-card-title">{isAr ? 'الاشتراك الفصلي المحمي' : 'Semester Protected Pass'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'الاشتراك الفصلي المحمي' : 'Semester Protected Pass'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'موقف مخصص ومحمي باسمك طوال الفصل الدراسي لطلاب الدراسات العليا وأعضاء الهيئة.'
@@ -677,14 +877,18 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
               <span>{isAr ? 'التكامل المالي الرقمي' : 'Academic Invoicing Integration'}</span>
             </span>
             <h3 className="section-title">
-              {isAr ? 'سداد الرسوم الدراسية وإصدار الإيصالات الموثقة' : 'Tuition Settlement & Verified Receipts'}
+              {isAr
+                ? 'سداد الرسوم الدراسية وإصدار الإيصالات الموثقة'
+                : 'Tuition Settlement & Verified Receipts'}
             </h3>
           </div>
 
           <div className="explainer-cards-grid">
             <div className="explainer-step-card">
               <div className="step-card-num">01</div>
-              <h4 className="step-card-title">{isAr ? 'سداد مباشر من المحفظة' : 'Direct Wallet Settlement'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'سداد مباشر من المحفظة' : 'Direct Wallet Settlement'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'استخدم رصيد محفظتك المكتسب من التدريس بالأقران والتبادل الذكي لسداد فواتيرك الأكاديمية.'
@@ -693,7 +897,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">02</div>
-              <h4 className="step-card-title">{isAr ? 'إيصال مشفر بـ QR Code' : 'Cryptographic QR Receipts'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'إيصال مشفر بـ QR Code' : 'Cryptographic QR Receipts'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'يصدر النظام إيصال سداد رسمي معتمد ومزود برمز QR يتيح التحقق الفوري لعمادة القبول.'
@@ -702,7 +908,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">03</div>
-              <h4 className="step-card-title">{isAr ? 'خطط التقسيط الميسرة' : 'Flexible Payment Plans'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'خطط التقسيط الميسرة' : 'Flexible Payment Plans'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'خيارات تقسيط مجدولة تتوافق مع التقويم الدراسي وتضمن استمرارية تسجيلك بدون تأخير.'
@@ -724,14 +932,18 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
               <span>{isAr ? 'منظومة الدفع الموحدة' : 'Unified Campus Payments'}</span>
             </span>
             <h3 className="section-title">
-              {isAr ? 'استخدامات المحفظة الجامعية والتحويل الفوري' : 'Campus Digital Wallet Features'}
+              {isAr
+                ? 'استخدامات المحفظة الجامعية والتحويل الفوري'
+                : 'Campus Digital Wallet Features'}
             </h3>
           </div>
 
           <div className="explainer-cards-grid">
             <div className="explainer-step-card">
               <div className="step-card-num">01</div>
-              <h4 className="step-card-title">{isAr ? 'سداد فوري لكافة الخدمات' : 'All-in-One Payments'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'سداد فوري لكافة الخدمات' : 'All-in-One Payments'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'ادفع رسوم المواقف، جلسات التدريس، وحجز المعامل بنقرة واحدة بدون بطاقات مصرفية متكررة.'
@@ -740,7 +952,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">02</div>
-              <h4 className="step-card-title">{isAr ? 'تحويل فوري بين الطلاب P2P' : 'Instant Student P2P'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'تحويل فوري بين الطلاب P2P' : 'Instant Student P2P'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'حول الرصيد لزملائك الطلاب فورياً عبر الرقم الجامعي لمشاركة مصاريف الكتب والمشاريع.'
@@ -749,7 +963,9 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({
             </div>
             <div className="explainer-step-card">
               <div className="step-card-num">03</div>
-              <h4 className="step-card-title">{isAr ? 'سجل محاسبي موثق Ledger' : 'Audited Financial Ledger'}</h4>
+              <h4 className="step-card-title">
+                {isAr ? 'سجل محاسبي موثق Ledger' : 'Audited Financial Ledger'}
+              </h4>
               <p className="step-card-desc">
                 {isAr
                   ? 'سجل شفاف يوثق كل عملية إيداع، خصم، أو تحويل مع رقم مرجعي فريد وتاريخ العملية بدقة.'
