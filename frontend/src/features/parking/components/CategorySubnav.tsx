@@ -9,6 +9,7 @@ import {
   Users,
   UserCheck,
   DoorClosed,
+  Bus,
 } from 'lucide-react';
 import { soundFX } from '../../../shared/utils/sound';
 
@@ -20,7 +21,9 @@ export interface CategorySubnavProps {
 
 export const CategorySubnav: FC<CategorySubnavProps> = ({ activeTab, isAr, onTabChange }) => {
   const isParkingCategory = ['map', 'booking', 'gate', 'share'].includes(activeTab);
-  const isCampusCategory = ['tutoring', 'office-hours', 'rooms'].includes(activeTab);
+  const isCampusCategory = ['tutoring', 'office-hours', 'rooms', 'bus', 'transit'].includes(
+    activeTab
+  );
 
   if (!isParkingCategory && !isCampusCategory) return null;
 
@@ -126,6 +129,18 @@ export const CategorySubnav: FC<CategorySubnavProps> = ({ activeTab, isAr, onTab
           >
             <DoorClosed size={13} />
             <span>{isAr ? 'حجز القاعات ومعامل الحاسوب' : 'Labs & Study Pods'}</span>
+          </button>
+
+          <button
+            className={`subnav-chip-btn ${activeTab === 'bus' || activeTab === 'transit' ? 'active' : ''}`}
+            onClick={() => {
+              soundFX.playClick();
+              onTabChange('bus');
+            }}
+            type="button"
+          >
+            <Bus size={13} />
+            <span>{isAr ? 'الحافلات الترددية الذكية' : 'Smart Shuttles'}</span>
           </button>
         </div>
       )}

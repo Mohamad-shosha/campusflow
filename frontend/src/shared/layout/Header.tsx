@@ -20,6 +20,7 @@ import {
   UserCheck,
   DoorClosed,
   GraduationCap,
+  Bus,
   LogIn,
   LogOut,
 } from 'lucide-react';
@@ -73,7 +74,14 @@ export const Header: FC<HeaderProps> = ({
   };
 
   const isParkingActive = ['map', 'booking', 'gate', 'share'].includes(activeTab);
-  const isCampusActive = ['tuition', 'tutoring', 'office-hours', 'rooms'].includes(activeTab);
+  const isCampusActive = [
+    'tuition',
+    'tutoring',
+    'office-hours',
+    'rooms',
+    'bus',
+    'transit',
+  ].includes(activeTab);
 
   return (
     <header className="main-header" ref={headerRef} data-testid="main-header">
@@ -222,6 +230,24 @@ export const Header: FC<HeaderProps> = ({
                   <div className="dropdown-item-info">
                     <span className="dropdown-item-title">{t('nav.studyRooms')}</span>
                     <span className="dropdown-item-desc">{t('nav.studyRoomsDesc')}</span>
+                  </div>
+                </button>
+                <button
+                  className={`dropdown-item ${activeTab === 'bus' || activeTab === 'transit' ? 'active' : ''}`}
+                  onClick={() => handleDropdownItemClick('bus')}
+                  type="button"
+                  data-testid="nav-transit-item"
+                >
+                  <Bus size={14} />
+                  <div className="dropdown-item-info">
+                    <span className="dropdown-item-title">
+                      {isAr ? 'حافلات النقل الجامعي الذكي' : 'Campus Transit & Shuttles'}
+                    </span>
+                    <span className="dropdown-item-desc">
+                      {isAr
+                        ? 'أسطول الحافلات الترددية وتذاكر الصعود الفورية'
+                        : 'Eco-shuttle fleet & live boarding passes'}
+                    </span>
                   </div>
                 </button>
               </div>

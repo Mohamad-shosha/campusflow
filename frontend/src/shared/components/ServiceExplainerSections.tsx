@@ -14,6 +14,7 @@ import {
   UserCheck,
   CreditCard,
   QrCode,
+  Bus,
 } from 'lucide-react';
 
 export type SupportedService =
@@ -26,7 +27,9 @@ export type SupportedService =
   | 'booking'
   | 'tuition'
   | 'wallet'
-  | 'analytics';
+  | 'analytics'
+  | 'bus'
+  | 'transit';
 
 export interface ServiceExplainerSectionsProps {
   service: SupportedService;
@@ -970,6 +973,63 @@ export const ServiceExplainerSections: FC<ServiceExplainerSectionsProps> = ({ se
                 {isAr
                   ? 'سجل شفاف يوثق كل عملية إيداع، خصم، أو تحويل مع رقم مرجعي فريد وتاريخ العملية بدقة.'
                   : 'Immutable ledger logging every debit, credit, and transfer with unique reference IDs.'}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          11. TRANSIT & ECO-SHUTTLE FLEET EXPLAINER SECTIONS
+          ========================================================================= */}
+      {(service === 'bus' || service === 'transit') && (
+        <section className="service-explainer-block" data-testid="explainer-transit-block">
+          <div className="section-header-centered">
+            <span className="section-eyebrow">
+              <Bus size={14} />
+              <span>
+                {isAr ? 'منظومة النقل الترددي الصديق للبيئة' : 'Eco-Shuttle Transit System'}
+              </span>
+            </span>
+            <h3 className="section-title">
+              {isAr
+                ? 'كيف تعمل منظومة الحافلات الكهربائية وتذاكر الصعود الذكية'
+                : 'How FBSU Smart Shuttles & QR Boarding Passes Work'}
+            </h3>
+          </div>
+
+          <div className="explainer-cards-grid">
+            <div className="explainer-step-card">
+              <div className="step-card-num">01</div>
+              <h4 className="step-card-title">
+                {isAr ? 'تتبع لحظي للأسطول والمقاعد الشاغرة' : 'Live Fleet Telemetry & Seats'}
+              </h4>
+              <p className="step-card-desc">
+                {isAr
+                  ? 'شاهد موقع كل حافلة بدقة، نسبة شحن البطارية، وعدد المقاعد الشاغرة قبل التوجه للمحطة.'
+                  : 'Track real-time shuttle location, EV battery percentage, and seat occupancy before heading to the stop.'}
+              </p>
+            </div>
+            <div className="explainer-step-card">
+              <div className="step-card-num">02</div>
+              <h4 className="step-card-title">
+                {isAr ? 'تذكرة صعود رقمية مشفرة بـ QR' : 'Encrypted QR Boarding Pass'}
+              </h4>
+              <p className="step-card-desc">
+                {isAr
+                  ? 'أصدر تصريح ركوب فوري مشفر يرتبط برقمك الجامعي ومحطة الوصول بنقرة زر واحدة ومجاناً.'
+                  : 'Generate a cryptographic digital boarding token tied to your student ID and destination stop with zero friction.'}
+              </p>
+            </div>
+            <div className="explainer-step-card">
+              <div className="step-card-num">03</div>
+              <h4 className="step-card-title">
+                {isAr ? 'حرم جامعي أخضر وصفر انبعاثات' : 'Zero-Emission Green Campus'}
+              </h4>
+              <p className="step-card-desc">
+                {isAr
+                  ? 'أسطول حافلات كهربائي 100% يربط بوابات الحرم ومواقف السيارات بكافة الكليات بتردد كل 10 دقائق.'
+                  : '100% electric bus fleet connecting campus gates, parking lots, and faculties on a 10-minute cadence.'}
               </p>
             </div>
           </div>

@@ -47,7 +47,10 @@ import {
   Award,
   Zap,
   Users,
+  Bus,
 } from 'lucide-react';
+
+import { TransitView } from '../features/transit/components/TransitView';
 
 import { TutoringView } from '../features/campus/components/TutoringView';
 import { tutoringApi } from '../features/campus/api/tutoringApi';
@@ -867,6 +870,51 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         />
       )}
 
+      {(activeTab === 'bus' || activeTab === 'transit') && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'منظومة النقل الترددي والحافلات الذكية - جامعة فهد بن سلطان'
+              : 'Smart Campus Transit & Eco-Shuttle Fleet - FBSU'
+          }
+          tagIcon={Bus}
+          title={isAr ? 'أسطول الحافلات الجامعية' : 'Campus Transit Fleet &'}
+          highlightText={isAr ? 'والنقل الذكي الصديق للبيئة' : 'Smart Eco-Shuttle Network'}
+          description={
+            isAr
+              ? 'تتبع فوري لأسطول الحافلات الكهربائية داخل الحرم الجامعي، مواعيد التردد بين الكليات ومواقف السيارات، وإصدار تذاكر الصعود الفورية عبر رمز QR الموحد.'
+              : 'Real-time GPS tracking for electric campus shuttles, live timetable between faculties and parking zones, and instant QR boarding pass issuance.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'أسطول كهربائي 100%' : '100% Electric Fleet',
+              value: 'صفر انبعاثات',
+              icon: Zap,
+              color: '#10B981',
+            },
+            {
+              label: isAr ? 'معدل التردد بين المحطات' : 'Transit Frequency',
+              value: '10 دقائق',
+              icon: Sparkles,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'خطوط تغطي الحرم' : 'Active Campus Lines',
+              value: '3 مسارات',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'الركوب لجميع الطلاب' : 'Student Access',
+              value: 'مجاني بالكامل',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
       <div
         className="container"
         style={{ marginTop: '2.5rem', minHeight: '60vh', paddingBottom: '3rem' }}
@@ -1102,6 +1150,16 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               />
             </div>
             <ServiceExplainerSections service="tuition" isAr={isAr} onNavigate={setActiveTab} />
+          </>
+        )}
+
+        {/* Tab 13: Transit & Eco-Shuttle (Dedicated Transit Service Portal) */}
+        {(activeTab === 'bus' || activeTab === 'transit') && (
+          <>
+            <div style={{ marginTop: '1rem' }}>
+              <TransitView isAr={isAr} />
+            </div>
+            <ServiceExplainerSections service="bus" isAr={isAr} onNavigate={setActiveTab} />
           </>
         )}
 
