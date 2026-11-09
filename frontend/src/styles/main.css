@@ -915,19 +915,24 @@ body.theme-light .persona-badge-box {
 .btn-gold {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
-  background: var(--fbsu-gold);
-  color: #0b1a17;
-  padding: 0.8rem 1.6rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #0b1a17 !important;
+  padding: 0.85rem 1.6rem;
   border-radius: var(--radius-md);
   font-weight: 800;
   font-size: 0.95rem;
-  box-shadow: 0 4px 18px rgba(215, 162, 55, 0.3);
+  box-shadow: 0 4px 18px rgba(217, 119, 6, 0.38);
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
 }
 
 .btn-gold:hover {
-  background: var(--fbsu-gold-hover);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(217, 119, 6, 0.55);
 }
 
 .btn-outline {
@@ -2297,31 +2302,49 @@ body.theme-light .hub-filter-btn {
   box-shadow: 0 4px 12px rgba(17, 110, 99, 0.35);
 }
 
-/* 1. Student Tutoring Hub Cards */
-.tutoring-grid {
+/* 1. Student Tutoring Hub Cards & Deluxe Showcase Hub Cards */
+.tutoring-grid,
+.showcase-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 1.5rem;
 }
 
-.tutoring-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+@media (max-width: 768px) {
+  .tutoring-grid,
+  .showcase-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tutoring-card,
+.showcase-deluxe-card {
+  background: linear-gradient(180deg, rgba(13, 29, 26, 0.96) 0%, rgba(7, 18, 16, 0.98) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.22);
   border-radius: var(--radius-xl);
-  padding: 1.6rem;
+  padding: 1.65rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.28s var(--ease);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--card-shadow);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.52);
 }
 
-.tutoring-card:hover {
+.tutoring-card:hover,
+.showcase-deluxe-card:hover {
   transform: translateY(-4px);
-  border-color: var(--fbsu-gold-border);
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.65), 0 0 25px rgba(16, 185, 129, 0.15);
+}
+
+.showcase-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+  line-height: 1.35;
 }
 
 .tutoring-top-bar {

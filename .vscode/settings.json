@@ -17,6 +17,13 @@
   "java.autobuild.enabled": true,
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.compile.nullAnalysis.mode": "disabled",
+  "java.compiler.problem.unusedLocalVariable": "ignore",
+  "java.compiler.problem.unusedParameter": "ignore",
+  "java.compiler.problem.unusedImport": "ignore",
+  "java.compiler.problem.unusedPrivateMember": "ignore",
+  "java.compiler.problem.rawTypeReference": "ignore",
+  "java.compiler.problem.deprecation": "ignore",
+  "java.compiler.problem.staticMethodShouldBeAccessedInAStaticWay": "ignore",
   "editor.formatOnSave": false,
   "files.eol": "\n",
   "search.exclude": {

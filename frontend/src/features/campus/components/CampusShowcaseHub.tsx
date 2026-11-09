@@ -11,6 +11,13 @@ import {
   Wallet,
   ArrowRight,
   ArrowLeft,
+  Award,
+  Clock,
+  MapPin,
+  Users,
+  Coffee,
+  CreditCard,
+  Navigation,
 } from 'lucide-react';
 import { soundFX } from '../../../shared/utils/sound';
 import {
@@ -44,7 +51,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
       style={{ marginTop: '3.5rem' }}
     >
       {/* 1. SECTION: Smart Research Labs & High-Performance Study Hubs */}
-      <section className="showcase-section" style={{ marginBottom: '3.5rem' }}>
+      <section className="showcase-section" style={{ marginBottom: '4rem' }}>
         <div
           className="section-head"
           style={{
@@ -53,7 +60,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
             alignItems: 'flex-end',
             flexWrap: 'wrap',
             gap: '1rem',
-            marginBottom: '1.5rem',
+            marginBottom: '1.75rem',
           }}
         >
           <div>
@@ -116,149 +123,164 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
         </div>
 
         {/* Labs Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.25rem',
-          }}
-        >
+        <div className="showcase-grid">
           {featuredRooms.map(room => {
             const isAvailable = room.status === 'available';
-            const statusColor = isAvailable
-              ? '#10b981'
-              : room.status === 'in-use'
-                ? '#f59e0b'
-                : '#3b82f6';
-            const statusLabel = isAvailable
+            const statusNum = isAvailable
               ? isAr
-                ? 'متاحة للحجز الفوري'
-                : 'Available Now'
+                ? 'متاح الآن'
+                : 'Available'
               : room.status === 'in-use'
                 ? isAr
-                  ? 'جلسة نشطة حالياً'
-                  : 'Session Active'
+                  ? 'جلسة نشطة'
+                  : 'In Session'
                 : isAr
-                  ? 'محجوزة مسبقاً'
+                  ? 'محجوز'
                   : 'Reserved';
+            const statusUnit = isAvailable
+              ? isAr
+                ? 'حجز فوري'
+                : 'Instant Book'
+              : isAr
+                ? 'حتى 02:00 م'
+                : 'Until 2PM';
 
             return (
               <div
                 key={room.id}
-                className="glass-panel"
-                style={{
-                  padding: '1.5rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  backdropFilter: 'blur(12px)',
-                  transition: 'all 0.25s ease',
-                }}
+                className="tutoring-card showcase-deluxe-card"
+                data-testid={`showcase-lab-${room.id}`}
               >
                 <div>
+                  {/* Top Bar */}
+                  <div className="tutoring-top-bar">
+                    <span className="course-code-badge">
+                      <Cpu size={13} color="var(--fbsu-primary)" />
+                      <span>{isAr ? room.typeBadge : room.typeBadgeEn || room.typeBadge}</span>
+                    </span>
+
+                    <div className="tutor-rate-badge">
+                      <span
+                        className="tutor-rate-num"
+                        style={{ color: isAvailable ? '#10b981' : '#f59e0b', fontSize: '1.1rem' }}
+                      >
+                        {statusNum}
+                      </span>
+                      <span className="tutor-rate-unit">{statusUnit}</span>
+                    </div>
+                  </div>
+
+                  {/* Profile Strip */}
+                  <div className="tutor-profile-strip">
+                    <div
+                      className="tutor-avatar-circle"
+                      style={{
+                        background: 'linear-gradient(135deg, #0d9488 0%, #042f2e 100%)',
+                        borderColor: 'rgba(45, 212, 191, 0.4)',
+                      }}
+                    >
+                      <Cpu size={22} color="#ffffff" />
+                    </div>
+                    <div className="tutor-info-meta">
+                      <div className="tutor-title-row">
+                        <span className="tutor-name">
+                          {isAr ? room.typeBadge : room.typeBadgeEn || room.typeBadge}
+                        </span>
+                        <span className="tutor-badge-tag">
+                          {isAr ? 'معمل بحثي معتمد' : 'Verified Facility'}
+                        </span>
+                      </div>
+                      <div className="tutor-college-text">
+                        {isAr ? room.building : room.buildingEn || room.building}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          fontSize: '0.75rem',
+                          color: 'var(--fbsu-gold)',
+                          marginTop: '0.25rem',
+                        }}
+                      >
+                        <span>★ 4.98</span>
+                        <span style={{ color: 'var(--text-dim)' }}>
+                          ({isAr ? 'تجهيزات فائقة' : 'High Spec HPC'})
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h4 className="showcase-card-title">
+                    {isAr ? room.name : room.nameEn || room.name}
+                  </h4>
+
+                  {/* Inset Scope Box */}
+                  <div className="tutoring-content-box">
+                    <div className="lectures-scope-title">
+                      <Cpu size={14} color="var(--fbsu-gold)" />
+                      <span>
+                        {room.specs && room.specs[0]
+                          ? room.specs[0]
+                          : isAr
+                            ? 'تجهيزات الحوسبة المتقدمة'
+                            : 'Hardware Specifications'}
+                      </span>
+                    </div>
+                    <div className="lectures-scope-desc">
+                      {room.specs && room.specs[1]
+                        ? room.specs[1]
+                        : isAr
+                          ? 'اتصال مباشر بشبكة الألياف الضوئية الفائقة 40Gbps وحوسبة سحابية متقدمة.'
+                          : 'Direct 40Gbps HPC cluster connection and cloud computing.'}
+                    </div>
+                  </div>
+
+                  {/* Meta Details Row */}
+                  <div className="tutoring-meta-row">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <MapPin size={14} color="var(--text-dim)" />
+                      <span>{isAr ? room.building : room.buildingEn || room.building}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <DoorClosed size={14} color="var(--text-dim)" />
+                      <span>{isAr ? 'دخول فوري بالـ NFC' : 'Instant NFC Entry'}</span>
+                    </div>
+                  </div>
+
                   <div
                     style={{
+                      fontSize: '0.76rem',
+                      color: 'var(--text-muted)',
                       display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
+                      alignItems: 'center',
+                      gap: '0.35rem',
                       marginBottom: '0.75rem',
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
-                        padding: '0.2rem 0.6rem',
-                        borderRadius: '999px',
-                        background: 'rgba(13, 148, 136, 0.15)',
-                        color: 'var(--fbsu-primary)',
-                        border: '1px solid rgba(13, 148, 136, 0.3)',
-                      }}
-                    >
-                      {isAr ? room.typeBadge : room.typeBadgeEn || room.typeBadge}
-                    </span>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        color: statusColor,
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          background: statusColor,
-                          boxShadow: `0 0 8px ${statusColor}`,
-                        }}
-                      />
-                      <span>{statusLabel}</span>
+                    <Users size={13} color="var(--fbsu-primary)" />
+                    <span>
+                      {isAr
+                        ? `السعة الاستيعابية: ${room.capacity}`
+                        : `Capacity: ${room.capacity}`}
                     </span>
                   </div>
 
-                  <h4
-                    style={{
-                      fontSize: '1.1rem',
-                      fontWeight: 800,
-                      color: 'var(--text-main)',
-                      marginBottom: '0.35rem',
-                    }}
-                  >
-                    {isAr ? room.name : room.nameEn || room.name}
-                  </h4>
-                  <p
-                    style={{
-                      fontSize: '0.8rem',
-                      color: 'var(--text-dim)',
-                      marginBottom: '0.85rem',
-                    }}
-                  >
-                    {isAr ? room.building : room.buildingEn || room.building}
-                  </p>
-
-                  <div
-                    style={{
-                      fontSize: '0.82rem',
-                      color: 'var(--text-muted)',
-                      marginBottom: '1rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                    }}
-                  >
-                    <DoorClosed size={14} color="var(--fbsu-gold)" />
-                    <span>{isAr ? room.capacity : room.capacityEn || room.capacity}</span>
+                  {/* Routing / Security Notice */}
+                  <div className="wallet-routing-notice">
+                    <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                    <span>
+                      {isAr
+                        ? 'حجز فوري ومؤكد متصل بأنظمة الأبواب الذكية IoT وسيرفرات الكلية.'
+                        : 'Instant reservation synced with campus IoT smart locks & compute.'}
+                    </span>
                   </div>
-
-                  {room.specs && room.specs.length > 0 && (
-                    <ul
-                      style={{
-                        margin: '0 0 1.25rem 0',
-                        paddingInlineStart: '1.1rem',
-                        fontSize: '0.78rem',
-                        color: 'var(--text-dim)',
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {(isAr ? room.specs : room.specsEn || room.specs)
-                        .slice(0, 2)
-                        .map((spec, sIdx) => (
-                          <li key={sIdx}>{spec}</li>
-                        ))}
-                    </ul>
-                  )}
                 </div>
 
+                {/* Golden CTA Button */}
                 <button
                   type="button"
-                  className={isAvailable ? 'btn-primary' : 'btn-glass'}
+                  className="btn-gold"
                   onClick={() => {
                     soundFX.playClick();
                     onNavigate('rooms');
@@ -266,11 +288,11 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                   style={{
                     width: '100%',
                     justifyContent: 'center',
-                    fontSize: '0.85rem',
-                    padding: '0.65rem 1rem',
+                    padding: '0.85rem',
+                    fontSize: '0.9rem',
                   }}
                 >
-                  <DoorClosed size={15} />
+                  <DoorClosed size={16} />
                   <span>
                     {isAvailable
                       ? isAr
@@ -288,7 +310,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
       </section>
 
       {/* 2. SECTION: Academic Advising & Distinguished Faculty Office Hours */}
-      <section className="showcase-section" style={{ marginBottom: '3.5rem' }}>
+      <section className="showcase-section" style={{ marginBottom: '4rem' }}>
         <div
           className="section-head"
           style={{
@@ -297,7 +319,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
             alignItems: 'flex-end',
             flexWrap: 'wrap',
             gap: '1rem',
-            marginBottom: '1.5rem',
+            marginBottom: '1.75rem',
           }}
         >
           <div>
@@ -360,123 +382,164 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
         </div>
 
         {/* Faculty Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.25rem',
-          }}
-        >
-          {featuredFaculty.map(faculty => (
-            <div
-              key={faculty.id}
-              className="glass-panel"
-              style={{
-                padding: '1.5rem',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                background: 'rgba(15, 23, 42, 0.65)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.85rem',
-                    marginBottom: '1rem',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '46px',
-                      height: '46px',
-                      borderRadius: '50%',
-                      background: faculty.avatarColor,
-                      color: '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 800,
-                      fontSize: '1.15rem',
-                      boxShadow: `0 4px 12px ${faculty.avatarColor}55`,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {faculty.name.split(' ').slice(1, 2)[0]?.charAt(0) || 'د'}
+        <div className="showcase-grid">
+          {featuredFaculty.map(faculty => {
+            const avatarChar = faculty.name.split(' ').slice(1, 2)[0]?.charAt(0) || 'د';
+
+            return (
+              <div
+                key={faculty.id}
+                className="tutoring-card showcase-deluxe-card"
+                data-testid={`showcase-faculty-${faculty.id}`}
+              >
+                <div>
+                  {/* Top Bar */}
+                  <div className="tutoring-top-bar">
+                    <span className="course-code-badge">
+                      <UserCheck size={13} color="var(--fbsu-primary)" />
+                      <span>{isAr ? faculty.badge : faculty.badgeEn || faculty.badge}</span>
+                    </span>
+
+                    <div className="tutor-rate-badge">
+                      <span className="tutor-rate-num" style={{ fontSize: '1.05rem' }}>
+                        {isAr ? 'ساعات مكتبية' : 'Office Hours'}
+                      </span>
+                      <span className="tutor-rate-unit">
+                        {isAr ? 'استشارة مجانية' : 'Free 1-on-1'}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h4
+
+                  {/* Profile Strip */}
+                  <div className="tutor-profile-strip">
+                    <div
+                      className="tutor-avatar-circle"
                       style={{
-                        fontSize: '1.05rem',
-                        fontWeight: 800,
-                        color: 'var(--text-main)',
-                        margin: 0,
+                        background: faculty.avatarColor,
+                        borderColor: 'rgba(215, 162, 55, 0.4)',
                       }}
                     >
-                      {isAr ? faculty.name : faculty.nameEn}
-                    </h4>
-                    <span
-                      style={{ fontSize: '0.76rem', color: 'var(--fbsu-gold)', fontWeight: 600 }}
-                    >
-                      {isAr ? faculty.badge : faculty.badgeEn || faculty.badge}
+                      {avatarChar}
+                    </div>
+                    <div className="tutor-info-meta">
+                      <div className="tutor-title-row">
+                        <span className="tutor-name">{isAr ? faculty.name : faculty.nameEn}</span>
+                        <span className="tutor-badge-tag">
+                          {isAr ? faculty.badge : faculty.badgeEn || faculty.badge}
+                        </span>
+                      </div>
+                      <div className="tutor-college-text">
+                        {isAr ? faculty.rank : faculty.rankEn}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          fontSize: '0.75rem',
+                          color: 'var(--fbsu-gold)',
+                          marginTop: '0.25rem',
+                        }}
+                      >
+                        <span>★ 5.0</span>
+                        <span style={{ color: 'var(--text-dim)' }}>
+                          ({isAr ? 'تقييم إرشاد ممتاز' : 'Top Mentor Rating'})
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h4 className="showcase-card-title">
+                    {isAr ? faculty.rank : faculty.rankEn}
+                  </h4>
+
+                  {/* Inset Scope Box */}
+                  <div className="tutoring-content-box">
+                    <div className="lectures-scope-title">
+                      <BookOpen size={14} color="var(--fbsu-gold)" />
+                      <span>{isAr ? 'مجالات الإرشاد والمتابعة المعتمدة' : 'Advising Focus'}</span>
+                    </div>
+                    <div className="lectures-scope-desc">
+                      {isAr
+                        ? 'مناقشة مشاريع التخرج، أطروحات الماجستير، الخطط الدراسية، ومعادلة المقررات الأكاديمية والتوجيه المهني.'
+                        : 'Senior capstone advising, master thesis supervision, degree plans, and course equivalence.'}
+                    </div>
+                  </div>
+
+                  {/* Meta Details Row */}
+                  <div className="tutoring-meta-row">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <MapPin size={14} color="var(--text-dim)" />
+                      <span>
+                        {faculty.office ||
+                          (isAr ? 'مكتب العمادة - مبنى الإدارة' : 'Dean Office - Admin Bldg')}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Clock size={14} color="var(--fbsu-gold)" />
+                      <strong style={{ color: 'var(--fbsu-gold)' }}>
+                        {isAr
+                          ? faculty.nextAvailable
+                          : faculty.nextAvailableEn || faculty.nextAvailable}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: '0.76rem',
+                      color: 'var(--text-muted)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      marginBottom: '0.75rem',
+                    }}
+                  >
+                    <Users size={13} color="var(--fbsu-primary)" />
+                    <span>
+                      {isAr
+                        ? 'جلسة فردية مباشرة 1-on-1 (30 دقيقة)'
+                        : '1-on-1 In-Person Session (30 mins)'}
+                    </span>
+                  </div>
+
+                  {/* Routing / Security Notice */}
+                  <div className="wallet-routing-notice">
+                    <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                    <span>
+                      {isAr
+                        ? 'حجز مباشر في الأجندة الرسمية للعمادة مع تنبيه فوري عبر الرسائل والتقويم.'
+                        : 'Official calendar booking with instant confirmation & SMS alert.'}
                     </span>
                   </div>
                 </div>
 
-                <p
+                {/* Golden CTA Button */}
+                <button
+                  type="button"
+                  className="btn-gold"
+                  onClick={() => {
+                    soundFX.playClick();
+                    onNavigate('office-hours');
+                  }}
                   style={{
-                    fontSize: '0.82rem',
-                    color: 'var(--text-muted)',
-                    marginBottom: '0.85rem',
-                    lineHeight: 1.5,
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '0.85rem',
+                    fontSize: '0.9rem',
                   }}
                 >
-                  {isAr ? faculty.rank : faculty.rankEn}
-                </p>
-
-                <div
-                  style={{
-                    padding: '0.65rem 0.85rem',
-                    background: 'rgba(0,0,0,0.25)',
-                    borderRadius: 'var(--radius-md)',
-                    marginBottom: '1.1rem',
-                    fontSize: '0.78rem',
-                  }}
-                >
-                  <div style={{ color: 'var(--text-dim)', marginBottom: '0.2rem' }}>
-                    {isAr ? 'أقرب موعد متاح:' : 'Next Available Slot:'}
-                  </div>
-                  <strong style={{ color: 'var(--fbsu-primary)' }}>
-                    {isAr
-                      ? faculty.nextAvailable
-                      : faculty.nextAvailableEn || faculty.nextAvailable}
-                  </strong>
-                </div>
+                  <UserCheck size={16} />
+                  <span>{isAr ? 'حجز موعد استشارة' : 'Book Office Hour'}</span>
+                </button>
               </div>
-
-              <button
-                type="button"
-                className="btn-gold"
-                onClick={() => {
-                  soundFX.playClick();
-                  onNavigate('office-hours');
-                }}
-                style={{ width: '100%', justifyContent: 'center', fontSize: '0.85rem' }}
-              >
-                <UserCheck size={15} />
-                <span>{isAr ? 'حجز موعد استشارة' : 'Book Office Hour'}</span>
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
       {/* 3. SECTION: Peer Tutoring & AI-Assisted Academic Support */}
-      <section className="showcase-section" style={{ marginBottom: '3.5rem' }}>
+      <section className="showcase-section" style={{ marginBottom: '4rem' }}>
         <div
           className="section-head"
           style={{
@@ -485,7 +548,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
             alignItems: 'flex-end',
             flexWrap: 'wrap',
             gap: '1rem',
-            marginBottom: '1.5rem',
+            marginBottom: '1.75rem',
           }}
         >
           <div>
@@ -547,141 +610,144 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
           </button>
         </div>
 
-        {/* Tutoring Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '1.25rem',
-          }}
-        >
+        {/* Tutoring Grid - EXACT MATCH to Reference Design */}
+        <div className="showcase-grid">
           {featuredTutoring.map(session => (
             <div
               key={session.id}
-              className="glass-panel"
-              style={{
-                padding: '1.5rem',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                background: 'rgba(15, 23, 42, 0.65)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
+              className="tutoring-card showcase-deluxe-card"
+              data-testid={`showcase-tutoring-${session.id}`}
             >
               <div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '0.75rem',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '0.78rem',
-                      fontWeight: 800,
-                      padding: '0.2rem 0.6rem',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(245, 158, 11, 0.15)',
-                      color: 'var(--fbsu-gold)',
-                      border: '1px solid rgba(245, 158, 11, 0.3)',
-                    }}
-                  >
-                    {session.courseCode}
+                {/* Top Bar */}
+                <div className="tutoring-top-bar">
+                  <span className="course-code-badge">
+                    <Award size={13} color="var(--fbsu-primary)" />
+                    <span>{session.courseCode}</span>
                   </span>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                    ⭐ {session.rating}{' '}
-                    <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>
-                      ({session.reviewsCount})
+
+                  <div className="tutor-rate-badge">
+                    <span className="tutor-rate-num">
+                      {session.hourlyRate} {isAr ? 'ر.س' : 'SAR'}
                     </span>
-                  </span>
+                    <span className="tutor-rate-unit">{isAr ? 'للساعة الواحدة' : 'per hour'}</span>
+                  </div>
                 </div>
 
-                <h4
-                  style={{
-                    fontSize: '1.05rem',
-                    fontWeight: 800,
-                    color: 'var(--text-main)',
-                    marginBottom: '0.45rem',
-                  }}
-                >
-                  {isAr ? session.courseName : session.courseNameEn}
-                </h4>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    marginBottom: '0.85rem',
-                  }}
-                >
+                {/* Tutor Profile Strip */}
+                <div className="tutor-profile-strip">
                   <div
-                    style={{
-                      width: '26px',
-                      height: '26px',
-                      borderRadius: '50%',
-                      background: session.tutorAvatarColor,
-                      color: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.75rem',
-                      fontWeight: 800,
-                    }}
+                    className="tutor-avatar-circle"
+                    style={{ background: session.tutorAvatarColor }}
                   >
                     {session.tutorName.charAt(0)}
                   </div>
-                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                    {isAr ? session.tutorName : session.tutorNameEn || session.tutorName}
+                  <div className="tutor-info-meta">
+                    <div className="tutor-title-row">
+                      <span className="tutor-name">
+                        {isAr ? session.tutorName : session.tutorNameEn || session.tutorName}
+                      </span>
+                      <span className="tutor-badge-tag">{isAr ? 'طالب متميز' : 'Honor Tutor'}</span>
+                    </div>
+                    <div className="tutor-college-text">
+                      {isAr ? session.tutorRole : session.tutorRoleEn || session.tutorRole}
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        fontSize: '0.75rem',
+                        color: 'var(--fbsu-gold)',
+                        marginTop: '0.25rem',
+                      }}
+                    >
+                      <span>★ {session.rating}</span>
+                      <span style={{ color: 'var(--text-dim)' }}>
+                        ({session.reviewsCount} {isAr ? 'تقييم طالب' : 'reviews'})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <h4 className="showcase-card-title">
+                  {isAr ? session.courseName : session.courseNameEn}
+                </h4>
+
+                {/* Scope Box */}
+                <div className="tutoring-content-box">
+                  <div className="lectures-scope-title">
+                    <BookOpen size={14} color="var(--fbsu-gold)" />
+                    <span>{session.coveredLectures}</span>
+                  </div>
+                  <div className="lectures-scope-desc">{session.coveredScope}</div>
+                </div>
+
+                {/* Meta details */}
+                <div className="tutoring-meta-row">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Clock size={14} color="var(--text-dim)" />
+                    <span>
+                      {session.dateTime} ({session.durationHours}h)
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <MapPin size={14} color="var(--text-dim)" />
+                    <span>{session.location}</span>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    fontSize: '0.76rem',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    marginBottom: '0.65rem',
+                  }}
+                >
+                  <Users size={13} color="var(--fbsu-primary)" />
+                  <span>
+                    {isAr
+                      ? `المسجلون حالياً: ${session.enrolledStudents.length} / ${session.maxCapacity || 10}`
+                      : `Enrolled: ${session.enrolledStudents.length} / ${session.maxCapacity || 10}`}
                   </span>
                 </div>
 
-                <p
-                  style={{
-                    fontSize: '0.78rem',
-                    color: 'var(--text-dim)',
-                    lineHeight: 1.5,
-                    marginBottom: '1rem',
-                  }}
-                >
-                  {session.coveredScope}
-                </p>
+                {/* University Balance routing notice */}
+                <div className="wallet-routing-notice">
+                  <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                  <span>
+                    {isAr
+                      ? `يتم تحويل ${session.totalPrice} ر.س كرصيد جامعي للطالب ${session.tutorName.split(' ')[0]} لسداد رسوم جامعته.`
+                      : `${session.totalPrice} SAR transfers directly to official university tuition credit.`}
+                  </span>
+                </div>
               </div>
 
-              <div
+              {/* Action Button */}
+              <button
+                type="button"
+                className="btn-gold book-tutoring-btn"
+                onClick={() => {
+                  soundFX.playClick();
+                  onNavigate('tutoring');
+                }}
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                  paddingTop: '0.85rem',
+                  width: '100%',
+                  justifyContent: 'center',
+                  padding: '0.85rem',
+                  fontSize: '0.9rem',
                 }}
               >
-                <div>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', display: 'block' }}>
-                    {isAr ? 'رسوم الجلسة (ساعة):' : 'Session Fee:'}
-                  </span>
-                  <strong style={{ fontSize: '1.05rem', color: 'var(--fbsu-primary)' }}>
-                    {session.hourlyRate} {isAr ? 'ر.س' : 'SAR'}
-                  </strong>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={() => {
-                    soundFX.playClick();
-                    onNavigate('tutoring');
-                  }}
-                  style={{ fontSize: '0.82rem', padding: '0.55rem 0.95rem' }}
-                >
-                  <BookOpen size={14} />
-                  <span>{isAr ? 'حجز وحضور الجلسة' : 'Enroll Session'}</span>
-                </button>
-              </div>
+                <Wallet size={16} color="#0b1a17" />
+                <span>
+                  {isAr
+                    ? `حجز الجلسة وسداد ${session.totalPrice} ر.س`
+                    : `Book & Settle ${session.totalPrice} SAR`}
+                </span>
+              </button>
             </div>
           ))}
         </div>
@@ -689,7 +755,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
 
       {/* 4. SECTION: Smart Auxiliary University Services (Shuttles, Dining & Wallet) */}
       <section className="showcase-section" style={{ marginBottom: '2.5rem' }}>
-        <div className="section-head" style={{ marginBottom: '1.5rem' }}>
+        <div className="section-head" style={{ marginBottom: '1.75rem' }}>
           <span
             className="section-eyebrow"
             style={{
@@ -721,388 +787,351 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
           </h3>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '1.25rem',
-          }}
-        >
+        <div className="showcase-grid">
           {/* Service 1: Shuttle Fleet */}
-          <div
-            className="glass-panel"
-            style={{
-              padding: '1.5rem',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              background: 'rgba(15, 23, 42, 0.65)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1rem',
-              }}
-            >
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(14, 165, 233, 0.15)',
-                  color: '#0ea5e9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Bus size={22} />
+          <div className="tutoring-card showcase-deluxe-card">
+            <div>
+              <div className="tutoring-top-bar">
+                <span className="course-code-badge">
+                  <Bus size={13} color="var(--fbsu-primary)" />
+                  <span>FBSU-EXPRESS</span>
+                </span>
+
+                <div className="tutor-rate-badge">
+                  <span className="tutor-rate-num" style={{ color: '#10b981', fontSize: '1.1rem' }}>
+                    {isAr ? 'مباشر GPS' : 'Live GPS'}
+                  </span>
+                  <span className="tutor-rate-unit">{isAr ? 'مجاني للطلاب' : 'Free for All'}</span>
+                </div>
               </div>
-              <div>
-                <h4
+
+              <div className="tutor-profile-strip">
+                <div
+                  className="tutor-avatar-circle"
                   style={{
-                    margin: 0,
-                    fontSize: '1.05rem',
-                    fontWeight: 800,
-                    color: 'var(--text-main)',
+                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    borderColor: 'rgba(56, 189, 248, 0.4)',
                   }}
                 >
-                  {isAr ? 'أسطول الحافلات الترددية FBSU Express' : 'FBSU Express Shuttle Fleet'}
-                </h4>
-                <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>
-                  ● {isAr ? 'مباشر: 4 حافلات نشطة في المسار' : 'Live: 4 Active Shuttles on Route'}
-                </span>
+                  <Bus size={22} color="#ffffff" />
+                </div>
+                <div className="tutor-info-meta">
+                  <div className="tutor-title-row">
+                    <span className="tutor-name">
+                      {isAr ? 'أسطول الحافلات الترددية' : 'FBSU Express Shuttle'}
+                    </span>
+                    <span className="tutor-badge-tag">
+                      {isAr ? 'أسطول كهربائي نشط' : 'Electric Fleet'}
+                    </span>
+                  </div>
+                  <div className="tutor-college-text">
+                    {isAr ? '4 حافلات كهربائية نشطة في المسار' : '4 Zero-Emission Shuttles Active'}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      fontSize: '0.75rem',
+                      color: 'var(--fbsu-gold)',
+                      marginTop: '0.25rem',
+                    }}
+                  >
+                    <span>★ 4.96</span>
+                    <span style={{ color: 'var(--text-dim)' }}>
+                      ({isAr ? 'تواتر كل 7 دقائق' : 'Every 7 mins'})
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <p
-              style={{
-                fontSize: '0.82rem',
-                color: 'var(--text-muted)',
-                lineHeight: 1.5,
-                marginBottom: '1rem',
-              }}
-            >
-              {isAr
-                ? 'خدمة نقل كهربائي ترددي مجانية تربط البوابة الرئيسية، مجمع الهندسة، المكتبة، ومباني السكن الطلابي كل 7 دقائق.'
-                : 'Free zero-emission electric shuttle buses circulating between the Main Gate, Engineering complex, Library, and Student Residences every 7 minutes.'}
-            </p>
-
-            <div
-              style={{
-                padding: '0.65rem 0.85rem',
-                background: 'rgba(0,0,0,0.25)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.78rem',
-                color: 'var(--text-dim)',
-                marginBottom: '1rem',
-              }}
-            >
-              <div>
-                🚌{' '}
+              <h4 className="showcase-card-title">
                 {isAr
-                  ? 'الحافلة القادمة لمحطة الهندسة: تصل خلال 3 دقائق'
-                  : 'Next Bus at Engineering Stop: Arrives in 3 mins'}
+                  ? 'النقل الترددي الذكي المباشر بالحرم الجامعي'
+                  : 'Zero-Emission Campus Shuttle Network'}
+              </h4>
+
+              <div className="tutoring-content-box">
+                <div className="lectures-scope-title">
+                  <Navigation size={14} color="var(--fbsu-gold)" />
+                  <span>{isAr ? 'المسار النشط ومواعيد الوصول الحية' : 'Live Route & Arrival'}</span>
+                </div>
+                <div className="lectures-scope-desc">
+                  {isAr
+                    ? 'خدمة نقل كهربائي مجانية تربط البوابة الرئيسية، مجمع الهندسة، المكتبة، ومباني السكن الطلابي كل 7 دقائق. الحافلة القادمة لمحطة الهندسة: تصل خلال 3 دقائق.'
+                    : 'Free electric shuttle connecting Main Gate, Engineering complex, Library, and Residences every 7 minutes. Next stop arrival: 3 mins.'}
+                </div>
+              </div>
+
+              <div className="tutoring-meta-row">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Clock size={14} color="var(--text-dim)" />
+                  <span>07:30 ص - 05:00 م</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <MapPin size={14} color="var(--text-dim)" />
+                  <span>{isAr ? 'كافة محطات الكليات والسكن' : 'All Campus Stations'}</span>
+                </div>
+              </div>
+
+              <div className="wallet-routing-notice">
+                <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                <span>
+                  {isAr
+                    ? 'تتبع مباشر عبر الـ GPS ومتصل بالبطاقة الجامعية الرقمية.'
+                    : 'Real-time GPS tracking integrated with digital student ID.'}
+                </span>
               </div>
             </div>
 
             <button
               type="button"
-              className="btn-outline"
+              className="btn-gold"
               onClick={() => {
                 soundFX.playClick();
                 onNavigate('bus');
               }}
-              style={{ width: '100%', justifyContent: 'center', fontSize: '0.82rem' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.85rem',
+                fontSize: '0.9rem',
+              }}
             >
+              <Bus size={16} />
               <span>{isAr ? 'استعراض مواعيد وخطوط الحافلات' : 'View Live Shuttle Tracker'}</span>
-              <NextArrow size={14} />
             </button>
           </div>
 
           {/* Service 2: Smart Dining */}
-          <div
-            className="glass-panel"
-            style={{
-              padding: '1.5rem',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              background: 'rgba(15, 23, 42, 0.65)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1rem',
-              }}
-            >
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  color: 'var(--fbsu-gold)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <UtensilsCrossed size={22} />
+          <div className="tutoring-card showcase-deluxe-card">
+            <div>
+              <div className="tutoring-top-bar">
+                <span className="course-code-badge">
+                  <UtensilsCrossed size={13} color="var(--fbsu-primary)" />
+                  <span>FBSU-DINING</span>
+                </span>
+
+                <div className="tutor-rate-badge">
+                  <span className="tutor-rate-num" style={{ color: 'var(--fbsu-gold)', fontSize: '1.1rem' }}>
+                    {isAr ? 'خصم 20%' : '20% OFF'}
+                  </span>
+                  <span className="tutor-rate-unit">{isAr ? 'طلب مسبق' : 'Order Ahead'}</span>
+                </div>
               </div>
-              <div>
-                <h4
+
+              <div className="tutor-profile-strip">
+                <div
+                  className="tutor-avatar-circle"
                   style={{
-                    margin: 0,
-                    fontSize: '1.05rem',
-                    fontWeight: 800,
-                    color: 'var(--text-main)',
+                    background: 'linear-gradient(135deg, #d97706 0%, #78350f 100%)',
+                    borderColor: 'rgba(245, 158, 11, 0.4)',
                   }}
                 >
-                  {isAr ? 'المطاعم والكافيهات الجامعية' : 'Campus Dining & Cafeterias'}
-                </h4>
-                <span style={{ fontSize: '0.75rem', color: 'var(--fbsu-gold)', fontWeight: 700 }}>
-                  {isAr ? 'طلب مسبق واستلام سريع بدون انتظار' : 'Pre-order & Fast Pickup'}
-                </span>
+                  <UtensilsCrossed size={22} color="#ffffff" />
+                </div>
+                <div className="tutor-info-meta">
+                  <div className="tutor-title-row">
+                    <span className="tutor-name">
+                      {isAr ? 'المطاعم والكافيهات الجامعية' : 'Campus Cafes & Dining'}
+                    </span>
+                    <span className="tutor-badge-tag">
+                      {isAr ? 'استلام فوري' : 'Fast Pickup'}
+                    </span>
+                  </div>
+                  <div className="tutor-college-text">
+                    {isAr ? 'ستاربكس • مطعم الحرم المركزي' : 'Starbucks & Campus Food Court'}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      fontSize: '0.75rem',
+                      color: 'var(--fbsu-gold)',
+                      marginTop: '0.25rem',
+                    }}
+                  >
+                    <span>★ 4.94</span>
+                    <span style={{ color: 'var(--text-dim)' }}>
+                      ({isAr ? 'خصم فوري للمحفظة' : 'Instant Wallet Discount'})
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <p
-              style={{
-                fontSize: '0.82rem',
-                color: 'var(--text-muted)',
-                lineHeight: 1.5,
-                marginBottom: '1rem',
-              }}
-            >
-              {isAr
-                ? 'استمتع بقوائم الطعام الطازجة ومشروبات القهوة المختصة في ستاربكس ومطعم الحرم المركزي مع الخصم الفوري من المحفظة.'
-                : 'Browse menus, order ahead from campus cafes and Starbucks, and pay seamlessly using your institutional campus wallet.'}
-            </p>
-
-            <div
-              style={{
-                padding: '0.65rem 0.85rem',
-                background: 'rgba(0,0,0,0.25)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.78rem',
-                color: 'var(--text-dim)',
-                marginBottom: '1rem',
-              }}
-            >
-              <div>
-                ☕{' '}
+              <h4 className="showcase-card-title">
                 {isAr
-                  ? 'عروض اليوم: خصم 20% للطلاب على وجبات الغداء الصحية'
-                  : 'Today Special: 20% Student Discount on Healthy Lunch Combos'}
+                  ? 'الطلب المسبق السريع والاستلام بدون انتظار'
+                  : 'Fast Pickup & Mobile Student Dining'}
+              </h4>
+
+              <div className="tutoring-content-box">
+                <div className="lectures-scope-title">
+                  <Coffee size={14} color="var(--fbsu-gold)" />
+                  <span>{isAr ? 'عروض اليوم الحصرية للطلاب' : 'Today Exclusive Combos'}</span>
+                </div>
+                <div className="lectures-scope-desc">
+                  {isAr
+                    ? 'استمتع بقوائم الطعام الطازجة والقهوة المختصة مع خصم فوري 20% للطلاب مخصوم مباشرة من محفظتك الجامعية بدون بطاقات بنكية.'
+                    : 'Order healthy bowls and specialty coffee with 20% student discount deducted instantly from your campus wallet.'}
+                </div>
+              </div>
+
+              <div className="tutoring-meta-row">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Clock size={14} color="var(--text-dim)" />
+                  <span>{isAr ? 'استلام خلال 5-10 دقائق' : 'Ready in 5-10 mins'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <MapPin size={14} color="var(--text-dim)" />
+                  <span>{isAr ? 'المطعم المركزي وستاربكس' : 'Central Hall & Starbucks'}</span>
+                </div>
+              </div>
+
+              <div className="wallet-routing-notice">
+                <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                <span>
+                  {isAr
+                    ? 'دفع فوري مخصوم من الرصيد الجامعي مع فاتورة إلكترونية معتمدة.'
+                    : 'Seamless institutional wallet settlement with e-receipt.'}
+                </span>
               </div>
             </div>
 
             <button
               type="button"
-              className="btn-outline"
+              className="btn-gold"
               onClick={() => {
                 soundFX.playClick();
                 onNavigate('dining');
               }}
-              style={{ width: '100%', justifyContent: 'center', fontSize: '0.82rem' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.85rem',
+                fontSize: '0.9rem',
+              }}
             >
+              <UtensilsCrossed size={16} />
               <span>{isAr ? 'استعراض المطاعم والوجبات' : 'Browse Dining Menus'}</span>
-              <NextArrow size={14} />
             </button>
           </div>
 
           {/* Service 3: Campus Digital Wallet */}
-          <div
-            className="glass-panel"
-            style={{
-              padding: '1.5rem',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              background: 'rgba(15, 23, 42, 0.65)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1rem',
-              }}
-            >
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  color: '#10b981',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Wallet size={22} />
+          <div className="tutoring-card showcase-deluxe-card">
+            <div>
+              <div className="tutoring-top-bar">
+                <span className="course-code-badge">
+                  <Wallet size={13} color="var(--fbsu-primary)" />
+                  <span>FBSU-WALLET</span>
+                </span>
+
+                <div className="tutor-rate-badge">
+                  <span className="tutor-rate-num" style={{ color: '#10b981', fontSize: '1.1rem' }}>
+                    {walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
+                  </span>
+                  <span className="tutor-rate-unit">{isAr ? 'الرصيد المتاح' : 'Balance'}</span>
+                </div>
               </div>
-              <div>
-                <h4
+
+              <div className="tutor-profile-strip">
+                <div
+                  className="tutor-avatar-circle"
                   style={{
-                    margin: 0,
-                    fontSize: '1.05rem',
-                    fontWeight: 800,
-                    color: 'var(--text-main)',
+                    background: 'linear-gradient(135deg, #10b981 0%, #064e3b 100%)',
+                    borderColor: 'rgba(52, 211, 153, 0.4)',
                   }}
                 >
-                  {isAr ? 'المحفظة الرقمية والرسوم' : 'Campus Digital Wallet'}
-                </h4>
-                <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>
-                  {isAr
-                    ? `الرصيد المتاح: ${walletBalance.toFixed(2)} ر.س`
-                    : `Balance: ${walletBalance.toFixed(2)} SAR`}
-                </span>
+                  <Wallet size={22} color="#ffffff" />
+                </div>
+                <div className="tutor-info-meta">
+                  <div className="tutor-title-row">
+                    <span className="tutor-name">
+                      {isAr ? 'المحفظة الرقمية والرسوم' : 'Digital Campus Wallet'}
+                    </span>
+                    <span className="tutor-badge-tag">
+                      {isAr ? 'معاملات فورية' : 'Zero-Fee Transfer'}
+                    </span>
+                  </div>
+                  <div className="tutor-college-text">
+                    {isAr ? 'الحساب المالي الموحد للطالب' : 'Unified Financial Ledger'}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      fontSize: '0.75rem',
+                      color: 'var(--fbsu-gold)',
+                      marginTop: '0.25rem',
+                    }}
+                  >
+                    <span>★ 4.99</span>
+                    <span style={{ color: 'var(--text-dim)' }}>
+                      ({isAr ? 'شحن Mada و Apple Pay' : 'Mada & Apple Pay'})
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <p
-              style={{
-                fontSize: '0.82rem',
-                color: 'var(--text-muted)',
-                lineHeight: 1.5,
-                marginBottom: '1rem',
-              }}
-            >
-              {isAr
-                ? 'محفظتك المالية الموحدة لحجز المواقف، شروحات الأقران، سداد الرسوم الدراسية، وشحن الرصيد الآمن عبر Mada و Apple Pay.'
-                : 'Your unified financial hub for parking tariffs, tutoring, tuition invoices, and instant Mada / Apple Pay top-ups.'}
-            </p>
-
-            <div
-              style={{
-                padding: '0.65rem 0.85rem',
-                background: 'rgba(0,0,0,0.25)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.78rem',
-                color: 'var(--text-dim)',
-                marginBottom: '1rem',
-              }}
-            >
-              <div>
-                💳{' '}
+              <h4 className="showcase-card-title">
                 {isAr
-                  ? 'معاملات فورية خالية من الرسوم الإضافية بين الطلاب'
-                  : 'Zero-fee instant peer transfers with audit trail'}
+                  ? 'إدارة الرصيد الجامعي وسداد الرسوم والمواقف'
+                  : 'Integrated Tuition & Campus Micro-Payments'}
+              </h4>
+
+              <div className="tutoring-content-box">
+                <div className="lectures-scope-title">
+                  <CreditCard size={14} color="var(--fbsu-gold)" />
+                  <span>{isAr ? 'خدمات المحفظة المالية المعتمدة' : 'Unified Financial Scope'}</span>
+                </div>
+                <div className="lectures-scope-desc">
+                  {isAr
+                    ? 'محفظتك المالية الموحدة لحجز المواقف الذكية، سداد شروحات الأقران، تسوية الرسوم الدراسية، وشحن الرصيد الآمن عبر Mada و Apple Pay بدون رسوم.'
+                    : 'Institutional wallet for smart parking, peer tutoring settlements, tuition deductions, and instant P2P peer transfers.'}
+                </div>
+              </div>
+
+              <div className="tutoring-meta-row">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Clock size={14} color="var(--text-dim)" />
+                  <span>{isAr ? 'تسوية آنية 24/7' : '24/7 Instant Clearing'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <CreditCard size={14} color="var(--text-dim)" />
+                  <span>مدى • أبل باي • تحويل أقران</span>
+                </div>
+              </div>
+
+              <div className="wallet-routing-notice">
+                <ShieldCheck size={14} color="var(--fbsu-primary)" />
+                <span>
+                  {isAr
+                    ? 'نظام دفع مالي آمن ومعتمد متصل بوزارة التعليم وعمادة القبول.'
+                    : 'Certified ledger linked to the university registrar & MOE.'}
+                </span>
               </div>
             </div>
 
             <button
               type="button"
-              className="btn-outline"
+              className="btn-gold"
               onClick={() => {
                 soundFX.playClick();
                 onNavigate('wallet');
               }}
-              style={{ width: '100%', justifyContent: 'center', fontSize: '0.82rem' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.85rem',
+                fontSize: '0.9rem',
+              }}
             >
-              <span>{isAr ? 'إدارة المحفظة وشحن الرصيد' : 'Manage Wallet & Top Up'}</span>
-              <NextArrow size={14} />
+              <Wallet size={16} />
+              <span>{isAr ? 'إدارة المحفظة وشحن الرصيد' : 'Manage Campus Wallet'}</span>
             </button>
           </div>
-        </div>
-      </section>
-
-      {/* 5. Institutional Accreditation Banner */}
-      <section
-        style={{
-          padding: '1.75rem 2rem',
-          borderRadius: 'var(--radius-lg)',
-          background:
-            'linear-gradient(135deg, rgba(13, 148, 136, 0.12) 0%, rgba(15, 23, 42, 0.85) 100%)',
-          border: '1px solid rgba(13, 148, 136, 0.3)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1.25rem',
-          marginBottom: '2rem',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--fbsu-primary)',
-              color: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(13, 148, 136, 0.4)',
-              flexShrink: 0,
-            }}
-          >
-            <ShieldCheck size={26} />
-          </div>
-          <div>
-            <h4
-              style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)' }}
-            >
-              {isAr
-                ? 'منظومة معتمدة ومطابقة لأعلى معايير الأمن السيبراني والجودة'
-                : 'Institutional Accreditation & Cybersecurity Certified'}
-            </h4>
-            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-              {isAr
-                ? 'مرخصة ومطابقة لضوابط الهيئة الوطنية للأمن السيبراني NCA والاعتماد المؤسسي الكامل لجامعة فهد بن سلطان.'
-                : 'Compliant with Saudi National Cybersecurity Authority (NCA) standards and accredited by Ministry of Education.'}
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span
-            style={{
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              padding: '0.35rem 0.75rem',
-              background: 'rgba(255,255,255,0.06)',
-              borderRadius: '999px',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: 'var(--text-main)',
-            }}
-          >
-            NCA ECC-1:2018
-          </span>
-          <span
-            style={{
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              padding: '0.35rem 0.75rem',
-              background: 'rgba(255,255,255,0.06)',
-              borderRadius: '999px',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: 'var(--text-main)',
-            }}
-          >
-            ABET Accredited
-          </span>
-          <span
-            style={{
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              padding: '0.35rem 0.75rem',
-              background: 'rgba(255,255,255,0.06)',
-              borderRadius: '999px',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: 'var(--text-main)',
-            }}
-          >
-            NCAAA Institutional
-          </span>
         </div>
       </section>
     </div>
