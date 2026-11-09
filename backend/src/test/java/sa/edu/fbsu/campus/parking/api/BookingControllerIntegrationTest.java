@@ -18,7 +18,9 @@ import sa.edu.fbsu.campus.infra.UniversityRepository;
 import sa.edu.fbsu.campus.parking.domain.ParkingSpot;
 import sa.edu.fbsu.campus.parking.domain.SpotStatus;
 import sa.edu.fbsu.campus.parking.dto.CreateBookingRequest;
+import sa.edu.fbsu.campus.parking.domain.ParkingTariff;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
+import sa.edu.fbsu.campus.parking.infra.ParkingTariffRepository;
 import sa.edu.fbsu.campus.wallet.dto.TopUpRequest;
 
 import java.math.BigDecimal;
@@ -48,6 +50,9 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
 
     @Autowired
     private ParkingSpotRepository spotRepository;
+
+    @Autowired
+    private ParkingTariffRepository tariffRepository;
 
     private void ensureUniversity() {
         if (!universityRepository.existsByCode("FBSU")) {
@@ -270,5 +275,49 @@ class BookingControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(50.00));
+    }
+
+    @Test
+    @DisplayName("Booking fails with 409 and charges nothing when no active tariff is configured (no 5.75 fallback)")
+    void shouldRejectBookingWhenTariffMissing() throws Exception {
+        ensureUniversity();
+        String suffix = UUID.randomUUID().toString().substring(0, 6);
+        String token = obtainAuthToken(suffix);
+
+        mockMvc.perform(post("/api/v1/wallet/top-up")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TopUpRequest(
+                                new BigDecimal("50.00"), "TOPUP-NT-" + suffix, "MADA", "Test Top-up"))))
+                .andExpect(status().isOk());
+
+        UUID uniId = universityRepository.findByCode("FBSU").map(University::getId).orElseThrow();
+        ParkingTariff studentTariff = tariffRepository.findByUniversityIdAndUserType(uniId, UserType.STUDENT)
+                .orElseThrow(() -> new IllegalStateException("dev seeder should configure a STUDENT tariff"));
+        studentTariff.setActive(false);
+        tariffRepository.save(studentTariff);
+        try {
+            ParkingSpot spot = spotRepository.findAll().stream()
+                    .filter(s -> s.getStatus() == SpotStatus.AVAILABLE)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("No available spot for test"));
+
+            mockMvc.perform(post("/api/v1/parking/bookings")
+                            .header("Authorization", "Bearer " + token)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(new CreateBookingRequest(
+                                    spot.getId(), null, new BigDecimal("2.0"), Instant.now(), true, "BOOK-NT-" + suffix))))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.type").value("https://fbsu.edu.sa/errors/tariff-not-configured"))
+                    .andExpect(jsonPath("$.userType").value("STUDENT"));
+
+            mockMvc.perform(get("/api/v1/wallet").header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.balance").value(50.00));
+        } finally {
+            ParkingTariff restored = tariffRepository.findById(studentTariff.getId()).orElseThrow();
+            restored.setActive(true);
+            tariffRepository.save(restored);
+        }
     }
 }

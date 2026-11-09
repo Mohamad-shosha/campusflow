@@ -291,8 +291,8 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
             <div className="form-group">
               <label className="form-label" style={{ marginBottom: '0.65rem' }}>
                 {isAr
-                  ? 'اختر سيارة للتجربة والفحص المباشر عبر قاعدة البيانات:'
-                  : 'Select Vehicle to Scan Against Real Database:'}
+                  ? 'اختر لوحة اختبار لإرسالها إلى نظام البوابة (القرار يصدر من الخادم):'
+                  : 'Choose a test plate to send to the gate service (the server makes the decision):'}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.6rem' }}>
                 {/* Preset 1: Faculty */}
@@ -311,9 +311,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                     }}
                   >
                     <h5 style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-main)' }}>
-                      {isAr
-                        ? 'سيارة عضو هيئة التدريس (د. محمد مزهر)'
-                        : 'Faculty Vehicle (Dr. Mezher)'}
+                      {isAr ? 'لوحة اختبار: عضو هيئة تدريس' : 'Test plate: faculty vehicle'}
                     </h5>
                     <span
                       style={{
@@ -336,7 +334,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                     }}
                   >
                     {isAr ? 'لوحة:' : 'Plate:'} <strong>س ع د 7700</strong> —{' '}
-                    {isAr ? 'موقف محجوز #19 (المنطقة C)' : 'Dedicated Bay #19 (Zone C)'}
+                    {isAr ? 'النتيجة تُحدد من قاعدة البيانات' : 'Result decided by the database'}
                   </span>
                 </button>
 
@@ -356,9 +354,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
                     }}
                   >
                     <h5 style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-main)' }}>
-                      {isAr
-                        ? 'سيارة الطالب سعد القحطاني (كامري)'
-                        : 'Student Vehicle (Saad Al-Qahtani)'}
+                      {isAr ? 'لوحة اختبار: طالب' : 'Test plate: student vehicle'}
                     </h5>
                     <span
                       style={{

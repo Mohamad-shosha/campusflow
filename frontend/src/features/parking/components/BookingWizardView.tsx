@@ -194,7 +194,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
         college: isAr ? booking.zoneNameAr : booking.zoneNameEn,
         userName: currentUser.name,
         userId: currentUser.id,
-        plate: booking.vehiclePlate || currentUser.plate || 'أ ب ح 1234',
+        plate: booking.vehiclePlate || currentUser.plate || '',
         duration: `${booking.durationHours} ${isAr ? 'ساعات' : 'Hours'} (${timeFrom} - ${timeTo})`,
         bookingId: booking.id,
         passCode: booking.digitalPassCode,
@@ -638,7 +638,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
           >
             <span>{isAr ? 'رقم اللوحة:' : 'License Plate:'}</span>
             <strong style={{ color: 'var(--gold-text)', fontFamily: 'var(--font-en)' }}>
-              {currentUser.plate || 'ب ط ك 1234'}
+              {currentUser.plate || (isAr ? 'لا توجد مركبة مسجلة' : 'No vehicle registered')}
             </strong>
           </div>
           <div
@@ -876,7 +876,7 @@ export const BookingWizardView: FC<BookingWizardViewProps> = ({
                               college: isAr ? booking.zoneNameAr : booking.zoneNameEn,
                               userName: currentUser.name,
                               userId: currentUser.id,
-                              plate: booking.vehiclePlate || currentUser.plate || 'أ ب ح 1234',
+                              plate: booking.vehiclePlate || currentUser.plate || '',
                               duration: `${booking.durationHours} ${isAr ? 'ساعات' : 'Hours'}`,
                               bookingId: booking.id,
                               passCode: booking.digitalPassCode,

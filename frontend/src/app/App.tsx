@@ -11,12 +11,10 @@ import { AdminDashboard } from '../features/admin/components/AdminDashboard';
 import { walletApi } from '../features/wallet/api/walletApi';
 import { Toast, type ToastType } from '../shared/components/Toast';
 import type { AppUser } from '../shared/types/navigation';
-import { INITIAL_PARKING_SPOTS, type ParkingSpot } from '../features/parking/data/parkingData';
+import { type ParkingSpot } from '../features/parking/data/parkingData';
 import { parkingApi } from '../features/parking/api/parkingApi';
 import { mapBackendSpotToUi, type ParkingSummaryResponse } from '../features/parking/types/parking';
 import {
-  INITIAL_TUTORING_SESSIONS,
-  FACULTY_MEMBERS,
   type TutoringSession,
   type FacultyMember,
   type StudyRoom,
@@ -28,7 +26,7 @@ import { ParkingLotView } from '../features/parking/components/ParkingLotView';
 import { BookingWizardView } from '../features/parking/components/BookingWizardView';
 import { AlprGateView } from '../features/parking/components/AlprGateView';
 import { ShareSpotView } from '../features/parking/components/ShareSpotView';
-import { ServiceHeroBanner } from '../shared/components/ServiceHeroBanner';
+import { ServiceHeroBanner, type ServiceStatChip } from '../shared/components/ServiceHeroBanner';
 import { ServiceExplainerSections } from '../shared/components/ServiceExplainerSections';
 import {
   Cpu,
@@ -42,10 +40,6 @@ import {
   BarChart3,
   Car,
   ShieldCheck,
-  Sparkles,
-  Award,
-  Zap,
-  Users,
   Bus,
 } from 'lucide-react';
 
@@ -62,10 +56,12 @@ import { NotificationsModal } from '../features/notifications/components/Notific
 import { notificationsApi } from '../features/notifications/api/notificationsApi';
 import type { NotificationResponse } from '../features/notifications/types/notification';
 
+import type { ResourceStatus } from '../shared/types/resource';
 import '../shared/i18n/i18n';
 import '../styles/main.css';
 import '../styles/rooms-hub.css';
 import '../styles/transit-utilities.css';
+import '../styles/design-system.css';
 
 export interface AppContentProps {
   initialTab?: string | undefined;
@@ -80,14 +76,17 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
 
   // Dynamic campus state
-  const [parkingSpots, setParkingSpots] = useState<ParkingSpot[]>(INITIAL_PARKING_SPOTS);
-  const [isParkingLoading, setIsParkingLoading] = useState<boolean>(false);
+  // All service data comes from the backend; nothing is pre-filled with mock records.
+  const [parkingSpots, setParkingSpots] = useState<ParkingSpot[]>([]);
+  const [isParkingLoading, setIsParkingLoading] = useState<boolean>(true);
+  const [parkingLoadError, setParkingLoadError] = useState<boolean>(false);
   const [parkingLastUpdated, setParkingLastUpdated] = useState<Date | null>(null);
   const [parkingSummary, setParkingSummary] = useState<ParkingSummaryResponse | null>(null);
 
-  const [tutoringSessions, setTutoringSessions] =
-    useState<TutoringSession[]>(INITIAL_TUTORING_SESSIONS);
-  const [facultyList, setFacultyList] = useState<FacultyMember[]>(FACULTY_MEMBERS);
+  const [tutoringSessions, setTutoringSessions] = useState<TutoringSession[]>([]);
+  const [tutoringStatus, setTutoringStatus] = useState<ResourceStatus>('loading');
+  const [facultyList, setFacultyList] = useState<FacultyMember[]>([]);
+  const [facultyStatus, setFacultyStatus] = useState<ResourceStatus>('loading');
   // Rooms & labs come from the backend only; no mock fallback is rendered.
   const [studyRooms, setStudyRooms] = useState<StudyRoom[]>([]);
   const [isRoomsLoading, setIsRoomsLoading] = useState<boolean>(true);
@@ -208,15 +207,17 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         parkingApi.getSpots(),
         parkingApi.getSummary().catch(() => null),
       ]);
-      if (backendSpots && backendSpots.length > 0) {
-        setParkingSpots(backendSpots.map(mapBackendSpotToUi));
-        setParkingLastUpdated(new Date());
+      // A non-list payload (e.g. an HTML fallback page) is a failed load, not "zero bays".
+      if (!Array.isArray(backendSpots)) {
+        throw new Error('Unexpected parking spots payload');
       }
-      if (summary) {
-        setParkingSummary(summary);
-      }
-    } catch (err) {
-      console.warn('Failed to fetch live parking data from backend:', err);
+      setParkingSpots(backendSpots.map(mapBackendSpotToUi));
+      setParkingLastUpdated(new Date());
+      setParkingSummary(summary);
+      setParkingLoadError(false);
+    } catch {
+      // Keep the last successfully loaded spots (if any) and surface the error
+      setParkingLoadError(true);
     } finally {
       setIsParkingLoading(false);
     }
@@ -225,22 +226,20 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
   const fetchTutoringSessions = useCallback(async () => {
     try {
       const liveSessions = await tutoringApi.getSessions();
-      if (liveSessions && liveSessions.length > 0) {
-        setTutoringSessions(liveSessions);
-      }
+      setTutoringSessions(Array.isArray(liveSessions) ? liveSessions : []);
+      setTutoringStatus('ready');
     } catch {
-      // Fallback to initial showcase sessions when offline or in isolated unit tests
+      setTutoringStatus('error');
     }
   }, []);
 
   const fetchFacultyOfficeHours = useCallback(async () => {
     try {
       const liveFaculty = await officeHoursApi.getFaculty();
-      if (liveFaculty && liveFaculty.length > 0) {
-        setFacultyList(liveFaculty);
-      }
+      setFacultyList(Array.isArray(liveFaculty) ? liveFaculty : []);
+      setFacultyStatus('ready');
     } catch {
-      // Fallback to initial faculty directory when offline or in isolated unit tests
+      setFacultyStatus('error');
     }
   }, []);
 
@@ -328,35 +327,15 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     parkingSummary?.flexSpots ??
     parkingSpots.filter(s => s.status === 'flex' || s.status === 'flex-share').length;
 
-  const handleReserveSpot = (spotId: number) => {
-    setParkingSpots(prev =>
-      prev.map(s =>
-        s.id === spotId
-          ? {
-              ...s,
-              status: 'reserved' as const,
-              occupant: currentUser.name,
-              timeLeft: isAr ? 'محجوز لك' : 'Reserved for you',
-            }
-          : s
-      )
-    );
-    setActiveToast({
-      title: isAr ? 'تم الحجز بنجاح' : 'Spot Reserved',
-      message: isAr
-        ? `تم حجز الموقف رقم #${spotId} وإصدار التصريح الرقمي`
-        : `Bay #${spotId} reserved and digital pass issued`,
-      type: 'success',
-    });
-  };
-
-  const handleShareConfirmed = (_hours: number, earnAmount: number) => {
+  const handleShareConfirmed = (_hours: number, rewardAmount: number) => {
     handleRefreshAll();
+    const rewardAr = rewardAmount > 0 ? ` (عائد +${rewardAmount.toFixed(2)} ر.س عند حجزه)` : '';
+    const rewardEn = rewardAmount > 0 ? ` (+${rewardAmount.toFixed(2)} SAR reward upon claim)` : '';
     setActiveToast({
       title: isAr ? 'تم تفعيل التبادل الذكي' : 'Flex Share Activated',
       message: isAr
-        ? `تمت إتاحة موقفك للتبادل الذكي (عائد +${earnAmount.toFixed(2)} ر.س عند حجزه)`
-        : `Spot shared for Flex exchange (+${earnAmount.toFixed(2)} SAR reward upon claim)`,
+        ? `تمت إتاحة موقفك للتبادل الذكي${rewardAr}`
+        : `Spot shared for Flex exchange${rewardEn}`,
       type: 'success',
     });
   };
@@ -406,27 +385,113 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
+  // Hero banner chips are computed only from data loaded from the backend.
+  // A chip is omitted when its value is unknown (never a placeholder figure).
+  const parkingReady = parkingSummary !== null || parkingSpots.length > 0;
+  const parkingChips: ServiceStatChip[] = parkingReady
+    ? [
+        {
+          label: isAr ? 'المواقف المتاحة الآن' : 'Bays available now',
+          value: `${availableCount} / ${totalSpots}`,
+          icon: Car,
+          color: 'var(--fbsu-primary)',
+        },
+      ]
+    : [];
+  const shareChips: ServiceStatChip[] = parkingReady
+    ? [
+        ...parkingChips,
+        {
+          label: isAr ? 'مواقف معروضة للتبادل' : 'Bays in Flex Share',
+          value: String(flexCount),
+          icon: RefreshCw,
+          color: 'var(--gold-text)',
+        },
+      ]
+    : [];
+  const openTutoringSessions = tutoringSessions.filter(s => s.status !== 'booked').length;
+  const tutoringChips: ServiceStatChip[] =
+    tutoringStatus === 'ready'
+      ? [
+          {
+            label: isAr ? 'جلسات منشورة' : 'Published sessions',
+            value: String(tutoringSessions.length),
+            icon: BookOpen,
+            color: 'var(--fbsu-primary)',
+          },
+          {
+            label: isAr ? 'جلسات متاحة للحجز' : 'Open for booking',
+            value: String(openTutoringSessions),
+            icon: Calendar,
+            color: 'var(--gold-text)',
+          },
+        ]
+      : [];
+  const openOfficeSlots = facultyList.reduce(
+    (sum, f) => sum + (f.timeSlots?.filter(t => t.available).length ?? 0),
+    0
+  );
+  const officeHoursChips: ServiceStatChip[] =
+    facultyStatus === 'ready'
+      ? [
+          {
+            label: isAr ? 'أعضاء هيئة التدريس' : 'Faculty members',
+            value: String(facultyList.length),
+            icon: UserCheck,
+            color: 'var(--fbsu-primary)',
+          },
+          {
+            label: isAr ? 'مواعيد متاحة' : 'Open slots',
+            value: String(openOfficeSlots),
+            icon: Calendar,
+            color: 'var(--gold-text)',
+          },
+        ]
+      : [];
+  const roomsChips: ServiceStatChip[] =
+    !isRoomsLoading && studyRooms.length > 0
+      ? [
+          {
+            label: isAr ? 'إجمالي المرافق' : 'Facilities',
+            value: String(studyRooms.length),
+            icon: Cpu,
+            color: 'var(--fbsu-primary)',
+          },
+          {
+            label: isAr ? 'متاح الآن' : 'Available now',
+            value: String(studyRooms.filter(r => r.status === 'available').length),
+            icon: ShieldCheck,
+            color: 'var(--gold-text)',
+          },
+        ]
+      : [];
+  const walletChips: ServiceStatChip[] = isAuthenticated
+    ? [
+        {
+          label: isAr ? 'رصيدك الحالي' : 'Your balance',
+          value: `${liveBalance.toFixed(2)} ${isAr ? 'ر.س' : 'SAR'}`,
+          icon: WalletIcon,
+          color: 'var(--gold-text)',
+        },
+      ]
+    : [];
+
   const primaryVehicle = user?.vehicles?.find(v => v.primary) ?? user?.vehicles?.[0];
   const primaryPlate = primaryVehicle
     ? `${primaryVehicle.plateLettersAr} ${primaryVehicle.plateDigits}`
-    : isAuthenticated
-      ? isAr
-        ? 'غير مسجلة'
-        : 'Unregistered'
-      : 'أ ب ح 1234';
+    : '';
   const primaryCarModel =
     primaryVehicle?.makeModel ||
     (isAuthenticated
       ? isAr
-        ? 'مركبة جامعية مسجلة'
-        : 'Registered Campus Vehicle'
+        ? 'لا توجد مركبة مسجلة'
+        : 'No vehicle registered'
       : isAr
         ? 'مركبة زائر (يرجى تسجيل الدخول)'
         : 'Guest Vehicle (Sign in required)');
-  const userAssignedBay =
-    parkingSpots.find(
-      s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
-    )?.id ?? 1;
+  const userAssignedBay = parkingSpots.find(
+    s => user && (s.occupant === user.fullNameAr || s.occupant === user.fullNameEn)
+  )?.id;
 
   return (
     <AppShell
@@ -468,6 +533,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           totalSpots={totalSpots}
           availableCount={availableCount}
           flexCount={flexCount}
+          isLoading={isParkingLoading && parkingSpots.length === 0}
+          isUnavailable={parkingLoadError && parkingSpots.length === 0}
           onNavigate={tab => setActiveTab(tab)}
         />
       )}
@@ -488,32 +555,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'احجز موقفك الجامعي مسبقاً وفق جدولك الدراسي (ساعي، يومي، أو فصلي) مع إصدار تصريح رقمي فوري مشفر برمز QR معتمد على كافة بوابات الحرم الجامعي.'
               : 'Reserve your parking space in advance according to your lecture schedule, with encrypted QR digital passes recognized across all campus gates.'
           }
-          statChips={[
-            {
-              label: isAr ? 'نوع التصريح الصادر' : 'Pass Format',
-              value: 'QR مشفر',
-              icon: ShieldCheck,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'باقات حجز مرنة' : 'Booking Plans',
-              value: 'ساعي / يومي / فصلي',
-              icon: Calendar,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'سداد فوري من المحفظة' : 'Wallet Settlement',
-              value: 'فوري',
-              icon: CreditCard,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'سياسة استرداد الرصيد' : 'Instant Refund Policy',
-              value: 'مضمونة',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={parkingChips}
         />
       )}
 
@@ -533,32 +575,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'منظومة بوابات آلية تعتمد على كاميرات عالية السرعة وخوارزميات الذكاء الاصطناعي لقراءة اللوحات السعودية والتحقق من التصاريح وفتح الحواجز التلقائية في أقل من 300 مللي ثانية دون توقف.'
               : 'High-speed automated barriers utilizing computer vision to read Saudi license plates, verify permits, and lift gates in sub-300ms.'
           }
-          statChips={[
-            {
-              label: isAr ? 'زمن المعالجة والاستجابة' : 'Processing Latency',
-              value: '< 300 ms',
-              icon: Zap,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'دقة الذكاء الاصطناعي' : 'OCR Vision Accuracy',
-              value: '99.4%',
-              icon: ShieldCheck,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'دعم اللوحات الرسمية' : 'Plate Recognition',
-              value: 'عربي وإنجليزي',
-              icon: Car,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'فتح الحواجز تلقائياً' : 'Automated Barrier',
-              value: 'دون توقف',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={[]}
         />
       )}
 
@@ -578,32 +595,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'استثمر موقفك أثناء مغادرتك للجامعة خلال فترات البريك، وأتحه لزملائك القادمين للمحاضرات، واكسب رصيداً مالياً في محفظتك الجامعية عن كل ساعة يظل فيها موقفك متاحاً مع ضمان إخلائه قبل عودتك.'
               : 'Monetize your bay during off-campus break hours by allocating it to arriving peers, earning wallet credits with guaranteed prompt vacancy upon your return.'
           }
-          statChips={[
-            {
-              label: isAr ? 'عائد نقدي في المحفظة' : 'Direct Wallet Reward',
-              value: '+17.25 ر.س',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'ضمان إخلاء الموقف' : 'Vacancy Guarantee',
-              value: 'قبل موعدك بـ 15 د',
-              icon: ShieldCheck,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'زيادة السعة الاستيعابية' : 'Capacity Elevation',
-              value: '+35%',
-              icon: Zap,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'تنبيهات وتذكير آلي' : 'Smart Evacuation Alerts',
-              value: 'نشط',
-              icon: Sparkles,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={shareChips}
         />
       )}
 
@@ -623,32 +615,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'منظومة طلابية رائدة تتيح للطلاب المتفوقين تدريس زملائهم وتحقيق دخل فوري (70 ر.س/ساعة) يُحوّل مباشرة إلى حسابهم الجامعي لسداد الرسوم الدراسية، مما يرسخ التفوق العلمي ويوفر تمويلاً ذاتياً للطلاب.'
               : 'A student-led framework where high achievers tutor peers at 70 SAR/hour, credited directly to university accounts to pay tuition fees.'
           }
-          statChips={[
-            {
-              label: isAr ? 'مكافأة ساعة التدريس' : 'Hourly Tutor Reward',
-              value: '70 ر.س',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'سداد فوري للرسوم' : 'Direct Tuition Offset',
-              value: '100%',
-              icon: CreditCard,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'تغطية المقررات التخصصية' : 'Course Disciplines',
-              value: 'CS & ENG',
-              icon: BookOpen,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'متوسط تقييم المعلمين' : 'Average Peer Rating',
-              value: '4.92 ★',
-              icon: Sparkles,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={tutoringChips}
         />
       )}
 
@@ -668,32 +635,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'احجز موعداً استشارياً مباشراً مع أعضاء هيئة التدريس والقيادات الأكاديمية لمناقشة خطتك الدراسية، مشاريع التخرج، أبحاث النشر، وفرص التدريب الصيفي لدى الشركاء في نيوم والمشاريع الكبرى.'
               : 'Schedule one-on-one advising sessions with deans, department chairs, and faculty to discuss graduation projects and cooperative training.'
           }
-          statChips={[
-            {
-              label: isAr ? 'تأكيد وحجز فوري' : 'Instant Confirmation',
-              value: 'مباشر',
-              icon: UserCheck,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'إشعار لحظي للعمادة' : 'Deanery Notification',
-              value: 'آلي',
-              icon: ShieldCheck,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'جلسات حضورية وعن بعد' : 'Session Modalities',
-              value: 'حضوري / عن بعد',
-              icon: BookOpen,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'مشاريع التخرج والتدريب' : 'Capstone & Internships',
-              value: 'NEOM & Red Sea',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={officeHoursChips}
         />
       )}
 
@@ -713,32 +655,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'استكشف واحجز أحدث بيئات العمل الهندسية ومختبرات الحوسبة الفائقة المزودة بوحدات NVIDIA RTX 4090 وشبكات Cisco وغرف الدراسة المعزولة صوتياً لدعم مسيرتك البحثية والأكاديمية.'
               : 'Explore and reserve top-tier engineering facilities, NVIDIA RTX 4090 GPU clusters, Cisco CyberOps sandboxes, and acoustically isolated study pods.'
           }
-          statChips={[
-            {
-              label: isAr ? 'مرفقاً بحثياً متقدماً' : 'Advanced Facilities',
-              value: '10',
-              icon: Cpu,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'محطات معالجة RTX 4090' : 'NVIDIA GPU Stations',
-              value: '20',
-              icon: Zap,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'راوترات وسويتشات Cisco' : 'Cisco Enterprise Racks',
-              value: 'Catalyst',
-              icon: ShieldCheck,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'عزل صوتي لكبائن التركيز' : 'Acoustic Soundproofing',
-              value: '42 dB',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={roomsChips}
         />
       )}
 
@@ -758,32 +675,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'مؤشرات أداء لحظية تعتمد على تقنيات الذكاء الاصطناعي وإنترنت الأشياء لمتابعة كفاءة إشغال المواقف، حركة بوابات ALPR، ونشاط المرافق الأكاديمية والتدريس.'
               : 'Real-time performance metrics powered by AI & IoT to track bay occupancy, ALPR traffic throughput, and academic facility utilization.'
           }
-          statChips={[
-            {
-              label: isAr ? 'مستشعرات IoT متصلة' : 'Connected IoT Sensors',
-              value: '40 حساس',
-              icon: Cpu,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'معدل التبادل الذكي Flex' : 'Flex Sharing Rate',
-              value: '35%',
-              icon: Zap,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'زمن اتخاذ القرار' : 'Gate AI Decision Time',
-              value: '< 0.3 ث',
-              icon: ShieldCheck,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'دقة التنبؤ بالطلب' : 'Demand Forecasting',
-              value: '98.2%',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={[]}
         />
       )}
 
@@ -801,32 +693,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'محفظتك الرقمية المتكاملة لإدارة جميع العمليات المالية داخل الحرم الجامعي: شحن الرصيد، سداد المواقف، استقبال مكافآت التدريس، التحويل بين الزملاء، وسداد الرسوم الدراسية بأعلى درجات الأمان.'
               : 'Your central digital wallet for all on-campus transactions: balance top-up, parking, tutoring payouts, peer transfers, and tuition settlements.'
           }
-          statChips={[
-            {
-              label: isAr ? 'تحويل فوري بين الطلاب' : 'Peer-to-Peer Transfers',
-              value: 'P2P فوري',
-              icon: Users,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'سجل محاسبي موثق' : 'Immutable Audit Ledger',
-              value: '100% موثق',
-              icon: ShieldCheck,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'وسائل شحن متعددة' : 'Top-Up Gateways',
-              value: 'مدى / فيزا / أبل باي',
-              icon: CreditCard,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'أمان مصرفي عالي' : 'Security Standards',
-              value: 'مشفر 256-bit',
-              icon: Zap,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={walletChips}
         />
       )}
 
@@ -846,32 +713,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'استعرض وسدد فواتيرك الأكاديمية مباشرة من رصيد محفظتك الجامعية أو عبر وسائل الدفع الرسمية، مع إصدار إيصالات إلكترونية معتمدة برمز QR تحقق فوري لعمادة القبول والتسجيل.'
               : 'Review and pay university tuition invoices seamlessly from your digital wallet with official QR-verified electronic receipts.'
           }
-          statChips={[
-            {
-              label: isAr ? 'سداد من عوائد التدريس' : 'Peer Tutoring Offset',
-              value: 'تلقائي',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'إيصالات رسمية بـ QR' : 'Cryptographic Receipts',
-              value: 'معتمدة',
-              icon: ShieldCheck,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'خطط تقسيط مجدولة' : 'Flexible Installments',
-              value: 'ميسرة',
-              icon: CreditCard,
-              color: 'var(--accent-text)',
-            },
-            {
-              label: isAr ? 'التحديث اللحظي للعمادة' : 'Registrar Sync',
-              value: 'فوري',
-              icon: Sparkles,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={[]}
         />
       )}
 
@@ -891,32 +733,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               ? 'تتبع فوري لأسطول الحافلات الكهربائية داخل الحرم الجامعي، مواعيد التردد بين الكليات ومواقف السيارات، وإصدار تذاكر الصعود الفورية عبر رمز QR الموحد.'
               : 'Real-time GPS tracking for electric campus shuttles, live timetable between faculties and parking zones, and instant QR boarding pass issuance.'
           }
-          statChips={[
-            {
-              label: isAr ? 'أسطول كهربائي 100%' : '100% Electric Fleet',
-              value: 'صفر انبعاثات',
-              icon: Zap,
-              color: '#10B981',
-            },
-            {
-              label: isAr ? 'معدل التردد بين المحطات' : 'Transit Frequency',
-              value: '10 دقائق',
-              icon: Sparkles,
-              color: 'var(--gold-text)',
-            },
-            {
-              label: isAr ? 'خطوط تغطي الحرم' : 'Active Campus Lines',
-              value: '3 مسارات',
-              icon: ShieldCheck,
-              color: 'var(--fbsu-primary)',
-            },
-            {
-              label: isAr ? 'الركوب لجميع الطلاب' : 'Student Access',
-              value: 'مجاني بالكامل',
-              icon: Award,
-              color: 'var(--gold-text)',
-            },
-          ]}
+          statChips={[]}
         />
       )}
 
@@ -941,7 +758,6 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               }}
               isAuthenticated={isAuthenticated}
               onOpenAuth={() => setIsAuthModalOpen(true)}
-              onReserveSpot={handleReserveSpot}
               onBookingSuccess={booking => {
                 handleRefreshAll();
                 setActiveToast({
@@ -964,6 +780,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               }}
               onOpenGate={() => setActiveTab('gate')}
               isLoading={isParkingLoading}
+              loadError={parkingLoadError}
               onRefresh={handleRefreshAll}
               lastUpdated={parkingLastUpdated}
             />
@@ -1038,6 +855,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
                 id: currentUser.id,
                 name: currentUser.name,
                 role: currentUser.role,
+                userType: user?.userType,
                 primarySpot: userAssignedBay,
                 walletBalance: currentUser.walletBalance,
               }}
@@ -1054,6 +872,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <>
             <TutoringView
               sessions={tutoringSessions}
+              status={tutoringStatus}
+              onRetry={fetchTutoringSessions}
               isAr={isAr}
               isAuthenticated={isAuthenticated}
               currentUser={{
@@ -1076,6 +896,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
           <>
             <OfficeHoursView
               facultyList={facultyList}
+              status={facultyStatus}
+              onRetry={fetchFacultyOfficeHours}
               isAr={isAr}
               isAuthenticated={isAuthenticated}
               currentUser={{
@@ -1163,7 +985,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         {(activeTab === 'bus' || activeTab === 'transit') && (
           <>
             <div style={{ marginTop: '1rem' }}>
-              <TransitView isAr={isAr} />
+              <TransitView isAr={isAr} onRequireAuth={() => setIsAuthModalOpen(true)} />
             </div>
             <ServiceExplainerSections service="bus" isAr={isAr} onNavigate={setActiveTab} />
           </>

@@ -41,6 +41,8 @@ export interface ParkingLotViewProps {
   onBookingCancelled?: (() => void) | undefined;
   onOpenGate?: (() => void) | undefined;
   isLoading?: boolean | undefined;
+  /** True when the last attempt to load spots from the API failed */
+  loadError?: boolean | undefined;
   onRefresh?: (() => void) | undefined;
   lastUpdated?: Date | null | undefined;
 }
@@ -112,11 +114,11 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
   currentUser,
   isAuthenticated,
   onOpenAuth,
-  onReserveSpot,
   onBookingSuccess,
   onBookingCancelled,
   onOpenGate,
   isLoading = false,
+  loadError = false,
   onRefresh,
   lastUpdated,
 }) => {
@@ -268,18 +270,14 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
   const handleBookFromModal = async (spot: ParkingSpot) => {
     setBookingError(null);
 
-    // If spot does not have backendId (isolated unit test fallback), use local handler
+    // A bay can only be booked against its real backend record. Never issue a
+    // locally generated pass.
     if (!spot.backendId) {
-      setSelectedSpot(null);
-      onReserveSpot?.(spot.id);
-      setDigitalPass({
-        spotId: spot.id,
-        college: isAr ? spot.college : spot.collegeEn,
-        userName: currentUser.name,
-        userId: currentUser.id,
-        plate: currentUser.plate || 'ب ط ك 1234',
-        duration: isAr ? '3 ساعات (09:00 - 12:00)' : '3 Hours (09:00 - 12:00)',
-      });
+      setBookingError(
+        isAr
+          ? 'لا يمكن حجز هذا الموقف حالياً: بياناته غير متزامنة مع الخادم. حدّث الصفحة وحاول مجدداً.'
+          : 'This bay cannot be booked right now: it is not synced with the server. Refresh and try again.'
+      );
       return;
     }
 
@@ -315,7 +313,7 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
         college: isAr ? booking.zoneNameAr || spot.college : booking.zoneNameEn || spot.collegeEn,
         userName: currentUser.name,
         userId: currentUser.id,
-        plate: booking.vehiclePlate || currentUser.plate || 'ب ط ك 1234',
+        plate: booking.vehiclePlate || currentUser.plate || '',
         duration: `${booking.durationHours} ${isAr ? 'ساعات' : 'Hours'}`,
         bookingId: booking.id,
         passCode: booking.digitalPassCode,
@@ -425,7 +423,7 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
             <span className="radar-head-text">
               {isAr ? 'رادار المواقف اللحظي الشامل' : 'Full Campus Mini-Radar'}
             </span>
-            <span className="radar-chip-count">({spots.length}/40)</span>
+            <span className="radar-chip-count">({spots.length})</span>
           </div>
 
           <div className="radar-quick-stats">
@@ -783,6 +781,37 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
           </span>
         </div>
       </div>
+
+      {/* Data state: loading / error / empty (no mock fallback) */}
+      {spots.length === 0 && (
+        <div
+          className="parking-data-state"
+          role={loadError ? 'alert' : 'status'}
+          data-testid={
+            isLoading ? 'parking-loading' : loadError ? 'parking-load-error' : 'parking-empty'
+          }
+        >
+          <strong>
+            {isLoading
+              ? isAr
+                ? 'جاري تحميل المواقف من الخادم...'
+                : 'Loading parking bays from the server...'
+              : loadError
+                ? isAr
+                  ? 'تعذر تحميل بيانات المواقف.'
+                  : 'Could not load parking data.'
+                : isAr
+                  ? 'لا توجد مواقف مسجلة حالياً.'
+                  : 'No parking bays are registered yet.'}
+          </strong>
+          {!isLoading && onRefresh && (
+            <button type="button" className="btn-outline" onClick={onRefresh}>
+              <RotateCw size={14} />
+              <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* 5. Main Visual Area Depending on ViewMode */}
 

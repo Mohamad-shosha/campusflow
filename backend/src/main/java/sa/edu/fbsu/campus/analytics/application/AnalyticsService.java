@@ -5,45 +5,157 @@ import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.analytics.dto.AnalyticsSummaryResponse;
 import sa.edu.fbsu.campus.analytics.dto.HourlyLoadPoint;
 import sa.edu.fbsu.campus.analytics.dto.ZoneOccupancyStat;
+import sa.edu.fbsu.campus.domain.University;
+import sa.edu.fbsu.campus.infra.UniversityRepository;
+import sa.edu.fbsu.campus.parking.domain.FlexOfferStatus;
 import sa.edu.fbsu.campus.parking.domain.ParkingSpot;
 import sa.edu.fbsu.campus.parking.domain.SpotStatus;
 import sa.edu.fbsu.campus.parking.infra.FlexOfferRepository;
 import sa.edu.fbsu.campus.parking.infra.GateEventLogRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
+import sa.edu.fbsu.campus.wallet.domain.TransactionDirection;
+import sa.edu.fbsu.campus.wallet.domain.TransactionType;
+import sa.edu.fbsu.campus.wallet.infra.LedgerEntryRepository;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Campus analytics computed exclusively from persisted records.
+ *
+ * <ul>
+ *   <li>Spot / zone occupancy: {@code parking_spot}</li>
+ *   <li>Active flex offers: {@code flex_offer} with status AVAILABLE</li>
+ *   <li>Gate passages and hourly load: GRANTED rows of {@code gate_event_log}</li>
+ *   <li>Parking revenue: PARKING_FEE debits minus parking booking refunds in {@code ledger_entry}</li>
+ * </ul>
+ *
+ * Metrics with no backing data source (net capacity gain, time saved, satisfaction rate)
+ * are returned as {@code null} rather than estimated.
+ */
 @Service
 @Transactional(readOnly = true)
 public class AnalyticsService {
 
+    /** Gate decision value written by GateDecisionService for an admitted vehicle. */
+    static final String GATE_GRANTED = "GRANTED";
+    /** Idempotency-key prefix used by BookingService for parking booking refunds. */
+    static final String PARKING_REFUND_KEY_PREFIX = "REFUND-";
+    /** Look-back window for the hourly gate load distribution. */
+    static final Duration HOURLY_LOAD_WINDOW = Duration.ofDays(7);
+
+    private static final UUID DEFAULT_UNIVERSITY_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final ZoneId FALLBACK_ZONE = ZoneId.of("Asia/Riyadh");
+
     private final ParkingSpotRepository spotRepository;
     private final FlexOfferRepository flexOfferRepository;
     private final GateEventLogRepository gateEventLogRepository;
+    private final LedgerEntryRepository ledgerEntryRepository;
+    private final UniversityRepository universityRepository;
+    private final Clock clock;
 
     public AnalyticsService(
             ParkingSpotRepository spotRepository,
             FlexOfferRepository flexOfferRepository,
-            GateEventLogRepository gateEventLogRepository
+            GateEventLogRepository gateEventLogRepository,
+            LedgerEntryRepository ledgerEntryRepository,
+            UniversityRepository universityRepository,
+            Optional<Clock> clock
     ) {
         this.spotRepository = spotRepository;
         this.flexOfferRepository = flexOfferRepository;
         this.gateEventLogRepository = gateEventLogRepository;
+        this.ledgerEntryRepository = ledgerEntryRepository;
+        this.universityRepository = universityRepository;
+        this.clock = clock.orElse(Clock.systemUTC());
     }
 
     public AnalyticsSummaryResponse getSummary(UUID universityId) {
-        UUID effectiveUniId = universityId != null
-                ? universityId
-                : UUID.fromString("00000000-0000-0000-0000-000000000001");
+        UUID effectiveUniId = universityId != null ? universityId : DEFAULT_UNIVERSITY_ID;
 
         List<ParkingSpot> spots = spotRepository.findAllWithZoneByUniversityId(effectiveUniId);
         int totalSpots = spots.size();
         int availableSpots = (int) spots.stream().filter(s -> s.getStatus() == SpotStatus.AVAILABLE).count();
-        int occupiedSpots = (int) spots.stream().filter(s -> s.getStatus() == SpotStatus.OCCUPIED || s.getStatus() == SpotStatus.RESERVED).count();
+        int occupiedSpots = (int) spots.stream()
+                .filter(s -> s.getStatus() == SpotStatus.OCCUPIED || s.getStatus() == SpotStatus.RESERVED)
+                .count();
 
-        // Calculate occupancy by zone
+        int activeFlexOffers = (int) flexOfferRepository.countByUniversityIdAndStatus(effectiveUniId, FlexOfferStatus.AVAILABLE);
+        int grantedPassages = (int) gateEventLogRepository.countByUniversityIdAndDecision(effectiveUniId, GATE_GRANTED);
+
+        return new AnalyticsSummaryResponse(
+                null, // netCapacityGainPercent: no baseline capacity data recorded
+                null, // timeSavedMinutes: no search-time measurements recorded
+                null, // satisfactionRatePercent: no survey data recorded
+                totalSpots,
+                availableSpots,
+                occupiedSpots,
+                activeFlexOffers,
+                grantedPassages,
+                netParkingRevenue(effectiveUniId),
+                getHourlyLoad(effectiveUniId),
+                buildZoneStats(spots)
+        );
+    }
+
+    /**
+     * Distribution of admitted vehicles by hour of day (university local time) over the last
+     * {@link #HOURLY_LOAD_WINDOW}. {@code load} is relative to the busiest hour (busiest = 100).
+     * Returns an empty list when no gate entries were recorded in the window.
+     */
+    public List<HourlyLoadPoint> getHourlyLoad(UUID universityId) {
+        UUID effectiveUniId = universityId != null ? universityId : DEFAULT_UNIVERSITY_ID;
+        Instant since = Instant.now(clock).minus(HOURLY_LOAD_WINDOW);
+        List<Instant> entries = gateEventLogRepository.findEventTimesSince(effectiveUniId, GATE_GRANTED, since);
+        if (entries.isEmpty()) {
+            return List.of();
+        }
+
+        ZoneId zone = resolveZone(effectiveUniId);
+        int[] perHour = new int[24];
+        for (Instant at : entries) {
+            perHour[at.atZone(zone).getHour()]++;
+        }
+        int max = Arrays.stream(perHour).max().orElse(0);
+
+        List<HourlyLoadPoint> points = new ArrayList<>();
+        for (int hour = 0; hour < 24; hour++) {
+            int count = perHour[hour];
+            if (count == 0) {
+                continue;
+            }
+            int load = (int) Math.round(count * 100.0 / max);
+            points.add(new HourlyLoadPoint(
+                    String.format("%02d:00", hour),
+                    load,
+                    loadColor(load),
+                    count + " دخول",
+                    count + (count == 1 ? " entry" : " entries")
+            ));
+        }
+        return points;
+    }
+
+    public List<ZoneOccupancyStat> getZoneStats(UUID universityId) {
+        UUID effectiveUniId = universityId != null ? universityId : DEFAULT_UNIVERSITY_ID;
+        return buildZoneStats(spotRepository.findAllWithZoneByUniversityId(effectiveUniId));
+    }
+
+    private BigDecimal netParkingRevenue(UUID universityId) {
+        BigDecimal fees = ledgerEntryRepository.sumAmount(
+                universityId, TransactionType.PARKING_FEE, TransactionDirection.DEBIT, "");
+        BigDecimal refunds = ledgerEntryRepository.sumAmount(
+                universityId, TransactionType.REFUND, TransactionDirection.CREDIT, PARKING_REFUND_KEY_PREFIX);
+        return nz(fees).subtract(nz(refunds));
+    }
+
+    private List<ZoneOccupancyStat> buildZoneStats(List<ParkingSpot> spots) {
         Map<String, List<ParkingSpot>> byZone = spots.stream()
                 .filter(s -> s.getZone() != null)
                 .collect(Collectors.groupingBy(s -> s.getZone().getCode()));
@@ -55,52 +167,33 @@ public class AnalyticsService {
                     .filter(s -> s.getStatus() == SpotStatus.OCCUPIED || s.getStatus() == SpotStatus.RESERVED)
                     .count();
             double rate = zTotal > 0 ? Math.round(((double) zOccupied / zTotal) * 1000.0) / 10.0 : 0.0;
-            String nameAr = switch (code) {
-                case "A" -> "قطاع A - الحاسب والهندسة";
-                case "B" -> "قطاع B - إدارة الأعمال والطب";
-                case "C" -> "قطاع C - كادر التدريس";
-                case "D" -> "قطاع D - شحن كهربائي وذوي الهمم";
-                default -> "القطاع " + code;
-            };
-            String nameEn = switch (code) {
-                case "A" -> "Zone A - Engineering & Computing";
-                case "B" -> "Zone B - Business & Medicine";
-                case "C" -> "Zone C - Faculty Staff";
-                case "D" -> "Zone D - EV Charging & Accessible";
-                default -> "Zone " + code;
-            };
-            zoneStats.add(new ZoneOccupancyStat(code, nameAr, nameEn, zTotal, zOccupied, rate));
+            var zoneEntity = zoneSpots.get(0).getZone();
+            zoneStats.add(new ZoneOccupancyStat(code, zoneEntity.getNameAr(), zoneEntity.getNameEn(), zTotal, zOccupied, rate));
         });
         zoneStats.sort(Comparator.comparing(ZoneOccupancyStat::zoneCode));
+        return zoneStats;
+    }
 
-        long flexCount = flexOfferRepository.count();
-        long gateCount = gateEventLogRepository.count();
+    private ZoneId resolveZone(UUID universityId) {
+        return universityRepository.findById(universityId)
+                .map(University::getTimezone)
+                .map(tz -> {
+                    try {
+                        return ZoneId.of(tz);
+                    } catch (DateTimeException ex) {
+                        return FALLBACK_ZONE;
+                    }
+                })
+                .orElse(FALLBACK_ZONE);
+    }
 
-        List<HourlyLoadPoint> hourly = List.of(
-                new HourlyLoadPoint("08:00", 85, "#f59e0b", "ذروة 1", "Peak 1"),
-                new HourlyLoadPoint("09:00", 95, "#ef4444", "ذروة قصوى", "Max Peak"),
-                new HourlyLoadPoint("10:00", 70, "#10b981", "فترة خروج البريك", "Break Exit"),
-                new HourlyLoadPoint("11:00", 90, "#ef4444", "محاضرات الظهر", "Midday"),
-                new HourlyLoadPoint("12:00", 80, "#f59e0b", "صلاة الظهر", "Prayer"),
-                new HourlyLoadPoint("01:00", 65, "#10b981", "تبادل المواقف", "Flex Swap"),
-                new HourlyLoadPoint("02:00", 75, "#f59e0b", "عودة الطلاب", "Return"),
-                new HourlyLoadPoint("03:00", 50, "#10b981", "هدوء", "Calm"),
-                new HourlyLoadPoint("04:00", 25, "#10b981", "نهاية الدوام", "Dismissal")
-        );
+    private static String loadColor(int load) {
+        if (load >= 85) return "#ef4444";
+        if (load >= 60) return "#f59e0b";
+        return "#10b981";
+    }
 
-        return new AnalyticsSummaryResponse(
-                42.0,
-                14.2,
-                98.8,
-                totalSpots,
-                availableSpots,
-                occupiedSpots,
-                (int) flexCount,
-                (int) gateCount,
-                BigDecimal.valueOf(14250.00),
-                hourly,
-                zoneStats
-        );
+    private static BigDecimal nz(BigDecimal v) {
+        return v != null ? v : BigDecimal.ZERO;
     }
 }
-

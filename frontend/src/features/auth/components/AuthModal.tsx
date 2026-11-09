@@ -11,6 +11,12 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useAppPreferences } from '../../../shared/context/AppPreferencesContext';
 
+/**
+ * Demo login shortcuts use accounts created by the backend `dev` profile seeders.
+ * Shown only in Vite dev mode, or when VITE_ENABLE_DEMO_LOGIN=true is set at build time.
+ */
+const SHOW_DEMO_LOGIN = import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEMO_LOGIN === 'true';
+
 export interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -197,8 +203,8 @@ export const AuthModal: FC<AuthModalProps> = ({
                   className="form-control"
                   placeholder={
                     isAr
-                      ? 'مثال: 20210045 أو email@fbsu.edu.sa'
-                      : 'e.g. 20210045 or email@fbsu.edu.sa'
+                      ? 'الرقم الجامعي أو email@fbsu.edu.sa'
+                      : 'University ID or email@fbsu.edu.sa'
                   }
                   {...loginField('identifier')}
                 />
@@ -265,117 +271,120 @@ export const AuthModal: FC<AuthModalProps> = ({
               </span>
             </button>
 
-            {/* Quick 1-Click Demo Personas */}
-            <div
-              style={{
-                marginTop: '1.25rem',
-                paddingTop: '1rem',
-                borderTop: '1px solid var(--border-color)',
-              }}
-            >
+            {/* Quick 1-Click Demo Personas: dev-seed accounts, only in dev builds or when
+                explicitly enabled. Stripped from production bundles by Vite. */}
+            {SHOW_DEMO_LOGIN && (
               <div
                 style={{
-                  fontSize: '0.78rem',
-                  color: 'var(--text-muted)',
-                  marginBottom: '0.5rem',
-                  textAlign: 'center',
-                  fontWeight: 600,
+                  marginTop: '1.25rem',
+                  paddingTop: '1rem',
+                  borderTop: '1px solid var(--border-color)',
                 }}
               >
-                {isAr
-                  ? '⚡ تجربة سريعة بنقرة واحدة (حسابات العرض التفاعلي)'
-                  : '⚡ 1-Click Demo Personas (Interactive Accounts)'}
+                <div
+                  style={{
+                    fontSize: '0.78rem',
+                    color: 'var(--text-muted)',
+                    marginBottom: '0.5rem',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                  }}
+                >
+                  {isAr
+                    ? '⚡ تجربة سريعة بنقرة واحدة (حسابات العرض التفاعلي)'
+                    : '⚡ 1-Click Demo Personas (Interactive Accounts)'}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={isLoggingIn}
+                    onClick={() => {
+                      setLoginValue('identifier', '20210045');
+                      setLoginValue('password', 'FbsuDev2026!');
+                      onLogin({
+                        identifier: '20210045',
+                        password: 'FbsuDev2026!',
+                        universityCode: 'FBSU',
+                      });
+                    }}
+                    style={{
+                      fontSize: '0.75rem',
+                      padding: '0.45rem 0.6rem',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    🎓 <strong>{isAr ? 'إياد الحربي' : 'Eyad Al-Harbi'}</strong> (
+                    {isAr ? 'طالب' : 'Student'})
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={isLoggingIn}
+                    onClick={() => {
+                      setLoginValue('identifier', '20220088');
+                      setLoginValue('password', 'FbsuDev2026!');
+                      onLogin({
+                        identifier: '20220088',
+                        password: 'FbsuDev2026!',
+                        universityCode: 'FBSU',
+                      });
+                    }}
+                    style={{
+                      fontSize: '0.75rem',
+                      padding: '0.45rem 0.6rem',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    🚗 <strong>{isAr ? 'راكان المطيري' : 'Rakan Al-Mutairi'}</strong> (
+                    {isAr ? 'طالب' : 'Student'})
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={isLoggingIn}
+                    onClick={() => {
+                      setLoginValue('identifier', 'FAC-8821');
+                      setLoginValue('password', 'FbsuDev2026!');
+                      onLogin({
+                        identifier: 'FAC-8821',
+                        password: 'FbsuDev2026!',
+                        universityCode: 'FBSU',
+                      });
+                    }}
+                    style={{
+                      fontSize: '0.75rem',
+                      padding: '0.45rem 0.6rem',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    👩‍🏫 <strong>{isAr ? 'د. رغد النفيعي' : 'Dr. Raghad'}</strong> (
+                    {isAr ? 'أستاذ' : 'Faculty'})
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={isLoggingIn}
+                    onClick={() => {
+                      setLoginValue('identifier', 'ADM-1001');
+                      setLoginValue('password', 'FbsuDev2026!');
+                      onLogin({
+                        identifier: 'ADM-1001',
+                        password: 'FbsuDev2026!',
+                        universityCode: 'FBSU',
+                      });
+                    }}
+                    style={{
+                      fontSize: '0.75rem',
+                      padding: '0.45rem 0.6rem',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    🛡️ <strong>{isAr ? 'إدارة النظام' : 'System Admin'}</strong> (Admin)
+                  </button>
+                </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  disabled={isLoggingIn}
-                  onClick={() => {
-                    setLoginValue('identifier', '20210045');
-                    setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({
-                      identifier: '20210045',
-                      password: 'FbsuDev2026!',
-                      universityCode: 'FBSU',
-                    });
-                  }}
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '0.45rem 0.6rem',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  🎓 <strong>{isAr ? 'إياد الحربي' : 'Eyad Al-Harbi'}</strong> (
-                  {isAr ? 'طالب' : 'Student'})
-                </button>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  disabled={isLoggingIn}
-                  onClick={() => {
-                    setLoginValue('identifier', '20220088');
-                    setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({
-                      identifier: '20220088',
-                      password: 'FbsuDev2026!',
-                      universityCode: 'FBSU',
-                    });
-                  }}
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '0.45rem 0.6rem',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  🚗 <strong>{isAr ? 'راكان المطيري' : 'Rakan Al-Mutairi'}</strong> (
-                  {isAr ? 'طالب' : 'Student'})
-                </button>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  disabled={isLoggingIn}
-                  onClick={() => {
-                    setLoginValue('identifier', 'FAC-8821');
-                    setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({
-                      identifier: 'FAC-8821',
-                      password: 'FbsuDev2026!',
-                      universityCode: 'FBSU',
-                    });
-                  }}
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '0.45rem 0.6rem',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  👩‍🏫 <strong>{isAr ? 'د. رغد النفيعي' : 'Dr. Raghad'}</strong> (
-                  {isAr ? 'أستاذ' : 'Faculty'})
-                </button>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  disabled={isLoggingIn}
-                  onClick={() => {
-                    setLoginValue('identifier', 'ADM-1001');
-                    setLoginValue('password', 'FbsuDev2026!');
-                    onLogin({
-                      identifier: 'ADM-1001',
-                      password: 'FbsuDev2026!',
-                      universityCode: 'FBSU',
-                    });
-                  }}
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '0.45rem 0.6rem',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  🛡️ <strong>{isAr ? 'إدارة النظام' : 'System Admin'}</strong> (Admin)
-                </button>
-              </div>
-            </div>
+            )}
           </form>
         )}
 

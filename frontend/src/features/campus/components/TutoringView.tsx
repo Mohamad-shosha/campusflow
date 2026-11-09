@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useMemo, useState, FC } from 'react';
 import {
   BookOpen,
   GraduationCap,
@@ -9,14 +9,28 @@ import {
   Plus,
   Users,
   Search,
+  RotateCw,
 } from 'lucide-react';
 import type { TutoringSession } from '../data/campusData';
 import { BookTutoringModal } from './BookTutoringModal';
 import { CreateTutoringModal } from './CreateTutoringModal';
 import { soundFX } from '../../../shared/utils/sound';
+import type { ResourceStatus } from '../../../shared/types/resource';
+
+// Categories allowed by the tutoring_session CHECK constraint (V10__tutoring.sql)
+const CATEGORY_LABELS: Record<string, { ar: string; en: string }> = {
+  programming: { ar: 'البرمجة وهياكل البيانات', en: 'Programming' },
+  hardware: { ar: 'التصميم المنطقي والعتاد', en: 'Digital Logic & Hardware' },
+  math: { ar: 'الرياضيات والفيزياء', en: 'Math & Physics' },
+  science: { ar: 'العلوم', en: 'Science' },
+  general: { ar: 'عام', en: 'General' },
+};
 
 export interface TutoringViewProps {
   sessions: TutoringSession[];
+  /** Load state of `sessions` from the API (defaults to 'ready' for isolated usage) */
+  status?: ResourceStatus | undefined;
+  onRetry?: (() => void) | undefined;
   isAr: boolean;
   isAuthenticated?: boolean | undefined;
   currentUser: {
@@ -33,6 +47,8 @@ export interface TutoringViewProps {
 
 export const TutoringView: FC<TutoringViewProps> = ({
   sessions,
+  status = 'ready',
+  onRetry,
   isAr,
   isAuthenticated = false,
   currentUser,
@@ -45,6 +61,12 @@ export const TutoringView: FC<TutoringViewProps> = ({
   const [selectedSession, setSelectedSession] = useState<TutoringSession | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Filter pills are derived from the categories present in the loaded sessions
+  const categories = useMemo(
+    () => Array.from(new Set(sessions.map(s => s.category).filter(Boolean))),
+    [sessions]
+  );
 
   const filteredSessions = sessions.filter(s => {
     if (filter !== 'all' && s.category !== filter) return false;
@@ -78,8 +100,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
         </h3>
         <p className="section-subtitle">
           {isAr
-            ? 'منصة رسمية تتيح للطلاب المتميزين (مثل إياد في الرياضيات وراكان في البرمجة وفاطمة في المنطق الرقمي) تقديم شروحات للمحاضرات والشباتر بأسعار محددة (70 ر.س / ساعة). لا تُحول المبالغ كاش؛ بل تتحول تلقائياً إلى "رصيد جامعي" معتمد في محفظة الطالب يُسدد به رسوم جامعته أو مواقفه!'
-            : 'Distinguished students (e.g. Eyad in Math, Rakan in Coding, Fatima in Logic) provide peer tutoring at 70 SAR/hour. Earnings transfer directly into University Balance to settle tuition fees or parking!'}
+            ? 'منصة رسمية تتيح للطلاب المتميزين تقديم شروحات للمحاضرات بسعر رسمي موحد (70 ر.س / ساعة). لا تُحول المبالغ كاش؛ بل تتحول إلى رصيد جامعي في محفظة الطالب يُسدد به رسومه الجامعية أو المواقف.'
+            : 'Distinguished students provide peer tutoring at the official rate of 70 SAR/hour. Earnings are credited to the tutor’s university wallet to settle tuition or parking fees.'}
         </p>
       </div>
 
@@ -88,9 +110,9 @@ export const TutoringView: FC<TutoringViewProps> = ({
         style={{
           background: 'linear-gradient(135deg, rgba(17,110,99,0.2), rgba(215,162,55,0.15))',
           border: '1px solid var(--fbsu-gold-border)',
-          borderRadius: 'var(--radius-xl)',
-          padding: '1.4rem 1.6rem',
-          marginBottom: '2rem',
+          borderRadius: 'var(--r-lg)',
+          padding: '0.9rem 1.15rem',
+          marginBottom: '1.25rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -120,8 +142,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
             </div>
             <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
               {isAr
-                ? 'الشرح بـ 70 ر.س/ساعة ➔ تجميع 10 ساعات = 700 ر.س ➔ خصم مباشر وسداد فوري من رسوم الفصل الدراسي بالجامعة!'
-                : 'Teach for 70 SAR/hr ➔ 10 hrs = 700 SAR credited to University Balance ➔ Offsets tuition & parking!'}
+                ? 'الشرح بـ 70 ر.س/ساعة ➔ يُضاف المبلغ لرصيدك الجامعي ➔ استخدمه لسداد الرسوم الجامعية أو المواقف.'
+                : 'Teach at 70 SAR/hr ➔ earnings credited to your university wallet ➔ use them for tuition or parking.'}
             </div>
           </div>
         </div>
@@ -170,67 +192,37 @@ export const TutoringView: FC<TutoringViewProps> = ({
           >
             <span>{isAr ? 'جميع الشروحات الأكاديمية' : 'All Sessions'}</span>
           </button>
-          <button
-            className={`hub-filter-btn ${filter === 'programming' ? 'active' : ''}`}
-            onClick={() => {
-              soundFX.playClick();
-              setFilter('programming');
-            }}
-            type="button"
-          >
-            <span>{isAr ? 'البرمجة وهياكل البيانات (راكان المطيري)' : 'Programming (Rakan)'}</span>
-          </button>
-          <button
-            className={`hub-filter-btn ${filter === 'hardware' ? 'active' : ''}`}
-            onClick={() => {
-              soundFX.playClick();
-              setFilter('hardware');
-            }}
-            type="button"
-          >
-            <span>{isAr ? 'التصميم المنطقي (فاطمة العنزي)' : 'Digital Logic (Fatima)'}</span>
-          </button>
-          <button
-            className={`hub-filter-btn ${filter === 'math' ? 'active' : ''}`}
-            onClick={() => {
-              soundFX.playClick();
-              setFilter('math');
-            }}
-            type="button"
-          >
-            <span>{isAr ? 'الفيزياء والرياضيات (إياد الحربي)' : 'Physics & Math (Eyad)'}</span>
-          </button>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              className={`hub-filter-btn ${filter === cat ? 'active' : ''}`}
+              onClick={() => {
+                soundFX.playClick();
+                setFilter(cat);
+              }}
+              type="button"
+            >
+              <span>
+                {CATEGORY_LABELS[cat]
+                  ? isAr
+                    ? CATEGORY_LABELS[cat].ar
+                    : CATEGORY_LABELS[cat].en
+                  : cat}
+              </span>
+            </button>
+          ))}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           {/* Quick Search */}
-          <div style={{ position: 'relative', width: '220px' }}>
-            <Search
-              size={14}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                [isAr ? 'right' : 'left']: '0.65rem',
-                color: 'var(--text-dim)',
-                pointerEvents: 'none',
-              }}
-            />
+          <div className="rooms-search" style={{ flex: '0 1 280px' }}>
+            <Search size={15} className="rooms-search-icon" />
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              aria-label={isAr ? 'بحث في الجلسات' : 'Search sessions'}
               placeholder={isAr ? 'ابحث بالمقرر أو الطالب...' : 'Search course or tutor...'}
-              style={{
-                width: '100%',
-                padding: '0.45rem 1.8rem',
-                background: 'rgba(2, 35, 31, 0.65)',
-                border: '1px solid rgba(215, 162, 55, 0.25)',
-                borderRadius: '8px',
-                color: 'var(--text-main)',
-                fontSize: '0.78rem',
-                outline: 'none',
-              }}
             />
           </div>
 
@@ -240,6 +232,37 @@ export const TutoringView: FC<TutoringViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Data states (no mock fallback) */}
+      {status === 'loading' && sessions.length === 0 && (
+        <div className="campus-data-state" role="status" data-testid="tutoring-loading">
+          {isAr ? 'جاري تحميل جلسات الشرح...' : 'Loading tutoring sessions...'}
+        </div>
+      )}
+      {status === 'error' && sessions.length === 0 && (
+        <div className="campus-data-state is-error" role="alert" data-testid="tutoring-load-error">
+          <span>
+            {isAr ? 'تعذر تحميل جلسات الشرح من الخادم.' : 'Could not load tutoring sessions.'}
+          </span>
+          {onRetry && (
+            <button type="button" className="btn-outline" onClick={onRetry}>
+              <RotateCw size={14} />
+              <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+            </button>
+          )}
+        </div>
+      )}
+      {status === 'ready' && filteredSessions.length === 0 && (
+        <div className="campus-data-state" data-testid="tutoring-empty">
+          {sessions.length === 0
+            ? isAr
+              ? 'لا توجد جلسات شرح منشورة حالياً.'
+              : 'No tutoring sessions have been published yet.'
+            : isAr
+              ? 'لا توجد جلسات مطابقة للتصفية أو البحث.'
+              : 'No sessions match your filter or search.'}
+        </div>
+      )}
 
       {/* Tutoring Cards Grid (Pixel-Perfect Alignment with Attachment Image 1) */}
       <div className="tutoring-grid">
@@ -251,11 +274,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
           const isOwn = isAuthenticated && s.tutorId === currentUser.id;
           const displayTutorName = isAr ? s.tutorName : s.tutorNameEn || s.tutorName;
           const displayTutorRole = isAr ? s.tutorRole : s.tutorRoleEn || s.tutorRole;
-          const avatarInitial = displayTutorName.includes('إياد')
-            ? '!'
-            : displayTutorName.charAt(0);
-          const isDistinguishedFemale =
-            displayTutorName.includes('فاطمة') || displayTutorName.includes('سارة');
+          const avatarInitial = displayTutorName.charAt(0);
 
           return (
             <div key={s.id} className="tutoring-card" data-testid={`tutoring-card-${s.id}`}>
@@ -281,7 +300,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
                     className="tutor-avatar-circle"
                     style={{
                       background: s.tutorAvatarColor,
-                      fontSize: avatarInitial === '!' ? '1.25rem' : '1.1rem',
+                      fontSize: '1.1rem',
                     }}
                   >
                     {avatarInitial}
@@ -289,30 +308,9 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   <div className="tutor-info-meta">
                     <div className="tutor-title-row">
                       <span className="tutor-name">{displayTutorName}</span>
-                      <span className="tutor-badge-tag">
-                        {isAr
-                          ? isDistinguishedFemale
-                            ? 'طالبة متميزة'
-                            : 'طالب متميز'
-                          : 'Honor Tutor'}
-                      </span>
+                      <span className="tutor-badge-tag">{isAr ? 'معلم أقران' : 'Peer Tutor'}</span>
                     </div>
                     <div className="tutor-college-text">{displayTutorRole}</div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        fontSize: '0.75rem',
-                        color: 'var(--gold-text)',
-                        marginTop: '0.25rem',
-                      }}
-                    >
-                      <span>★ {s.rating}</span>
-                      <span style={{ color: 'var(--text-dim)' }}>
-                        ({s.reviewsCount} {isAr ? 'تقييم طالب' : 'reviews'})
-                      </span>
-                    </div>
                   </div>
                 </div>
 
@@ -366,8 +364,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   <Users size={13} color="var(--fbsu-primary)" />
                   <span>
                     {isAr
-                      ? `المسجلون حالياً: ${s.enrolledStudents.length} / ${s.maxCapacity || 10}`
-                      : `Enrolled: ${s.enrolledStudents.length} / ${s.maxCapacity || 10}`}
+                      ? `المسجلون حالياً: ${s.enrolledStudents.length}${s.maxCapacity ? ` / ${s.maxCapacity}` : ''}`
+                      : `Enrolled: ${s.enrolledStudents.length}${s.maxCapacity ? ` / ${s.maxCapacity}` : ''}`}
                   </span>
                 </div>
 
@@ -376,7 +374,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   <ShieldCheck size={14} color="var(--fbsu-primary)" />
                   <span>
                     {isAr
-                      ? `يتم تحويل ${s.totalPrice} ر.س كرصيد جامعي للطالب ${isDistinguishedFemale ? 'فاطمة' : displayTutorName.split(' ')[0]} لسداد رسوم جامعته.`
+                      ? `يتم تحويل ${s.totalPrice} ر.س كرصيد جامعي إلى محفظة المعلم.`
                       : `${s.totalPrice} SAR transfers directly to official university tuition credit.`}
                   </span>
                 </div>

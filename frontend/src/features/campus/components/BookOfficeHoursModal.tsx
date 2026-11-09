@@ -85,22 +85,20 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
       return;
     }
 
+    // A slot can only be booked through its real backend id; never mark it booked locally
+    if (!activeSlotObj.id) {
+      setErrorMessage(
+        isAr
+          ? 'هذا الموعد غير متزامن مع الخادم ولا يمكن حجزه. حدّث الصفحة وحاول مجدداً.'
+          : 'This slot is not synced with the server and cannot be booked. Refresh and try again.'
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      let updatedFaculty: FacultyMember | undefined;
-      if (activeSlotObj.id) {
-        const result = await officeHoursApi.bookAppointment(activeSlotObj.id, trimmedTopic);
-        updatedFaculty = result.updatedFaculty;
-      } else {
-        updatedFaculty = {
-          ...faculty,
-          timeSlots: faculty.timeSlots.map(s =>
-            s.time === activeSlotObj.time
-              ? { ...s, available: false, bookedNote: `محجوز - ${currentUser.name}` }
-              : s
-          ),
-        };
-      }
+      const result = await officeHoursApi.bookAppointment(activeSlotObj.id, trimmedTopic);
+      const updatedFaculty: FacultyMember | undefined = result.updatedFaculty;
 
       soundFX.playSuccess();
       setIsSuccess(true);

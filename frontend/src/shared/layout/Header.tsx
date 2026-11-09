@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type FC } from 'react';
+import { useState, useRef, useEffect, type FC, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Car,
@@ -7,7 +7,6 @@ import {
   BarChart3,
   Volume2,
   VolumeX,
-  Globe,
   Sun,
   Moon,
   Bell,
@@ -23,6 +22,8 @@ import {
   Bus,
   LogIn,
   LogOut,
+  Menu,
+  X,
 } from 'lucide-react';
 import type { AppUser } from '../types/navigation';
 import { useAppPreferences } from '../context/AppPreferencesContext';
@@ -40,13 +41,39 @@ export interface HeaderProps {
   onOpenProfile?: (() => void) | undefined;
 }
 
+type IconType = ComponentType<{ size?: number | string }>;
+
+interface NavLeaf {
+  id: string;
+  icon: IconType;
+  title: string;
+  desc: string;
+  activeIds?: string[];
+  testId?: string;
+}
+
+interface NavGroup {
+  id: string;
+  icon: IconType;
+  label: string;
+  items: NavLeaf[];
+}
+
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part.charAt(0))
+    .join('');
+
 export const Header: FC<HeaderProps> = ({
   activeTab,
   onTabChange,
   currentUser,
   isAuthenticated = false,
   onLogout,
-  notificationCount = 3,
+  notificationCount = 0,
   onOpenNotifications,
   onOpenWallet,
   onOpenAuth,
@@ -55,357 +82,356 @@ export const Header: FC<HeaderProps> = ({
   const { t } = useTranslation();
   const { isAr, soundEnabled, toggleSound, toggleLanguage, isLightTheme, toggleTheme } =
     useAppPreferences();
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
-        setOpenDropdown(null);
+        setOpenGroup(null);
+      }
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpenGroup(null);
+        setMobileOpen(false);
       }
     };
     document.addEventListener('click', handleOutsideClick);
-    return () => document.removeEventListener('click', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, []);
 
-  const handleDropdownItemClick = (tabId: string) => {
+  const go = (tabId: string) => {
     onTabChange(tabId);
-    setOpenDropdown(null);
+    setOpenGroup(null);
+    setMobileOpen(false);
   };
 
-  const isParkingActive = ['map', 'booking', 'gate', 'share'].includes(activeTab);
-  const isCampusActive = [
-    'tuition',
-    'tutoring',
-    'office-hours',
-    'rooms',
-    'bus',
-    'transit',
-  ].includes(activeTab);
+  const groups: NavGroup[] = [
+    {
+      id: 'parking',
+      icon: Car,
+      label: t('nav.parkingSuite'),
+      items: [
+        { id: 'map', icon: MapPin, title: t('nav.liveMap'), desc: t('nav.liveMapDesc') },
+        {
+          id: 'booking',
+          icon: Calendar,
+          title: t('nav.bookParking'),
+          desc: t('nav.bookParkingDesc'),
+        },
+        { id: 'gate', icon: Camera, title: t('nav.gateAlpr'), desc: t('nav.gateAlprDesc') },
+        {
+          id: 'share',
+          icon: RefreshCw,
+          title: t('nav.shareAndEarn'),
+          desc: t('nav.shareAndEarnDesc'),
+        },
+      ],
+    },
+    {
+      id: 'campus',
+      icon: BookOpen,
+      label: t('nav.campusHub'),
+      items: [
+        {
+          id: 'tutoring',
+          icon: Users,
+          title: t('nav.peerTutoring'),
+          desc: t('nav.peerTutoringDesc'),
+        },
+        {
+          id: 'office-hours',
+          icon: UserCheck,
+          title: t('nav.officeHours'),
+          desc: t('nav.officeHoursDesc'),
+        },
+        {
+          id: 'rooms',
+          icon: DoorClosed,
+          title: t('nav.studyRooms'),
+          desc: t('nav.studyRoomsDesc'),
+        },
+        {
+          id: 'bus',
+          icon: Bus,
+          title: isAr ? 'النقل الجامعي' : 'Campus Transit',
+          desc: isAr ? 'المسارات والحافلات وتذاكر الصعود' : 'Routes, shuttles & boarding passes',
+          activeIds: ['bus', 'transit'],
+          testId: 'nav-transit-item',
+        },
+      ],
+    },
+    {
+      id: 'finance',
+      icon: Wallet,
+      label: isAr ? 'المالية' : 'Finance',
+      items: [
+        {
+          id: 'wallet',
+          icon: Wallet,
+          title: isAr ? 'المحفظة الجامعية' : 'Campus Wallet',
+          desc: isAr ? 'الرصيد والشحن والتحويل والسجل' : 'Balance, top-up, transfers & ledger',
+        },
+        {
+          id: 'tuition',
+          icon: GraduationCap,
+          title: isAr ? 'الرسوم الدراسية والإيصالات' : 'Tuition & Receipts',
+          desc: isAr ? 'سداد الفواتير الأكاديمية من المحفظة' : 'Academic invoices & receipts',
+          testId: 'nav-tuition-item',
+        },
+      ],
+    },
+  ];
+
+  const isLeafActive = (leaf: NavLeaf) => (leaf.activeIds ?? [leaf.id]).includes(activeTab);
+  const isGroupActive = (group: NavGroup) => group.items.some(isLeafActive);
+
+  const renderLeaf = (leaf: NavLeaf, inMobile = false) => {
+    const Icon = leaf.icon;
+    return (
+      <button
+        key={leaf.id}
+        type="button"
+        className={`cf-menu__item ${isLeafActive(leaf) ? 'is-active' : ''}`}
+        onClick={() => go(leaf.id)}
+        aria-current={isLeafActive(leaf) ? 'page' : undefined}
+        data-testid={inMobile ? undefined : leaf.testId}
+      >
+        <span className="cf-menu__icon">
+          <Icon size={16} />
+        </span>
+        <span>
+          <span className="cf-menu__title">{leaf.title}</span>
+          <span className="cf-menu__desc">{leaf.desc}</span>
+        </span>
+      </button>
+    );
+  };
+
+  const displayName = isAr ? currentUser.name : currentUser.nameEn || currentUser.name;
+  const displayRole = isAr ? currentUser.role : currentUser.roleEn || currentUser.role;
+  const unread = notificationCount ?? 0;
+
+  const utilityButtons = (
+    <>
+      <button
+        className="cf-icon-btn"
+        onClick={toggleLanguage}
+        type="button"
+        title={isAr ? t('utilities.switchToEn') : t('utilities.switchToAr')}
+        aria-label={isAr ? t('utilities.switchToEn') : t('utilities.switchToAr')}
+      >
+        <span className="cf-icon-btn__text">{isAr ? 'EN' : 'ع'}</span>
+      </button>
+      <button
+        className="cf-icon-btn"
+        onClick={toggleTheme}
+        type="button"
+        title={t('utilities.toggleTheme')}
+        aria-label={t('utilities.toggleTheme')}
+      >
+        {isLightTheme ? <Moon size={17} /> : <Sun size={17} />}
+      </button>
+      <button
+        className="cf-icon-btn"
+        onClick={toggleSound}
+        type="button"
+        title={soundEnabled ? t('utilities.disableSound') : t('utilities.enableSound')}
+        aria-label={soundEnabled ? t('utilities.disableSound') : t('utilities.enableSound')}
+        aria-pressed={soundEnabled}
+      >
+        {soundEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}
+      </button>
+    </>
+  );
 
   return (
-    <header className="main-header" ref={headerRef} data-testid="main-header">
-      <div className="header-compact-container">
-        {/* Right Section: Brand & Nav */}
-        <div className="header-right-group">
-          <div className="brand-section">
-            <img
-              src="/assets/branding/fbsu-logo.png"
-              alt="FBSU Logo"
-              className="brand-logo-img"
-              style={{ height: '36px' }}
-            />
-            <h1 className="brand-uni-name">{t('common.universityName')}</h1>
-          </div>
+    <header className="cf-header" ref={headerRef} data-testid="main-header">
+      <div className="cf-header__bar">
+        <button
+          type="button"
+          className="cf-icon-btn cf-menu-toggle"
+          onClick={() => setMobileOpen(open => !open)}
+          aria-expanded={mobileOpen}
+          aria-controls="cf-mobile-nav"
+          aria-label={isAr ? 'القائمة' : 'Menu'}
+        >
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
 
-          <nav className="nav-menu">
-            {/* Smart Parking Suite Dropdown */}
-            <div className={`nav-dropdown-group ${openDropdown === 'parking' ? 'open' : ''}`}>
-              <button
-                className={`nav-item nav-dropdown-trigger ${isParkingActive ? 'active' : ''}`}
-                onClick={e => {
-                  e.stopPropagation();
-                  setOpenDropdown(openDropdown === 'parking' ? null : 'parking');
-                }}
-                type="button"
-                aria-expanded={openDropdown === 'parking'}
+        <button type="button" className="cf-brand" onClick={() => go('map')}>
+          <img src="/assets/branding/fbsu-logo.png" alt="FBSU" />
+          <span className="cf-brand__text">
+            <span className="cf-brand__name">{t('common.universityName')}</span>
+            <span className="cf-brand__tag">CampusFlow</span>
+          </span>
+        </button>
+
+        <nav className="cf-nav" aria-label={isAr ? 'التنقل الرئيسي' : 'Main navigation'}>
+          {groups.map(group => {
+            const GroupIcon = group.icon;
+            const isOpen = openGroup === group.id;
+            return (
+              <div
+                key={group.id}
+                className={`cf-nav__item ${isOpen ? 'is-open' : ''}`}
+                onMouseEnter={() => setOpenGroup(group.id)}
+                onMouseLeave={() => setOpenGroup(null)}
               >
-                <Car size={14} />
-                <span>{t('nav.parkingSuite')}</span>
-                <ChevronDown size={12} className="dropdown-arrow" />
-              </button>
-
-              <div className="nav-dropdown-menu">
                 <button
-                  className={`dropdown-item ${activeTab === 'map' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('map')}
                   type="button"
+                  className={`cf-nav__link ${isGroupActive(group) ? 'is-active' : ''}`}
+                  aria-expanded={isOpen}
+                  aria-haspopup="true"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setOpenGroup(isOpen ? null : group.id);
+                  }}
                 >
-                  <MapPin size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.liveMap')}</span>
-                    <span className="dropdown-item-desc">{t('nav.liveMapDesc')}</span>
-                  </div>
+                  <GroupIcon size={16} />
+                  <span>{group.label}</span>
+                  <ChevronDown size={14} className="cf-caret" />
                 </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'booking' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('booking')}
-                  type="button"
-                >
-                  <Calendar size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.bookParking')}</span>
-                    <span className="dropdown-item-desc">{t('nav.bookParkingDesc')}</span>
-                  </div>
-                </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'gate' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('gate')}
-                  type="button"
-                >
-                  <Camera size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.gateAlpr')}</span>
-                    <span className="dropdown-item-desc">{t('nav.gateAlprDesc')}</span>
-                  </div>
-                </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'share' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('share')}
-                  type="button"
-                >
-                  <RefreshCw size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.shareAndEarn')}</span>
-                    <span className="dropdown-item-desc">{t('nav.shareAndEarnDesc')}</span>
-                  </div>
-                </button>
+                <div className="cf-menu" role="menu">
+                  {group.items.map(leaf => renderLeaf(leaf))}
+                </div>
               </div>
-            </div>
-
-            {/* Campus Hub Dropdown */}
-            <div className={`nav-dropdown-group ${openDropdown === 'campus' ? 'open' : ''}`}>
-              <button
-                className={`nav-item nav-dropdown-trigger ${isCampusActive ? 'active' : ''}`}
-                onClick={e => {
-                  e.stopPropagation();
-                  setOpenDropdown(openDropdown === 'campus' ? null : 'campus');
-                }}
-                type="button"
-                aria-expanded={openDropdown === 'campus'}
-              >
-                <BookOpen size={14} />
-                <span>{t('nav.campusHub')}</span>
-                <span className="nav-highlight-dot"></span>
-                <ChevronDown size={12} className="dropdown-arrow" />
-              </button>
-
-              <div className="nav-dropdown-menu">
-                <button
-                  className={`dropdown-item ${activeTab === 'tuition' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('tuition')}
-                  type="button"
-                  data-testid="nav-tuition-item"
-                >
-                  <GraduationCap size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">
-                      {isAr ? 'الرسوم الدراسية والإيصالات' : 'Tuition & Receipts'}
-                    </span>
-                    <span className="dropdown-item-desc">
-                      {isAr
-                        ? 'سداد الفواتير الأكاديمية من المحفظة'
-                        : 'Academic invoices & verified receipts'}
-                    </span>
-                  </div>
-                </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'tutoring' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('tutoring')}
-                  type="button"
-                >
-                  <Users size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.peerTutoring')}</span>
-                    <span className="dropdown-item-desc">{t('nav.peerTutoringDesc')}</span>
-                  </div>
-                </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'office-hours' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('office-hours')}
-                  type="button"
-                >
-                  <UserCheck size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.officeHours')}</span>
-                    <span className="dropdown-item-desc">{t('nav.officeHoursDesc')}</span>
-                  </div>
-                </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'rooms' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('rooms')}
-                  type="button"
-                >
-                  <DoorClosed size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">{t('nav.studyRooms')}</span>
-                    <span className="dropdown-item-desc">{t('nav.studyRoomsDesc')}</span>
-                  </div>
-                </button>
-                <button
-                  className={`dropdown-item ${activeTab === 'bus' || activeTab === 'transit' ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick('bus')}
-                  type="button"
-                  data-testid="nav-transit-item"
-                >
-                  <Bus size={14} />
-                  <div className="dropdown-item-info">
-                    <span className="dropdown-item-title">
-                      {isAr ? 'حافلات النقل الجامعي الذكي' : 'Campus Transit & Shuttles'}
-                    </span>
-                    <span className="dropdown-item-desc">
-                      {isAr
-                        ? 'أسطول الحافلات الترددية وتذاكر الصعود الفورية'
-                        : 'Eco-shuttle fleet & live boarding passes'}
-                    </span>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* Direct Analytics Tab */}
+            );
+          })}
+          <div className="cf-nav__item">
             <button
-              className={`nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
-              onClick={() => onTabChange('analytics')}
               type="button"
+              className={`cf-nav__link ${activeTab === 'analytics' ? 'is-active' : ''}`}
+              onClick={() => go('analytics')}
+              aria-current={activeTab === 'analytics' ? 'page' : undefined}
             >
-              <BarChart3 size={14} />
+              <BarChart3 size={16} />
               <span>{t('nav.analytics')}</span>
             </button>
-          </nav>
-        </div>
+          </div>
+        </nav>
 
-        {/* Left Section: Controls, Utilities, Badges */}
-        <div className="header-left-cluster">
-          <div className="system-utilities-capsule">
-            <button
-              className={`utility-pill-btn ${soundEnabled ? 'sound-active' : ''}`}
-              onClick={toggleSound}
-              type="button"
-              title={soundEnabled ? t('utilities.disableSound') : t('utilities.enableSound')}
-            >
-              {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-              <span className="utility-text-label">
-                {soundEnabled ? t('utilities.sound') : t('utilities.muted')}
-              </span>
-            </button>
-
-            <span className="utility-divider"></span>
-
-            <button
-              className="utility-pill-btn"
-              onClick={toggleLanguage}
-              type="button"
-              title={isAr ? t('utilities.switchToEn') : t('utilities.switchToAr')}
-            >
-              <Globe size={14} />
-              <span className="utility-text-label" style={{ fontWeight: 800 }}>
-                {isAr ? 'EN' : 'عربي'}
-              </span>
-            </button>
-
-            <span className="utility-divider"></span>
-
-            <button
-              className="utility-pill-btn"
-              onClick={toggleTheme}
-              type="button"
-              title={t('utilities.toggleTheme')}
-            >
-              {isLightTheme ? <Sun size={14} color="var(--fbsu-gold)" /> : <Moon size={14} />}
-              <span className="utility-text-label">
-                {isLightTheme ? t('utilities.themeLight') : t('utilities.themeDark')}
-              </span>
-            </button>
+        <div className="cf-header__actions">
+          <div className="cf-header__utils">
+            {utilityButtons}
+            <span className="cf-divider" aria-hidden="true" />
           </div>
 
-          {/* Direct Notifications */}
           <button
-            className="wallet-badge-btn"
+            className="cf-icon-btn"
             onClick={onOpenNotifications}
             type="button"
             title={t('utilities.notificationsTitle')}
+            aria-label={t('utilities.notificationsTitle')}
             data-testid="header-notifications-btn"
-            style={{
-              background: 'rgba(215, 162, 55, 0.12)',
-              borderColor: 'var(--fbsu-gold-border)',
-              gap: '0.4rem',
-            }}
           >
-            <Bell size={14} color="var(--fbsu-gold)" />
+            <Bell size={18} />
             <span
+              className={`cf-count-badge ${unread === 0 ? 'is-zero' : ''}`}
               data-testid="header-unread-badge"
-              style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--gold-text)' }}
             >
-              {notificationCount}
+              {unread > 99 ? '99+' : unread}
             </span>
           </button>
 
-          {/* University Wallet */}
           <button
-            className="wallet-badge-btn"
+            className="cf-wallet-pill"
             onClick={onOpenWallet}
             type="button"
             title={t('utilities.walletTitle')}
             data-testid="header-wallet-btn"
           >
-            <Wallet size={13} color="var(--fbsu-gold)" />
+            <Wallet size={15} />
             <span data-testid="header-wallet-balance">
               {isAuthenticated ? currentUser.walletBalance.toFixed(2) : '0.00'}{' '}
-              {t('common.currency')}
+              <span className="cf-wallet-pill__label">{t('common.currency')}</span>
             </span>
           </button>
 
-          {/* User Profile / Sign In & Sign Out */}
           {isAuthenticated ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <>
               <button
-                className="auth-btn-header"
+                className="cf-user-btn"
                 onClick={onOpenProfile ?? onOpenAuth}
                 type="button"
                 title={t('utilities.profileTitle')}
                 data-testid="header-auth-btn"
               >
                 <span
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: currentUser.avatarColor || '#116E63',
-                    display: 'inline-block',
-                  }}
-                ></span>
-                <span>
-                  {isAr ? currentUser.name.split(' ')[0] : currentUser.nameEn.split(' ')[0]} (
-                  {isAr ? currentUser.role.split(' ')[0] : currentUser.roleEn.split(' ')[0]})
+                  className="cf-avatar"
+                  style={{ background: currentUser.avatarColor || 'var(--fbsu-primary)' }}
+                  aria-hidden="true"
+                >
+                  {initials(displayName)}
                 </span>
+                <span className="cf-user-name">{displayName.split(' ')[0]}</span>
+                <span className="cf-user-role">· {displayRole.split(' ')[0]}</span>
               </button>
               {onLogout && (
                 <button
-                  className="utility-pill-btn"
+                  className="cf-icon-btn"
                   onClick={onLogout}
                   type="button"
                   title={t('auth.signOut')}
+                  aria-label={t('auth.signOut')}
                   data-testid="header-logout-btn"
-                  style={{
-                    border: '1px solid rgba(239, 68, 68, 0.45)',
-                    color: '#f87171',
-                    padding: '0.35rem 0.65rem',
-                    borderRadius: '8px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                  }}
                 >
-                  <LogOut size={13} />
-                  <span className="utility-text-label">{t('auth.signOut')}</span>
+                  <LogOut size={17} />
                 </button>
               )}
-            </div>
+            </>
           ) : (
             <button
-              className="auth-btn-header"
+              className="btn-primary cf-signin-btn"
               onClick={onOpenAuth}
               type="button"
               title={t('utilities.profileTitle')}
               data-testid="header-auth-btn"
             >
-              <LogIn size={14} color="var(--fbsu-gold)" />
+              <LogIn size={16} />
               <span>{t('auth.signIn')}</span>
             </button>
           )}
         </div>
       </div>
+
+      {mobileOpen && (
+        <div
+          className="cf-mobile-panel"
+          id="cf-mobile-nav"
+          role="navigation"
+          aria-label={isAr ? 'القائمة' : 'Menu'}
+        >
+          {groups.map(group => (
+            <div key={group.id} className="cf-mobile-group">
+              <div className="cf-mobile-group__title">{group.label}</div>
+              <div className="cf-mobile-grid">
+                {group.items.map(leaf => renderLeaf(leaf, true))}
+              </div>
+            </div>
+          ))}
+          <div className="cf-mobile-group">
+            <div className="cf-mobile-grid">
+              {renderLeaf(
+                {
+                  id: 'analytics',
+                  icon: BarChart3,
+                  title: t('nav.analytics'),
+                  desc: isAr ? 'مؤشرات تشغيل المواقف' : 'Parking operations indicators',
+                },
+                true
+              )}
+            </div>
+          </div>
+          <div className="cf-mobile-utils">{utilityButtons}</div>
+        </div>
+      )}
     </header>
   );
 };

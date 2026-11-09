@@ -1,10 +1,29 @@
+# Production: every secret must come from the environment. There are deliberately no
+# fallback values, so a missing variable fails startup instead of using a dev credential.
 spring:
   config:
     activate:
       on-profile: prod
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+
+fbsu:
+  seed:
+    demo-data: false
 
 logging:
   level:
     sa.edu.fbsu.campus: INFO
     org.springframework.web: WARN
-

@@ -1,11 +1,15 @@
 import { useState, FC } from 'react';
-import { UserCheck, Bell, MapPin, Calendar } from 'lucide-react';
+import { UserCheck, Bell, MapPin, Calendar, RotateCw } from 'lucide-react';
 import type { FacultyMember } from '../data/campusData';
 import { BookOfficeHoursModal } from './BookOfficeHoursModal';
 import { soundFX } from '../../../shared/utils/sound';
+import type { ResourceStatus } from '../../../shared/types/resource';
 
 export interface OfficeHoursViewProps {
   facultyList: FacultyMember[];
+  /** Load state of `facultyList` from the API (defaults to 'ready' for isolated usage) */
+  status?: ResourceStatus | undefined;
+  onRetry?: (() => void) | undefined;
   isAr: boolean;
   isAuthenticated?: boolean | undefined;
   currentUser: {
@@ -23,6 +27,8 @@ export interface OfficeHoursViewProps {
 
 export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
   facultyList,
+  status = 'ready',
+  onRetry,
   isAr,
   isAuthenticated = false,
   currentUser,
@@ -52,8 +58,8 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
         </h3>
         <p className="section-subtitle">
           {isAr
-            ? 'احجز موعداً مباشراً في الساعات المكتبية لرئيسة قسم كلية الحاسبات (د. رغد النفيعي) أو عميد كلية الحاسب (د. محمد مزهر) لمناقشة مشروع التخرج أو استفسار مادة Logic Design. يرسل النظام إشعاراً فورياً للعميد أو رئيسة القسم بالموعد وتفاصيل الطالب!'
-            : 'Book an office hour slot with Chairperson Dr. Raghad Al-Nefaie or Dean Dr. Mohammad Mezher for project reviews or Logic Design questions with instant notifications!'}
+            ? 'احجز موعداً في الساعات المكتبية لأعضاء هيئة التدريس والقيادات الأكاديمية لمناقشة مشروع التخرج أو الاستفسارات الأكاديمية، مع إشعار عضو هيئة التدريس بالموعد.'
+            : 'Book an office hour slot with faculty and academic leadership for project reviews or course questions; the faculty member is notified of your booking.'}
         </p>
       </div>
 
@@ -63,10 +69,41 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
         <div>
           <strong>{isAr ? 'إشعار فوري مباشر:' : 'Instant Direct Notification:'}</strong>
           {isAr
-            ? ' فور تأكيد حجزك، يرسل النظام تنبيهاً مباشراً مع بيانات الطالب والموضوع إلى لوحة رئيسة القسم د. رغد النفيعي أو العميد د. محمد مزهر.'
+            ? ' فور تأكيد حجزك، يرسل النظام تنبيهاً مع بيانات الطالب والموضوع إلى عضو هيئة التدريس.'
             : ' Instant alert is dispatched to the Dean or Dept Chair dashboard upon booking confirmation.'}
         </div>
       </div>
+
+      {/* Data states (no mock fallback) */}
+      {status === 'loading' && facultyList.length === 0 && (
+        <div className="campus-data-state" role="status" data-testid="office-hours-loading">
+          {isAr ? 'جاري تحميل الساعات المكتبية...' : 'Loading office hours...'}
+        </div>
+      )}
+      {status === 'error' && facultyList.length === 0 && (
+        <div
+          className="campus-data-state is-error"
+          role="alert"
+          data-testid="office-hours-load-error"
+        >
+          <span>
+            {isAr ? 'تعذر تحميل الساعات المكتبية من الخادم.' : 'Could not load office hours.'}
+          </span>
+          {onRetry && (
+            <button type="button" className="btn-outline" onClick={onRetry}>
+              <RotateCw size={14} />
+              <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+            </button>
+          )}
+        </div>
+      )}
+      {status === 'ready' && facultyList.length === 0 && (
+        <div className="campus-data-state" data-testid="office-hours-empty">
+          {isAr
+            ? 'لا توجد ساعات مكتبية منشورة حالياً.'
+            : 'No office hours have been published yet.'}
+        </div>
+      )}
 
       {/* Faculty Cards Grid */}
       <div className="faculty-grid">

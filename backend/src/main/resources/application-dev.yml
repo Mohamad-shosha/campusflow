@@ -8,3 +8,7 @@ logging:
     sa.edu.fbsu.campus: DEBUG
     org.springframework.web: INFO
 
+# Local development only: creates demo accounts, rooms, tutoring sessions, etc.
+fbsu:
+  seed:
+    demo-data: true

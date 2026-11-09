@@ -18,7 +18,7 @@ import sa.edu.fbsu.campus.parking.dto.CreateFlexOfferRequest;
 import sa.edu.fbsu.campus.parking.dto.FlexOfferResponse;
 import sa.edu.fbsu.campus.parking.infra.FlexOfferRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
-import sa.edu.fbsu.campus.parking.infra.ParkingTariffRepository;
+
 import sa.edu.fbsu.campus.wallet.application.WalletService;
 
 import java.math.BigDecimal;
@@ -36,7 +36,7 @@ public class FlexShareService {
 
     private final FlexOfferRepository flexOfferRepository;
     private final ParkingSpotRepository spotRepository;
-    private final ParkingTariffRepository tariffRepository;
+    private final TariffResolver tariffResolver;
     private final UserRepository userRepository;
     private final WalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
@@ -44,14 +44,14 @@ public class FlexShareService {
     public FlexShareService(
             FlexOfferRepository flexOfferRepository,
             ParkingSpotRepository spotRepository,
-            ParkingTariffRepository tariffRepository,
+            TariffResolver tariffResolver,
             UserRepository userRepository,
             WalletService walletService,
             ApplicationEventPublisher eventPublisher
     ) {
         this.flexOfferRepository = flexOfferRepository;
         this.spotRepository = spotRepository;
-        this.tariffRepository = tariffRepository;
+        this.tariffResolver = tariffResolver;
         this.userRepository = userRepository;
         this.walletService = walletService;
         this.eventPublisher = eventPublisher;
@@ -75,15 +75,12 @@ public class FlexShareService {
         Instant startTime = request.startTime() != null ? request.startTime() : Instant.now();
         Instant endTime = startTime.plus(Duration.ofMinutes(request.durationMinutes()));
 
-        // Resolve reward amount from tariff
-        BigDecimal rewardAmount = new BigDecimal("5.75");
-        var tariffOpt = tariffRepository.findByUniversityIdAndUserType(offerer.getUniversityId(), offerer.getUserType());
-        if (tariffOpt.isPresent()) {
-            ParkingTariff tariff = tariffOpt.get();
-            if (tariff.getFlexCashbackRate() != null && tariff.getFlexCashbackRate().compareTo(BigDecimal.ZERO) > 0) {
-                rewardAmount = tariff.getFlexCashbackRate();
-            }
-        }
+        // Reward strictly from the offerer's active tariff; no hardcoded fallback amount.
+        // flex_cashback_rate is NOT NULL in the schema; zero means "no cashback".
+        ParkingTariff tariff = tariffResolver.requireActiveTariff(offerer.getUniversityId(), offerer.getUserType());
+        BigDecimal rewardAmount = tariff.getFlexCashbackRate() != null
+                ? tariff.getFlexCashbackRate().max(BigDecimal.ZERO)
+                : BigDecimal.ZERO;
 
         FlexOffer offer = new FlexOffer(
                 offerer.getUniversityId(),

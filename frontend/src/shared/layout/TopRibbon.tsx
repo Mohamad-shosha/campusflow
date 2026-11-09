@@ -6,7 +6,7 @@ export interface TopRibbonProps {
   timeString?: string | undefined;
 }
 
-export const TopRibbon: FC<TopRibbonProps> = ({ flexCount = 3, timeString }) => {
+export const TopRibbon: FC<TopRibbonProps> = ({ flexCount = 0, timeString }) => {
   const { t } = useTranslation();
   const [liveClock, setLiveClock] = useState<string>(() =>
     new Date().toLocaleTimeString('en-GB', { hour12: false })

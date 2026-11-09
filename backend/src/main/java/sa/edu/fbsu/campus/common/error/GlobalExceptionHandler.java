@@ -81,6 +81,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
 
+    @ExceptionHandler(TariffNotConfiguredException.class)
+    public ResponseEntity<ProblemDetail> handleTariffNotConfigured(TariffNotConfiguredException ex) {
+        log.error("Parking tariff missing for user type {}: pricing request rejected", ex.getUserType());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problemDetail.setTitle("Parking Tariff Not Configured");
+        problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/tariff-not-configured"));
+        problemDetail.setProperty("userType", ex.getUserType());
+        problemDetail.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
+    }
+
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
     public ResponseEntity<ProblemDetail> handleBadRequestExceptions(RuntimeException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(

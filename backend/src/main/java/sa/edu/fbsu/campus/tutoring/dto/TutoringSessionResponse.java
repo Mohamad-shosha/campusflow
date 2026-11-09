@@ -71,8 +71,10 @@ public record TutoringSessionResponse(
                 s.getLocation(),
                 s.getMaxCapacity(),
                 enrollments.size(),
-                s.getRating(),
-                s.getReviewsCount(),
+                // No review system exists yet: the stored rating/reviews_count columns only hold
+                // schema defaults (5.00 / 1) or seed values, so they are not exposed as real ratings.
+                null,
+                0,
                 s.getStatus().name(),
                 names,
                 numbers,

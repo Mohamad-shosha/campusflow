@@ -299,7 +299,7 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
               type="text"
               className="form-control"
               placeholder={
-                isAr ? 'مثال: راكان المطيري، عبد العزيز البلوي' : 'e.g. Rakan, Abdulaziz'
+                isAr ? 'أسماء أعضاء الفريق مفصولة بفواصل' : 'Team member names, comma-separated'
               }
               value={teamMembers}
               onChange={e => setTeamMembers(e.target.value)}

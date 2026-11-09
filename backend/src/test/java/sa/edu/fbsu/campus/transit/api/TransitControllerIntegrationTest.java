@@ -57,4 +57,28 @@ class TransitControllerIntegrationTest extends AbstractPostgresIntegrationTest {
                 .andExpect(jsonPath("$[0].totalCapacity", is(28)))
                 .andExpect(jsonPath("$[0].isElectric", is(true)));
     }
+
+    @Test
+    @DisplayName("GET /api/v1/transit/shuttles labels status as stored data, not live telemetry")
+    void shuttlesDeclareStoredDataSource() throws Exception {
+        ensureUniversity();
+
+        mockMvc.perform(get("/api/v1/transit/shuttles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
+                .andExpect(jsonPath("$[*].dataSource", everyItem(is("STORED_STATUS"))))
+                .andExpect(jsonPath("$[*].lastUpdatedAt", everyItem(notNullValue())));
+    }
+
+    @Test
+    @DisplayName("Deprecated /shuttles/live alias still works and advertises its successor")
+    void liveAliasIsDeprecated() throws Exception {
+        ensureUniversity();
+
+        mockMvc.perform(get("/api/v1/transit/shuttles/live"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Deprecation", "true"))
+                .andExpect(header().string("Link", containsString("/api/v1/transit/shuttles")))
+                .andExpect(jsonPath("$[*].dataSource", everyItem(is("STORED_STATUS"))));
+    }
 }

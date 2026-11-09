@@ -175,9 +175,14 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
     const targetRoom = roomList.find(r => r.id === roomId);
     const bookingId = targetRoom?.activeBooking?.bookingId;
 
+    // Without a real booking id there is nothing to extend; never fake the result
     if (!bookingId) {
-      soundFX.playSuccess();
-      setCountdownMap(prev => ({ ...prev, [roomId]: (prev[roomId] ?? 10) + 10 }));
+      soundFX.playError();
+      setActionError(
+        isAr
+          ? 'لا يوجد حجز مسجل في الخادم لهذه الجلسة. حدّث الصفحة وحاول مجدداً.'
+          : 'This session has no booking record on the server. Refresh and try again.'
+      );
       return;
     }
 
@@ -207,12 +212,13 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
     const targetRoom = roomList.find(r => r.id === roomId);
     const bookingId = targetRoom?.activeBooking?.bookingId;
 
+    // Without a real booking id there is nothing to release; never fake the result
     if (!bookingId) {
-      soundFX.playSuccess();
-      setRoomList(prev =>
-        prev.map(r =>
-          r.id === roomId ? { ...r, status: 'available', activeBooking: undefined } : r
-        )
+      soundFX.playError();
+      setActionError(
+        isAr
+          ? 'لا يوجد حجز مسجل في الخادم لهذه الجلسة. حدّث الصفحة وحاول مجدداً.'
+          : 'This session has no booking record on the server. Refresh and try again.'
       );
       return;
     }
@@ -798,29 +804,12 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
         onClose={() => setSelectedRoom(null)}
         onOpenAuth={onOpenAuth}
         onConfirm={(rId, tFrom, tTo, purp, updated) => {
+          // Only the server's booked room is applied; no locally invented booking
           if (updated) {
             setRoomList(prev => prev.map(r => (r.id === rId ? updated : r)));
-            onRoomBooked?.(rId, tFrom, tTo, purp, updated);
             onRoomUpdated?.(updated);
-          } else {
-            setRoomList(prev =>
-              prev.map(r =>
-                r.id === rId
-                  ? {
-                      ...r,
-                      status: 'in-use',
-                      activeBooking: {
-                        teamLead: currentUser.name,
-                        teamMembers: [currentUser.name],
-                        purpose: purp,
-                        timeSlot: `${tFrom} - ${tTo}`,
-                      },
-                    }
-                  : r
-              )
-            );
-            onRoomBooked?.(rId, tFrom, tTo, purp);
           }
+          onRoomBooked?.(rId, tFrom, tTo, purp, updated);
         }}
       />
     </div>

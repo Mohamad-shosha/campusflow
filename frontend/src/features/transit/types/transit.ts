@@ -51,6 +51,10 @@ export interface ShuttleBus {
   nextStopNameEn?: string;
   nextStopEtaMins: number;
   batteryPercentage: number;
+  /** 'STORED_STATUS': last recorded values, not live telemetry */
+  dataSource?: string;
+  /** ISO timestamp of the last stored update */
+  lastUpdatedAt?: string;
 }
 
 export interface TransitPass {

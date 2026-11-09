@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -95,6 +96,16 @@ class TutoringControllerIntegrationTest extends AbstractPostgresIntegrationTest 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sessionCode").value("TUT-104"))
                 .andExpect(jsonPath("$.totalPrice").value(105.00));
+    }
+
+    @Test
+    @DisplayName("Sessions do not expose ratings: no review system backs them")
+    void sessionsDoNotExposeFabricatedRatings() throws Exception {
+        mockMvc.perform(get("/api/v1/tutoring/sessions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
+                .andExpect(jsonPath("$[*].rating", everyItem(nullValue())))
+                .andExpect(jsonPath("$[*].reviewsCount", everyItem(is(0))));
     }
 
     @Test

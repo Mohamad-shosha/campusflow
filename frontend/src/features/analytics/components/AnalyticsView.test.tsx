@@ -51,7 +51,7 @@ describe('AnalyticsView Component Tests', () => {
     vi.clearAllMocks();
   });
 
-  it('renders analytics view with default KPI values and section header', async () => {
+  it('renders only KPIs computed from real records', async () => {
     vi.mocked(analyticsApi.getSummary).mockResolvedValueOnce(mockSummary);
 
     render(<AnalyticsView isAr={true} />);
@@ -60,10 +60,26 @@ describe('AnalyticsView Component Tests', () => {
     expect(screen.getByText('لوحة تحليلات الذكاء الاصطناعي')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByTestId('kpi-capacity-gain')).toHaveTextContent('+55%');
-      expect(screen.getByTestId('kpi-time-saved')).toHaveTextContent('18.5 دقيقة');
-      expect(screen.getByTestId('kpi-satisfaction-rate')).toHaveTextContent('99.2%');
+      expect(screen.getByTestId('kpi-total-spots')).toHaveTextContent(
+        String(mockSummary.totalSpots)
+      );
+      expect(screen.getByTestId('kpi-gate-passages')).toHaveTextContent(
+        String(mockSummary.totalGatePassages)
+      );
     });
+    // Hardcoded backend metrics are not displayed
+    expect(screen.queryByText('+55%')).not.toBeInTheDocument();
+    expect(screen.queryByText(/99.2%/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('hourly-load-grid')).not.toBeInTheDocument();
+  });
+
+  it('shows an error state with retry instead of fallback figures', async () => {
+    vi.mocked(analyticsApi.getSummary).mockRejectedValueOnce(new Error('network'));
+
+    render(<AnalyticsView isAr={false} />);
+
+    expect(await screen.findByTestId('analytics-load-error')).toBeInTheDocument();
+    expect(screen.queryByTestId('analytics-kpis')).not.toBeInTheDocument();
   });
 
   it('renders dynamic zone occupancy cards when zoneStats are returned', async () => {
@@ -77,18 +93,6 @@ describe('AnalyticsView Component Tests', () => {
       expect(screen.getByText('قطاع B - إدارة الأعمال والطب')).toBeInTheDocument();
       expect(screen.getByText('70%')).toBeInTheDocument();
       expect(screen.getByText('50%')).toBeInTheDocument();
-    });
-  });
-
-  it('renders hourly load grid with schedule times', async () => {
-    vi.mocked(analyticsApi.getSummary).mockResolvedValueOnce(mockSummary);
-
-    render(<AnalyticsView isAr={true} />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('hourly-load-grid')).toBeInTheDocument();
-      expect(screen.getByText('08:00')).toBeInTheDocument();
-      expect(screen.getByText('09:00')).toBeInTheDocument();
     });
   });
 });

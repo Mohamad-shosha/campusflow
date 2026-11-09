@@ -28,7 +28,7 @@ public class AnalyticsController {
     }
 
     @GetMapping("/summary")
-    @Operation(summary = "Get Analytics Summary", description = "Aggregates overall campus efficiency, time saved, satisfaction, and zone loads")
+    @Operation(summary = "Get Analytics Summary", description = "Spot, zone, flex-offer, gate-passage and parking-revenue figures computed from database records. Unmeasured metrics are null.")
     public ResponseEntity<AnalyticsSummaryResponse> getSummary(@AuthenticationPrincipal UserPrincipal principal) {
         UUID uniId = principal != null && principal.getUniversityId() != null
                 ? principal.getUniversityId()
@@ -37,12 +37,12 @@ public class AnalyticsController {
     }
 
     @GetMapping("/hourly-load")
-    @Operation(summary = "Get Hourly Load Points", description = "Returns campus peak hours and load telemetry")
+    @Operation(summary = "Get Hourly Load Points", description = "Admitted vehicles per hour of day over the last 7 days (relative load, busiest hour = 100). Empty when no gate entries exist.")
     public ResponseEntity<List<HourlyLoadPoint>> getHourlyLoad(@AuthenticationPrincipal UserPrincipal principal) {
         UUID uniId = principal != null && principal.getUniversityId() != null
                 ? principal.getUniversityId()
                 : UUID.fromString("00000000-0000-0000-0000-000000000001");
-        return ResponseEntity.ok(analyticsService.getSummary(uniId).hourlyLoad());
+        return ResponseEntity.ok(analyticsService.getHourlyLoad(uniId));
     }
 
     @GetMapping("/zones")
@@ -51,7 +51,7 @@ public class AnalyticsController {
         UUID uniId = principal != null && principal.getUniversityId() != null
                 ? principal.getUniversityId()
                 : UUID.fromString("00000000-0000-0000-0000-000000000001");
-        return ResponseEntity.ok(analyticsService.getSummary(uniId).zoneStats());
+        return ResponseEntity.ok(analyticsService.getZoneStats(uniId));
     }
 }
 

@@ -3,8 +3,14 @@ package sa.edu.fbsu.campus.transit.dto;
 import sa.edu.fbsu.campus.transit.domain.ShuttleBus;
 import sa.edu.fbsu.campus.transit.domain.ShuttleStatus;
 
+import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Shuttle status as stored in the database. There is no telemetry ingestion yet, so
+ * position, occupancy, ETA and battery are the last values written to {@code shuttle_bus}
+ * (see {@link #dataSource} and {@link #lastUpdatedAt}); clients must not present them as live.
+ */
 public record ShuttleBusResponse(
         UUID id,
         UUID routeId,
@@ -30,8 +36,15 @@ public record ShuttleBusResponse(
         String nextStopNameAr,
         String nextStopNameEn,
         int nextStopEtaMins,
-        int batteryPercentage
+        int batteryPercentage,
+        /** Provenance of the status fields. Currently always {@value #DATA_SOURCE_STORED}. */
+        String dataSource,
+        /** When this shuttle record was last written. */
+        Instant lastUpdatedAt
 ) {
+    /** Status fields come from the stored shuttle record, not from a live vehicle feed. */
+    public static final String DATA_SOURCE_STORED = "STORED_STATUS";
+
     public static ShuttleBusResponse fromEntity(ShuttleBus bus) {
         if (bus == null) return null;
         return new ShuttleBusResponse(
@@ -59,7 +72,9 @@ public record ShuttleBusResponse(
                 bus.getNextStop() != null ? bus.getNextStop().getNameAr() : null,
                 bus.getNextStop() != null ? bus.getNextStop().getNameEn() : null,
                 bus.getNextStopEtaMins(),
-                bus.getBatteryPercentage()
+                bus.getBatteryPercentage(),
+                DATA_SOURCE_STORED,
+                bus.getUpdatedAt()
         );
     }
 }

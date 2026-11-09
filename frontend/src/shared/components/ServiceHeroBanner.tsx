@@ -44,21 +44,22 @@ export const ServiceHeroBanner: FC<ServiceHeroBannerProps> = ({
 }) => {
   return (
     <section
-      className="service-hero-banner"
+      className="service-hero-banner cf-photo-hero"
       data-testid="service-hero-banner"
       dir={isAr ? 'rtl' : 'ltr'}
     >
-      <div className="service-hero-backdrop" />
-      <div className="container">
+      <div className="cf-photo-hero__media" aria-hidden="true" />
+      <div className="cf-photo-hero__shade" aria-hidden="true" />
+      <div className="container cf-photo-hero__inner">
         <div className="service-hero-content-grid">
-          <div className="service-hero-text">
+          <div className="service-hero-text cf-rise">
             <div className="service-hero-tag">
               <TagIcon size={14} color="var(--fbsu-gold, #d7a237)" />
               <span>{serviceTag}</span>
             </div>
 
             <h2 className="service-hero-title">
-              {title} <span className="highlight-gold">{highlightText}</span>
+              {title} <span className="cf-hero-accent">{highlightText}</span>
             </h2>
 
             <p className="service-hero-desc">{description}</p>
@@ -100,7 +101,7 @@ export const ServiceHeroBanner: FC<ServiceHeroBannerProps> = ({
 
         {/* Dynamic Quick Stat Chips */}
         {statChips.length > 0 && (
-          <div className="service-hero-stats-row">
+          <div className="service-hero-stats-row cf-rise cf-rise--delay">
             {statChips.map((chip, idx) => {
               const ChipIcon = chip.icon;
               return (

@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/transit")
-@Tag(name = "Transit & Eco-Shuttles", description = "Endpoints for smart campus bus lines, stops, real-time shuttle fleet, and student boarding passes")
+@Tag(name = "Transit & Eco-Shuttles", description = "Campus bus lines, stops, shuttle fleet status (stored, not live telemetry), and student boarding passes")
 public class TransitController {
 
     private final TransitService transitService;
@@ -42,12 +42,31 @@ public class TransitController {
         return ResponseEntity.ok(transitService.getAllRoutes(uniId));
     }
 
-    @GetMapping("/shuttles/live")
-    @Operation(summary = "Get real-time locations, ETAs, battery levels, and seat availability of eco-shuttles")
-    public ResponseEntity<List<ShuttleBusResponse>> getLiveShuttles(
+    @GetMapping("/shuttles")
+    @Operation(summary = "List campus shuttles with their stored status",
+            description = "Route, stop, ETA, occupancy and battery are the last values recorded for each shuttle "
+                    + "(dataSource=STORED_STATUS, see lastUpdatedAt). No live telemetry feed is connected.")
+    public ResponseEntity<List<ShuttleBusResponse>> getShuttles(
             @AuthenticationPrincipal UserPrincipal principal) {
         UUID uniId = resolveUniversityId(principal);
         return ResponseEntity.ok(transitService.getLiveShuttles(uniId));
+    }
+
+    /**
+     * Deprecated alias kept for API compatibility. The data is not live telemetry; use
+     * {@code GET /api/v1/transit/shuttles}.
+     */
+    @Deprecated
+    @GetMapping("/shuttles/live")
+    @Operation(summary = "Deprecated alias of GET /api/v1/transit/shuttles (data is stored status, not live)",
+            deprecated = true)
+    public ResponseEntity<List<ShuttleBusResponse>> getLiveShuttles(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        UUID uniId = resolveUniversityId(principal);
+        return ResponseEntity.ok()
+                .header("Deprecation", "true")
+                .header("Link", "</api/v1/transit/shuttles>; rel=\"successor-version\"")
+                .body(transitService.getLiveShuttles(uniId));
     }
 
     @PostMapping("/passes/book")

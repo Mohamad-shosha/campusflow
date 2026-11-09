@@ -702,3 +702,30 @@
     animation: none;
   }
 }
+
+/* Shared honest data states for campus & parking service lists (Phase 1) */
+.campus-data-state,
+.parking-data-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border-strong);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.campus-data-state.is-error,
+.parking-data-state[role='alert'] {
+  border-style: solid;
+  border-color: var(--status-occupied-border);
+  background: var(--status-occupied-bg);
+  color: var(--danger-text);
+}

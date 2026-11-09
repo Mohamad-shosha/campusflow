@@ -99,67 +99,33 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
         </div>
       )}
 
-      {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          marginBottom: '1.5rem',
-        }}
-      >
-        <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.6rem',
-              marginBottom: '0.35rem',
-            }}
-          >
-            <GraduationCap size={26} color="var(--fbsu-gold)" />
-            <h2
-              style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--text-main)', margin: 0 }}
-            >
-              {isAr ? 'الحسابات والرسوم الدراسية' : 'Tuition Accounts & Digital Settlement'}
-            </h2>
-          </div>
-          <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0 }}>
-            {isAr
-              ? 'متابعة الفواتير الأكاديمية وسدادها فورياً عبر المحفظة الجامعية مع إصدار إيصالات مشفرة معتمدة.'
-              : 'Review academic tuition invoices, settle dues instantly from campus wallet, and download verified digital receipts.'}
-          </p>
-        </div>
-
+      {/* Page actions (title lives in the shared page header above) */}
+      <div className="cf-page-actions">
+        <span className="cf-status-chip">
+          <GraduationCap size={15} />
+          <span>{isAr ? 'سداد مباشر من المحفظة الجامعية' : 'Settled from your campus wallet'}</span>
+        </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           {onOpenTopUp && (
             <button
               onClick={onOpenTopUp}
-              className="utility-pill-btn"
+              className="btn-outline"
               type="button"
-              style={{ padding: '0.45rem 0.8rem', borderRadius: '8px' }}
               data-testid="tuition-goto-wallet-btn"
             >
-              <Wallet size={14} color="var(--fbsu-gold)" />
-              <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
-                {isAr ? 'المحفظة الجامعية' : 'Campus Wallet'}
-              </span>
+              <Wallet size={15} />
+              <span>{isAr ? 'المحفظة الجامعية' : 'Campus Wallet'}</span>
             </button>
           )}
           <button
             onClick={loadData}
             disabled={isLoading}
-            className="utility-pill-btn"
+            className="btn-outline"
             title={isAr ? 'تحديث البيانات' : 'Refresh'}
             type="button"
-            style={{ padding: '0.45rem 0.8rem', borderRadius: '8px' }}
           >
-            <RefreshCw size={14} className={isLoading ? 'spin-icon' : ''} />
-            <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
-              {isAr ? 'تحديث' : 'Refresh'}
-            </span>
+            <RefreshCw size={15} className={isLoading ? 'spin-icon' : ''} />
+            <span>{isAr ? 'تحديث' : 'Refresh'}</span>
           </button>
         </div>
       </div>

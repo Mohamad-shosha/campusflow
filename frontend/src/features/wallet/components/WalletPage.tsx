@@ -133,7 +133,7 @@ export const WalletPage: FC<WalletPageProps> = ({
     <div
       className="wallet-feature-page"
       data-testid="wallet-page"
-      style={{ maxWidth: '960px', margin: '0 auto' }}
+      style={{ maxWidth: '1100px', margin: '0 auto' }}
     >
       {toast && (
         <div style={{ position: 'fixed', top: '1.5rem', insetInlineEnd: '1.5rem', zIndex: 999999 }}>
@@ -146,66 +146,23 @@ export const WalletPage: FC<WalletPageProps> = ({
         </div>
       )}
 
-      {/* Page header */}
-      <div
-        style={{
-          marginBottom: '1.5rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
-          gap: '1rem',
-        }}
-      >
-        <div>
-          <h2
-            style={{
-              fontSize: '1.65rem',
-              fontWeight: 900,
-              color: 'var(--text-main)',
-              margin: '0 0 0.35rem',
-            }}
+      {/* Page actions (the page title lives in the shared page header above) */}
+      <div className="cf-page-actions">
+        <span className="cf-status-chip">
+          <ShieldCheck size={15} />
+          <span>{isAr ? 'سجل محاسبي غير قابل للتعديل' : 'Immutable ledger'}</span>
+        </span>
+        {onNavigateToTuition && (
+          <button
+            type="button"
+            className="btn-gold"
+            onClick={onNavigateToTuition}
+            data-testid="wallet-goto-tuition-btn"
           >
-            {isAr ? 'المحفظة الجامعية والمدفوعات الذكية' : 'Digital Campus Wallet & Smart Payments'}
-          </h2>
-          <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0 }}>
-            {isAr
-              ? 'إدارة الأرصدة المؤسسية، الشحن الإلكتروني الفوري، وسجل الحركات غير القابل للتعديل.'
-              : 'Institutional balances, real-time top-ups, and immutable financial ledger transactions.'}
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-          {onNavigateToTuition && (
-            <button
-              type="button"
-              className="btn-gold"
-              onClick={onNavigateToTuition}
-              style={{ fontSize: '0.82rem', padding: '0.45rem 0.9rem' }}
-              data-testid="wallet-goto-tuition-btn"
-            >
-              <GraduationCap size={16} color="#0b1a17" />
-              <span>{isAr ? 'سداد الرسوم الدراسية' : 'Tuition & Invoices'}</span>
-            </button>
-          )}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.4rem 0.8rem',
-              borderRadius: '8px',
-              background: 'rgba(17, 110, 99, 0.15)',
-              border: '1px solid rgba(17, 110, 99, 0.35)',
-              fontSize: '0.78rem',
-              color: '#34d399',
-              fontWeight: 700,
-            }}
-          >
-            <ShieldCheck size={15} />
-            <span>{isAr ? 'معتمد ومحمي بالقيود المحاسبية' : 'Audited & Immutable Ledger'}</span>
-          </div>
-        </div>
+            <GraduationCap size={16} />
+            <span>{isAr ? 'سداد الرسوم الدراسية' : 'Tuition & Invoices'}</span>
+          </button>
+        )}
       </div>
 
       {!isAuthenticated && (

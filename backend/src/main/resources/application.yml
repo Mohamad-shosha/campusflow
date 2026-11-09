@@ -1,8 +1,8 @@
 spring:
   application:
     name: fbsu-campus-backend
-  profiles:
-    active: dev
+  # No default profile: deployments must choose one explicitly (dev / prod).
+  # Demo seeders additionally require fbsu.seed.demo-data=true (set only in application-dev.yml).
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -71,3 +71,8 @@ app:
       secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
       access-token-expiration-minutes: 15
       refresh-token-expiration-days: 7
+
+# Demo/development seed data. Never enable outside local development.
+fbsu:
+  seed:
+    demo-data: false

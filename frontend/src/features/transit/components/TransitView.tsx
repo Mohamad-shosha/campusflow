@@ -13,20 +13,27 @@ import {
   Wind,
   Navigation,
   ShieldAlert,
+  X,
 } from 'lucide-react';
 import { transitApi } from '../api/transitApi';
 import type { TransitRoute, ShuttleBus, TransitPass } from '../types/transit';
-import { INITIAL_TRANSIT_ROUTES, INITIAL_SHUTTLE_BUSES } from '../data/transitData';
 import { TransitPassModal } from './TransitPassModal';
 import { soundFX } from '../../../shared/utils/sound';
+import { getApiErrorMessage, isUnauthorizedError } from '../../../shared/http/apiError';
 
 export interface TransitViewProps {
   isAr?: boolean;
+  /** Opens the sign-in modal when booking requires authentication */
+  onRequireAuth?: () => void;
 }
 
-export const TransitView: FC<TransitViewProps> = ({ isAr = true }) => {
-  const [routes, setRoutes] = useState<TransitRoute[]>(INITIAL_TRANSIT_ROUTES);
-  const [shuttles, setShuttles] = useState<ShuttleBus[]>(INITIAL_SHUTTLE_BUSES);
+type LoadState = 'loading' | 'ready' | 'error';
+
+export const TransitView: FC<TransitViewProps> = ({ isAr = true, onRequireAuth }) => {
+  const [routes, setRoutes] = useState<TransitRoute[]>([]);
+  const [shuttles, setShuttles] = useState<ShuttleBus[]>([]);
+  const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [bookingError, setBookingError] = useState<string | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -35,24 +42,32 @@ export const TransitView: FC<TransitViewProps> = ({ isAr = true }) => {
   const [isBooking, setIsBooking] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'shuttles' | 'timeline' | 'all'>('shuttles');
 
-  // Fetch real data on mount
+  const loadErrorText = isAr
+    ? 'تعذر تحميل بيانات النقل من الخادم. حاول مرة أخرى.'
+    : 'Could not load transit data from the server. Please try again.';
+
+  const loadTransitData = async () => {
+    const [routesData, shuttlesData] = await Promise.all([
+      transitApi.getRoutes(),
+      transitApi.getLiveShuttles(),
+    ]);
+    setRoutes(routesData);
+    setShuttles(shuttlesData);
+  };
+
+  // Fetch real data on mount (no mock fallback)
   useEffect(() => {
     let mounted = true;
-    const loadTransitData = async () => {
-      try {
-        const [routesData, shuttlesData] = await Promise.all([
-          transitApi.getRoutes(),
-          transitApi.getLiveShuttles(),
-        ]);
-        if (mounted) {
-          if (routesData && routesData.length > 0) setRoutes(routesData);
-          if (shuttlesData && shuttlesData.length > 0) setShuttles(shuttlesData);
-        }
-      } catch (err) {
-        console.warn('Using offline transit fallback', err);
-      }
-    };
-    loadTransitData();
+    Promise.all([transitApi.getRoutes(), transitApi.getLiveShuttles()])
+      .then(([routesData, shuttlesData]) => {
+        if (!mounted) return;
+        setRoutes(routesData);
+        setShuttles(shuttlesData);
+        setLoadState('ready');
+      })
+      .catch(() => {
+        if (mounted) setLoadState('error');
+      });
     return () => {
       mounted = false;
     };
@@ -62,68 +77,73 @@ export const TransitView: FC<TransitViewProps> = ({ isAr = true }) => {
     setIsRefreshing(true);
     soundFX.playClick();
     try {
-      const [freshRoutes, freshShuttles] = await Promise.all([
-        transitApi.getRoutes(),
-        transitApi.getLiveShuttles(),
-      ]);
-      setRoutes(freshRoutes);
-      setShuttles(freshShuttles);
+      await loadTransitData();
+      setLoadState('ready');
     } catch {
-      // no-op
+      setLoadState('error');
     } finally {
-      setTimeout(() => setIsRefreshing(false), 600);
+      setIsRefreshing(false);
     }
   };
 
   const handleBookQuickPass = async (shuttle: ShuttleBus) => {
+    setBookingError(null);
+    const currentRoute = routes.find(r => r.id === shuttle.routeId);
+    const pickupStop = currentRoute?.stops[0];
+    const dropoffStop = currentRoute?.stops[currentRoute.stops.length - 1];
+
+    // A pass can only be requested against a real route with real stops
+    if (!currentRoute || !pickupStop || !dropoffStop || pickupStop.id === dropoffStop.id) {
+      soundFX.playError();
+      setBookingError(
+        isAr
+          ? 'لا يمكن إصدار تذكرة لهذه الحافلة: بيانات المسار أو المحطات غير مكتملة.'
+          : 'Cannot issue a pass for this shuttle: its route or stops are incomplete.'
+      );
+      return;
+    }
+
     setIsBooking(true);
     soundFX.playClick();
     try {
-      const currentRoute = routes.find(r => r.id === shuttle.routeId) || routes[0];
-      const pickupStop = currentRoute.stops[0];
-      const dropoffStop = currentRoute.stops[currentRoute.stops.length - 1];
-
       const pass = await transitApi.bookBoardingPass({
         routeId: currentRoute.id,
         shuttleId: shuttle.id,
-        pickupStopId: pickupStop ? pickupStop.id : 'stop-1',
-        dropoffStopId: dropoffStop ? dropoffStop.id : 'stop-3',
+        pickupStopId: pickupStop.id,
+        dropoffStopId: dropoffStop.id,
       });
-
       setActivePass(pass);
       setIsModalOpen(true);
-    } catch {
-      // offline fallback
-      const pass: TransitPass = {
-        id: 'pass-' + Date.now(),
-        passCode: 'FBSU-BUS-9021',
-        qrToken: 'FBSU-QR-SHUTTLE-' + Date.now(),
-        userName: 'طالب جامعي (حساب تجريبي)',
-        userUniversityNumber: '202410098',
-        routeId: shuttle.routeId || 'r-1',
-        routeCode: shuttle.routeCode || 'EX-01',
-        routeNameAr: shuttle.routeNameAr || 'خط الحرم الأخضر السريع',
-        routeNameEn: shuttle.routeNameEn || 'Campus Green Express',
-        routeColor: shuttle.routeColor || '#10B981',
-        shuttleId: shuttle.id,
-        busNumber: shuttle.busNumber,
-        pickupStopId: 'stop-1',
-        pickupStopNameAr: 'بوابة الجامعة الرئيسية (Main Gate)',
-        pickupStopNameEn: 'Main Gate',
-        dropoffStopId: 'stop-3',
-        dropoffStopNameAr: 'مجمع كليات الحاسب والهندسة',
-        dropoffStopNameEn: 'Engineering Complex',
-        boardingWindow: 'صالح لمدة 45 دقيقة',
-        fareAmount: 0.0,
-        status: 'ACTIVE',
-        createdAt: new Date().toISOString(),
-      };
-      setActivePass(pass);
-      setIsModalOpen(true);
+      soundFX.playSuccess();
+    } catch (err) {
+      soundFX.playError();
+      if (isUnauthorizedError(err)) {
+        setBookingError(
+          isAr ? 'يجب تسجيل الدخول لإصدار تذكرة صعود.' : 'Please sign in to issue a boarding pass.'
+        );
+        onRequireAuth?.();
+      } else {
+        setBookingError(
+          getApiErrorMessage(
+            err,
+            isAr
+              ? 'تعذر إصدار التذكرة. لم يتم إنشاء أي حجز.'
+              : 'Could not issue the pass. No booking was created.'
+          )
+        );
+      }
     } finally {
       setIsBooking(false);
     }
   };
+
+  // Summary figures derived only from the loaded fleet/route records
+  const electricCount = shuttles.filter(sh => sh.isElectric).length;
+  const electricPct =
+    shuttles.length > 0 ? Math.round((electricCount / shuttles.length) * 100) : null;
+  const totalAvailableSeats = shuttles.reduce((sum, sh) => sum + (sh.availableSeats || 0), 0);
+  const frequencies = routes.map(r => r.frequencyMinutes).filter(f => Number.isFinite(f) && f > 0);
+  const minFrequency = frequencies.length > 0 ? Math.min(...frequencies) : null;
 
   const filteredShuttles = useMemo(() => {
     return shuttles.filter(shuttle => {
@@ -186,16 +206,20 @@ export const TransitView: FC<TransitViewProps> = ({ isAr = true }) => {
           <div className="rounded-2xl border border-teal-500/20 bg-[#071513]/90 p-4 shadow-lg shadow-emerald-950/30 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-teal-400">
-                {isAr ? 'انبعاثات كربونية' : 'Carbon Footprint'}
+                {isAr ? 'الحافلات الكهربائية' : 'Electric Fleet'}
               </span>
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400">
                 <Zap className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-emerald-400">0%</span>
+              <span className="text-2xl font-black text-emerald-400">
+                {electricPct === null ? '—' : `${electricPct}%`}
+              </span>
               <span className="text-xs text-gray-400">
-                {isAr ? 'طاقة كهربائية نظيفة 100%' : '100% Zero Emission'}
+                {isAr
+                  ? `${electricCount} من ${shuttles.length} حافلة`
+                  : `${electricCount} of ${shuttles.length} shuttles`}
               </span>
             </div>
           </div>
@@ -203,20 +227,68 @@ export const TransitView: FC<TransitViewProps> = ({ isAr = true }) => {
           <div className="rounded-2xl border border-emerald-500/20 bg-[#071513]/90 p-4 shadow-lg shadow-emerald-950/30 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-emerald-400">
-                {isAr ? 'التزام بالمواعيد' : 'On-Time Performance'}
+                {isAr ? 'المقاعد الشاغرة' : 'Available Seats'}
               </span>
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
                 <Clock className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-white">99.2%</span>
-              <span className="text-xs text-emerald-400">
-                {isAr ? 'تردد كل 10 دقائق' : 'Every 10 min'}
-              </span>
+              <span className="text-2xl font-black text-white">{totalAvailableSeats}</span>
+              {minFrequency !== null && (
+                <span className="text-xs text-emerald-400">
+                  {isAr ? `أقصر تردد ${minFrequency} د` : `Fastest every ${minFrequency} min`}
+                </span>
+              )}
             </div>
           </div>
         </div>
+
+        {loadState === 'loading' && (
+          <div
+            role="status"
+            data-testid="transit-loading"
+            className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center text-sm text-gray-400"
+          >
+            {isAr ? 'جاري تحميل بيانات النقل...' : 'Loading transit data...'}
+          </div>
+        )}
+
+        {loadState === 'error' && (
+          <div
+            role="alert"
+            data-testid="transit-load-error"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4"
+          >
+            <span className="text-sm font-semibold text-amber-300">{loadErrorText}</span>
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white hover:bg-white/10 disabled:opacity-50"
+            >
+              {isAr ? 'إعادة المحاولة' : 'Retry'}
+            </button>
+          </div>
+        )}
+
+        {bookingError && (
+          <div
+            role="alert"
+            data-testid="transit-booking-error"
+            className="flex items-center justify-between gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4"
+          >
+            <span className="text-sm font-semibold text-amber-300">{bookingError}</span>
+            <button
+              type="button"
+              onClick={() => setBookingError(null)}
+              aria-label={isAr ? 'إغلاق' : 'Dismiss'}
+              className="rounded-lg px-2 py-1 text-gray-400 hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         {/* Filter Tabs & Search Controls */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-2xl border border-emerald-500/20 bg-[#071513]/80 p-4 backdrop-blur-sm">
@@ -357,16 +429,16 @@ export const TransitView: FC<TransitViewProps> = ({ isAr = true }) => {
               <div>
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
                   <Zap className="h-5 w-5 text-amber-400" />
-                  {isAr ? 'حافلات النقل الترددي في الخدمة المباشرة' : 'Live Active Campus Shuttles'}
+                  {isAr ? 'حافلات النقل الترددي في الخدمة' : 'Campus Shuttles in Service'}
                 </h2>
                 <p className="text-xs text-gray-400">
                   {isAr
-                    ? 'تتبع فوري لمواقع الحافلات، نسبة شحن البطارية، ونسبة المقاعد الشاغرة'
-                    : 'Real-time telemetry, battery level, and available seat status'}
+                    ? 'آخر حالة مسجلة لكل حافلة: المحطة التالية، البطارية، والمقاعد الشاغرة'
+                    : 'Latest recorded status per shuttle: next stop, battery and free seats'}
                 </p>
               </div>
               <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
-                {filteredShuttles.length} {isAr ? 'حافلات متصلة' : 'Connected Shuttles'}
+                {filteredShuttles.length} {isAr ? 'حافلات' : 'Shuttles'}
               </span>
             </div>
 
@@ -510,17 +582,25 @@ export const TransitView: FC<TransitViewProps> = ({ isAr = true }) => {
               })}
             </div>
 
-            {filteredShuttles.length === 0 && (
+            {loadState === 'ready' && filteredShuttles.length === 0 && (
               <div className="rounded-3xl border border-dashed border-white/10 bg-[#071513]/50 p-12 text-center">
                 <ShieldAlert className="mx-auto h-12 w-12 text-gray-500" />
                 <h3 className="mt-3 text-base font-bold text-white">
-                  {isAr ? 'لا توجد حافلات مطابقة للبحث' : 'No matching shuttles'}
+                  {shuttles.length === 0
+                    ? isAr
+                      ? 'لا توجد حافلات مسجلة في الخدمة حالياً'
+                      : 'No shuttles are registered in service'
+                    : isAr
+                      ? 'لا توجد حافلات مطابقة للبحث'
+                      : 'No matching shuttles'}
                 </h3>
-                <p className="mt-1 text-xs text-gray-400">
-                  {isAr
-                    ? 'جرّب اختيار خط آخر أو تعديل نص البحث.'
-                    : 'Try selecting a different route or clearing your search.'}
-                </p>
+                {shuttles.length > 0 && (
+                  <p className="mt-1 text-xs text-gray-400">
+                    {isAr
+                      ? 'جرّب اختيار خط آخر أو تعديل نص البحث.'
+                      : 'Try selecting a different route or clearing your search.'}
+                  </p>
+                )}
               </div>
             )}
           </div>

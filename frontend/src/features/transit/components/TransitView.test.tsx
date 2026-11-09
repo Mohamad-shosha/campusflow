@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TransitView } from './TransitView';
+import { transitApi } from '../api/transitApi';
 
 vi.mock('../api/transitApi', () => ({
   transitApi: {
@@ -26,6 +27,18 @@ vi.mock('../api/transitApi', () => ({
             locationDescEn: 'North Gate',
             stopOrder: 1,
             etaMinutesFromStart: 0,
+            hasShelter: true,
+            hasAc: true,
+          },
+          {
+            id: 's-2',
+            stopCode: 'ST-02',
+            nameAr: 'مجمع كليات الهندسة',
+            nameEn: 'Engineering Complex',
+            locationDescAr: 'المجمع الأكاديمي',
+            locationDescEn: 'Academic Complex',
+            stopOrder: 2,
+            etaMinutesFromStart: 5,
             hasShelter: true,
             hasAc: true,
           },
@@ -88,7 +101,7 @@ describe('TransitView Component', () => {
     render(<TransitView isAr={true} />);
 
     expect(screen.getByText(/أسطول الحافلات النشط/i)).toBeInTheDocument();
-    expect(screen.getByText(/انبعاثات كربونية/i)).toBeInTheDocument();
+    expect(screen.getByText(/الحافلات الكهربائية/i)).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText(/SHUTTLE-01/i)).toBeInTheDocument();
@@ -124,5 +137,37 @@ describe('TransitView Component', () => {
       expect(screen.getByText(/بطاقة ركوب الحافلة الذكية/i)).toBeInTheDocument();
       expect(screen.getByText(/FBSU-BUS-9001/i)).toBeInTheDocument();
     });
+  });
+
+  it('shows an error state (no mock data) when the transit API fails', async () => {
+    vi.mocked(transitApi.getRoutes).mockRejectedValueOnce(new Error('network'));
+    render(<TransitView isAr={false} />);
+    expect(await screen.findByTestId('transit-load-error')).toBeInTheDocument();
+    expect(screen.queryByText(/SHUTTLE-01/i)).not.toBeInTheDocument();
+  });
+
+  it('never shows a boarding pass when booking fails', async () => {
+    vi.mocked(transitApi.bookBoardingPass).mockRejectedValueOnce({
+      response: { status: 409, data: { detail: 'Shuttle is full' } },
+    });
+    render(<TransitView isAr={true} />);
+    await waitFor(() => {
+      expect(screen.getByText(/SHUTTLE-01/i)).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText(/إصدار تذكرة صعود ذكية/i));
+    expect(await screen.findByTestId('transit-booking-error')).toHaveTextContent('Shuttle is full');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('asks the user to sign in when booking is unauthorized', async () => {
+    vi.mocked(transitApi.bookBoardingPass).mockRejectedValueOnce({ response: { status: 401 } });
+    const onRequireAuth = vi.fn();
+    render(<TransitView isAr={false} onRequireAuth={onRequireAuth} />);
+    await waitFor(() => {
+      expect(screen.getByText(/SHUTTLE-01/i)).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText(/Issue Instant Boarding Pass/i));
+    await waitFor(() => expect(onRequireAuth).toHaveBeenCalledTimes(1));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

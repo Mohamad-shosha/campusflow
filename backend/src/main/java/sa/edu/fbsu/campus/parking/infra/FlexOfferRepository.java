@@ -15,6 +15,8 @@ import java.util.UUID;
 @Repository
 public interface FlexOfferRepository extends JpaRepository<FlexOffer, UUID> {
 
+    long countByUniversityIdAndStatus(UUID universityId, FlexOfferStatus status);
+
     @Query("""
             SELECT o FROM FlexOffer o
             JOIN FETCH o.spot s

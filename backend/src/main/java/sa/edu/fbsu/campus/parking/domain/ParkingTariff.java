@@ -16,13 +16,13 @@ public class ParkingTariff extends BaseTenantEntity {
     private UserType userType;
 
     @Column(name = "hourly_rate", nullable = false, precision = 10, scale = 2)
-    private BigDecimal hourlyRate = new BigDecimal("5.75");
+    private BigDecimal hourlyRate;
 
     @Column(name = "daily_cap", nullable = false, precision = 10, scale = 2)
-    private BigDecimal dailyCap = new BigDecimal("25.00");
+    private BigDecimal dailyCap;
 
     @Column(name = "flex_cashback_rate", nullable = false, precision = 10, scale = 2)
-    private BigDecimal flexCashbackRate = new BigDecimal("5.75");
+    private BigDecimal flexCashbackRate;
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;

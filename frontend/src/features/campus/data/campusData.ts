@@ -18,7 +18,8 @@ export interface TutoringSession {
   dateTime: string;
   location: string;
   category: string;
-  rating: number;
+  /** Always null until a review system exists (backend does not expose stored defaults) */
+  rating: number | null;
   reviewsCount: number;
   status: 'open' | 'booked' | 'completed';
   enrolledStudents: string[];

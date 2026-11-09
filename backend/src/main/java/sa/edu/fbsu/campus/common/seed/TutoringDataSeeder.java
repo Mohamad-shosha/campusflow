@@ -3,6 +3,7 @@ package sa.edu.fbsu.campus.common.seed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 @Component
 @Profile("dev")
+@ConditionalOnProperty(name = "fbsu.seed.demo-data", havingValue = "true")
 @Order(2)
 public class TutoringDataSeeder implements CommandLineRunner {
 
@@ -81,8 +83,6 @@ public class TutoringDataSeeder implements CommandLineRunner {
                     "قاعة المذاكرة الذكية A-04 (أو أونلاين عبر المنصة)",
                     10
             );
-            s1.setRating(new BigDecimal("4.96"));
-            s1.setReviewsCount(28);
             TutoringSession savedS1 = sessionRepository.save(s1);
             enrollmentRepository.save(new TutoringEnrollment(
                     uniId, savedS1, rakan, savedS1.getTotalPrice(), "seed-enroll-TUT-101-rakan"
@@ -109,8 +109,6 @@ public class TutoringDataSeeder implements CommandLineRunner {
                     "معمل الحاسب 102 (Computer Lab 102)",
                     10
             );
-            s2.setRating(new BigDecimal("4.92"));
-            s2.setReviewsCount(19);
             TutoringSession savedS2 = sessionRepository.save(s2);
             if (omar != null) {
                 enrollmentRepository.save(new TutoringEnrollment(
@@ -139,8 +137,6 @@ public class TutoringDataSeeder implements CommandLineRunner {
                     "معمل التصميم المنطقي Lab 205",
                     10
             );
-            s3.setRating(new BigDecimal("4.98"));
-            s3.setReviewsCount(15);
             sessionRepository.save(s3);
         }
 
@@ -164,8 +160,6 @@ public class TutoringDataSeeder implements CommandLineRunner {
                     "قاعة المذاكرة B-12",
                     10
             );
-            s4.setRating(new BigDecimal("4.95"));
-            s4.setReviewsCount(31);
             sessionRepository.save(s4);
         }
 

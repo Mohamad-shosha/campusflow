@@ -21,7 +21,9 @@ export interface ShareSpotViewProps {
     id: string;
     name: string;
     role: string;
-    primarySpot?: number;
+    /** Backend user type (STUDENT / FACULTY / STAFF) used to look up the flex cashback tariff */
+    userType?: string | undefined;
+    primarySpot?: number | undefined;
     walletBalance: number;
   };
   onShareConfirmed?: (hours: number, earnAmount: number) => void;
@@ -53,25 +55,46 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
   const [claimSuccessMessage, setClaimSuccessMessage] = useState<string | null>(null);
   const [claimError, setClaimError] = useState<string | null>(null);
 
-  const earnAmount = breakHours * 5.75;
+  // Flex reward is a flat cashback per claimed offer, taken from the parking tariff
+  // (see FlexShareService). It does not scale with the break duration.
+  const [flexCashback, setFlexCashback] = useState<number | null>(null);
+  const [lastOfferReward, setLastOfferReward] = useState<number | null>(null);
+  const [spotsLoadError, setSpotsLoadError] = useState<boolean>(false);
+  const [offersLoadError, setOffersLoadError] = useState<boolean>(false);
 
   // Load spots and offers on mount
   useEffect(() => {
     loadSpots();
     loadOffers();
+    loadTariff();
   }, []);
+
+  const loadTariff = async () => {
+    if (!currentUser.userType || typeof parkingApi.getTariffs !== 'function') return;
+    try {
+      const tariffs = await parkingApi.getTariffs();
+      const match = tariffs.find(t => t.userType === currentUser.userType);
+      setFlexCashback(match && match.flexCashbackSar > 0 ? Number(match.flexCashbackSar) : null);
+    } catch {
+      setFlexCashback(null);
+    }
+  };
 
   const loadSpots = async () => {
     try {
       const spots = await parkingApi.getSpots();
       setAllSpots(spots);
-      // Auto-select spot matching currentUser primarySpot, or first occupied/active spot, or first spot
-      const matchingSpot = spots.find(s => s.bayNumber === currentUser.primarySpot) || spots[0];
+      setSpotsLoadError(false);
+      // Pre-select only the user's own assigned bay; otherwise the user must choose explicitly
+      const matchingSpot =
+        currentUser.primarySpot !== undefined
+          ? spots.find(s => s.bayNumber === currentUser.primarySpot)
+          : undefined;
       if (matchingSpot) {
         setSelectedSpotId(matchingSpot.id);
       }
     } catch {
-      // Non-blocking in dev/offline
+      setSpotsLoadError(true);
     }
   };
 
@@ -80,8 +103,9 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
     try {
       const data = await parkingApi.getFlexOffers();
       setOffers(data);
+      setOffersLoadError(false);
     } catch {
-      // Non-blocking
+      setOffersLoadError(true);
     } finally {
       setIsLoadingOffers(false);
     }
@@ -89,25 +113,38 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
 
   const handleActivate = async () => {
     setShareError(null);
+
+    // A real, explicitly selected bay is required. Never submit a placeholder id.
+    const targetSpot = allSpots.find(s => s.id === selectedSpotId);
+    if (!targetSpot) {
+      soundFX.playError();
+      setShareError(
+        isAr
+          ? 'يرجى اختيار الموقف الذي تريد إتاحته أولاً.'
+          : 'Please select the bay you want to share first.'
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const targetSpotId =
-        selectedSpotId || (allSpots.length > 0 ? allSpots[0].id : 'spot-fallback-id');
-      await parkingApi.createFlexOffer({
-        spotId: targetSpotId,
+      const created = await parkingApi.createFlexOffer({
+        spotId: targetSpot.id,
         durationMinutes: breakHours * 60,
       });
+      const reward = Number(created?.rewardAmount ?? created?.rewardAmountSar ?? 0);
+      setLastOfferReward(reward > 0 ? reward : null);
 
       soundFX.playSuccess();
       try {
         confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
       } catch {
-        // Mock fallback
+        // confetti is cosmetic; ignore failures
       }
 
       setIsShared(true);
-      onShareConfirmed?.(breakHours, earnAmount);
+      onShareConfirmed?.(breakHours, reward);
       onRefreshSpots?.();
       loadOffers();
     } catch (err: unknown) {
@@ -147,7 +184,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
       try {
         confetti({ particleCount: 80, spread: 80, origin: { y: 0.6 } });
       } catch {
-        // Mock fallback
+        // confetti is cosmetic; ignore failures
       }
 
       setClaimSuccessMessage(
@@ -311,10 +348,11 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                     gap: '0.5rem',
                   }}
                 >
-                  <span>{isAr ? 'الموقف المخصص:' : 'Assigned Bay:'}</span>
+                  <span>{isAr ? 'الموقف المراد إتاحته:' : 'Bay to share:'}</span>
                   {allSpots.length > 0 ? (
                     <select
                       value={selectedSpotId}
+                      aria-label={isAr ? 'اختر الموقف' : 'Select bay'}
                       onChange={e => setSelectedSpotId(e.target.value)}
                       style={{
                         background: 'var(--bg-glass)',
@@ -329,12 +367,11 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                       }}
                       data-testid="spot-select"
                     >
+                      <option value="" disabled>
+                        {isAr ? 'اختر الموقف...' : 'Select a bay...'}
+                      </option>
                       {allSpots.map(s => (
-                        <option
-                          key={s.id}
-                          value={s.id}
-                          style={{ background: '#0b1a17', color: '#fff' }}
-                        >
+                        <option key={s.id} value={s.id}>
                           {isAr
                             ? `موقف رقم #${s.bayNumber} (${s.zoneNameAr})`
                             : `Bay #${s.bayNumber} (${s.zoneCode})`}
@@ -342,10 +379,17 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                       ))}
                     </select>
                   ) : (
-                    <strong style={{ color: 'var(--gold-text)' }}>
-                      {isAr
-                        ? `موقف رقم #${currentUser.primarySpot || '01'}`
-                        : `Bay #${currentUser.primarySpot || '01'}`}
+                    <strong
+                      style={{ color: 'var(--text-dim)' }}
+                      data-testid="spot-select-unavailable"
+                    >
+                      {spotsLoadError
+                        ? isAr
+                          ? 'تعذر تحميل المواقف'
+                          : 'Could not load bays'
+                        : isAr
+                          ? 'لا توجد مواقف متاحة'
+                          : 'No bays available'}
                     </strong>
                   )}
                 </div>
@@ -497,8 +541,8 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                     }}
                   >
                     {isAr
-                      ? 'محسوب وفق تعرفة 5.75 ر.س/ساعة مع ضمان توفير الموقف لك فور عودتك بنسبة 100%.'
-                      : 'Calculated at standard 5.75 SAR/hr with guaranteed vacancy upon your return.'}
+                      ? 'مكافأة ثابتة من تعرفة المواقف تُضاف لمحفظتك عندما يحجز زميل موقفك.'
+                      : 'Flat cashback from your parking tariff, credited when a colleague claims your bay.'}
                   </p>
                 </div>
                 <div
@@ -510,7 +554,9 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                   }}
                   data-testid="flex-reward-amount"
                 >
-                  {earnAmount.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
+                  {flexCashback !== null
+                    ? `${flexCashback.toFixed(2)} ${isAr ? 'ر.س' : 'SAR'}`
+                    : '—'}
                 </div>
               </div>
             </div>
@@ -545,8 +591,8 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 </div>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', opacity: 0.9 }}>
                   {isAr
-                    ? `أصبح الموقف متاحاً لزملائك لمدة ${breakHours} ساعات، وتم ربط حسابك بالمكافأة النقدية (+${earnAmount.toFixed(2)} ر.س).`
-                    : `Bay shared for ${breakHours} hours. Wallet credit (+${earnAmount.toFixed(2)} SAR) recorded.`}
+                    ? `أصبح الموقف متاحاً لزملائك لمدة ${breakHours} ساعات.${lastOfferReward !== null ? ` ستُضاف ${lastOfferReward.toFixed(2)} ر.س لمحفظتك عند حجزه.` : ''}`
+                    : `Bay shared for ${breakHours} hours.${lastOfferReward !== null ? ` ${lastOfferReward.toFixed(2)} SAR will be credited when it is claimed.` : ''}`}
                 </p>
                 <button
                   type="button"
@@ -572,14 +618,14 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
               <button
                 className="btn-gold"
                 onClick={handleActivate}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !selectedSpotId}
                 style={{
                   width: '100%',
                   justifyContent: 'center',
                   padding: '1rem',
                   fontSize: '1rem',
-                  opacity: isSubmitting ? 0.7 : 1,
-                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  opacity: isSubmitting || !selectedSpotId ? 0.6 : 1,
+                  cursor: isSubmitting || !selectedSpotId ? 'not-allowed' : 'pointer',
                 }}
                 type="button"
                 data-testid="activate-flex-share-btn"
@@ -706,6 +752,29 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                     : 'Loading available shared spots...'}
                 </p>
               </div>
+            ) : offersLoadError ? (
+              <div
+                role="alert"
+                data-testid="flex-offers-load-error"
+                style={{
+                  textAlign: 'center',
+                  padding: '2rem 1.5rem',
+                  background: 'var(--status-occupied-bg)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--status-occupied-border)',
+                  color: 'var(--danger-text)',
+                  fontWeight: 700,
+                }}
+              >
+                <p style={{ marginBottom: '0.75rem' }}>
+                  {isAr
+                    ? 'تعذر تحميل العروض المتاحة من الخادم.'
+                    : 'Could not load shared spots from the server.'}
+                </p>
+                <button type="button" className="btn-outline" onClick={loadOffers}>
+                  {isAr ? 'إعادة المحاولة' : 'Retry'}
+                </button>
+              </div>
             ) : availableOffers.length === 0 ? (
               <div
                 style={{
@@ -765,7 +834,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
               >
                 {availableOffers.map(offer => {
                   const isClaiming = claimingOfferId === offer.id;
-                  const reward = offer.rewardAmount ?? offer.rewardAmountSar ?? 5.75;
+                  const reward = offer.rewardAmount ?? offer.rewardAmountSar;
                   const ownerName = isAr ? offer.offererNameAr : offer.offererNameEn;
 
                   return (
@@ -847,7 +916,9 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                           <span>
                             {isAr ? 'المكافأة النقدية للطرفين: ' : 'Cashback: '}
                             <strong style={{ color: 'var(--gold-text)' }}>
-                              {reward.toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
+                              {typeof reward === 'number'
+                                ? `${reward.toFixed(2)} ${isAr ? 'ر.س' : 'SAR'}`
+                                : '—'}
                             </strong>
                           </span>
                         </div>

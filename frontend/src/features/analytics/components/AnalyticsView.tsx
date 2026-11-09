@@ -1,68 +1,78 @@
-import { FC, useState, useEffect } from 'react';
-import { BarChart3, Layers } from 'lucide-react';
+import { FC, useCallback, useState, useEffect } from 'react';
+import { BarChart3, Layers, RotateCw } from 'lucide-react';
 import { analyticsApi } from '../api/analyticsApi';
-import type { AnalyticsSummary, HourlyLoadPoint } from '../types/analytics';
+import type { AnalyticsSummary } from '../types/analytics';
+import type { ResourceStatus } from '../../../shared/types/resource';
 
 export interface AnalyticsViewProps {
   isAr: boolean;
 }
 
-const DEFAULT_PEAK_DATA: HourlyLoadPoint[] = [
-  { time: '08:00', load: 85, color: '#f59e0b', labelAr: 'ذروة 1', labelEn: 'Peak 1' },
-  { time: '09:00', load: 95, color: '#ef4444', labelAr: 'ذروة قصوى', labelEn: 'Max Peak' },
-  {
-    time: '10:00',
-    load: 70,
-    color: 'var(--success-text)',
-    labelAr: 'فترة خروج البريك',
-    labelEn: 'Break Exit',
-  },
-  { time: '11:00', load: 90, color: '#ef4444', labelAr: 'محاضرات الظهر', labelEn: 'Midday' },
-  { time: '12:00', load: 80, color: '#f59e0b', labelAr: 'صلاة الظهر', labelEn: 'Prayer' },
-  {
-    time: '01:00',
-    load: 65,
-    color: 'var(--success-text)',
-    labelAr: 'تبادل المواقف',
-    labelEn: 'Flex Swap',
-  },
-  { time: '02:00', load: 75, color: '#f59e0b', labelAr: 'عودة الطلاب', labelEn: 'Return' },
-  { time: '03:00', load: 50, color: 'var(--success-text)', labelAr: 'هدوء', labelEn: 'Calm' },
-  {
-    time: '04:00',
-    load: 25,
-    color: 'var(--success-text)',
-    labelAr: 'نهاية الدوام',
-    labelEn: 'Dismissal',
-  },
-];
-
+/**
+ * Shows only metrics the backend derives from real records (spots, flex offers,
+ * gate logs, zone occupancy). The summary endpoint also returns
+ * netCapacityGainPercent / timeSavedMinutes / satisfactionRatePercent /
+ * totalLedgerRevenue / hourlyLoad, but those are currently hardcoded in
+ * AnalyticsService, so they are intentionally not displayed.
+ */
 export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [status, setStatus] = useState<ResourceStatus>('loading');
 
-  useEffect(() => {
-    let mounted = true;
-    const fetchAnalytics = async () => {
-      try {
-        const data = await analyticsApi.getSummary();
-        if (mounted) {
-          setSummary(data);
-        }
-      } catch {
-        // Fallback gracefully to default values if server is busy or offline
-      }
-    };
-    fetchAnalytics();
-    return () => {
-      mounted = false;
-    };
+  const fetchAnalytics = useCallback(async () => {
+    setStatus('loading');
+    try {
+      const data = await analyticsApi.getSummary();
+      setSummary(data);
+      setStatus('ready');
+    } catch {
+      setStatus('error');
+    }
   }, []);
 
-  const peakData =
-    summary?.hourlyLoad && summary.hourlyLoad.length > 0 ? summary.hourlyLoad : DEFAULT_PEAK_DATA;
-  const capacityGain = summary?.netCapacityGainPercent ?? 42;
-  const timeSaved = summary?.timeSavedMinutes ?? 14.2;
-  const satisfaction = summary?.satisfactionRatePercent ?? 98.8;
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
+
+  const kpis = summary
+    ? [
+        {
+          id: 'total-spots',
+          value: summary.totalSpots,
+          labelAr: 'إجمالي المواقف',
+          labelEn: 'Total bays',
+          color: 'var(--text-main)',
+        },
+        {
+          id: 'available-spots',
+          value: summary.availableSpots,
+          labelAr: 'متاحة الآن',
+          labelEn: 'Available now',
+          color: 'var(--status-available)',
+        },
+        {
+          id: 'occupied-spots',
+          value: summary.occupiedSpots,
+          labelAr: 'مشغولة أو محجوزة',
+          labelEn: 'Occupied or reserved',
+          color: 'var(--status-occupied)',
+        },
+        {
+          id: 'flex-offers',
+          value: summary.flexSharesActive,
+          labelAr: 'عروض التبادل (الإجمالي)',
+          labelEn: 'Flex offers (all time)',
+          color: 'var(--gold-text)',
+        },
+        {
+          id: 'gate-passages',
+          value: summary.totalGatePassages,
+          labelAr: 'عمليات عبور البوابة المسجلة',
+          labelEn: 'Recorded gate passages',
+          color: 'var(--accent-text)',
+        },
+      ]
+    : [];
 
   return (
     <div data-testid="analytics-view">
@@ -72,94 +82,43 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
           <span>{isAr ? 'لوحة تحليلات الذكاء الاصطناعي' : 'AI Analytics'}</span>
         </span>
         <h3 className="section-title">
-          {isAr
-            ? 'مؤشرات الأداء والكفاءة التشغيلية لمواقف الجامعة'
-            : 'FBSU Smart Parking Efficiency & Forecast'}
+          {isAr ? 'مؤشرات تشغيل مواقف الجامعة' : 'FBSU Parking Operations Overview'}
         </h3>
         <p className="section-subtitle">
           {isAr
-            ? 'بيانات حية توضح التحسن الناتج عن خوارزمية التبادل الذكي في زيادة السعة الاستيعابية وخفض الازدحام.'
-            : 'Real-time metrics demonstrating how AI flex swapping increases capacity and eliminates traffic congestion.'}
+            ? 'مؤشرات محسوبة من سجلات المواقف والبوابات وعروض التبادل في قاعدة البيانات.'
+            : 'Indicators computed from parking, gate and flex-share records in the database.'}
         </p>
       </div>
 
-      <div className="analytics-kpi-grid">
-        <div className="stat-chip" style={{ padding: '1.5rem' }}>
-          <div>
-            <div
-              style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--status-available)' }}
-              data-testid="kpi-capacity-gain"
-            >
-              +{capacityGain}%
-            </div>
-            <div
-              style={{
-                fontSize: '0.95rem',
-                fontWeight: 800,
-                color: 'var(--text-main)',
-                margin: '0.35rem 0',
-              }}
-            >
-              {isAr ? 'زيادة في سعة المواقف الفعلية' : 'Net Capacity Gain'}
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {isAr
-                ? 'دون بناء أي خرسانات أو مساحات إضافية'
-                : 'Zero additional concrete or real estate'}
-            </div>
-          </div>
+      {status === 'loading' && !summary && (
+        <div className="campus-data-state" role="status" data-testid="analytics-loading">
+          {isAr ? 'جاري تحميل المؤشرات...' : 'Loading indicators...'}
         </div>
+      )}
 
-        <div className="stat-chip" style={{ padding: '1.5rem' }}>
-          <div>
-            <div
-              style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--gold-text)' }}
-              data-testid="kpi-time-saved"
-            >
-              {timeSaved} {isAr ? 'دقيقة' : 'Mins'}
-            </div>
-            <div
-              style={{
-                fontSize: '0.95rem',
-                fontWeight: 800,
-                color: 'var(--text-main)',
-                margin: '0.35rem 0',
-              }}
-            >
-              {isAr ? 'توفير في وقت كل طالب' : 'Time Saved per Student'}
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {isAr ? 'اختفاء ظاهرة الدوران والبحث عن موقف' : 'Eliminates campus cruising time'}
-            </div>
-          </div>
+      {status === 'error' && !summary && (
+        <div className="campus-data-state is-error" role="alert" data-testid="analytics-load-error">
+          <span>{isAr ? 'تعذر تحميل المؤشرات من الخادم.' : 'Could not load indicators.'}</span>
+          <button type="button" className="btn-outline" onClick={fetchAnalytics}>
+            <RotateCw size={14} />
+            <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+          </button>
         </div>
+      )}
 
-        <div className="stat-chip" style={{ padding: '1.5rem' }}>
-          <div>
-            <div
-              style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--fbsu-primary)' }}
-              data-testid="kpi-satisfaction-rate"
-            >
-              {satisfaction}%
+      {kpis.length > 0 && (
+        <div className="rooms-kpis" data-testid="analytics-kpis">
+          {kpis.map(k => (
+            <div key={k.id} className="rooms-kpi" data-testid={`kpi-${k.id}`}>
+              <span className="rooms-kpi-value" style={{ color: k.color }}>
+                {k.value}
+              </span>
+              <span className="rooms-kpi-label">{isAr ? k.labelAr : k.labelEn}</span>
             </div>
-            <div
-              style={{
-                fontSize: '0.95rem',
-                fontWeight: 800,
-                color: 'var(--text-main)',
-                margin: '0.35rem 0',
-              }}
-            >
-              {isAr ? 'مستوى رضا طلاب ودكاترة الجامعة' : 'Campus Satisfaction Rate'}
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {isAr
-                ? 'وفق استبيان عمادة شؤون الطلاب بتبوك'
-                : 'Student Affairs Deanship Survey (Tabuk)'}
-            </div>
-          </div>
+          ))}
         </div>
-      </div>
+      )}
 
       {/* Real-time Zone Breakdown Grid */}
       {summary?.zoneStats && summary.zoneStats.length > 0 && (
@@ -268,94 +227,6 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
           </div>
         </div>
       )}
-
-      {/* AI Hourly Heatmap */}
-      <div className="glass-panel" style={{ padding: '2rem' }}>
-        <h4
-          style={{
-            fontSize: '1.1rem',
-            fontWeight: 800,
-            color: 'var(--text-main)',
-            marginBottom: '1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-          }}
-        >
-          <BarChart3 size={18} color="var(--fbsu-primary)" />
-          <span>
-            {isAr
-              ? 'التوزيع الذكي للطلب على المواقف حسب ساعات الدوام الجامعي (FBSU Daily Peak Hours)'
-              : 'Dynamic Parking Demand Distribution across Campus Schedule (FBSU Peak Hours)'}
-          </span>
-        </h4>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(85px, 1fr))',
-            gap: '0.75rem',
-            textAlign: 'center',
-          }}
-          data-testid="hourly-load-grid"
-        >
-          {peakData.map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                background: 'var(--surface-soft)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '1rem 0.5rem',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  color: 'var(--text-muted)',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                {item.time}
-              </div>
-              <div
-                style={{
-                  height: '120px',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  justifyContent: 'center',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                <div
-                  style={{
-                    width: '26px',
-                    height: `${item.load}%`,
-                    background: item.color,
-                    borderRadius: '4px',
-                    boxShadow: `0 0 10px ${item.color}50`,
-                    transition: 'height 1s',
-                  }}
-                ></div>
-              </div>
-              <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                {item.load}%
-              </div>
-              <div
-                style={{
-                  fontSize: '0.7rem',
-                  color: item.color,
-                  fontWeight: 700,
-                  marginTop: '0.25rem',
-                }}
-              >
-                {isAr ? item.labelAr : item.labelEn}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

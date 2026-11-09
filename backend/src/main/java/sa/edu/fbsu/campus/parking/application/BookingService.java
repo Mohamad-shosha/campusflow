@@ -22,7 +22,7 @@ import sa.edu.fbsu.campus.parking.dto.CreateBookingRequest;
 import sa.edu.fbsu.campus.parking.dto.DigitalPassResponse;
 import sa.edu.fbsu.campus.parking.infra.ParkingBookingRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
-import sa.edu.fbsu.campus.parking.infra.ParkingTariffRepository;
+
 import sa.edu.fbsu.campus.wallet.application.WalletService;
 import sa.edu.fbsu.campus.wallet.domain.TransactionType;
 
@@ -41,7 +41,7 @@ public class BookingService {
 
     private final ParkingBookingRepository bookingRepository;
     private final ParkingSpotRepository spotRepository;
-    private final ParkingTariffRepository tariffRepository;
+    private final TariffResolver tariffResolver;
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final WalletService walletService;
@@ -50,7 +50,7 @@ public class BookingService {
     public BookingService(
             ParkingBookingRepository bookingRepository,
             ParkingSpotRepository spotRepository,
-            ParkingTariffRepository tariffRepository,
+            TariffResolver tariffResolver,
             UserRepository userRepository,
             VehicleRepository vehicleRepository,
             WalletService walletService,
@@ -58,7 +58,7 @@ public class BookingService {
     ) {
         this.bookingRepository = bookingRepository;
         this.spotRepository = spotRepository;
-        this.tariffRepository = tariffRepository;
+        this.tariffResolver = tariffResolver;
         this.userRepository = userRepository;
         this.vehicleRepository = vehicleRepository;
         this.walletService = walletService;
@@ -107,22 +107,16 @@ public class BookingService {
             throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is already booked for the selected time window.");
         }
 
-        // Calculate pricing from active institutional tariff (default 5.75 SAR/hr, 25.00 SAR daily cap)
-        BigDecimal ratePerHour = new BigDecimal("5.75");
-        BigDecimal dailyCap = new BigDecimal("25.00");
-        var tariffOpt = tariffRepository.findByUniversityIdAndUserType(user.getUniversityId(), user.getUserType());
-        if (tariffOpt.isPresent()) {
-            ParkingTariff tariff = tariffOpt.get();
-            if (tariff.getHourlyRate() != null && tariff.getHourlyRate().compareTo(BigDecimal.ZERO) > 0) {
-                ratePerHour = tariff.getHourlyRate();
-            }
-            if (tariff.getDailyCap() != null && tariff.getDailyCap().compareTo(BigDecimal.ZERO) > 0) {
-                dailyCap = tariff.getDailyCap();
-            }
-        }
-
+        // Price strictly from the active institutional tariff; no hardcoded fallback rate.
+        // hourly_rate and daily_cap are NOT NULL in the schema. A zero hourly rate means free
+        // parking; a non-positive daily cap means "no cap".
+        ParkingTariff tariff = tariffResolver.requireActiveTariff(user.getUniversityId(), user.getUserType());
+        BigDecimal ratePerHour = tariff.getHourlyRate();
         BigDecimal calculatedTotal = ratePerHour.multiply(durationHours).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal totalAmount = calculatedTotal.min(dailyCap);
+        BigDecimal dailyCap = tariff.getDailyCap();
+        BigDecimal totalAmount = dailyCap != null && dailyCap.compareTo(BigDecimal.ZERO) > 0
+                ? calculatedTotal.min(dailyCap)
+                : calculatedTotal;
 
         // Atomic wallet debit when autoDebitWallet is enabled (true by default)
         if (Boolean.TRUE.equals(request.autoDebitWallet()) && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
