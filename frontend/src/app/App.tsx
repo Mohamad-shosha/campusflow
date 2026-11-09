@@ -29,7 +29,25 @@ import { ParkingLotView } from '../features/parking/components/ParkingLotView';
 import { BookingWizardView } from '../features/parking/components/BookingWizardView';
 import { AlprGateView } from '../features/parking/components/AlprGateView';
 import { ShareSpotView } from '../features/parking/components/ShareSpotView';
-import { CampusShowcaseHub } from '../features/campus/components/CampusShowcaseHub';
+import { ServiceHeroBanner } from '../shared/components/ServiceHeroBanner';
+import { ServiceExplainerSections } from '../shared/components/ServiceExplainerSections';
+import {
+  Cpu,
+  BookOpen,
+  UserCheck,
+  Camera,
+  RefreshCw,
+  Calendar,
+  CreditCard,
+  Wallet as WalletIcon,
+  BarChart3,
+  Car,
+  ShieldCheck,
+  Sparkles,
+  Award,
+  Zap,
+  Users,
+} from 'lucide-react';
 
 import { TutoringView } from '../features/campus/components/TutoringView';
 import { tutoringApi } from '../features/campus/api/tutoringApi';
@@ -435,7 +453,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         </div>
       )}
 
-      {/* Hero Section displayed on map tab or home */}
+      {/* Dedicated Service Hero Banners for each page */}
       {activeTab === 'map' && (
         <HeroSection
           isAr={isAr}
@@ -446,6 +464,411 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         />
       )}
 
+      {activeTab === 'booking' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'منظومة التصاريح والحجوزات الرقمية - جامعة فهد بن سلطان'
+              : 'Digital Permits & Advance Reservations - FBSU'
+          }
+          tagIcon={Calendar}
+          title={isAr ? 'بوابة حجز المواقف' : 'Advance Parking Booking'}
+          highlightText={isAr ? 'والتصاريح المسبقة' : '& Digital Pass Wizard'}
+          description={
+            isAr
+              ? 'احجز موقفك الجامعي مسبقاً وفق جدولك الدراسي (ساعي، يومي، أو فصلي) مع إصدار تصريح رقمي فوري مشفر برمز QR معتمد على كافة بوابات الحرم الجامعي.'
+              : 'Reserve your parking space in advance according to your lecture schedule, with encrypted QR digital passes recognized across all campus gates.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'نوع التصريح الصادر' : 'Pass Format',
+              value: 'QR مشفر',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'باقات حجز مرنة' : 'Booking Plans',
+              value: 'ساعي / يومي / فصلي',
+              icon: Calendar,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'سداد فوري من المحفظة' : 'Wallet Settlement',
+              value: 'فوري',
+              icon: CreditCard,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'سياسة استرداد الرصيد' : 'Instant Refund Policy',
+              value: 'مضمونة',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'gate' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'نظام البوابات الذكية والحواجز الآلية - جامعة فهد بن سلطان'
+              : 'Smart Automated Gate System - FBSU'
+          }
+          tagIcon={Camera}
+          title={isAr ? 'بوابة التعرف الذكي' : 'Automated ALPR Plate'}
+          highlightText={isAr ? 'على لوحات المركبات (ALPR)' : 'Recognition Gate'}
+          description={
+            isAr
+              ? 'منظومة بوابات آلية تعتمد على كاميرات عالية السرعة وخوارزميات الذكاء الاصطناعي لقراءة اللوحات السعودية والتحقق من التصاريح وفتح الحواجز التلقائية في أقل من 300 مللي ثانية دون توقف.'
+              : 'High-speed automated barriers utilizing computer vision to read Saudi license plates, verify permits, and lift gates in sub-300ms.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'زمن المعالجة والاستجابة' : 'Processing Latency',
+              value: '< 300 ms',
+              icon: Zap,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'دقة الذكاء الاصطناعي' : 'OCR Vision Accuracy',
+              value: '99.4%',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'دعم اللوحات الرسمية' : 'Plate Recognition',
+              value: 'عربي وإنجليزي',
+              icon: Car,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'فتح الحواجز تلقائياً' : 'Automated Barrier',
+              value: 'دون توقف',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'share' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'مبادرة استثمار المواقف والتبادل المرن - جامعة فهد بن سلطان'
+              : 'Smart Parking Monetization & Flex Sharing - FBSU'
+          }
+          tagIcon={RefreshCw}
+          title={isAr ? 'برنامج التبادل الذكي' : 'AI Flex Share &'}
+          highlightText={isAr ? 'واستثمار المواقف الشاغرة' : 'Monetization Portal'}
+          description={
+            isAr
+              ? 'استثمر موقفك أثناء مغادرتك للجامعة خلال فترات البريك، وأتحه لزملائك القادمين للمحاضرات، واكسب رصيداً مالياً في محفظتك الجامعية عن كل ساعة يظل فيها موقفك متاحاً مع ضمان إخلائه قبل عودتك.'
+              : 'Monetize your bay during off-campus break hours by allocating it to arriving peers, earning wallet credits with guaranteed prompt vacancy upon your return.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'عائد نقدي في المحفظة' : 'Direct Wallet Reward',
+              value: '+17.25 ر.س',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'ضمان إخلاء الموقف' : 'Vacancy Guarantee',
+              value: 'قبل موعدك بـ 15 د',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'زيادة السعة الاستيعابية' : 'Capacity Elevation',
+              value: '+35%',
+              icon: Zap,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'تنبيهات وتذكير آلي' : 'Smart Evacuation Alerts',
+              value: 'نشط',
+              icon: Sparkles,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'tutoring' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'مبادرة التكافل الأكاديمي والتمويل الذاتي للطلاب'
+              : 'Academic Peer Mentorship & Self-Funding'
+          }
+          tagIcon={BookOpen}
+          title={isAr ? 'برنامج التدريس بالأقران' : 'Peer Tutoring &'}
+          highlightText={isAr ? 'ومكافآت التميز الأكاديمي' : 'Merit Rewards Program'}
+          description={
+            isAr
+              ? 'منظومة طلابية رائدة تتيح للطلاب المتفوقين تدريس زملائهم وتحقيق دخل فوري (70 ر.س/ساعة) يُحوّل مباشرة إلى حسابهم الجامعي لسداد الرسوم الدراسية، مما يرسخ التفوق العلمي ويوفر تمويلاً ذاتياً للطلاب.'
+              : 'A student-led framework where high achievers tutor peers at 70 SAR/hour, credited directly to university accounts to pay tuition fees.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'مكافأة ساعة التدريس' : 'Hourly Tutor Reward',
+              value: '70 ر.س',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'سداد فوري للرسوم' : 'Direct Tuition Offset',
+              value: '100%',
+              icon: CreditCard,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'تغطية المقررات التخصصية' : 'Course Disciplines',
+              value: 'CS & ENG',
+              icon: BookOpen,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'متوسط تقييم المعلمين' : 'Average Peer Rating',
+              value: '4.92 ★',
+              icon: Sparkles,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'office-hours' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'منظومة التواصل والتوجيه الأكاديمي المباشر'
+              : 'Direct Academic Advising & Leadership'
+          }
+          tagIcon={UserCheck}
+          title={isAr ? 'الساعات المكتبية والاستشارات' : 'Faculty Office Hours &'}
+          highlightText={isAr ? 'مع عمداء الكليات والأساتذة' : 'Deanery Mentorship'}
+          description={
+            isAr
+              ? 'احجز موعداً استشارياً مباشراً مع أعضاء هيئة التدريس والقيادات الأكاديمية لمناقشة خطتك الدراسية، مشاريع التخرج، أبحاث النشر، وفرص التدريب الصيفي لدى الشركاء في نيوم والمشاريع الكبرى.'
+              : 'Schedule one-on-one advising sessions with deans, department chairs, and faculty to discuss graduation projects and cooperative training.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'تأكيد وحجز فوري' : 'Instant Confirmation',
+              value: 'مباشر',
+              icon: UserCheck,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'إشعار لحظي للعمادة' : 'Deanery Notification',
+              value: 'آلي',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'جلسات حضورية وعن بعد' : 'Session Modalities',
+              value: 'حضوري / عن بعد',
+              icon: BookOpen,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'مشاريع التخرج والتدريب' : 'Capstone & Internships',
+              value: 'NEOM & Red Sea',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'rooms' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'مختبرات الأبحاث والذكاء الاصطناعي - جامعة فهد بن سلطان'
+              : 'Research Labs & AI Infrastructure - FBSU'
+          }
+          tagIcon={Cpu}
+          title={isAr ? 'المعامل والقاعات الذكية' : 'Smart Laboratories &'}
+          highlightText={isAr ? 'ومراكز الحوسبة الفائقة' : 'Supercomputing Hubs'}
+          description={
+            isAr
+              ? 'استكشف واحجز أحدث بيئات العمل الهندسية ومختبرات الحوسبة الفائقة المزودة بوحدات NVIDIA RTX 4090 وشبكات Cisco وغرف الدراسة المعزولة صوتياً لدعم مسيرتك البحثية والأكاديمية.'
+              : 'Explore and reserve top-tier engineering facilities, NVIDIA RTX 4090 GPU clusters, Cisco CyberOps sandboxes, and acoustically isolated study pods.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'مرفقاً بحثياً متقدماً' : 'Advanced Facilities',
+              value: '10',
+              icon: Cpu,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'محطات معالجة RTX 4090' : 'NVIDIA GPU Stations',
+              value: '20',
+              icon: Zap,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'راوترات وسويتشات Cisco' : 'Cisco Enterprise Racks',
+              value: 'Catalyst',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'عزل صوتي لكبائن التركيز' : 'Acoustic Soundproofing',
+              value: '42 dB',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'analytics' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'لوحة القيادة والتحليلات الذكية بالذكاء الاصطناعي'
+              : 'AI Campus Analytics & Predictive Intelligence'
+          }
+          tagIcon={BarChart3}
+          title={isAr ? 'التحليلات والمؤشرات الذكية' : 'Campus Intelligence &'}
+          highlightText={isAr ? 'لقيادة الحرم الجامعي' : 'Performance Analytics'}
+          description={
+            isAr
+              ? 'مؤشرات أداء لحظية تعتمد على تقنيات الذكاء الاصطناعي وإنترنت الأشياء لمتابعة كفاءة إشغال المواقف، حركة بوابات ALPR، ونشاط المرافق الأكاديمية والتدريس.'
+              : 'Real-time performance metrics powered by AI & IoT to track bay occupancy, ALPR traffic throughput, and academic facility utilization.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'مستشعرات IoT متصلة' : 'Connected IoT Sensors',
+              value: '40 حساس',
+              icon: Cpu,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'معدل التبادل الذكي Flex' : 'Flex Sharing Rate',
+              value: '35%',
+              icon: Zap,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'زمن اتخاذ القرار' : 'Gate AI Decision Time',
+              value: '< 0.3 ث',
+              icon: ShieldCheck,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'دقة التنبؤ بالطلب' : 'Demand Forecasting',
+              value: '98.2%',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'wallet' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'منظومة الدفع الموحدة لجامعة فهد بن سلطان'
+              : 'FBSU Unified Campus Digital Wallet'
+          }
+          tagIcon={WalletIcon}
+          title={isAr ? 'المحفظة الرقمية الجامعية' : 'Campus Digital Wallet &'}
+          highlightText={isAr ? 'والمدفوعات الفورية' : 'Instant P2P Settlements'}
+          description={
+            isAr
+              ? 'محفظتك الرقمية المتكاملة لإدارة جميع العمليات المالية داخل الحرم الجامعي: شحن الرصيد، سداد المواقف، استقبال مكافآت التدريس، التحويل بين الزملاء، وسداد الرسوم الدراسية بأعلى درجات الأمان.'
+              : 'Your central digital wallet for all on-campus transactions: balance top-up, parking, tutoring payouts, peer transfers, and tuition settlements.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'تحويل فوري بين الطلاب' : 'Peer-to-Peer Transfers',
+              value: 'P2P فوري',
+              icon: Users,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'سجل محاسبي موثق' : 'Immutable Audit Ledger',
+              value: '100% موثق',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'وسائل شحن متعددة' : 'Top-Up Gateways',
+              value: 'مدى / فيزا / أبل باي',
+              icon: CreditCard,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'أمان مصرفي عالي' : 'Security Standards',
+              value: 'مشفر 256-bit',
+              icon: Zap,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
+      {activeTab === 'tuition' && (
+        <ServiceHeroBanner
+          isAr={isAr}
+          serviceTag={
+            isAr
+              ? 'منظومة السداد الأكاديمي المعتمدة - جامعة فهد بن سلطان'
+              : 'Official Academic Billing & Settlements - FBSU'
+          }
+          tagIcon={CreditCard}
+          title={isAr ? 'الرسوم الدراسية والفواتير' : 'Tuition Fees &'}
+          highlightText={isAr ? 'والإيصالات الرقمية المعتمدة' : 'Verified QR Receipts'}
+          description={
+            isAr
+              ? 'استعرض وسدد فواتيرك الأكاديمية مباشرة من رصيد محفظتك الجامعية أو عبر وسائل الدفع الرسمية، مع إصدار إيصالات إلكترونية معتمدة برمز QR تحقق فوري لعمادة القبول والتسجيل.'
+              : 'Review and pay university tuition invoices seamlessly from your digital wallet with official QR-verified electronic receipts.'
+          }
+          statChips={[
+            {
+              label: isAr ? 'سداد من عوائد التدريس' : 'Peer Tutoring Offset',
+              value: 'تلقائي',
+              icon: Award,
+              color: 'var(--fbsu-gold)',
+            },
+            {
+              label: isAr ? 'إيصالات رسمية بـ QR' : 'Cryptographic Receipts',
+              value: 'معتمدة',
+              icon: ShieldCheck,
+              color: 'var(--fbsu-primary)',
+            },
+            {
+              label: isAr ? 'خطط تقسيط مجدولة' : 'Flexible Installments',
+              value: 'ميسرة',
+              icon: CreditCard,
+              color: '#38c2b0',
+            },
+            {
+              label: isAr ? 'التحديث اللحظي للعمادة' : 'Registrar Sync',
+              value: 'فوري',
+              icon: Sparkles,
+              color: 'var(--fbsu-gold)',
+            },
+          ]}
+        />
+      )}
+
       <div
         className="container"
         style={{ marginTop: '2.5rem', minHeight: '60vh', paddingBottom: '3rem' }}
@@ -453,7 +876,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         {/* Category Subnav chips */}
         <CategorySubnav activeTab={activeTab} isAr={isAr} onTabChange={setActiveTab} />
 
-        {/* Tab 1: Live Map & Campus Showcase Hub */}
+        {/* Tab 1: Live Parking Map (Dedicated Parking Service Portal) */}
         {activeTab === 'map' && (
           <>
             <ParkingLotView
@@ -494,169 +917,190 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               lastUpdated={parkingLastUpdated}
             />
 
-            {/* Comprehensive University Showcase: Labs, Faculty Advising, Tutoring & Shuttles */}
-            <CampusShowcaseHub
-              isAr={isAr}
-              onNavigate={setActiveTab}
-              isAuthenticated={isAuthenticated}
-              walletBalance={currentUser.walletBalance}
-            />
+            {/* Dedicated Parking Explainer Sections */}
+            <ServiceExplainerSections service="parking" isAr={isAr} onNavigate={setActiveTab} />
           </>
         )}
 
-        {/* Tab 2: Booking Wizard */}
+        {/* Tab 2: Booking Wizard (Dedicated Booking Service Portal) */}
         {activeTab === 'booking' && (
-          <BookingWizardView
-            isAr={isAr}
-            currentUser={{
-              id: currentUser.id,
-              name: currentUser.name,
-              car: primaryCarModel,
-              plate: primaryPlate,
-              primarySpot: userAssignedBay,
-            }}
-            isAuthenticated={isAuthenticated}
-            onOpenGate={() => setActiveTab('gate')}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
-            onBookingSuccess={booking => {
-              handleRefreshAll();
-              setActiveToast({
-                title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
-                message: isAr
-                  ? 'تم تأكيد حجز موقف #' +
-                    booking.bayNumber +
-                    ' بنجاح، وخصم ' +
-                    Number(booking.totalAmount).toFixed(2) +
-                    ' ر.س من محفظتك.'
-                  : 'Bay #' +
-                    booking.bayNumber +
-                    ' booked. ' +
-                    Number(booking.totalAmount).toFixed(2) +
-                    ' SAR debited from wallet.',
-                type: 'success',
-              });
-            }}
-            onBookingCancelled={() => {
-              handleRefreshAll();
-              setActiveToast({
-                title: isAr ? 'تم إلغاء الحجز واسترداد الرصيد' : 'Booking Cancelled & Refunded',
-                message: isAr
-                  ? 'تم إلغاء الحجز وإعادة المبلغ كاملاً إلى محفظتك الجامعية.'
-                  : 'Booking cancelled and amount refunded to your wallet.',
-                type: 'info',
-              });
-            }}
-          />
+          <>
+            <BookingWizardView
+              isAr={isAr}
+              currentUser={{
+                id: currentUser.id,
+                name: currentUser.name,
+                car: primaryCarModel,
+                plate: primaryPlate,
+                primarySpot: userAssignedBay,
+              }}
+              isAuthenticated={isAuthenticated}
+              onOpenGate={() => setActiveTab('gate')}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+              onBookingSuccess={booking => {
+                handleRefreshAll();
+                setActiveToast({
+                  title: isAr ? 'تم الحجز بنجاح' : 'Booking Confirmed',
+                  message: isAr
+                    ? 'تم تأكيد حجز موقف #' +
+                      booking.bayNumber +
+                      ' بنجاح، وخصم ' +
+                      Number(booking.totalAmount).toFixed(2) +
+                      ' ر.س من محفظتك.'
+                    : 'Bay #' +
+                      booking.bayNumber +
+                      ' booked. ' +
+                      Number(booking.totalAmount).toFixed(2) +
+                      ' SAR debited from wallet.',
+                  type: 'success',
+                });
+              }}
+              onBookingCancelled={() => {
+                handleRefreshAll();
+                setActiveToast({
+                  title: isAr ? 'تم إلغاء الحجز واسترداد الرصيد' : 'Booking Cancelled & Refunded',
+                  message: isAr
+                    ? 'تم إلغاء الحجز وإعادة المبلغ كاملاً إلى محفظتك الجامعية.'
+                    : 'Booking cancelled and amount refunded to your wallet.',
+                  type: 'info',
+                });
+              }}
+            />
+            <ServiceExplainerSections service="booking" isAr={isAr} onNavigate={setActiveTab} />
+          </>
         )}
 
-        {/* Tab 4: Gate ALPR */}
-        {activeTab === 'gate' && <AlprGateView isAr={isAr} />}
+        {/* Tab 4: Gate ALPR (Dedicated Gate Service Portal) */}
+        {activeTab === 'gate' && (
+          <>
+            <AlprGateView isAr={isAr} />
+            <ServiceExplainerSections service="gate" isAr={isAr} onNavigate={setActiveTab} />
+          </>
+        )}
 
-        {/* Tab 5: Share Spot */}
+        {/* Tab 5: Share Spot (Dedicated Flex Share Service Portal) */}
         {activeTab === 'share' && (
-          <ShareSpotView
-            isAr={isAr}
-            currentUser={{
-              id: currentUser.id,
-              name: currentUser.name,
-              role: currentUser.role,
-              primarySpot: userAssignedBay,
-              walletBalance: currentUser.walletBalance,
-            }}
-            onShareConfirmed={handleShareConfirmed}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
-            onRefreshSpots={handleRefreshAll}
-          />
+          <>
+            <ShareSpotView
+              isAr={isAr}
+              currentUser={{
+                id: currentUser.id,
+                name: currentUser.name,
+                role: currentUser.role,
+                primarySpot: userAssignedBay,
+                walletBalance: currentUser.walletBalance,
+              }}
+              onShareConfirmed={handleShareConfirmed}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+              onRefreshSpots={handleRefreshAll}
+            />
+            <ServiceExplainerSections service="share" isAr={isAr} onNavigate={setActiveTab} />
+          </>
         )}
 
-        {/* Tab 6: Peer Tutoring */}
+        {/* Tab 6: Peer Tutoring (Dedicated Tutoring Service Portal) */}
         {activeTab === 'tutoring' && (
-          <TutoringView
-            sessions={tutoringSessions}
-            isAr={isAr}
-            isAuthenticated={isAuthenticated}
-            currentUser={{
-              id: currentUser.id,
-              name: currentUser.name,
-              role: currentUser.role,
-              walletBalance: currentUser.walletBalance,
-            }}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
-            onOpenTuition={() => setActiveTab('tuition')}
-            onBookSuccess={handleTutoringBooked}
-            onAddSession={handleAddTutoringSession}
-          />
+          <>
+            <TutoringView
+              sessions={tutoringSessions}
+              isAr={isAr}
+              isAuthenticated={isAuthenticated}
+              currentUser={{
+                id: currentUser.id,
+                name: currentUser.name,
+                role: currentUser.role,
+                walletBalance: currentUser.walletBalance,
+              }}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+              onOpenTuition={() => setActiveTab('tuition')}
+              onBookSuccess={handleTutoringBooked}
+              onAddSession={handleAddTutoringSession}
+            />
+            <ServiceExplainerSections service="tutoring" isAr={isAr} onNavigate={setActiveTab} />
+          </>
         )}
 
-        {/* Tab 7: Faculty Office Hours */}
+        {/* Tab 7: Faculty Office Hours (Dedicated Office Hours Service Portal) */}
         {activeTab === 'office-hours' && (
-          <OfficeHoursView
-            facultyList={facultyList}
-            isAr={isAr}
-            isAuthenticated={isAuthenticated}
-            currentUser={{
-              id: currentUser.id,
-              name: currentUser.name,
-            }}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
-            onBookSuccess={handleOfficeHoursSuccess}
-          />
+          <>
+            <OfficeHoursView
+              facultyList={facultyList}
+              isAr={isAr}
+              isAuthenticated={isAuthenticated}
+              currentUser={{
+                id: currentUser.id,
+                name: currentUser.name,
+              }}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+              onBookSuccess={handleOfficeHoursSuccess}
+            />
+            <ServiceExplainerSections service="office-hours" isAr={isAr} onNavigate={setActiveTab} />
+          </>
         )}
 
-        {/* Tab 8: Study Rooms & Labs */}
+        {/* Tab 8: Study Rooms & Labs (Dedicated Smart Labs & Pods Service Portal) */}
         {activeTab === 'rooms' && (
-          <StudyRoomsView
-            rooms={studyRooms}
-            isAr={isAr}
-            isAuthenticated={isAuthenticated}
-            currentUser={{
-              id: currentUser.id,
-              name: currentUser.name,
-            }}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
-            onRoomBooked={(_roomId, _timeFrom, _timeTo, _purpose, updated) => {
-              if (updated) {
+          <>
+            <StudyRoomsView
+              rooms={studyRooms}
+              isAr={isAr}
+              isAuthenticated={isAuthenticated}
+              currentUser={{
+                id: currentUser.id,
+                name: currentUser.name,
+              }}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+              onRoomBooked={(_roomId, _timeFrom, _timeTo, _purpose, updated) => {
+                if (updated) {
+                  setStudyRooms(prev => prev.map(r => (r.id === updated.id ? updated : r)));
+                } else {
+                  fetchStudyRooms();
+                }
+                setActiveToast({
+                  title: isAr ? 'تم حجز القاعة' : 'Room Reserved',
+                  message: isAr
+                    ? 'تم تفعيل حجز القاعة وبدء المؤقت التنازلي بنجاح'
+                    : 'Room booking active with countdown',
+                  type: 'success',
+                });
+              }}
+              onRoomUpdated={updated => {
                 setStudyRooms(prev => prev.map(r => (r.id === updated.id ? updated : r)));
-              } else {
-                fetchStudyRooms();
-              }
-              setActiveToast({
-                title: isAr ? 'تم حجز القاعة' : 'Room Reserved',
-                message: isAr
-                  ? 'تم تفعيل حجز القاعة وبدء المؤقت التنازلي بنجاح'
-                  : 'Room booking active with countdown',
-                type: 'success',
-              });
-            }}
-            onRoomUpdated={updated => {
-              setStudyRooms(prev => prev.map(r => (r.id === updated.id ? updated : r)));
-            }}
-          />
+              }}
+            />
+            <ServiceExplainerSections service="rooms" isAr={isAr} onNavigate={setActiveTab} />
+          </>
         )}
 
-        {/* Tab 9: Analytics */}
+        {/* Tab 9: Analytics (Dedicated Analytics Portal) */}
         {activeTab === 'analytics' && <AnalyticsView isAr={isAr} />}
 
-        {/* Tab 10: Wallet Page */}
+        {/* Tab 10: Wallet Page (Dedicated Wallet Portal) */}
         {activeTab === 'wallet' && (
-          <div style={{ marginTop: '1rem' }}>
-            <WalletPage
-              onBalanceUpdate={b => setLiveBalance(b)}
-              onNavigateToTuition={() => setActiveTab('tuition')}
-              onOpenAuth={() => setIsAuthModalOpen(true)}
-            />
-          </div>
+          <>
+            <div style={{ marginTop: '1rem' }}>
+              <WalletPage
+                onBalanceUpdate={b => setLiveBalance(b)}
+                onNavigateToTuition={() => setActiveTab('tuition')}
+                onOpenAuth={() => setIsAuthModalOpen(true)}
+              />
+            </div>
+            <ServiceExplainerSections service="wallet" isAr={isAr} onNavigate={setActiveTab} />
+          </>
         )}
 
-        {/* Tab 11: Tuition Page */}
+        {/* Tab 11: Tuition Page (Dedicated Tuition Portal) */}
         {activeTab === 'tuition' && (
-          <div style={{ marginTop: '1rem' }}>
-            <TuitionPage
-              onBalanceUpdate={b => setLiveBalance(b)}
-              onOpenTopUp={() => setActiveTab('wallet')}
-              onOpenAuth={() => setIsAuthModalOpen(true)}
-            />
-          </div>
+          <>
+            <div style={{ marginTop: '1rem' }}>
+              <TuitionPage
+                onBalanceUpdate={b => setLiveBalance(b)}
+                onOpenTopUp={() => setActiveTab('wallet')}
+                onOpenAuth={() => setIsAuthModalOpen(true)}
+              />
+            </div>
+            <ServiceExplainerSections service="tuition" isAr={isAr} onNavigate={setActiveTab} />
+          </>
         )}
 
         {/* Tab 12: Admin Panel */}
