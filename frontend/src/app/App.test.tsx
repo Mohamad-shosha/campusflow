@@ -3,6 +3,47 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { App } from './App';
 import { tokenStorage } from '../shared/http/tokenStorage';
 
+vi.mock('../features/parking/api/parkingApi', () => ({
+  parkingApi: {
+    getSpots: vi.fn().mockResolvedValue([]),
+    getSummary: vi.fn().mockResolvedValue(null),
+  },
+}));
+
+vi.mock('../features/wallet/api/walletApi', () => ({
+  walletApi: {
+    getWallet: vi.fn().mockResolvedValue({ balance: 0 }),
+    getLedger: vi.fn().mockResolvedValue([]),
+  },
+}));
+
+vi.mock('../features/notifications/api/notificationsApi', () => ({
+  notificationsApi: {
+    getMyNotifications: vi.fn().mockResolvedValue([]),
+    getUnreadCount: vi.fn().mockResolvedValue({ unreadCount: 0 }),
+    markAsRead: vi.fn().mockResolvedValue({}),
+    markAllAsRead: vi.fn().mockResolvedValue({}),
+  },
+}));
+
+vi.mock('../features/campus/api/tutoringApi', () => ({
+  tutoringApi: {
+    getSessions: vi.fn().mockResolvedValue([]),
+  },
+}));
+
+vi.mock('../features/campus/api/officeHoursApi', () => ({
+  officeHoursApi: {
+    getFaculty: vi.fn().mockResolvedValue([]),
+  },
+}));
+
+vi.mock('../features/campus/api/roomsApi', () => ({
+  roomsApi: {
+    getRooms: vi.fn().mockResolvedValue([]),
+  },
+}));
+
 describe('App Full Integration & Feature Navigation Tests', () => {
   beforeEach(() => {
     localStorage.clear();
