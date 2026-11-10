@@ -25,7 +25,7 @@ export interface TutoringSessionDto {
   location: string;
   maxCapacity: number;
   enrolledCount: number;
-  rating: number;
+  rating: number | null;
   reviewsCount: number;
   status: 'OPEN' | 'BOOKED' | 'COMPLETED' | 'CANCELLED';
   enrolledStudents: string[];
@@ -90,7 +90,7 @@ export function mapTutoringDtoToUi(dto: TutoringSessionDto): TutoringSession {
     dateTime: dto.scheduleText,
     location: dto.location,
     category: dto.category,
-    rating: Number(dto.rating),
+    rating: dto.rating != null ? Number(dto.rating) : null,
     reviewsCount: dto.reviewsCount,
     status: mappedStatus,
     enrolledStudents: dto.enrolledStudents ?? [],
@@ -132,5 +132,16 @@ export const tutoringApi = {
   getMyEnrollments: async (): Promise<TutoringEnrollmentDto[]> => {
     const response = await apiClient.get<TutoringEnrollmentDto[]>('/tutoring/enrollments/my');
     return response.data;
+  },
+
+  submitReview: async (
+    idOrCode: string,
+    payload: { rating: number; comment?: string | undefined }
+  ): Promise<TutoringSession> => {
+    const response = await apiClient.post<TutoringSessionDto>(
+      `/tutoring/sessions/${encodeURIComponent(idOrCode)}/reviews`,
+      payload
+    );
+    return mapTutoringDtoToUi(response.data);
   },
 };

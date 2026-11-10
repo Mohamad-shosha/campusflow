@@ -19,6 +19,13 @@ export interface ActiveRoomBookingDto {
   status: string;
 }
 
+export interface RoomScheduleSlotDto {
+  time: string;
+  timeEn?: string;
+  status: 'booked' | 'available';
+  label?: string | null;
+}
+
 export interface StudyRoomDto {
   id: string;
   roomCode: string;
@@ -36,6 +43,10 @@ export interface StudyRoomDto {
   availableFromAr: string;
   availableFromEn: string;
   activeBooking?: ActiveRoomBookingDto | null;
+  utilizationPercent?: number | null;
+  scheduleSlots?: RoomScheduleSlotDto[];
+  requirementNoteAr?: string | null;
+  requirementNoteEn?: string | null;
 }
 
 export interface BookRoomPayload {
@@ -95,6 +106,16 @@ export function mapRoomDtoToUi(dto: StudyRoomDto): StudyRoom {
     specsEn: dto.specsEn ?? [],
     availableFrom: dto.availableFromAr,
     availableFromEn: dto.availableFromEn,
+    utilizationPercent:
+      typeof dto.utilizationPercent === 'number' ? dto.utilizationPercent : undefined,
+    scheduleSlots: dto.scheduleSlots?.map(slot => ({
+      time: slot.time,
+      timeEn: slot.timeEn,
+      status: slot.status,
+      label: slot.label ?? undefined,
+    })),
+    requirementNote: dto.requirementNoteAr ?? undefined,
+    requirementNoteEn: dto.requirementNoteEn ?? undefined,
   };
 }
 

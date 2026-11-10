@@ -233,4 +233,42 @@ class RoomsControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         int loserStatus = (status1 == 201) ? status2 : status1;
         assertThat(loserStatus).isIn(400, 409);
     }
+
+    @Test
+    @DisplayName("P6-08: Rooms compute real daily utilizationPercent, scheduleSlots, and bilingual requirement notes")
+    void shouldComputeRealScheduleSlotsUtilizationAndRequirements() throws Exception {
+        String studentToken = registerStudentAndGetToken("889900");
+
+        // 1. LAB-205 exposes persisted V17/seeder bilingual safety requirement notes and schedule slots
+        mockMvc.perform(get("/api/v1/rooms/LAB-205"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.requirementNoteAr").isNotEmpty())
+                .andExpect(jsonPath("$.requirementNoteEn").isNotEmpty())
+                .andExpect(jsonPath("$.utilizationPercent").isNumber())
+                .andExpect(jsonPath("$.scheduleSlots.length()", greaterThanOrEqualTo(6)));
+
+        // 2. Booking LAB-101 updates today's utilizationPercent (> 0) and marks a schedule slot booked
+        Instant start = Instant.now().plus(2, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.SECONDS);
+        Instant end = start.plus(120, ChronoUnit.MINUTES);
+        BookRoomRequest req = new BookRoomRequest(start, end, "14:00", "16:00", "AI benchmark run", List.of("Student Team"));
+
+        MvcResult bookedRes = mockMvc.perform(post("/api/v1/rooms/LAB-101/book")
+                        .header("Authorization", "Bearer " + studentToken)
+                        .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                        .content(Objects.requireNonNull(objectMapper.writeValueAsString(req))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.utilizationPercent", greaterThanOrEqualTo(10)))
+                .andExpect(jsonPath("$.scheduleSlots[?(@.status=='booked')].label", hasItem("AI benchmark run")))
+                .andReturn();
+
+        String bookingId = objectMapper.readTree(bookedRes.getResponse().getContentAsString())
+                .path("activeBooking").path("bookingId").asText();
+
+        // 3. Releasing booking frees the schedule slot and resets utilization
+        mockMvc.perform(post("/api/v1/rooms/bookings/" + bookingId + "/release")
+                        .header("Authorization", "Bearer " + studentToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.utilizationPercent").value(0))
+                .andExpect(jsonPath("$.scheduleSlots[?(@.status=='booked')].label").isEmpty());
+    }
 }

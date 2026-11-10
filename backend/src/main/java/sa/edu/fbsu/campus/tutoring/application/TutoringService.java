@@ -15,13 +15,17 @@ import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.infra.UniversityRepository;
 import sa.edu.fbsu.campus.tutoring.domain.TutoringEnrollment;
 import sa.edu.fbsu.campus.tutoring.domain.TutoringEnrollmentStatus;
+import sa.edu.fbsu.campus.tutoring.domain.TutoringReview;
 import sa.edu.fbsu.campus.tutoring.domain.TutoringSession;
 import sa.edu.fbsu.campus.tutoring.dto.CreateTutoringSessionRequest;
+import sa.edu.fbsu.campus.tutoring.dto.SubmitTutoringReviewRequest;
 import sa.edu.fbsu.campus.tutoring.dto.TutoringSessionResponse;
 import sa.edu.fbsu.campus.tutoring.infra.TutoringEnrollmentRepository;
+import sa.edu.fbsu.campus.tutoring.infra.TutoringReviewRepository;
 import sa.edu.fbsu.campus.tutoring.infra.TutoringSessionRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,17 +38,20 @@ public class TutoringService {
 
     private final TutoringSessionRepository sessionRepository;
     private final TutoringEnrollmentRepository enrollmentRepository;
+    private final TutoringReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
 
     public TutoringService(
             TutoringSessionRepository sessionRepository,
             TutoringEnrollmentRepository enrollmentRepository,
+            TutoringReviewRepository reviewRepository,
             UserRepository userRepository,
             UniversityRepository universityRepository
     ) {
         this.sessionRepository = sessionRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.universityRepository = universityRepository;
     }
@@ -68,19 +75,99 @@ public class TutoringService {
                 .findBySessionIdsAndStatusWithStudent(sessionIds, TutoringEnrollmentStatus.CONFIRMED)
                 .stream()
                 .collect(Collectors.groupingBy(e -> e.getSession().getId()));
+        Map<UUID, RatingAggregate> ratingMap = loadRatingStats(sessionIds);
 
         return sessions.stream()
-                .map(s -> TutoringSessionResponse.fromEntity(s, enrollmentsBySession.getOrDefault(s.getId(), List.of())))
+                .map(s -> {
+                    RatingAggregate agg = ratingMap.get(s.getId());
+                    return TutoringSessionResponse.fromEntity(
+                            s,
+                            enrollmentsBySession.getOrDefault(s.getId(), List.of()),
+                            agg != null ? agg.rating() : null,
+                            agg != null ? agg.count() : 0
+                    );
+                })
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public TutoringSessionResponse getSession(String idOrCode) {
         TutoringSession session = findSessionByIdOrCode(idOrCode);
+        return buildSessionResponse(session);
+    }
+
+    @Transactional
+    public TutoringSessionResponse submitReview(
+            UUID studentUserId,
+            String idOrCode,
+            SubmitTutoringReviewRequest request
+    ) {
+        Objects.requireNonNull(studentUserId, "Authenticated user ID cannot be null");
+        Objects.requireNonNull(request, "SubmitTutoringReviewRequest cannot be null");
+
+        User student = userRepository.findById(studentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student user not found: " + studentUserId));
+
+        TutoringSession session = findSessionByIdOrCode(idOrCode);
+
+        if (session.getTutor().getId().equals(studentUserId)) {
+            throw new IllegalArgumentException("Tutors cannot submit reviews for their own tutoring sessions.");
+        }
+
+        boolean isEnrolled = enrollmentRepository.existsBySessionIdAndStudentIdAndStatus(
+                session.getId(), studentUserId, TutoringEnrollmentStatus.CONFIRMED);
+        if (!isEnrolled) {
+            throw new AccessDeniedException("Only confirmed enrolled students may rate and review this tutoring session.");
+        }
+
+        if (reviewRepository.existsBySessionIdAndStudentId(session.getId(), studentUserId)) {
+            throw new IllegalStateException("You have already submitted a review for session " + session.getSessionCode() + ".");
+        }
+
+        reviewRepository.saveAndFlush(new TutoringReview(
+                session.getUniversityId(),
+                session,
+                student,
+                request.rating(),
+                request.comment()
+        ));
+
+        log.info("Recorded {} star review for tutoring session {} by student {}",
+                request.rating(), session.getSessionCode(), student.getUniversityNumber());
+
+        return buildSessionResponse(session);
+    }
+
+    private TutoringSessionResponse buildSessionResponse(TutoringSession session) {
         List<TutoringEnrollment> enrollments = enrollmentRepository
                 .findBySessionIdAndStatusWithStudent(session.getId(), TutoringEnrollmentStatus.CONFIRMED);
-        return TutoringSessionResponse.fromEntity(session, enrollments);
+        RatingAggregate agg = loadRatingStats(List.of(session.getId())).get(session.getId());
+        return TutoringSessionResponse.fromEntity(
+                session,
+                enrollments,
+                agg != null ? agg.rating() : null,
+                agg != null ? agg.count() : 0
+        );
     }
+
+    private Map<UUID, RatingAggregate> loadRatingStats(List<UUID> sessionIds) {
+        if (sessionIds == null || sessionIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<UUID, RatingAggregate> map = new HashMap<>();
+        for (Object[] row : reviewRepository.findRatingStatsBySessionIds(sessionIds)) {
+            UUID sessionId = (UUID) row[0];
+            double avgRaw = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
+            int count = row[2] != null ? ((Number) row[2]).intValue() : 0;
+            if (count > 0) {
+                BigDecimal avg = BigDecimal.valueOf(avgRaw).setScale(2, RoundingMode.HALF_UP);
+                map.put(sessionId, new RatingAggregate(avg, count));
+            }
+        }
+        return map;
+    }
+
+    private record RatingAggregate(BigDecimal rating, int count) {}
 
     @Transactional
     public TutoringSessionResponse createSession(UUID userId, CreateTutoringSessionRequest request) {

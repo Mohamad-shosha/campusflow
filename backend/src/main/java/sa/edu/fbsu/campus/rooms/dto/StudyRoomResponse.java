@@ -22,9 +22,22 @@ public record StudyRoomResponse(
         List<String> specsEn,
         String availableFromAr,
         String availableFromEn,
-        ActiveRoomBookingDto activeBooking
+        ActiveRoomBookingDto activeBooking,
+        Integer utilizationPercent,
+        List<RoomScheduleSlotDto> scheduleSlots,
+        String requirementNoteAr,
+        String requirementNoteEn
 ) {
     public static StudyRoomResponse fromEntity(StudyRoom room, RoomBooking currentBooking) {
+        return fromEntity(room, currentBooking, null, List.of());
+    }
+
+    public static StudyRoomResponse fromEntity(
+            StudyRoom room,
+            RoomBooking currentBooking,
+            Integer utilizationPercent,
+            List<RoomScheduleSlotDto> scheduleSlots
+    ) {
         return new StudyRoomResponse(
                 room.getId(),
                 room.getRoomCode(),
@@ -41,7 +54,11 @@ public record StudyRoomResponse(
                 room.getSpecsEnList(),
                 room.getAvailableFromAr(),
                 room.getAvailableFromEn(),
-                currentBooking != null ? ActiveRoomBookingDto.fromEntity(currentBooking) : null
+                currentBooking != null ? ActiveRoomBookingDto.fromEntity(currentBooking) : null,
+                utilizationPercent,
+                scheduleSlots != null ? scheduleSlots : List.of(),
+                room.getRequirementNoteAr(),
+                room.getRequirementNoteEn()
         );
     }
 }

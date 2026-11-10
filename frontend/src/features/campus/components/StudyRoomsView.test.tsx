@@ -192,4 +192,33 @@ describe('StudyRoomsView (P6-07)', () => {
       expect(onRoomUpdated).toHaveBeenCalledWith(releasedRoom);
     });
   });
+
+  it('renders live utilization bar, requirement note, and daily schedule slots when provided', () => {
+    const lab205: StudyRoom = {
+      ...INITIAL_STUDY_ROOMS[2]!,
+      id: 'LAB-205',
+      utilizationPercent: 28,
+      requirementNote: 'يتطلب بطاقة المعمل الهندسي',
+      requirementNoteEn: 'Requires Engineering Lab badge',
+      scheduleSlots: [
+        { time: '08:00 - 10:00', timeEn: '08:00 - 10:00', status: 'booked', label: 'Logic Lab' },
+        { time: '10:00 - 12:00', timeEn: '10:00 - 12:00', status: 'available' },
+      ],
+    };
+
+    render(
+      <StudyRoomsView
+        rooms={[lab205]}
+        isAr={true}
+        isAuthenticated={true}
+        currentUser={{ id: '20220088', name: 'راكان المطيري' }}
+      />
+    );
+
+    expect(screen.getByText('28%')).toBeInTheDocument();
+    expect(screen.getByText('يتطلب بطاقة المعمل الهندسي')).toBeInTheDocument();
+    expect(screen.getByTestId('room-schedule-LAB-205')).toBeInTheDocument();
+    expect(screen.getByText('08:00 - 10:00')).toBeInTheDocument();
+    expect(screen.getByText('10:00 - 12:00')).toBeInTheDocument();
+  });
 });

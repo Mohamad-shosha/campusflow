@@ -13,6 +13,7 @@ import sa.edu.fbsu.campus.tutoring.application.TutoringBookingService;
 import sa.edu.fbsu.campus.tutoring.application.TutoringService;
 import sa.edu.fbsu.campus.tutoring.dto.BookTutoringRequest;
 import sa.edu.fbsu.campus.tutoring.dto.CreateTutoringSessionRequest;
+import sa.edu.fbsu.campus.tutoring.dto.SubmitTutoringReviewRequest;
 import sa.edu.fbsu.campus.tutoring.dto.TutoringEnrollmentResponse;
 import sa.edu.fbsu.campus.tutoring.dto.TutoringSessionResponse;
 
@@ -80,5 +81,17 @@ public class TutoringController {
             @AuthenticationPrincipal UserPrincipal principal
     ) {
         return ResponseEntity.ok(bookingService.getMyEnrollments(principal.getUserId()));
+    }
+
+    @PostMapping("/sessions/{idOrCode}/reviews")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Submit a verified 1-5 star peer review for an enrolled tutoring session")
+    public ResponseEntity<TutoringSessionResponse> submitReview(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable String idOrCode,
+            @Valid @RequestBody SubmitTutoringReviewRequest request
+    ) {
+        TutoringSessionResponse updated = tutoringService.submitReview(principal.getUserId(), idOrCode, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updated);
     }
 }

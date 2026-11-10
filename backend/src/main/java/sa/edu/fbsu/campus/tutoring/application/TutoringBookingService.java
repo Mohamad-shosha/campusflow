@@ -17,11 +17,14 @@ import sa.edu.fbsu.campus.tutoring.dto.BookTutoringRequest;
 import sa.edu.fbsu.campus.tutoring.dto.TutoringEnrollmentResponse;
 import sa.edu.fbsu.campus.tutoring.dto.TutoringSessionResponse;
 import sa.edu.fbsu.campus.tutoring.infra.TutoringEnrollmentRepository;
+import sa.edu.fbsu.campus.tutoring.infra.TutoringReviewRepository;
 import sa.edu.fbsu.campus.tutoring.infra.TutoringSessionRepository;
 import sa.edu.fbsu.campus.wallet.application.WalletService;
 import sa.edu.fbsu.campus.wallet.dto.TransferRequest;
 import sa.edu.fbsu.campus.wallet.dto.WalletResponse;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -33,6 +36,7 @@ public class TutoringBookingService {
 
     private final TutoringSessionRepository sessionRepository;
     private final TutoringEnrollmentRepository enrollmentRepository;
+    private final TutoringReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final WalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
@@ -40,12 +44,14 @@ public class TutoringBookingService {
     public TutoringBookingService(
             TutoringSessionRepository sessionRepository,
             TutoringEnrollmentRepository enrollmentRepository,
+            TutoringReviewRepository reviewRepository,
             UserRepository userRepository,
             WalletService walletService,
             ApplicationEventPublisher eventPublisher
     ) {
         this.sessionRepository = sessionRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.walletService = walletService;
         this.eventPublisher = eventPublisher;
@@ -79,7 +85,7 @@ public class TutoringBookingService {
                 return TutoringEnrollmentResponse.fromEntity(
                         existing,
                         wallet.balance(),
-                        TutoringSessionResponse.fromEntity(session, activeEnrollments)
+                        toRatedSessionResponse(session, activeEnrollments)
                 );
             }
         }
@@ -162,7 +168,7 @@ public class TutoringBookingService {
         return TutoringEnrollmentResponse.fromEntity(
                 enrollment,
                 updatedStudentWallet.balance(),
-                TutoringSessionResponse.fromEntity(session, updatedEnrollments)
+                toRatedSessionResponse(session, updatedEnrollments)
         );
     }
 
@@ -176,10 +182,27 @@ public class TutoringBookingService {
                     return TutoringEnrollmentResponse.fromEntity(
                             e,
                             wallet.balance(),
-                            TutoringSessionResponse.fromEntity(e.getSession(), enrollments)
+                            toRatedSessionResponse(e.getSession(), enrollments)
                     );
                 })
                 .toList();
+    }
+
+    private TutoringSessionResponse toRatedSessionResponse(
+            TutoringSession session,
+            List<TutoringEnrollment> enrollments
+    ) {
+        List<Object[]> stats = reviewRepository.findRatingStatsBySessionIds(List.of(session.getId()));
+        if (!stats.isEmpty()) {
+            Object[] row = stats.getFirst();
+            int count = row[2] != null ? ((Number) row[2]).intValue() : 0;
+            if (count > 0 && row[1] != null) {
+                BigDecimal avg = BigDecimal.valueOf(((Number) row[1]).doubleValue())
+                        .setScale(2, RoundingMode.HALF_UP);
+                return TutoringSessionResponse.fromEntity(session, enrollments, avg, count);
+            }
+        }
+        return TutoringSessionResponse.fromEntity(session, enrollments, null, 0);
     }
 
     private TutoringSession lockSessionByIdOrCode(String idOrCode) {

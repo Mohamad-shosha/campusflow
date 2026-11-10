@@ -409,7 +409,33 @@ public class RoomsDataSeeder implements CommandLineRunner {
             ));
         }
 
+        ensureRequirementNote(
+                "LAB-205",
+                "يتطلب بطاقة المعمل الهندسي والالتزام بإجراءات السلامة الكهربائية",
+                "Requires Engineering Lab ID badge and ESD safety compliance"
+        );
+        ensureRequirementNote(
+                "LAB-103",
+                "شبكة معزولة: يُمنع توصيل الأجهزة الشخصية بدون تصريح قسم الشبكات",
+                "Isolated network: personal devices require IT NOC clearance"
+        );
+        ensureRequirementNote(
+                "LAB-104",
+                "يتطلب إشرافاً فنياً عند تشغيل محطات اللحام والطابعات ثلاثية الأبعاد",
+                "Technician supervision required for soldering stations and 3D printers"
+        );
+
         log.info("--- [RoomsDataSeeder] Initialized collaborative study rooms and lab bookings ---");
+    }
+
+    private void ensureRequirementNote(String roomCode, String noteAr, String noteEn) {
+        roomRepository.findByRoomCodeForUpdate(roomCode).ifPresent(room -> {
+            if (room.getRequirementNoteAr() == null || room.getRequirementNoteAr().isBlank()) {
+                room.setRequirementNoteAr(noteAr);
+                room.setRequirementNoteEn(noteEn);
+                roomRepository.save(room);
+            }
+        });
     }
 }
 

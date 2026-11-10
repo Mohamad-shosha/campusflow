@@ -40,6 +40,15 @@ public record TutoringSessionResponse(
         Instant createdAt
 ) {
     public static TutoringSessionResponse fromEntity(TutoringSession s, List<TutoringEnrollment> enrollments) {
+        return fromEntity(s, enrollments, null, 0);
+    }
+
+    public static TutoringSessionResponse fromEntity(
+            TutoringSession s,
+            List<TutoringEnrollment> enrollments,
+            BigDecimal rating,
+            int reviewsCount
+    ) {
         List<String> names = enrollments.stream()
                 .map(e -> e.getStudent().getFullNameAr())
                 .toList();
@@ -71,10 +80,8 @@ public record TutoringSessionResponse(
                 s.getLocation(),
                 s.getMaxCapacity(),
                 enrollments.size(),
-                // No review system exists yet: the stored rating/reviews_count columns only hold
-                // schema defaults (5.00 / 1) or seed values, so they are not exposed as real ratings.
-                null,
-                0,
+                reviewsCount > 0 ? rating : null,
+                reviewsCount,
                 s.getStatus().name(),
                 names,
                 numbers,

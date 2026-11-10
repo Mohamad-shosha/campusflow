@@ -10,8 +10,11 @@ import {
   Users,
   Search,
   RotateCw,
+  Star,
+  X,
 } from 'lucide-react';
 import type { TutoringSession } from '../data/campusData';
+import { tutoringApi } from '../api/tutoringApi';
 import { BookTutoringModal } from './BookTutoringModal';
 import { CreateTutoringModal } from './CreateTutoringModal';
 import { soundFX } from '../../../shared/utils/sound';
@@ -43,6 +46,7 @@ export interface TutoringViewProps {
   onOpenTuition: () => void;
   onBookSuccess: (session: TutoringSession, updatedBalance?: number) => void;
   onAddSession: (session: TutoringSession) => void;
+  onSessionUpdated?: ((session: TutoringSession) => void) | undefined;
 }
 
 export const TutoringView: FC<TutoringViewProps> = ({
@@ -56,11 +60,18 @@ export const TutoringView: FC<TutoringViewProps> = ({
   onOpenTuition,
   onBookSuccess,
   onAddSession,
+  onSessionUpdated,
 }) => {
   const [filter, setFilter] = useState<string>('all');
   const [selectedSession, setSelectedSession] = useState<TutoringSession | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sessionOverrides, setSessionOverrides] = useState<Record<string, TutoringSession>>({});
+  const [reviewModalSession, setReviewModalSession] = useState<TutoringSession | null>(null);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState<string>('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
 
   // Filter pills are derived from the categories present in the loaded sessions
   const categories = useMemo(
@@ -266,7 +277,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
 
       {/* Tutoring Cards Grid (Pixel-Perfect Alignment with Attachment Image 1) */}
       <div className="tutoring-grid">
-        {filteredSessions.map(s => {
+        {filteredSessions.map(baseSession => {
+          const s = sessionOverrides[baseSession.id] ?? baseSession;
           const isEnrolled =
             isAuthenticated &&
             ((s.enrolledStudentNumbers && s.enrolledStudentNumbers.includes(currentUser.id)) ||
@@ -275,16 +287,40 @@ export const TutoringView: FC<TutoringViewProps> = ({
           const displayTutorName = isAr ? s.tutorName : s.tutorNameEn || s.tutorName;
           const displayTutorRole = isAr ? s.tutorRole : s.tutorRoleEn || s.tutorRole;
           const avatarInitial = displayTutorName.charAt(0);
+          const hasRealRating = s.reviewsCount > 0 && s.rating !== null;
 
           return (
             <div key={s.id} className="tutoring-card" data-testid={`tutoring-card-${s.id}`}>
               <div>
                 {/* Top Bar: Rate on Left, Course Code on Right in RTL */}
                 <div className="tutoring-top-bar">
-                  <span className="course-code-badge">
-                    <GraduationCap size={13} color="var(--fbsu-primary)" />
-                    <span>{s.courseCode}</span>
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                    <span className="course-code-badge">
+                      <GraduationCap size={13} color="var(--fbsu-primary)" />
+                      <span>{s.courseCode}</span>
+                    </span>
+                    {hasRealRating && s.rating !== null && (
+                      <span
+                        data-testid={`tutoring-rating-${s.id}`}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                          padding: '0.2rem 0.5rem',
+                          borderRadius: '999px',
+                          background: 'rgba(215, 162, 55, 0.16)',
+                          color: 'var(--gold-text, #fbbf24)',
+                          fontSize: '0.76rem',
+                          fontWeight: 800,
+                        }}
+                      >
+                        <Star size={12} fill="currentColor" />
+                        <span>
+                          {s.rating.toFixed(1)} ({s.reviewsCount})
+                        </span>
+                      </span>
+                    )}
+                  </div>
 
                   <div className="tutor-rate-badge">
                     <span className="tutor-rate-num">
@@ -380,45 +416,212 @@ export const TutoringView: FC<TutoringViewProps> = ({
                 </div>
               </div>
 
-              {/* Golden Action Button */}
-              <button
-                className="btn-gold book-tutoring-btn"
-                onClick={() => {
-                  soundFX.playClick();
-                  setSelectedSession(s);
-                }}
-                disabled={s.status === 'booked' && !isEnrolled}
-                style={{
-                  width: '100%',
-                  justifyContent: 'center',
-                  padding: '0.85rem',
-                  fontSize: '0.9rem',
-                }}
-                type="button"
-              >
-                <Wallet size={16} color="#0b1a17" />
-                <span>
-                  {isEnrolled
-                    ? isAr
-                      ? 'مسجل بالفعل في الجلسة ✓'
-                      : 'Enrolled ✓'
-                    : isOwn
+              {/* Golden Action Button + Enrolled Student Review Action */}
+              <div style={{ display: 'grid', gap: '0.5rem' }}>
+                <button
+                  className="btn-gold book-tutoring-btn"
+                  onClick={() => {
+                    soundFX.playClick();
+                    setSelectedSession(s);
+                  }}
+                  disabled={s.status === 'booked' && !isEnrolled}
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '0.85rem',
+                    fontSize: '0.9rem',
+                  }}
+                  type="button"
+                >
+                  <Wallet size={16} color="#0b1a17" />
+                  <span>
+                    {isEnrolled
                       ? isAr
-                        ? 'جلستك المنشورة'
-                        : 'Your Published Session'
-                      : s.status === 'booked'
+                        ? 'مسجل بالفعل في الجلسة ✓'
+                        : 'Enrolled ✓'
+                      : isOwn
                         ? isAr
-                          ? 'اكتمل العدد'
-                          : 'Session Full'
-                        : isAr
-                          ? `حجز الجلسة وسداد ${s.totalPrice} ر.س`
-                          : `Book & Settle ${s.totalPrice} SAR`}
-                </span>
-              </button>
+                          ? 'جلستك المنشورة'
+                          : 'Your Published Session'
+                        : s.status === 'booked'
+                          ? isAr
+                            ? 'اكتمل العدد'
+                            : 'Session Full'
+                          : isAr
+                            ? `حجز الجلسة وسداد ${s.totalPrice} ر.س`
+                            : `Book & Settle ${s.totalPrice} SAR`}
+                  </span>
+                </button>
+
+                {isEnrolled && !isOwn && (
+                  <button
+                    type="button"
+                    className="btn-outline"
+                    data-testid={`rate-tutoring-btn-${s.id}`}
+                    style={{
+                      width: '100%',
+                      justifyContent: 'center',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      fontSize: '0.82rem',
+                      padding: '0.5rem',
+                    }}
+                    onClick={() => {
+                      soundFX.playClick();
+                      setReviewModalSession(s);
+                      setReviewRating(5);
+                      setReviewComment('');
+                      setReviewError(null);
+                    }}
+                  >
+                    <Star size={14} color="var(--fbsu-gold)" />
+                    <span>{isAr ? 'تقييم الجلسة وإضافة مراجعة' : 'Rate & Review Session'}</span>
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
+
+      {reviewModalSession && (
+        <div
+          className="modal-overlay active"
+          role="dialog"
+          aria-modal="true"
+          data-testid="tutoring-review-modal"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1200,
+            background: 'rgba(3, 12, 10, 0.78)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+          }}
+        >
+          <div
+            className="glass-panel"
+            style={{ width: '100%', maxWidth: 440, padding: '1.35rem', borderRadius: 14 }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.85rem',
+              }}
+            >
+              <h3 style={{ margin: 0, fontSize: '1.05rem' }}>
+                {isAr
+                  ? `تقييم جلسة ${reviewModalSession.courseCode}`
+                  : `Rate ${reviewModalSession.courseCode}`}
+              </h3>
+              <button
+                type="button"
+                className="btn-outline"
+                onClick={() => setReviewModalSession(null)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form
+              onSubmit={async e => {
+                e.preventDefault();
+                setIsSubmittingReview(true);
+                setReviewError(null);
+                try {
+                  const trimmedComment = reviewComment.trim();
+                  const updated = await tutoringApi.submitReview(
+                    reviewModalSession.backendId || reviewModalSession.id,
+                    {
+                      rating: reviewRating,
+                      ...(trimmedComment ? { comment: trimmedComment } : {}),
+                    }
+                  );
+                  setSessionOverrides(prev => ({ ...prev, [reviewModalSession.id]: updated }));
+                  if (onSessionUpdated) onSessionUpdated(updated);
+                  setReviewModalSession(null);
+                } catch {
+                  setReviewError(
+                    isAr
+                      ? 'تعذر إرسال التقييم (قد تكون قيّمت الجلسة مسبقاً).'
+                      : 'Could not submit review (you may have already reviewed this session).'
+                  );
+                } finally {
+                  setIsSubmittingReview(false);
+                }
+              }}
+              style={{ display: 'grid', gap: '0.8rem' }}
+            >
+              <div>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 6 }}>
+                  {isAr ? 'التقييم بالنجوم (1 إلى 5)' : 'Star Rating (1 to 5)'}
+                </div>
+                <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      type="button"
+                      data-testid={`review-star-${star}`}
+                      className={`btn btn-sm ${reviewRating >= star ? 'btn-primary' : 'btn-ghost'}`}
+                      onClick={() => setReviewRating(star)}
+                    >
+                      <Star size={15} fill={reviewRating >= star ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                  {isAr ? 'ملاحظاتك (اختياري)' : 'Feedback comment (optional)'}
+                </label>
+                <textarea
+                  rows={3}
+                  maxLength={500}
+                  className="form-control"
+                  data-testid="review-comment-input"
+                  value={reviewComment}
+                  onChange={e => setReviewComment(e.target.value)}
+                  placeholder={isAr ? 'اكتب تجربتك مع المعلم الأقران...' : 'Share your feedback...'}
+                />
+              </div>
+
+              {reviewError && (
+                <div style={{ fontSize: '0.82rem', color: '#fca5a5' }}>{reviewError}</div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  className="btn-outline"
+                  onClick={() => setReviewModalSession(null)}
+                >
+                  {isAr ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmittingReview}
+                  data-testid="submit-tutoring-review-btn"
+                >
+                  {isSubmittingReview
+                    ? isAr
+                      ? 'جاري الحفظ...'
+                      : 'Saving...'
+                    : isAr
+                      ? 'إرسال التقييم'
+                      : 'Submit Review'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <BookTutoringModal
         isOpen={selectedSession !== null}

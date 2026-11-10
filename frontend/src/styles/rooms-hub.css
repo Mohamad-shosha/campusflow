@@ -729,3 +729,45 @@
   background: var(--status-occupied-bg);
   color: var(--danger-text);
 }
+
+.room-schedule-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.room-schedule-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.room-schedule-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.room-slot-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border-subtle);
+}
+
+.room-slot-pill--available {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.room-slot-pill--booked {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.35);
+}
