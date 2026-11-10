@@ -1,10 +1,13 @@
 import { apiClient } from '../../../shared/http/apiClient';
+import type { GateEventPageResponse } from '../../parking/types/parking';
 import type {
   AdminSpot,
   AdminTariff,
   AdminRoom,
   AdminUser,
   AdminAuditLog,
+  CreateRoomRequest,
+  UpdateRoomRequest,
   UpdateSpotStatusRequest,
   UpdateSpotTypeRequest,
   UpdateTariffRequest,
@@ -49,8 +52,28 @@ export const adminApi = {
     return response.data;
   },
 
+  createRoom: async (payload: CreateRoomRequest): Promise<AdminRoom> => {
+    const response = await apiClient.post<AdminRoom>('/admin/rooms', payload);
+    return response.data;
+  },
+
+  updateRoom: async (id: string, payload: UpdateRoomRequest): Promise<AdminRoom> => {
+    const response = await apiClient.patch<AdminRoom>(`/admin/rooms/${id}`, payload);
+    return response.data;
+  },
+
   updateRoomStatus: async (id: string, payload: UpdateRoomStatusRequest): Promise<AdminRoom> => {
     const response = await apiClient.patch<AdminRoom>(`/admin/rooms/${id}/status`, payload);
+    return response.data;
+  },
+
+  // --- Gate Passage Events ---
+  getGateEvents: async (params?: {
+    page?: number;
+    size?: number;
+    decision?: 'GRANTED' | 'DENIED';
+  }): Promise<GateEventPageResponse> => {
+    const response = await apiClient.get<GateEventPageResponse>('/parking/gate/events', { params });
     return response.data;
   },
 

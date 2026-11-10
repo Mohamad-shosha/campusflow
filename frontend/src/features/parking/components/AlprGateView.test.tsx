@@ -6,6 +6,7 @@ import { parkingApi } from '../api/parkingApi';
 vi.mock('../api/parkingApi', () => ({
   parkingApi: {
     scanGate: vi.fn(),
+    getGateEvents: vi.fn(),
   },
 }));
 
@@ -100,6 +101,52 @@ describe('AlprGateView Component', () => {
       );
       expect(screen.getByText('تم رفض الدخول - الحاجز مغلق')).toBeInTheDocument();
       expect(screen.getByText('UNREGISTERED_VEHICLE')).toBeInTheDocument();
+    });
+  });
+
+  it('shows restricted notice when caller lacks officer/admin role and never fetches /gate/events', () => {
+    render(<AlprGateView isAr={true} canViewGateHistory={false} />);
+    expect(screen.getByTestId('gate-events-restricted-notice')).toBeInTheDocument();
+    expect(parkingApi.getGateEvents).not.toHaveBeenCalled();
+  });
+
+  it('loads and filters persisted gate events when caller is SECURITY_OFFICER or CAMPUS_ADMIN', async () => {
+    vi.mocked(parkingApi.getGateEvents).mockResolvedValue({
+      content: [
+        {
+          id: 'ev-1',
+          gateId: 'GATE_MAIN_NORTH_01',
+          plateLettersAr: 'س ع د',
+          plateDigits: '7700',
+          decision: 'GRANTED',
+          reason: 'FACULTY_CAMPUS_PERMIT',
+          bayNumber: 19,
+          bayCode: 'A-19',
+          occurredAt: '2026-11-10T10:00:00Z',
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 1,
+      totalPages: 1,
+    });
+
+    render(<AlprGateView isAr={true} canViewGateHistory={true} />);
+
+    await waitFor(() => {
+      expect(parkingApi.getGateEvents).toHaveBeenCalledWith({ page: 0, size: 10 });
+      expect(screen.getByTestId('gate-events-table')).toBeInTheDocument();
+      expect(screen.getByText('FACULTY_CAMPUS_PERMIT')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('gate-events-filter-denied'));
+
+    await waitFor(() => {
+      expect(parkingApi.getGateEvents).toHaveBeenCalledWith({
+        page: 0,
+        size: 10,
+        decision: 'DENIED',
+      });
     });
   });
 });

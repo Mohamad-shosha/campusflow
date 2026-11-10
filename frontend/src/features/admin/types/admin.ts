@@ -1,5 +1,7 @@
-export type AdminSpotStatus = 'AVAILABLE' | 'OCCUPIED' | 'RESERVED' | 'MAINTENANCE';
-export type AdminSpotType = 'STANDARD' | 'ACCESSIBLE' | 'EV' | 'FACULTY';
+export type AdminSpotStatus =
+  'AVAILABLE' | 'OCCUPIED' | 'RESERVED' | 'FLEX_SHARE' | 'FACULTY_ASSIGNED' | 'MAINTENANCE';
+export type AdminSpotType =
+  'STANDARD' | 'ACCESSIBLE' | 'EV' | 'EV_CHARGING' | 'FACULTY' | 'VIP' | 'SERVICE';
 
 export interface AdminSpot {
   id: string;
@@ -11,14 +13,22 @@ export interface AdminSpot {
   occupiedUntil?: string | null;
   currentVehiclePlate?: string | null;
   occupantName?: string | null;
+  occupantNameAr?: string | null;
+  occupantNameEn?: string | null;
+  plateLettersAr?: string | null;
+  plateDigits?: string | null;
+  vehicleModel?: string | null;
+  flexEligible?: boolean;
 }
 
 export interface AdminTariff {
   id?: string;
-  userType: 'STUDENT' | 'FACULTY' | 'STAFF' | 'VISITOR';
+  userType: 'STUDENT' | 'FACULTY' | 'STAFF' | 'VISITOR' | 'GUEST';
   hourlyRate: number;
-  dailyRate: number;
-  semesterRate: number;
+  dailyCap?: number;
+  flexCashbackRate?: number;
+  dailyRate?: number;
+  semesterRate?: number;
 }
 
 export interface AdminRoom {
@@ -27,13 +37,59 @@ export interface AdminRoom {
   roomCode: string;
   nameAr: string;
   nameEn: string;
-  capacity: number;
-  floorNumber: number;
-  roomType: string;
+  buildingAr?: string;
+  buildingEn?: string;
+  capacityAr?: string;
+  capacityEn?: string;
+  typeBadgeAr?: string;
+  typeBadgeEn?: string;
+  specsAr?: string[];
+  specsEn?: string[];
+  availableFromAr?: string;
+  availableFromEn?: string;
+  displayOrder?: number;
+  capacity?: number;
+  floorNumber?: number;
+  roomType?: string;
   status: string;
-  hasProjector: boolean;
-  hasWhiteboard: boolean;
-  isQuietZone: boolean;
+  hasProjector?: boolean;
+  hasWhiteboard?: boolean;
+  isQuietZone?: boolean;
+}
+
+export interface CreateRoomRequest {
+  roomCode: string;
+  nameAr: string;
+  nameEn: string;
+  buildingAr: string;
+  buildingEn: string;
+  capacityAr: string;
+  capacityEn: string;
+  typeBadgeAr: string;
+  typeBadgeEn: string;
+  specsAr: string[];
+  specsEn: string[];
+  availableFromAr: string;
+  availableFromEn: string;
+  status: 'AVAILABLE' | 'IN_USE' | 'RESERVED' | 'MAINTENANCE';
+  displayOrder: number;
+}
+
+export interface UpdateRoomRequest {
+  nameAr?: string;
+  nameEn?: string;
+  buildingAr?: string;
+  buildingEn?: string;
+  capacityAr?: string;
+  capacityEn?: string;
+  typeBadgeAr?: string;
+  typeBadgeEn?: string;
+  specsAr?: string[];
+  specsEn?: string[];
+  availableFromAr?: string;
+  availableFromEn?: string;
+  status?: 'AVAILABLE' | 'IN_USE' | 'RESERVED' | 'MAINTENANCE';
+  displayOrder?: number;
 }
 
 export interface AdminUser {
@@ -78,8 +134,8 @@ export interface UpdateSpotTypeRequest {
 
 export interface UpdateTariffRequest {
   hourlyRate: number;
-  dailyRate: number;
-  semesterRate: number;
+  dailyCap: number;
+  flexCashbackRate: number;
 }
 
 export interface UpdateRoomStatusRequest {
