@@ -1,5 +1,6 @@
 import { apiClient } from '../../../shared/http/apiClient';
 import type { GateEventPageResponse } from '../../parking/types/parking';
+import type { ShuttleBus, TransitRoute } from '../../transit/types/transit';
 import type {
   AdminSpot,
   AdminTariff,
@@ -8,6 +9,10 @@ import type {
   AdminAuditLog,
   CreateRoomRequest,
   UpdateRoomRequest,
+  CreateTransitRouteRequest,
+  UpdateTransitRouteStatusRequest,
+  CreateShuttleBusRequest,
+  UpdateShuttleBusRequest,
   UpdateSpotStatusRequest,
   UpdateSpotTypeRequest,
   UpdateTariffRequest,
@@ -105,6 +110,43 @@ export const adminApi = {
     limit?: number;
   }): Promise<AdminAuditLog[]> => {
     const response = await apiClient.get<AdminAuditLog[]>('/admin/audit-logs', { params });
+    return response.data;
+  },
+
+  // --- Transit Admin ---
+  getTransitRoutes: async (): Promise<TransitRoute[]> => {
+    const response = await apiClient.get<TransitRoute[]>('/admin/transit/routes');
+    return response.data;
+  },
+
+  createTransitRoute: async (payload: CreateTransitRouteRequest): Promise<TransitRoute> => {
+    const response = await apiClient.post<TransitRoute>('/admin/transit/routes', payload);
+    return response.data;
+  },
+
+  updateTransitRouteStatus: async (
+    id: string,
+    payload: UpdateTransitRouteStatusRequest
+  ): Promise<TransitRoute> => {
+    const response = await apiClient.patch<TransitRoute>(
+      `/admin/transit/routes/${id}/status`,
+      payload
+    );
+    return response.data;
+  },
+
+  getTransitShuttles: async (): Promise<ShuttleBus[]> => {
+    const response = await apiClient.get<ShuttleBus[]>('/admin/transit/shuttles');
+    return response.data;
+  },
+
+  createShuttleBus: async (payload: CreateShuttleBusRequest): Promise<ShuttleBus> => {
+    const response = await apiClient.post<ShuttleBus>('/admin/transit/shuttles', payload);
+    return response.data;
+  },
+
+  updateShuttleBus: async (id: string, payload: UpdateShuttleBusRequest): Promise<ShuttleBus> => {
+    const response = await apiClient.patch<ShuttleBus>(`/admin/transit/shuttles/${id}`, payload);
     return response.data;
   },
 };

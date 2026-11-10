@@ -18,11 +18,25 @@ public interface ShuttleBusRepository extends JpaRepository<ShuttleBus, UUID> {
            "LEFT JOIN FETCH b.currentStop cs " +
            "LEFT JOIN FETCH b.nextStop ns " +
            "WHERE b.universityId = :universityId " +
+           "AND b.status <> sa.edu.fbsu.campus.transit.domain.ShuttleStatus.OUT_OF_SERVICE " +
+           "AND (r IS NULL OR r.status <> sa.edu.fbsu.campus.transit.domain.TransitRouteStatus.INACTIVE) " +
+           "ORDER BY b.busNumber ASC")
+    List<ShuttleBus> findPublicDetailedByUniversityId(@Param("universityId") UUID universityId);
+
+    @Query("SELECT b FROM ShuttleBus b " +
+           "LEFT JOIN FETCH b.currentRoute r " +
+           "LEFT JOIN FETCH b.currentStop cs " +
+           "LEFT JOIN FETCH b.nextStop ns " +
+           "WHERE b.universityId = :universityId " +
            "ORDER BY b.busNumber ASC")
     List<ShuttleBus> findAllDetailedByUniversityId(@Param("universityId") UUID universityId);
 
     Optional<ShuttleBus> findByBusNumber(String busNumber);
 
+    boolean existsByBusNumber(String busNumber);
+
     List<ShuttleBus> findByCurrentRouteId(UUID routeId);
+
+    List<ShuttleBus> findBySource(String source);
 }
 

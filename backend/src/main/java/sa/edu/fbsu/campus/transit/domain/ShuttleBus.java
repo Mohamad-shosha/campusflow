@@ -58,6 +58,9 @@ public class ShuttleBus extends BaseTenantEntity {
     @Column(name = "battery_percentage", nullable = false)
     private int batteryPercentage = 90;
 
+    @Column(name = "source", nullable = false, length = 20)
+    private String source = "MANUAL";
+
     protected ShuttleBus() {
     }
 
@@ -219,6 +222,14 @@ public class ShuttleBus extends BaseTenantEntity {
 
     public void setBatteryPercentage(int batteryPercentage) {
         this.batteryPercentage = batteryPercentage;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source != null && !source.isBlank() ? source.trim() : "MANUAL";
     }
 }
 

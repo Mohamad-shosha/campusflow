@@ -13,9 +13,16 @@ import java.util.UUID;
 @Repository
 public interface TransitRouteRepository extends JpaRepository<TransitRoute, UUID> {
 
-    @Query("SELECT r FROM TransitRoute r LEFT JOIN FETCH r.stops s WHERE r.universityId = :universityId ORDER BY r.displayOrder ASC, s.stopOrder ASC")
+    @Query("SELECT DISTINCT r FROM TransitRoute r LEFT JOIN FETCH r.stops s WHERE r.universityId = :universityId AND r.status <> sa.edu.fbsu.campus.transit.domain.TransitRouteStatus.INACTIVE ORDER BY r.displayOrder ASC, s.stopOrder ASC")
+    List<TransitRoute> findPublicWithStopsByUniversityId(@Param("universityId") UUID universityId);
+
+    @Query("SELECT DISTINCT r FROM TransitRoute r LEFT JOIN FETCH r.stops s WHERE r.universityId = :universityId ORDER BY r.displayOrder ASC, s.stopOrder ASC")
     List<TransitRoute> findAllWithStopsByUniversityId(@Param("universityId") UUID universityId);
 
     Optional<TransitRoute> findByRouteCode(String routeCode);
+
+    boolean existsByRouteCode(String routeCode);
+
+    List<TransitRoute> findBySource(String source);
 }
 

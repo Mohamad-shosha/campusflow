@@ -21,6 +21,12 @@ vi.mock('../api/adminApi', () => ({
     updateUserStatus: vi.fn(),
     updateUserRoles: vi.fn(),
     getAuditLogs: vi.fn(),
+    getTransitRoutes: vi.fn(),
+    createTransitRoute: vi.fn(),
+    updateTransitRouteStatus: vi.fn(),
+    getTransitShuttles: vi.fn(),
+    createShuttleBus: vi.fn(),
+    updateShuttleBus: vi.fn(),
   },
 }));
 
@@ -109,6 +115,8 @@ describe('AdminDashboard Component Tests', () => {
       totalElements: 0,
       totalPages: 0,
     });
+    vi.mocked(adminApi.getTransitRoutes).mockResolvedValue([]);
+    vi.mocked(adminApi.getTransitShuttles).mockResolvedValue([]);
   });
 
   it('renders admin dashboard header, badges, and default spots tab with spot data', async () => {
@@ -337,6 +345,110 @@ describe('AdminDashboard Component Tests', () => {
         size: 30,
         decision: 'DENIED',
       });
+    });
+  });
+
+  it('switches to transit tab, retires DEMO_V15 route, saves shuttle telemetry, and creates new manual route', async () => {
+    const sampleRoute = {
+      id: 'route-uuid-1',
+      routeCode: 'ROUTE-EXPRESS',
+      nameAr: 'المسار السريع الأخضر',
+      nameEn: 'Express Green Line',
+      colorHex: '#10b981',
+      operatingHoursAr: '07:30 ص - 05:30 م',
+      operatingHoursEn: '07:30 AM - 05:30 PM',
+      frequencyMinutes: 8,
+      status: 'ACTIVE' as const,
+      displayOrder: 1,
+      stops: [],
+      source: 'DEMO_V15',
+    };
+    const sampleShuttle = {
+      id: 'bus-uuid-1',
+      routeCode: 'ROUTE-EXPRESS',
+      busNumber: 'FBSU-BUS-01',
+      plateLettersAr: 'أ ح د',
+      plateDigits: '4582',
+      modelName: 'BYD K8',
+      totalCapacity: 28,
+      occupiedSeats: 12,
+      availableSeats: 16,
+      isElectric: true,
+      driverNameAr: 'عبدالله السعدي',
+      driverNameEn: 'Abdullah Al-Saadi',
+      status: 'IN_TRANSIT' as const,
+      nextStopEtaMins: 3,
+      batteryPercentage: 92,
+      source: 'DEMO_V15',
+    };
+
+    vi.mocked(adminApi.getTransitRoutes).mockResolvedValueOnce([sampleRoute]);
+    vi.mocked(adminApi.getTransitShuttles).mockResolvedValueOnce([sampleShuttle]);
+    vi.mocked(adminApi.updateTransitRouteStatus).mockResolvedValueOnce({
+      ...sampleRoute,
+      status: 'INACTIVE',
+    });
+    vi.mocked(adminApi.updateShuttleBus).mockResolvedValueOnce({
+      ...sampleShuttle,
+      occupiedSeats: 18,
+    });
+    vi.mocked(adminApi.createTransitRoute).mockResolvedValueOnce({
+      ...sampleRoute,
+      id: 'route-uuid-2',
+      routeCode: 'ROUTE-LABS',
+      nameAr: 'مسار المختبرات',
+      nameEn: 'Labs Route',
+      source: 'MANUAL',
+    });
+
+    render(<AdminDashboard isAr={true} />);
+
+    fireEvent.click(screen.getByTestId('admin-tab-transit'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('admin-transit-panel')).toBeInTheDocument();
+      expect(screen.getAllByText('DEMO_V15')).toHaveLength(2);
+      expect(screen.getByText('FBSU-BUS-01')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId('admin-route-status-ROUTE-EXPRESS'), {
+      target: { value: 'INACTIVE' },
+    });
+
+    await waitFor(() => {
+      expect(adminApi.updateTransitRouteStatus).toHaveBeenCalledWith('route-uuid-1', {
+        status: 'INACTIVE',
+        reason: 'Admin status change to INACTIVE',
+      });
+    });
+
+    fireEvent.change(screen.getByTestId('admin-shuttle-occupied-FBSU-BUS-01'), {
+      target: { value: '18' },
+    });
+    fireEvent.click(screen.getByTestId('admin-save-shuttle-FBSU-BUS-01'));
+
+    await waitFor(() => {
+      expect(adminApi.updateShuttleBus).toHaveBeenCalledWith(
+        'bus-uuid-1',
+        expect.objectContaining({ occupiedSeats: 18 })
+      );
+    });
+
+    fireEvent.click(screen.getByTestId('admin-create-route-btn'));
+    fireEvent.change(screen.getByTestId('route-form-code'), { target: { value: 'ROUTE-LABS' } });
+    fireEvent.change(screen.getByTestId('route-form-name-ar'), {
+      target: { value: 'مسار المختبرات' },
+    });
+    fireEvent.change(screen.getByTestId('route-form-name-en'), {
+      target: { value: 'Labs Route' },
+    });
+    fireEvent.click(screen.getByTestId('route-form-submit'));
+
+    await waitFor(() => {
+      expect(adminApi.createTransitRoute).toHaveBeenCalledWith(
+        expect.objectContaining({ routeCode: 'ROUTE-LABS' })
+      );
+      expect(screen.getByText('MANUAL')).toBeInTheDocument();
     });
   });
 });

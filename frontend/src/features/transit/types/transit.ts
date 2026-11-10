@@ -20,9 +20,10 @@ export interface TransitRoute {
   operatingHoursAr: string;
   operatingHoursEn: string;
   frequencyMinutes: number;
-  status: 'ACTIVE' | 'MAINTENANCE' | 'OFF_PEAK';
+  status: 'ACTIVE' | 'MAINTENANCE' | 'OFF_PEAK' | 'INACTIVE';
   displayOrder: number;
   stops: TransitStop[];
+  source?: string;
 }
 
 export interface ShuttleBus {
@@ -55,6 +56,8 @@ export interface ShuttleBus {
   dataSource?: string;
   /** ISO timestamp of the last stored update */
   lastUpdatedAt?: string;
+  /** Provenance: DEMO_V15, DEV_SEED, or MANUAL */
+  source?: string;
 }
 
 export interface TransitPass {

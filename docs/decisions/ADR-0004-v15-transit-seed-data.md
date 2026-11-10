@@ -1,6 +1,6 @@
 # ADR-0004: Handling demo transit data inserted by V15 migration
 
-- **Status:** Proposed. Needs approval before any migration is written.
+- **Status:** Accepted & Implemented (`V16`, status filtering, prod retirement runner, dev seeder, and `/api/v1/admin/transit` console).
 - **Date:** 2026-11-09
 - **Context owner:** Backend / Data
 

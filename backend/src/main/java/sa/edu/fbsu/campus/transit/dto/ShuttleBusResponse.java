@@ -40,7 +40,9 @@ public record ShuttleBusResponse(
         /** Provenance of the status fields. Currently always {@value #DATA_SOURCE_STORED}. */
         String dataSource,
         /** When this shuttle record was last written. */
-        Instant lastUpdatedAt
+        Instant lastUpdatedAt,
+        /** Provenance of the shuttle record (DEMO_V15, DEV_SEED, or MANUAL). */
+        String source
 ) {
     /** Status fields come from the stored shuttle record, not from a live vehicle feed. */
     public static final String DATA_SOURCE_STORED = "STORED_STATUS";
@@ -74,7 +76,8 @@ public record ShuttleBusResponse(
                 bus.getNextStopEtaMins(),
                 bus.getBatteryPercentage(),
                 DATA_SOURCE_STORED,
-                bus.getUpdatedAt()
+                bus.getUpdatedAt(),
+                bus.getSource()
         );
     }
 }

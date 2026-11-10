@@ -17,7 +17,8 @@ public record TransitRouteResponse(
         int frequencyMinutes,
         TransitRouteStatus status,
         int displayOrder,
-        List<TransitStopResponse> stops
+        List<TransitStopResponse> stops,
+        String source
 ) {
     public static TransitRouteResponse fromEntity(TransitRoute route) {
         if (route == null) return null;
@@ -36,7 +37,8 @@ public record TransitRouteResponse(
                 route.getFrequencyMinutes(),
                 route.getStatus(),
                 route.getDisplayOrder(),
-                stopResponses
+                stopResponses,
+                route.getSource()
         );
     }
 }
