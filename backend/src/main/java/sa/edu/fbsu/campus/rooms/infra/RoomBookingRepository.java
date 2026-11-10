@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sa.edu.fbsu.campus.rooms.domain.RoomBooking;
+import sa.edu.fbsu.campus.rooms.domain.RoomBookingStatus;
 
 import java.time.Instant;
 import java.util.List;
@@ -33,5 +34,7 @@ public interface RoomBookingRepository extends JpaRepository<RoomBooking, UUID> 
             @Param("endTime") Instant endTime,
             @Param("excludeId") UUID excludeId
     );
+
+    long countByUniversityIdAndStatusIn(UUID universityId, List<RoomBookingStatus> statuses);
 }
 

@@ -34,7 +34,31 @@ public class AnalyticsControllerIntegrationTest extends AbstractPostgresIntegrat
                 .andExpect(jsonPath("$.totalGatePassages", greaterThanOrEqualTo(0)))
                 .andExpect(jsonPath("$.totalLedgerRevenue", notNullValue()))
                 .andExpect(jsonPath("$.hourlyLoad", notNullValue()))
-                .andExpect(jsonPath("$.zoneStats", notNullValue()));
+                .andExpect(jsonPath("$.zoneStats", notNullValue()))
+                .andExpect(jsonPath("$.roomsUtilization.totalRooms", greaterThanOrEqualTo(0)))
+                .andExpect(jsonPath("$.revenueBreakdown.totalCampusVolume", notNullValue()));
+    }
+
+    @Test
+    @DisplayName("Get study rooms and labs utilization breakdown")
+    void testGetRoomsUtilization() throws Exception {
+        mockMvc.perform(get("/api/v1/analytics/rooms/utilization")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalRooms", greaterThanOrEqualTo(0)))
+                .andExpect(jsonPath("$.activeUtilizationPercent", greaterThanOrEqualTo(0.0)));
+    }
+
+    @Test
+    @DisplayName("Get financial revenue breakdown across parking, tuition, and tutoring")
+    void testGetRevenueBreakdown() throws Exception {
+        mockMvc.perform(get("/api/v1/analytics/financial/revenue-breakdown")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.netParkingRevenue", notNullValue()))
+                .andExpect(jsonPath("$.tuitionRevenue", notNullValue()))
+                .andExpect(jsonPath("$.tutoringVolume", notNullValue()))
+                .andExpect(jsonPath("$.totalCampusVolume", notNullValue()));
     }
 
     @Test

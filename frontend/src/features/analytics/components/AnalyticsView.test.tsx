@@ -9,23 +9,25 @@ vi.mock('../api/analyticsApi', () => ({
     getSummary: vi.fn(),
     getHourlyLoad: vi.fn(),
     getZoneStats: vi.fn(),
+    getRoomsUtilization: vi.fn(),
+    getRevenueBreakdown: vi.fn(),
   },
 }));
 
 describe('AnalyticsView Component Tests', () => {
   const mockSummary: AnalyticsSummary = {
-    netCapacityGainPercent: 55.0,
-    timeSavedMinutes: 18.5,
-    satisfactionRatePercent: 99.2,
-    totalSpots: 30,
+    netCapacityGainPercent: null,
+    timeSavedMinutes: null,
+    satisfactionRatePercent: null,
+    totalSpots: 40,
     availableSpots: 18,
-    occupiedSpots: 12,
+    occupiedSpots: 22,
     flexSharesActive: 4,
     totalGatePassages: 142,
-    totalLedgerRevenue: 24500.0,
+    totalLedgerRevenue: 575.5,
     hourlyLoad: [
-      { time: '08:00', load: 85, color: '#f59e0b', labelAr: 'ذروة 1', labelEn: 'Peak 1' },
-      { time: '09:00', load: 95, color: '#ef4444', labelAr: 'ذروة قصوى', labelEn: 'Max Peak' },
+      { time: '08:00', load: 85, color: '#f59e0b', labelAr: '12 دخول', labelEn: '12 entries' },
+      { time: '09:00', load: 100, color: '#ef4444', labelAr: '14 دخول', labelEn: '14 entries' },
     ],
     zoneStats: [
       {
@@ -45,31 +47,59 @@ describe('AnalyticsView Component Tests', () => {
         occupancyRate: 50.0,
       },
     ],
+    roomsUtilization: {
+      totalRooms: 10,
+      availableRooms: 6,
+      inUseRooms: 2,
+      reservedRooms: 1,
+      maintenanceRooms: 1,
+      activeUtilizationPercent: 33.3,
+      activeBookingsCount: 3,
+    },
+    revenueBreakdown: {
+      netParkingRevenue: 575.5,
+      tuitionRevenue: 14500.0,
+      tutoringVolume: 420.0,
+      totalCampusVolume: 15495.5,
+    },
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders only KPIs computed from real records', async () => {
+  it('renders live KPIs, hourly gate load, financial breakdown, and rooms utilization', async () => {
     vi.mocked(analyticsApi.getSummary).mockResolvedValueOnce(mockSummary);
 
     render(<AnalyticsView isAr={true} />);
 
     expect(screen.getByTestId('analytics-view')).toBeInTheDocument();
-    expect(screen.getByText('لوحة تحليلات الذكاء الاصطناعي')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByTestId('kpi-total-spots')).toHaveTextContent(
-        String(mockSummary.totalSpots)
-      );
-      expect(screen.getByTestId('kpi-gate-passages')).toHaveTextContent(
-        String(mockSummary.totalGatePassages)
-      );
+      expect(screen.getByTestId('kpi-total-spots')).toHaveTextContent('40');
+      expect(screen.getByTestId('kpi-gate-passages')).toHaveTextContent('142');
+      expect(screen.getByTestId('analytics-revenue-panel')).toBeInTheDocument();
+      expect(screen.getByTestId('rev-parking')).toHaveTextContent('575.50');
+      expect(screen.getByTestId('rev-tuition')).toHaveTextContent('14500.00');
+      expect(screen.getByTestId('rev-tutoring')).toHaveTextContent('420.00');
+      expect(screen.getByTestId('analytics-rooms-panel')).toHaveTextContent('33.3%');
+      expect(screen.getByTestId('hourly-load-grid')).toBeInTheDocument();
     });
-    // Hardcoded backend metrics are not displayed
-    expect(screen.queryByText('+55%')).not.toBeInTheDocument();
-    expect(screen.queryByText(/99.2%/)).not.toBeInTheDocument();
+
+    // Unmeasured metrics are never fabricated or shown
+    expect(screen.queryByText('+42%')).not.toBeInTheDocument();
+    expect(screen.queryByText(/98\.8%/)).not.toBeInTheDocument();
+  });
+
+  it('shows honest empty message when no gate passages occurred in last 7 days', async () => {
+    vi.mocked(analyticsApi.getSummary).mockResolvedValueOnce({
+      ...mockSummary,
+      hourlyLoad: [],
+    });
+
+    render(<AnalyticsView isAr={false} />);
+
+    expect(await screen.findByTestId('hourly-load-empty')).toBeInTheDocument();
     expect(screen.queryByTestId('hourly-load-grid')).not.toBeInTheDocument();
   });
 

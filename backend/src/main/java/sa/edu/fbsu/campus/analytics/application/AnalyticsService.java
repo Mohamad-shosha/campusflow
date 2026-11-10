@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sa.edu.fbsu.campus.analytics.dto.AnalyticsSummaryResponse;
 import sa.edu.fbsu.campus.analytics.dto.HourlyLoadPoint;
+import sa.edu.fbsu.campus.analytics.dto.RevenueBreakdownStat;
+import sa.edu.fbsu.campus.analytics.dto.RoomsUtilizationStat;
 import sa.edu.fbsu.campus.analytics.dto.ZoneOccupancyStat;
 import sa.edu.fbsu.campus.domain.University;
 import sa.edu.fbsu.campus.infra.UniversityRepository;
@@ -13,6 +15,13 @@ import sa.edu.fbsu.campus.parking.domain.SpotStatus;
 import sa.edu.fbsu.campus.parking.infra.FlexOfferRepository;
 import sa.edu.fbsu.campus.parking.infra.GateEventLogRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
+import sa.edu.fbsu.campus.rooms.domain.RoomBookingStatus;
+import sa.edu.fbsu.campus.rooms.domain.RoomStatus;
+import sa.edu.fbsu.campus.rooms.domain.StudyRoom;
+import sa.edu.fbsu.campus.rooms.infra.RoomBookingRepository;
+import sa.edu.fbsu.campus.rooms.infra.StudyRoomRepository;
+import sa.edu.fbsu.campus.tutoring.domain.TutoringEnrollmentStatus;
+import sa.edu.fbsu.campus.tutoring.infra.TutoringEnrollmentRepository;
 import sa.edu.fbsu.campus.wallet.domain.TransactionDirection;
 import sa.edu.fbsu.campus.wallet.domain.TransactionType;
 import sa.edu.fbsu.campus.wallet.infra.LedgerEntryRepository;
@@ -57,6 +66,9 @@ public class AnalyticsService {
     private final FlexOfferRepository flexOfferRepository;
     private final GateEventLogRepository gateEventLogRepository;
     private final LedgerEntryRepository ledgerEntryRepository;
+    private final StudyRoomRepository studyRoomRepository;
+    private final RoomBookingRepository roomBookingRepository;
+    private final TutoringEnrollmentRepository tutoringEnrollmentRepository;
     private final UniversityRepository universityRepository;
     private final Clock clock;
 
@@ -65,6 +77,9 @@ public class AnalyticsService {
             FlexOfferRepository flexOfferRepository,
             GateEventLogRepository gateEventLogRepository,
             LedgerEntryRepository ledgerEntryRepository,
+            StudyRoomRepository studyRoomRepository,
+            RoomBookingRepository roomBookingRepository,
+            TutoringEnrollmentRepository tutoringEnrollmentRepository,
             UniversityRepository universityRepository,
             Optional<Clock> clock
     ) {
@@ -72,6 +87,9 @@ public class AnalyticsService {
         this.flexOfferRepository = flexOfferRepository;
         this.gateEventLogRepository = gateEventLogRepository;
         this.ledgerEntryRepository = ledgerEntryRepository;
+        this.studyRoomRepository = studyRoomRepository;
+        this.roomBookingRepository = roomBookingRepository;
+        this.tutoringEnrollmentRepository = tutoringEnrollmentRepository;
         this.universityRepository = universityRepository;
         this.clock = clock.orElse(Clock.systemUTC());
     }
@@ -89,6 +107,8 @@ public class AnalyticsService {
         int activeFlexOffers = (int) flexOfferRepository.countByUniversityIdAndStatus(effectiveUniId, FlexOfferStatus.AVAILABLE);
         int grantedPassages = (int) gateEventLogRepository.countByUniversityIdAndDecision(effectiveUniId, GATE_GRANTED);
 
+        RevenueBreakdownStat revenueBreakdown = getRevenueBreakdown(effectiveUniId);
+
         return new AnalyticsSummaryResponse(
                 null, // netCapacityGainPercent: no baseline capacity data recorded
                 null, // timeSavedMinutes: no search-time measurements recorded
@@ -98,9 +118,11 @@ public class AnalyticsService {
                 occupiedSpots,
                 activeFlexOffers,
                 grantedPassages,
-                netParkingRevenue(effectiveUniId),
+                revenueBreakdown.netParkingRevenue(),
                 getHourlyLoad(effectiveUniId),
-                buildZoneStats(spots)
+                buildZoneStats(spots),
+                getRoomsUtilization(effectiveUniId),
+                revenueBreakdown
         );
     }
 
@@ -145,6 +167,44 @@ public class AnalyticsService {
     public List<ZoneOccupancyStat> getZoneStats(UUID universityId) {
         UUID effectiveUniId = universityId != null ? universityId : DEFAULT_UNIVERSITY_ID;
         return buildZoneStats(spotRepository.findAllWithZoneByUniversityId(effectiveUniId));
+    }
+
+    public RoomsUtilizationStat getRoomsUtilization(UUID universityId) {
+        UUID effectiveUniId = universityId != null ? universityId : DEFAULT_UNIVERSITY_ID;
+        List<StudyRoom> rooms = studyRoomRepository.findAllByUniversityIdOrderByDisplayOrderAsc(effectiveUniId);
+        int totalRooms = rooms.size();
+        int available = (int) rooms.stream().filter(r -> r.getStatus() == RoomStatus.AVAILABLE).count();
+        int inUse = (int) rooms.stream().filter(r -> r.getStatus() == RoomStatus.IN_USE).count();
+        int reserved = (int) rooms.stream().filter(r -> r.getStatus() == RoomStatus.RESERVED).count();
+        int maintenance = (int) rooms.stream().filter(r -> r.getStatus() == RoomStatus.MAINTENANCE).count();
+
+        int bookable = totalRooms - maintenance;
+        double activePercent = bookable > 0
+                ? Math.round(((double) (inUse + reserved) / bookable) * 1000.0) / 10.0
+                : 0.0;
+        int activeBookings = (int) roomBookingRepository.countByUniversityIdAndStatusIn(
+                effectiveUniId, List.of(RoomBookingStatus.ACTIVE, RoomBookingStatus.RESERVED));
+
+        return new RoomsUtilizationStat(
+                totalRooms,
+                available,
+                inUse,
+                reserved,
+                maintenance,
+                activePercent,
+                activeBookings
+        );
+    }
+
+    public RevenueBreakdownStat getRevenueBreakdown(UUID universityId) {
+        UUID effectiveUniId = universityId != null ? universityId : DEFAULT_UNIVERSITY_ID;
+        BigDecimal parkingNet = netParkingRevenue(effectiveUniId);
+        BigDecimal tuition = nz(ledgerEntryRepository.sumAmount(
+                effectiveUniId, TransactionType.TUITION_PAYMENT, TransactionDirection.DEBIT, ""));
+        BigDecimal tutoring = nz(tutoringEnrollmentRepository.sumAmountPaidByUniversityIdAndStatus(
+                effectiveUniId, TutoringEnrollmentStatus.CONFIRMED));
+        BigDecimal totalVolume = parkingNet.add(tuition).add(tutoring);
+        return new RevenueBreakdownStat(parkingNet, tuition, tutoring, totalVolume);
     }
 
     private BigDecimal netParkingRevenue(UUID universityId) {
