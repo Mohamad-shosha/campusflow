@@ -891,6 +891,9 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               onOpenTuition={() => setActiveTab('tuition')}
               onBookSuccess={handleTutoringBooked}
               onAddSession={handleAddTutoringSession}
+              onSessionUpdated={updated =>
+                setTutoringSessions(prev => prev.map(s => (s.id === updated.id ? updated : s)))
+              }
             />
             <ServiceExplainerSections service="tutoring" isAr={isAr} onNavigate={setActiveTab} />
           </>

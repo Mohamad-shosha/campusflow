@@ -50,6 +50,12 @@ public class StudyRoom extends BaseTenantEntity {
     @Column(name = "available_from_en", nullable = false, length = 140)
     private String availableFromEn;
 
+    @Column(name = "requirement_note_ar", length = 400)
+    private String requirementNoteAr;
+
+    @Column(name = "requirement_note_en", length = 400)
+    private String requirementNoteEn;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private RoomStatus status = RoomStatus.AVAILABLE;
@@ -198,6 +204,22 @@ public class StudyRoom extends BaseTenantEntity {
 
     public void setAvailableFromEn(String availableFromEn) {
         this.availableFromEn = availableFromEn;
+    }
+
+    public String getRequirementNoteAr() {
+        return requirementNoteAr;
+    }
+
+    public void setRequirementNoteAr(String requirementNoteAr) {
+        this.requirementNoteAr = requirementNoteAr;
+    }
+
+    public String getRequirementNoteEn() {
+        return requirementNoteEn;
+    }
+
+    public void setRequirementNoteEn(String requirementNoteEn) {
+        this.requirementNoteEn = requirementNoteEn;
     }
 
     public RoomStatus getStatus() {

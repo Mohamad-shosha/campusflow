@@ -99,13 +99,17 @@ class TutoringControllerIntegrationTest extends AbstractPostgresIntegrationTest 
     }
 
     @Test
-    @DisplayName("Sessions do not expose ratings: no review system backs them")
+    @DisplayName("Unreviewed seeded sessions return null rating and 0 reviewsCount (no fabricated ratings)")
     void sessionsDoNotExposeFabricatedRatings() throws Exception {
-        mockMvc.perform(get("/api/v1/tutoring/sessions"))
+        mockMvc.perform(get("/api/v1/tutoring/sessions/TUT-101"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
-                .andExpect(jsonPath("$[*].rating", everyItem(nullValue())))
-                .andExpect(jsonPath("$[*].reviewsCount", everyItem(is(0))));
+                .andExpect(jsonPath("$.rating").value(nullValue()))
+                .andExpect(jsonPath("$.reviewsCount").value(is(0)));
+
+        mockMvc.perform(get("/api/v1/tutoring/sessions/TUT-104"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rating").value(nullValue()))
+                .andExpect(jsonPath("$.reviewsCount").value(is(0)));
     }
 
     @Test

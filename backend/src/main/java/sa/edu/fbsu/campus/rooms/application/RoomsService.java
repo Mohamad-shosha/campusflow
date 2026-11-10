@@ -17,12 +17,14 @@ import sa.edu.fbsu.campus.rooms.domain.RoomBookingStatus;
 import sa.edu.fbsu.campus.rooms.domain.RoomStatus;
 import sa.edu.fbsu.campus.rooms.domain.StudyRoom;
 import sa.edu.fbsu.campus.rooms.dto.BookRoomRequest;
+import sa.edu.fbsu.campus.rooms.dto.RoomScheduleSlotDto;
 import sa.edu.fbsu.campus.rooms.dto.StudyRoomResponse;
 import sa.edu.fbsu.campus.rooms.infra.RoomBookingRepository;
 import sa.edu.fbsu.campus.rooms.infra.StudyRoomRepository;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -32,7 +34,10 @@ import java.util.stream.Collectors;
 public class RoomsService {
 
     private static final Logger log = LoggerFactory.getLogger(RoomsService.class);
-    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneOffset.ofHours(3));
+    private static final ZoneOffset RIYADH_OFFSET = ZoneOffset.ofHours(3);
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm").withZone(RIYADH_OFFSET);
+    private static final double CAMPUS_DAILY_OPERATING_MINUTES = 840.0; // 08:00 - 22:00 KSA (14h)
+    private static final int[] SCHEDULE_BLOCK_START_HOURS = {8, 10, 12, 14, 16, 18};
 
     private final StudyRoomRepository roomRepository;
     private final RoomBookingRepository bookingRepository;
@@ -62,7 +67,7 @@ public class RoomsService {
             return List.of();
         }
 
-        List<UUID> roomIds = rooms.stream().map(r -> r.getId()).toList();
+        List<UUID> roomIds = rooms.stream().map(StudyRoom::getId).toList();
         Map<UUID, RoomBooking> activeBookings = bookingRepository.findActiveOrReservedByRoomIds(roomIds)
                 .stream()
                 .collect(Collectors.toMap(
@@ -71,9 +76,7 @@ public class RoomsService {
                         (existing, replacement) -> existing
                 ));
 
-        return rooms.stream()
-                .map(r -> StudyRoomResponse.fromEntity(r, activeBookings.get(r.getId())))
-                .toList();
+        return buildRoomResponses(rooms, activeBookings);
     }
 
     @Transactional(readOnly = true)
@@ -83,7 +86,7 @@ public class RoomsService {
                 .stream()
                 .findFirst()
                 .orElse(null);
-        return StudyRoomResponse.fromEntity(room, activeBooking);
+        return buildSingleRoomResponse(room, activeBooking);
     }
 
     @Transactional
@@ -172,7 +175,7 @@ public class RoomsService {
                 startLabel + " - " + endLabel
         ));
 
-        return StudyRoomResponse.fromEntity(room, booking);
+        return buildSingleRoomResponse(room, booking);
     }
 
     @Transactional
@@ -233,7 +236,7 @@ public class RoomsService {
                 booking.getStartLabel() + " - " + newEndLabel
         ));
 
-        return StudyRoomResponse.fromEntity(room, booking);
+        return buildSingleRoomResponse(room, booking);
     }
 
     @Transactional
@@ -277,7 +280,92 @@ public class RoomsService {
                 booking.getStartLabel() + " - " + booking.getEndLabel()
         ));
 
-        return StudyRoomResponse.fromEntity(room, null);
+        return buildSingleRoomResponse(room, null);
+    }
+
+    private List<StudyRoomResponse> buildRoomResponses(
+            List<StudyRoom> rooms,
+            Map<UUID, RoomBooking> activeBookings
+    ) {
+        if (rooms.isEmpty()) {
+            return List.of();
+        }
+        LocalDate todayKsa = LocalDate.now(RIYADH_OFFSET);
+        Instant dayStart = todayKsa.atStartOfDay().toInstant(RIYADH_OFFSET);
+        Instant dayEnd = dayStart.plus(Duration.ofDays(1));
+
+        List<UUID> roomIds = rooms.stream().map(StudyRoom::getId).toList();
+        Map<UUID, List<RoomBooking>> dailyBookingsByRoom = bookingRepository
+                .findDailyOccupiedByRoomIds(roomIds, dayStart, dayEnd)
+                .stream()
+                .collect(Collectors.groupingBy(b -> b.getRoom().getId()));
+
+        return rooms.stream()
+                .map(room -> toComputedResponse(
+                        room,
+                        activeBookings.get(room.getId()),
+                        dailyBookingsByRoom.getOrDefault(room.getId(), List.of()),
+                        todayKsa,
+                        dayStart,
+                        dayEnd
+                ))
+                .toList();
+    }
+
+    private StudyRoomResponse buildSingleRoomResponse(StudyRoom room, RoomBooking activeBooking) {
+        return buildRoomResponses(
+                List.of(room),
+                activeBooking != null ? Map.of(room.getId(), activeBooking) : Map.of()
+        ).getFirst();
+    }
+
+    private StudyRoomResponse toComputedResponse(
+            StudyRoom room,
+            RoomBooking activeBooking,
+            List<RoomBooking> dailyBookings,
+            LocalDate todayKsa,
+            Instant dayStart,
+            Instant dayEnd
+    ) {
+        long totalBookedMinutes = 0L;
+        for (RoomBooking booking : dailyBookings) {
+            Instant clippedStart = booking.getStartTime().isBefore(dayStart) ? dayStart : booking.getStartTime();
+            Instant clippedEnd = booking.getEndTime().isAfter(dayEnd) ? dayEnd : booking.getEndTime();
+            if (clippedEnd.isAfter(clippedStart)) {
+                totalBookedMinutes += Duration.between(clippedStart, clippedEnd).toMinutes();
+            }
+        }
+        int utilizationPercent = (int) Math.min(100L, Math.round((totalBookedMinutes * 100.0) / CAMPUS_DAILY_OPERATING_MINUTES));
+
+        List<RoomScheduleSlotDto> slots = new ArrayList<>();
+        Set<UUID> matchedInStandardGrid = new HashSet<>();
+        for (int hour : SCHEDULE_BLOCK_START_HOURS) {
+            Instant slotStart = todayKsa.atTime(hour, 0).toInstant(RIYADH_OFFSET);
+            Instant slotEnd = slotStart.plus(Duration.ofHours(2));
+            String rangeLabel = String.format("%02d:00 - %02d:00", hour, hour + 2);
+
+            RoomBooking overlapping = dailyBookings.stream()
+                    .filter(b -> b.getStartTime().isBefore(slotEnd) && b.getEndTime().isAfter(slotStart))
+                    .findFirst()
+                    .orElse(null);
+
+            if (overlapping != null) {
+                matchedInStandardGrid.add(overlapping.getId());
+                slots.add(new RoomScheduleSlotDto(rangeLabel, rangeLabel, "booked", overlapping.getPurpose()));
+            } else {
+                slots.add(new RoomScheduleSlotDto(rangeLabel, rangeLabel, "available", null));
+            }
+        }
+
+        // Preserve visibility when an occupied session occurs outside 08:00-20:00 (e.g. evening/night tests)
+        for (RoomBooking booking : dailyBookings) {
+            if (!matchedInStandardGrid.contains(booking.getId())) {
+                String label = TIME_FMT.format(booking.getStartTime()) + " - " + TIME_FMT.format(booking.getEndTime());
+                slots.add(new RoomScheduleSlotDto(label, label, "booked", booking.getPurpose()));
+            }
+        }
+
+        return StudyRoomResponse.fromEntity(room, activeBooking, utilizationPercent, slots);
     }
 
     private StudyRoom findRoomByIdOrCode(String idOrCode) {

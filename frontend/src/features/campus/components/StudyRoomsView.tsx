@@ -421,6 +421,32 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
           </div>
         )}
 
+        {room.scheduleSlots && room.scheduleSlots.length > 0 && (
+          <div className="room-schedule-strip" data-testid={`room-schedule-${room.id}`}>
+            <span className="room-schedule-label">{isAr ? 'جدول اليوم:' : "Today's slots:"}</span>
+            <div className="room-schedule-pills">
+              {room.scheduleSlots.slice(0, 6).map((slot, idx) => (
+                <span
+                  key={`${slot.time}-${idx}`}
+                  className={`room-slot-pill room-slot-pill--${slot.status}`}
+                  title={
+                    slot.label ||
+                    (slot.status === 'booked'
+                      ? isAr
+                        ? 'محجوز'
+                        : 'Booked'
+                      : isAr
+                        ? 'متاح'
+                        : 'Available')
+                  }
+                >
+                  {isAr ? slot.time : slot.timeEn || slot.time}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {specs.length > 0 && (
           <ul className="room-spec-chips" aria-label={isAr ? 'التجهيزات' : 'Equipment'}>
             {specs.slice(0, 3).map((spec, idx) => (

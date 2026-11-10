@@ -10,6 +10,7 @@ vi.mock('../api/tutoringApi', () => ({
     createSession: vi.fn(),
     bookSession: vi.fn(),
     getMyEnrollments: vi.fn(),
+    submitReview: vi.fn(),
   },
 }));
 
@@ -171,6 +172,61 @@ describe('TutoringView (P6-03)', () => {
     await waitFor(() => {
       expect(tutoringApi.createSession).toHaveBeenCalledTimes(1);
       expect(onAddSession).toHaveBeenCalledWith(createdSession);
+    });
+  });
+
+  it('allows enrolled students to submit a rating review and displays aggregated stars', async () => {
+    const enrolledSession = {
+      ...INITIAL_TUTORING_SESSIONS[0]!,
+      id: 'TUT-101',
+      backendId: 'uuid-101',
+      rating: null,
+      reviewsCount: 0,
+      enrolledStudents: ['طالب مسجل'],
+      enrolledStudentNumbers: ['STD-999'],
+    };
+
+    vi.mocked(tutoringApi.submitReview).mockResolvedValueOnce({
+      ...enrolledSession,
+      rating: 4.5,
+      reviewsCount: 2,
+    });
+
+    render(
+      <TutoringView
+        sessions={[enrolledSession]}
+        isAr={true}
+        isAuthenticated={true}
+        currentUser={{
+          id: 'STD-999',
+          name: 'طالب مسجل',
+          role: 'STUDENT',
+          walletBalance: 400,
+        }}
+        onOpenTuition={vi.fn()}
+        onBookSuccess={vi.fn()}
+        onAddSession={vi.fn()}
+      />
+    );
+
+    // Unreviewed session does not show fabricated rating badge
+    expect(screen.queryByTestId('tutoring-rating-TUT-101')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('rate-tutoring-btn-TUT-101'));
+    expect(screen.getByTestId('tutoring-review-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('review-star-4'));
+    fireEvent.change(screen.getByTestId('review-comment-input'), {
+      target: { value: 'شرح ممتاز ومفيد جداً' },
+    });
+    fireEvent.click(screen.getByTestId('submit-tutoring-review-btn'));
+
+    await waitFor(() => {
+      expect(tutoringApi.submitReview).toHaveBeenCalledWith('uuid-101', {
+        rating: 4,
+        comment: 'شرح ممتاز ومفيد جداً',
+      });
+      expect(screen.getByTestId('tutoring-rating-TUT-101')).toHaveTextContent('4.5 (2)');
     });
   });
 });

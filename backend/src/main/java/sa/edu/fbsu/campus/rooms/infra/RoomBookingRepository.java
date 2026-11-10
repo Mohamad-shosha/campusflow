@@ -36,5 +36,12 @@ public interface RoomBookingRepository extends JpaRepository<RoomBooking, UUID> 
     );
 
     long countByUniversityIdAndStatusIn(UUID universityId, List<RoomBookingStatus> statuses);
+
+    @Query("SELECT b FROM RoomBooking b JOIN FETCH b.room WHERE b.room.id IN :roomIds AND b.status IN (sa.edu.fbsu.campus.rooms.domain.RoomBookingStatus.ACTIVE, sa.edu.fbsu.campus.rooms.domain.RoomBookingStatus.RESERVED) AND b.startTime < :dayEnd AND b.endTime > :dayStart ORDER BY b.startTime ASC")
+    List<RoomBooking> findDailyOccupiedByRoomIds(
+            @Param("roomIds") List<UUID> roomIds,
+            @Param("dayStart") Instant dayStart,
+            @Param("dayEnd") Instant dayEnd
+    );
 }
 
