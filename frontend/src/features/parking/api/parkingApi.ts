@@ -11,6 +11,7 @@ import type {
   CreateFlexOfferRequest,
   GateScanRequest,
   GateDecisionResponse,
+  GateEventPageResponse,
 } from '../types/parking';
 
 export const parkingApi = {
@@ -87,9 +88,18 @@ export const parkingApi = {
     await apiClient.post(`/parking/flex/offers/${offerId}/cancel`);
   },
 
-  // Gate Scanner Simulator
+  // Gate Scanner Simulator & Protected Event History
   scanGate: async (request: GateScanRequest): Promise<GateDecisionResponse> => {
     const response = await apiClient.post<GateDecisionResponse>('/parking/gate/scan', request);
+    return response.data;
+  },
+
+  getGateEvents: async (params?: {
+    page?: number;
+    size?: number;
+    decision?: 'GRANTED' | 'DENIED';
+  }): Promise<GateEventPageResponse> => {
+    const response = await apiClient.get<GateEventPageResponse>('/parking/gate/events', { params });
     return response.data;
   },
 };

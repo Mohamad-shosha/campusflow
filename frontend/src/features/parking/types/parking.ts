@@ -154,6 +154,26 @@ export interface GateDecisionResponse {
   scannedPlate: string;
 }
 
+export interface GateEventResponse {
+  id: string;
+  gateId: string;
+  plateLettersAr: string;
+  plateDigits: string;
+  decision: 'GRANTED' | 'DENIED';
+  reason: string;
+  bayNumber?: number | null;
+  bayCode?: string | null;
+  occurredAt: string;
+}
+
+export interface GateEventPageResponse {
+  content: GateEventResponse[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 /**
  * Maps a backend ParkingSpotResponse to the UI ParkingSpot structure
  */

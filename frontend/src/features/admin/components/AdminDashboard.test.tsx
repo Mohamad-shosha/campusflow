@@ -13,7 +13,10 @@ vi.mock('../api/adminApi', () => ({
     getTariffs: vi.fn(),
     updateTariff: vi.fn(),
     getRooms: vi.fn(),
+    createRoom: vi.fn(),
+    updateRoom: vi.fn(),
     updateRoomStatus: vi.fn(),
+    getGateEvents: vi.fn(),
     getUsers: vi.fn(),
     updateUserStatus: vi.fn(),
     updateUserRoles: vi.fn(),
@@ -44,8 +47,8 @@ describe('AdminDashboard Component Tests', () => {
   ];
 
   const mockTariffs: AdminTariff[] = [
-    { userType: 'STUDENT', hourlyRate: 2.0, dailyRate: 15.0, semesterRate: 250.0 },
-    { userType: 'FACULTY', hourlyRate: 1.0, dailyRate: 10.0, semesterRate: 150.0 },
+    { userType: 'STUDENT', hourlyRate: 2.0, dailyCap: 15.0, flexCashbackRate: 5.75 },
+    { userType: 'FACULTY', hourlyRate: 1.0, dailyCap: 10.0, flexCashbackRate: 5.75 },
   ];
 
   const mockRooms: AdminRoom[] = [
@@ -99,6 +102,13 @@ describe('AdminDashboard Component Tests', () => {
     vi.mocked(adminApi.getRooms).mockResolvedValue(mockRooms);
     vi.mocked(adminApi.getUsers).mockResolvedValue(mockUsers);
     vi.mocked(adminApi.getAuditLogs).mockResolvedValue(mockAuditLogs);
+    vi.mocked(adminApi.getGateEvents).mockResolvedValue({
+      content: [],
+      page: 0,
+      size: 30,
+      totalElements: 0,
+      totalPages: 0,
+    });
   });
 
   it('renders admin dashboard header, badges, and default spots tab with spot data', async () => {
@@ -146,8 +156,8 @@ describe('AdminDashboard Component Tests', () => {
     vi.mocked(adminApi.updateTariff).mockResolvedValueOnce({
       userType: 'STUDENT',
       hourlyRate: 3.0,
-      dailyRate: 20.0,
-      semesterRate: 300.0,
+      dailyCap: 20.0,
+      flexCashbackRate: 6.5,
     });
 
     render(<AdminDashboard isAr={true} />);
@@ -237,6 +247,96 @@ describe('AdminDashboard Component Tests', () => {
       expect(screen.getByText('admin@fbsu.edu.sa')).toBeInTheDocument();
       expect(screen.getByText('UPDATE_SPOT_STATUS')).toBeInTheDocument();
       expect(screen.getByText('تحويل الموقف للصيانة')).toBeInTheDocument();
+    });
+  });
+
+  it('opens create room modal from rooms tab and submits new room', async () => {
+    vi.mocked(adminApi.createRoom).mockResolvedValueOnce({
+      id: 'room-uuid-2',
+      roomCode: 'LAB-204',
+      nameAr: 'مختبر الذكاء الاصطناعي',
+      nameEn: 'AI Lab',
+      buildingAr: 'مبنى كلية الحاسب',
+      buildingEn: 'College of Computing',
+      capacityAr: '8 أشخاص',
+      capacityEn: '8 Seats',
+      typeBadgeAr: 'قاعة دراسة ذكية',
+      typeBadgeEn: 'Smart Study Pod',
+      status: 'AVAILABLE',
+      specsAr: ['شاشة عرض تفاعلية', 'سبورة زجاجية'],
+      specsEn: ['Smart Display', 'Glass Whiteboard'],
+    });
+
+    render(<AdminDashboard isAr={true} />);
+
+    fireEvent.click(screen.getByTestId('admin-tab-rooms'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('admin-create-room-btn')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('admin-create-room-btn'));
+
+    fireEvent.change(screen.getByTestId('room-form-code'), { target: { value: 'LAB-204' } });
+    fireEvent.change(screen.getByTestId('room-form-name-ar'), {
+      target: { value: 'مختبر الذكاء الاصطناعي' },
+    });
+    fireEvent.change(screen.getByTestId('room-form-name-en'), { target: { value: 'AI Lab' } });
+
+    fireEvent.click(screen.getByTestId('room-form-submit'));
+
+    await waitFor(() => {
+      expect(adminApi.createRoom).toHaveBeenCalledWith(
+        expect.objectContaining({
+          roomCode: 'LAB-204',
+          nameAr: 'مختبر الذكاء الاصطناعي',
+          nameEn: 'AI Lab',
+        })
+      );
+      expect(screen.getByText('LAB-204')).toBeInTheDocument();
+    });
+  });
+
+  it('switches to gate tab, renders persisted gate events, and filters by decision', async () => {
+    vi.mocked(adminApi.getGateEvents).mockResolvedValue({
+      content: [
+        {
+          id: 'gate-evt-1',
+          gateId: 'MAIN-GATE',
+          plateLettersAr: 'أ ح د',
+          plateDigits: '4582',
+          decision: 'DENIED',
+          reason: 'UNREGISTERED_VEHICLE',
+          bayNumber: null,
+          bayCode: null,
+          occurredAt: '2026-11-10T10:15:00Z',
+        },
+      ],
+      page: 0,
+      size: 30,
+      totalElements: 1,
+      totalPages: 1,
+    });
+
+    render(<AdminDashboard isAr={true} />);
+
+    fireEvent.click(screen.getByTestId('admin-tab-gate'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('admin-gate-panel')).toBeInTheDocument();
+      expect(screen.getByText('MAIN-GATE')).toBeInTheDocument();
+      expect(screen.getByText('أ ح د 4582')).toBeInTheDocument();
+      expect(screen.getByText('UNREGISTERED_VEHICLE')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('admin-gate-filter-denied'));
+
+    await waitFor(() => {
+      expect(adminApi.getGateEvents).toHaveBeenCalledWith({
+        page: 0,
+        size: 30,
+        decision: 'DENIED',
+      });
     });
   });
 });

@@ -1,12 +1,24 @@
-import { useState, FC } from 'react';
-import { Camera, CheckCircle2, ShieldCheck, XCircle, Clock, Shield, Sparkles } from 'lucide-react';
+import { useState, useEffect, useCallback, FC } from 'react';
+import {
+  Camera,
+  CheckCircle2,
+  ShieldCheck,
+  XCircle,
+  Clock,
+  Shield,
+  Sparkles,
+  RotateCw,
+  Lock,
+} from 'lucide-react';
 import { SaudiPlate } from '../../../shared/components/SaudiPlate';
 import { soundFX } from '../../../shared/utils/sound';
 import { parkingApi } from '../api/parkingApi';
-import type { GateDecisionResponse } from '../types/parking';
+import type { GateDecisionResponse, GateEventResponse } from '../types/parking';
 
 export interface AlprGateViewProps {
   isAr: boolean;
+  /** True when caller holds SECURITY_OFFICER or CAMPUS_ADMIN role */
+  canViewGateHistory?: boolean | undefined;
 }
 
 interface ScanLogEntry {
@@ -19,7 +31,7 @@ interface ScanLogEntry {
   reason: string;
 }
 
-export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
+export const AlprGateView: FC<AlprGateViewProps> = ({ isAr, canViewGateHistory = false }) => {
   const [selectedPlate, setSelectedPlate] = useState<string>('س ع د 7700');
   const [customLetters, setCustomLetters] = useState<string>('');
   const [customDigits, setCustomDigits] = useState<string>('');
@@ -29,6 +41,48 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
   const [lastDecision, setLastDecision] = useState<GateDecisionResponse | null>(null);
   const [isArmOpen, setIsArmOpen] = useState<boolean>(false);
   const [scanHistory, setScanHistory] = useState<ScanLogEntry[]>([]);
+
+  // Protected persisted gate history state (SECURITY_OFFICER / CAMPUS_ADMIN only)
+  const [persistedEvents, setPersistedEvents] = useState<GateEventResponse[]>([]);
+  const [eventsPage, setEventsPage] = useState<number>(0);
+  const [eventsTotalPages, setEventsTotalPages] = useState<number>(0);
+  const [eventsTotalElements, setEventsTotalElements] = useState<number>(0);
+  const [eventsDecisionFilter, setEventsDecisionFilter] = useState<'ALL' | 'GRANTED' | 'DENIED'>(
+    'ALL'
+  );
+  const [isLoadingEvents, setIsLoadingEvents] = useState<boolean>(false);
+  const [eventsError, setEventsError] = useState<boolean>(false);
+
+  const loadGateEvents = useCallback(
+    async (page = eventsPage, filter = eventsDecisionFilter) => {
+      if (!canViewGateHistory) return;
+      setIsLoadingEvents(true);
+      setEventsError(false);
+      try {
+        const res = await parkingApi.getGateEvents({
+          page,
+          size: 10,
+          ...(filter !== 'ALL' ? { decision: filter } : {}),
+        });
+        setPersistedEvents(res.content);
+        setEventsTotalPages(res.totalPages);
+        setEventsTotalElements(res.totalElements);
+      } catch {
+        setEventsError(true);
+      } finally {
+        setIsLoadingEvents(false);
+      }
+    },
+    [canViewGateHistory, eventsPage, eventsDecisionFilter]
+  );
+
+  useEffect(() => {
+    if (canViewGateHistory) {
+      loadGateEvents(eventsPage, eventsDecisionFilter);
+    } else {
+      setPersistedEvents([]);
+    }
+  }, [canViewGateHistory, eventsPage, eventsDecisionFilter, loadGateEvents]);
 
   const parsePlate = (plateStr: string) => {
     const parts = plateStr.trim().split(/\s+/);
@@ -112,6 +166,9 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
       };
 
       setScanHistory(prev => [newLog, ...prev.slice(0, 7)]);
+      if (canViewGateHistory) {
+        loadGateEvents(0, eventsDecisionFilter);
+      }
     } catch {
       soundFX.playError();
       setIsArmOpen(false);
@@ -740,6 +797,191 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr }) => {
           </div>
         </div>
       )}
+
+      {/* Protected Persisted Gate Passage Events (SECURITY_OFFICER / CAMPUS_ADMIN) */}
+      <div style={{ marginTop: '2.5rem' }} data-testid="persisted-gate-events-section">
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '0.75rem',
+            marginBottom: '1rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Shield size={16} color="var(--fbsu-primary)" />
+            <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)' }}>
+              {isAr
+                ? 'سجل عبور البوابات الرسمي من قاعدة البيانات'
+                : 'Persisted Gate Events Registry (Database)'}
+            </h4>
+            {canViewGateHistory && (
+              <span className="badge badge-secondary" style={{ fontSize: '0.75rem' }}>
+                {eventsTotalElements} {isAr ? 'سجل' : 'events'}
+              </span>
+            )}
+          </div>
+
+          {canViewGateHistory && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {(['ALL', 'GRANTED', 'DENIED'] as const).map(f => (
+                <button
+                  key={f}
+                  type="button"
+                  data-testid={`gate-events-filter-${f.toLowerCase()}`}
+                  onClick={() => {
+                    setEventsDecisionFilter(f);
+                    setEventsPage(0);
+                  }}
+                  className={`hub-filter-btn ${eventsDecisionFilter === f ? 'active' : ''}`}
+                  style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+                >
+                  {f === 'ALL'
+                    ? isAr
+                      ? 'الكل'
+                      : 'All'
+                    : f === 'GRANTED'
+                      ? isAr
+                        ? 'مصرّح'
+                        : 'Granted'
+                      : isAr
+                        ? 'مرفوض'
+                        : 'Denied'}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="btn-outline"
+                onClick={() => loadGateEvents(eventsPage, eventsDecisionFilter)}
+                disabled={isLoadingEvents}
+                data-testid="refresh-gate-events-btn"
+                style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem' }}
+              >
+                <RotateCw size={13} />
+                <span>{isAr ? 'تحديث' : 'Refresh'}</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {!canViewGateHistory ? (
+          <div
+            className="glass-panel"
+            data-testid="gate-events-restricted-notice"
+            style={{
+              padding: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              borderRadius: '12px',
+              border: '1px dashed var(--border-color)',
+              color: 'var(--text-muted)',
+              fontSize: '0.86rem',
+            }}
+          >
+            <Lock size={18} color="var(--fbsu-gold)" />
+            <span>
+              {isAr
+                ? 'عرض السجل الرسمي الدائم للوحات السيارات مقتصر على مسؤولي الأمن والإدارة (SECURITY_OFFICER / CAMPUS_ADMIN) حفاظاً على الخصوصية.'
+                : 'Persisted vehicle license plate logs are restricted to SECURITY_OFFICER and CAMPUS_ADMIN roles.'}
+            </span>
+          </div>
+        ) : eventsError ? (
+          <div className="campus-data-state is-error" role="alert" data-testid="gate-events-error">
+            <span>
+              {isAr ? 'تعذر تحميل سجل عبور البوابات.' : 'Failed to load persisted gate events.'}
+            </span>
+          </div>
+        ) : persistedEvents.length === 0 ? (
+          <div className="campus-data-state" data-testid="gate-events-empty">
+            {isLoadingEvents
+              ? isAr
+                ? 'جاري تحميل السجلات...'
+                : 'Loading gate events...'
+              : isAr
+                ? 'لا توجد حركات مسجلة مطابقة للتصفية.'
+                : 'No persisted gate events match the selected filter.'}
+          </div>
+        ) : (
+          <div
+            className="table-responsive glass-panel"
+            style={{ padding: '0.75rem', overflowX: 'auto' }}
+            data-testid="gate-events-table"
+          >
+            <table className="ledger-table" style={{ width: '100%', fontSize: '0.84rem' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'start' }}>{isAr ? 'التاريخ والوقت' : 'Occurred At'}</th>
+                  <th style={{ textAlign: 'start' }}>{isAr ? 'البوابة' : 'Gate'}</th>
+                  <th style={{ textAlign: 'start' }}>{isAr ? 'اللوحة' : 'Plate'}</th>
+                  <th style={{ textAlign: 'start' }}>{isAr ? 'الموقف' : 'Bay'}</th>
+                  <th style={{ textAlign: 'start' }}>{isAr ? 'القرار' : 'Decision'}</th>
+                  <th style={{ textAlign: 'start' }}>{isAr ? 'السبب' : 'Reason'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {persistedEvents.map(ev => (
+                  <tr key={ev.id}>
+                    <td style={{ fontFamily: 'var(--font-en)', color: 'var(--text-muted)' }}>
+                      {new Date(ev.occurredAt).toLocaleString(isAr ? 'ar-SA' : 'en-US')}
+                    </td>
+                    <td>{ev.gateId}</td>
+                    <td style={{ fontWeight: 800 }}>
+                      {ev.plateLettersAr} {ev.plateDigits}
+                    </td>
+                    <td>{ev.bayNumber ? `#${ev.bayNumber}` : '—'}</td>
+                    <td>
+                      <span
+                        className={`badge ${ev.decision === 'GRANTED' ? 'badge-success' : 'badge-danger'}`}
+                      >
+                        {ev.decision}
+                      </span>
+                    </td>
+                    <td style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{ev.reason}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {eventsTotalPages > 1 && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '0.85rem',
+                  paddingTop: '0.65rem',
+                  borderTop: '1px solid var(--border-color)',
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn-outline"
+                  disabled={eventsPage === 0 || isLoadingEvents}
+                  onClick={() => setEventsPage(p => Math.max(0, p - 1))}
+                  data-testid="gate-events-prev"
+                >
+                  {isAr ? 'السابق' : 'Previous'}
+                </button>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {eventsPage + 1} / {eventsTotalPages}
+                </span>
+                <button
+                  type="button"
+                  className="btn-outline"
+                  disabled={eventsPage + 1 >= eventsTotalPages || isLoadingEvents}
+                  onClick={() => setEventsPage(p => p + 1)}
+                  data-testid="gate-events-next"
+                >
+                  {isAr ? 'التالي' : 'Next'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
