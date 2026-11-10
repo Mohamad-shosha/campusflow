@@ -8,8 +8,10 @@ import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.transit.domain.ShuttleBus;
+import sa.edu.fbsu.campus.transit.domain.ShuttleStatus;
 import sa.edu.fbsu.campus.transit.domain.TransitPass;
 import sa.edu.fbsu.campus.transit.domain.TransitRoute;
+import sa.edu.fbsu.campus.transit.domain.TransitRouteStatus;
 import sa.edu.fbsu.campus.transit.domain.TransitStop;
 import sa.edu.fbsu.campus.transit.dto.BookTransitPassRequest;
 import sa.edu.fbsu.campus.transit.dto.ShuttleBusResponse;
@@ -55,7 +57,7 @@ public class TransitService {
     @Transactional(readOnly = true)
     public List<TransitRouteResponse> getAllRoutes(UUID universityId) {
         Objects.requireNonNull(universityId, "University ID cannot be null");
-        return routeRepository.findAllWithStopsByUniversityId(universityId)
+        return routeRepository.findPublicWithStopsByUniversityId(universityId)
                 .stream()
                 .map(TransitRouteResponse::fromEntity)
                 .toList();
@@ -64,7 +66,7 @@ public class TransitService {
     @Transactional(readOnly = true)
     public List<ShuttleBusResponse> getLiveShuttles(UUID universityId) {
         Objects.requireNonNull(universityId, "University ID cannot be null");
-        return shuttleRepository.findAllDetailedByUniversityId(universityId)
+        return shuttleRepository.findPublicDetailedByUniversityId(universityId)
                 .stream()
                 .map(ShuttleBusResponse::fromEntity)
                 .toList();
@@ -81,6 +83,10 @@ public class TransitService {
         TransitRoute route = routeRepository.findById(request.routeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Transit route not found: " + request.routeId()));
 
+        if (route.getStatus() == TransitRouteStatus.INACTIVE) {
+            throw new IllegalStateException("Transit route is currently inactive: " + route.getRouteCode());
+        }
+
         TransitStop pickup = stopRepository.findById(request.pickupStopId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pickup stop not found: " + request.pickupStopId()));
 
@@ -90,6 +96,9 @@ public class TransitService {
         ShuttleBus shuttle = null;
         if (request.shuttleId() != null) {
             shuttle = shuttleRepository.findById(request.shuttleId()).orElse(null);
+            if (shuttle != null && shuttle.getStatus() == ShuttleStatus.OUT_OF_SERVICE) {
+                throw new IllegalStateException("Selected shuttle is out of service: " + shuttle.getBusNumber());
+            }
         }
 
         // Generate digital pass code & verifiable QR token

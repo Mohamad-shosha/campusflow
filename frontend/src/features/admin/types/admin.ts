@@ -151,3 +151,47 @@ export interface UpdateUserStatusRequest {
 export interface UpdateUserRolesRequest {
   roles: string[];
 }
+
+export interface CreateTransitRouteRequest {
+  routeCode: string;
+  nameAr: string;
+  nameEn: string;
+  colorHex?: string;
+  operatingHoursAr?: string;
+  operatingHoursEn?: string;
+  frequencyMinutes?: number;
+  status?: 'ACTIVE' | 'MAINTENANCE' | 'OFF_PEAK' | 'INACTIVE';
+  displayOrder?: number;
+}
+
+export interface UpdateTransitRouteStatusRequest {
+  status: 'ACTIVE' | 'MAINTENANCE' | 'OFF_PEAK' | 'INACTIVE';
+  reason?: string;
+}
+
+export interface CreateShuttleBusRequest {
+  routeId?: string;
+  busNumber: string;
+  plateLettersAr: string;
+  plateDigits: string;
+  modelName: string;
+  totalCapacity?: number;
+  occupiedSeats?: number;
+  isElectric?: boolean;
+  driverNameAr: string;
+  driverNameEn: string;
+  status?: 'IN_TRANSIT' | 'BOARDING' | 'ARRIVING' | 'OUT_OF_SERVICE';
+  nextStopEtaMins?: number;
+  batteryPercentage?: number;
+}
+
+export interface UpdateShuttleBusRequest {
+  status?: 'IN_TRANSIT' | 'BOARDING' | 'ARRIVING' | 'OUT_OF_SERVICE';
+  routeId?: string;
+  occupiedSeats?: number;
+  batteryPercentage?: number;
+  nextStopEtaMins?: number;
+  driverNameAr?: string;
+  driverNameEn?: string;
+  reason?: string;
+}

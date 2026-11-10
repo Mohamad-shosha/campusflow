@@ -39,6 +39,9 @@ public class TransitRoute extends BaseTenantEntity {
     @Column(name = "display_order", nullable = false)
     private int displayOrder = 1;
 
+    @Column(name = "source", nullable = false, length = 20)
+    private String source = "MANUAL";
+
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("stopOrder ASC")
     private List<TransitStop> stops = new ArrayList<>();
@@ -140,6 +143,14 @@ public class TransitRoute extends BaseTenantEntity {
 
     public void setDisplayOrder(int displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source != null && !source.isBlank() ? source.trim() : "MANUAL";
     }
 
     public List<TransitStop> getStops() {

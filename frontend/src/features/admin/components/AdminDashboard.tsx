@@ -19,9 +19,11 @@ import {
   Plus,
   Edit3,
   X,
+  Bus,
 } from 'lucide-react';
 import { adminApi } from '../api/adminApi';
 import type { GateEventResponse } from '../../parking/types/parking';
+import type { ShuttleBus, TransitRoute } from '../../transit/types/transit';
 import type {
   AdminSpot,
   AdminTariff,
@@ -32,6 +34,7 @@ import type {
   AdminSpotType,
   CreateRoomRequest,
   UpdateRoomRequest,
+  CreateTransitRouteRequest,
 } from '../types/admin';
 
 export interface AdminDashboardProps {
@@ -39,7 +42,7 @@ export interface AdminDashboardProps {
   onRefreshAll?: () => void;
 }
 
-type AdminSubTab = 'spots' | 'tariffs' | 'rooms' | 'users' | 'gate' | 'audit';
+type AdminSubTab = 'spots' | 'tariffs' | 'rooms' | 'transit' | 'users' | 'gate' | 'audit';
 
 interface RoomFormState {
   roomCode: string;
@@ -93,6 +96,32 @@ export const AdminDashboard: FC<AdminDashboardProps> = ({ isAr = true, onRefresh
   const [auditLogs, setAuditLogs] = useState<AdminAuditLog[]>([]);
   const [gateEvents, setGateEvents] = useState<GateEventResponse[]>([]);
   const [gateFilter, setGateFilter] = useState<'ALL' | 'GRANTED' | 'DENIED'>('ALL');
+  const [transitRoutes, setTransitRoutes] = useState<TransitRoute[]>([]);
+  const [transitShuttles, setTransitShuttles] = useState<ShuttleBus[]>([]);
+  const [editingShuttleMap, setEditingShuttleMap] = useState<
+    Record<
+      string,
+      {
+        status: ShuttleBus['status'];
+        occupiedSeats: number;
+        batteryPercentage: number;
+        nextStopEtaMins: number;
+      }
+    >
+  >({});
+  const [routeModalOpen, setRouteModalOpen] = useState<boolean>(false);
+  const [isSavingRoute, setIsSavingRoute] = useState<boolean>(false);
+  const [routeForm, setRouteForm] = useState<CreateTransitRouteRequest>({
+    routeCode: '',
+    nameAr: '',
+    nameEn: '',
+    colorHex: '#0ea5e9',
+    operatingHoursAr: '07:30 ص - 05:30 م',
+    operatingHoursEn: '07:30 AM - 05:30 PM',
+    frequencyMinutes: 10,
+    status: 'ACTIVE',
+    displayOrder: 10,
+  });
 
   // Room Create / Edit modal state
   const [roomModalOpen, setRoomModalOpen] = useState<boolean>(false);
@@ -136,6 +165,31 @@ export const AdminDashboard: FC<AdminDashboardProps> = ({ isAr = true, onRefresh
       } else if (activeSubTab === 'rooms') {
         const data = await adminApi.getRooms();
         setRooms(data);
+      } else if (activeSubTab === 'transit') {
+        const [routesData, shuttlesData] = await Promise.all([
+          adminApi.getTransitRoutes(),
+          adminApi.getTransitShuttles(),
+        ]);
+        setTransitRoutes(routesData);
+        setTransitShuttles(shuttlesData);
+        const sMap: Record<
+          string,
+          {
+            status: ShuttleBus['status'];
+            occupiedSeats: number;
+            batteryPercentage: number;
+            nextStopEtaMins: number;
+          }
+        > = {};
+        shuttlesData.forEach(b => {
+          sMap[b.id] = {
+            status: b.status,
+            occupiedSeats: b.occupiedSeats,
+            batteryPercentage: b.batteryPercentage,
+            nextStopEtaMins: b.nextStopEtaMins,
+          };
+        });
+        setEditingShuttleMap(sMap);
       } else if (activeSubTab === 'users') {
         const data = await adminApi.getUsers();
         setUsers(data);
@@ -374,6 +428,83 @@ export const AdminDashboard: FC<AdminDashboardProps> = ({ isAr = true, onRefresh
     }
   };
 
+  // --- Handlers: Transit ---
+  const handleUpdateRouteStatus = async (
+    route: TransitRoute,
+    newStatus: TransitRoute['status']
+  ) => {
+    try {
+      const updated = await adminApi.updateTransitRouteStatus(route.id, {
+        status: newStatus,
+        reason: `Admin status change to ${newStatus}`,
+      });
+      setTransitRoutes(prev => prev.map(r => (r.id === route.id ? updated : r)));
+      showFeedback(
+        'success',
+        isAr
+          ? `تم تحديث المسار ${route.routeCode} إلى ${newStatus}`
+          : `Route ${route.routeCode} updated to ${newStatus}`
+      );
+      if (onRefreshAll) onRefreshAll();
+    } catch {
+      showFeedback('error', isAr ? 'فشل تحديث حالة المسار' : 'Failed to update route status');
+    }
+  };
+
+  const handleSaveShuttle = async (shuttle: ShuttleBus) => {
+    const draft = editingShuttleMap[shuttle.id];
+    if (!draft) return;
+    try {
+      const updated = await adminApi.updateShuttleBus(shuttle.id, {
+        status: draft.status,
+        occupiedSeats: draft.occupiedSeats,
+        batteryPercentage: draft.batteryPercentage,
+        nextStopEtaMins: draft.nextStopEtaMins,
+        reason: 'Admin transit console update',
+      });
+      setTransitShuttles(prev => prev.map(b => (b.id === shuttle.id ? updated : b)));
+      showFeedback(
+        'success',
+        isAr
+          ? `تم تحديث الحافلة ${shuttle.busNumber}`
+          : `Shuttle ${shuttle.busNumber} updated successfully`
+      );
+      if (onRefreshAll) onRefreshAll();
+    } catch {
+      showFeedback('error', isAr ? 'فشل تحديث الحافلة' : 'Failed to update shuttle bus');
+    }
+  };
+
+  const handleCreateRoute = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingRoute(true);
+    try {
+      const created = await adminApi.createTransitRoute(routeForm);
+      setTransitRoutes(prev => [...prev, created]);
+      setRouteModalOpen(false);
+      setRouteForm({
+        routeCode: '',
+        nameAr: '',
+        nameEn: '',
+        colorHex: '#0ea5e9',
+        operatingHoursAr: '07:30 ص - 05:30 م',
+        operatingHoursEn: '07:30 AM - 05:30 PM',
+        frequencyMinutes: 10,
+        status: 'ACTIVE',
+        displayOrder: transitRoutes.length + 1,
+      });
+      showFeedback(
+        'success',
+        isAr ? `تمت إضافة المسار ${created.routeCode}` : `Route ${created.routeCode} created`
+      );
+      if (onRefreshAll) onRefreshAll();
+    } catch {
+      showFeedback('error', isAr ? 'فشل إنشاء المسار الجديد' : 'Failed to create transit route');
+    } finally {
+      setIsSavingRoute(false);
+    }
+  };
+
   // Filters for Users
   const filteredUsers = users.filter(u => {
     const matchSearch =
@@ -531,6 +662,16 @@ export const AdminDashboard: FC<AdminDashboardProps> = ({ isAr = true, onRefresh
         >
           <DoorOpen size={16} />
           <span>{isAr ? 'الغرف والبودات' : 'Rooms & Pods'}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('transit')}
+          className={`btn ${activeSubTab === 'transit' ? 'btn-primary' : 'btn-ghost'}`}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          data-testid="admin-tab-transit"
+        >
+          <Bus size={16} />
+          <span>{isAr ? 'النقل والحافلات' : 'Transit & Shuttles'}</span>
         </button>
 
         <button
@@ -1362,6 +1503,322 @@ export const AdminDashboard: FC<AdminDashboardProps> = ({ isAr = true, onRefresh
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* --- TAB 6: TRANSIT ROUTES & ECO SHUTTLE FLEET ADMIN --- */}
+      {activeSubTab === 'transit' && (
+        <div data-testid="admin-transit-panel" style={{ display: 'grid', gap: '1.5rem' }}>
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '0.85rem',
+              }}
+            >
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>
+                {isAr ? 'إدارة خطوط ومسارات النقل الترددي' : 'Manage Transit Routes & Lifecycle'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setRouteModalOpen(true)}
+                className="btn btn-primary btn-sm"
+                data-testid="admin-create-route-btn"
+              >
+                <Plus size={15} />
+                <span>{isAr ? 'إضافة مسار نقل' : 'Add Transit Route'}</span>
+              </button>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table
+                className="admin-table"
+                style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}
+              >
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: '2px solid var(--border-color)',
+                      textAlign: isAr ? 'right' : 'left',
+                    }}
+                  >
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'الرمز' : 'Code'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'المسار' : 'Route'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'المصدر' : 'Source'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'الحالة' : 'Status'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transitRoutes.map(route => (
+                    <tr key={route.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <td style={{ padding: '0.7rem', fontWeight: 700 }}>{route.routeCode}</td>
+                      <td style={{ padding: '0.7rem' }}>{isAr ? route.nameAr : route.nameEn}</td>
+                      <td style={{ padding: '0.7rem' }}>
+                        <span
+                          className={`badge ${
+                            route.source === 'MANUAL' ? 'badge-success' : 'badge-warning'
+                          }`}
+                        >
+                          {route.source || 'MANUAL'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.7rem' }}>
+                        <select
+                          value={route.status}
+                          onChange={e =>
+                            handleUpdateRouteStatus(route, e.target.value as TransitRoute['status'])
+                          }
+                          className="form-control"
+                          style={{ width: 'auto', minWidth: 145 }}
+                          data-testid={`admin-route-status-${route.routeCode}`}
+                        >
+                          <option value="ACTIVE">ACTIVE</option>
+                          <option value="MAINTENANCE">MAINTENANCE</option>
+                          <option value="OFF_PEAK">OFF_PEAK</option>
+                          <option value="INACTIVE">INACTIVE (Retired)</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <h3 style={{ margin: '0 0 0.85rem', fontSize: '1.1rem', color: 'var(--text-main)' }}>
+              {isAr ? 'أسطول الحافلات الكهربائية الذكية' : 'Eco-Shuttle Fleet Controls'}
+            </h3>
+            <div style={{ overflowX: 'auto' }}>
+              <table
+                className="admin-table"
+                style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}
+              >
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: '2px solid var(--border-color)',
+                      textAlign: isAr ? 'right' : 'left',
+                    }}
+                  >
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'الحافلة' : 'Bus'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'المسار' : 'Route'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'المصدر' : 'Source'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'المقاعد' : 'Occupied'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'البطارية %' : 'Battery %'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'الحالة' : 'Status'}</th>
+                    <th style={{ padding: '0.7rem' }}>{isAr ? 'حفظ' : 'Save'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transitShuttles.map(bus => {
+                    const draft = editingShuttleMap[bus.id] || {
+                      status: bus.status,
+                      occupiedSeats: bus.occupiedSeats,
+                      batteryPercentage: bus.batteryPercentage,
+                      nextStopEtaMins: bus.nextStopEtaMins,
+                    };
+                    return (
+                      <tr key={bus.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                        <td style={{ padding: '0.7rem', fontWeight: 700 }}>{bus.busNumber}</td>
+                        <td style={{ padding: '0.7rem' }}>{bus.routeCode || '—'}</td>
+                        <td style={{ padding: '0.7rem' }}>
+                          <span
+                            className={`badge ${
+                              bus.source === 'MANUAL' ? 'badge-success' : 'badge-warning'
+                            }`}
+                          >
+                            {bus.source || 'MANUAL'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.7rem' }}>
+                          <input
+                            type="number"
+                            min={0}
+                            max={bus.totalCapacity}
+                            value={draft.occupiedSeats}
+                            onChange={e =>
+                              setEditingShuttleMap(prev => ({
+                                ...prev,
+                                [bus.id]: {
+                                  ...draft,
+                                  occupiedSeats: Number(e.target.value),
+                                },
+                              }))
+                            }
+                            className="form-control"
+                            style={{ width: 72 }}
+                            data-testid={`admin-shuttle-occupied-${bus.busNumber}`}
+                          />
+                        </td>
+                        <td style={{ padding: '0.7rem' }}>
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            value={draft.batteryPercentage}
+                            onChange={e =>
+                              setEditingShuttleMap(prev => ({
+                                ...prev,
+                                [bus.id]: {
+                                  ...draft,
+                                  batteryPercentage: Number(e.target.value),
+                                },
+                              }))
+                            }
+                            className="form-control"
+                            style={{ width: 72 }}
+                          />
+                        </td>
+                        <td style={{ padding: '0.7rem' }}>
+                          <select
+                            value={draft.status}
+                            onChange={e =>
+                              setEditingShuttleMap(prev => ({
+                                ...prev,
+                                [bus.id]: {
+                                  ...draft,
+                                  status: e.target.value as ShuttleBus['status'],
+                                },
+                              }))
+                            }
+                            className="form-control"
+                            style={{ width: 'auto', minWidth: 145 }}
+                          >
+                            <option value="IN_TRANSIT">IN_TRANSIT</option>
+                            <option value="BOARDING">BOARDING</option>
+                            <option value="ARRIVING">ARRIVING</option>
+                            <option value="OUT_OF_SERVICE">OUT_OF_SERVICE</option>
+                          </select>
+                        </td>
+                        <td style={{ padding: '0.7rem' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSaveShuttle(bus)}
+                            className="btn btn-primary btn-sm"
+                            data-testid={`admin-save-shuttle-${bus.busNumber}`}
+                          >
+                            <Save size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- CREATE TRANSIT ROUTE MODAL --- */}
+      {routeModalOpen && (
+        <div
+          className="modal-overlay active"
+          role="dialog"
+          aria-modal="true"
+          data-testid="admin-route-modal"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1200,
+            background: 'rgba(3, 12, 10, 0.78)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+          }}
+        >
+          <div
+            className="glass-panel"
+            style={{
+              width: '100%',
+              maxWidth: '540px',
+              padding: '1.4rem',
+              borderRadius: '14px',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1rem',
+              }}
+            >
+              <h3 style={{ margin: 0 }}>
+                {isAr ? 'إضافة مسار نقل جامعي جديد' : 'Create Transit Route'}
+              </h3>
+              <button
+                type="button"
+                className="btn-outline"
+                onClick={() => setRouteModalOpen(false)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <form onSubmit={handleCreateRoute} style={{ display: 'grid', gap: '0.75rem' }}>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {isAr ? 'رمز المسار (Route Code)' : 'Route Code'}
+                </label>
+                <input
+                  required
+                  value={routeForm.routeCode}
+                  onChange={e => setRouteForm({ ...routeForm, routeCode: e.target.value })}
+                  className="form-control"
+                  data-testid="route-form-code"
+                  placeholder="ROUTE-LABS"
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {isAr ? 'اسم المسار (عربي)' : 'Route Name (AR)'}
+                </label>
+                <input
+                  required
+                  value={routeForm.nameAr}
+                  onChange={e => setRouteForm({ ...routeForm, nameAr: e.target.value })}
+                  className="form-control"
+                  data-testid="route-form-name-ar"
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {isAr ? 'اسم المسار (إنجليزي)' : 'Route Name (EN)'}
+                </label>
+                <input
+                  required
+                  value={routeForm.nameEn}
+                  onChange={e => setRouteForm({ ...routeForm, nameEn: e.target.value })}
+                  className="form-control"
+                  data-testid="route-form-name-en"
+                />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.65rem' }}>
+                <button
+                  type="button"
+                  className="btn-outline"
+                  onClick={() => setRouteModalOpen(false)}
+                >
+                  {isAr ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSavingRoute}
+                  data-testid="route-form-submit"
+                >
+                  <Save size={15} />
+                  <span>{isAr ? 'حفظ المسار' : 'Save Route'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
