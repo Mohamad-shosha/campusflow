@@ -20,6 +20,8 @@ public record AnalyticsSummaryResponse(
         int totalGatePassages,
         BigDecimal totalLedgerRevenue,
         List<HourlyLoadPoint> hourlyLoad,
-        List<ZoneOccupancyStat> zoneStats
+        List<ZoneOccupancyStat> zoneStats,
+        RoomsUtilizationStat roomsUtilization,
+        RevenueBreakdownStat revenueBreakdown
 ) {}
 

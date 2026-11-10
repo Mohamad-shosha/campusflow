@@ -1,5 +1,11 @@
 import { apiClient } from '../../../shared/http/apiClient';
-import type { AnalyticsSummary, HourlyLoadPoint, ZoneOccupancyStat } from '../types/analytics';
+import type {
+  AnalyticsSummary,
+  HourlyLoadPoint,
+  RevenueBreakdownStat,
+  RoomsUtilizationStat,
+  ZoneOccupancyStat,
+} from '../types/analytics';
 
 export const analyticsApi = {
   getSummary: async (): Promise<AnalyticsSummary> => {
@@ -14,6 +20,18 @@ export const analyticsApi = {
 
   getZoneStats: async (): Promise<ZoneOccupancyStat[]> => {
     const response = await apiClient.get<ZoneOccupancyStat[]>('/analytics/zones');
+    return response.data;
+  },
+
+  getRoomsUtilization: async (): Promise<RoomsUtilizationStat> => {
+    const response = await apiClient.get<RoomsUtilizationStat>('/analytics/rooms/utilization');
+    return response.data;
+  },
+
+  getRevenueBreakdown: async (): Promise<RevenueBreakdownStat> => {
+    const response = await apiClient.get<RevenueBreakdownStat>(
+      '/analytics/financial/revenue-breakdown'
+    );
     return response.data;
   },
 };

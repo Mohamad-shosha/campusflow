@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import sa.edu.fbsu.campus.tutoring.domain.TutoringEnrollment;
 import sa.edu.fbsu.campus.tutoring.domain.TutoringEnrollmentStatus;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,5 +35,11 @@ public interface TutoringEnrollmentRepository extends JpaRepository<TutoringEnro
     long countBySessionIdAndStatus(UUID sessionId, TutoringEnrollmentStatus status);
 
     Optional<TutoringEnrollment> findByIdempotencyKey(String idempotencyKey);
+
+    @Query("SELECT COALESCE(SUM(e.amountPaid), 0) FROM TutoringEnrollment e WHERE e.universityId = :universityId AND e.status = :status")
+    BigDecimal sumAmountPaidByUniversityIdAndStatus(
+            @Param("universityId") UUID universityId,
+            @Param("status") TutoringEnrollmentStatus status
+    );
 }
 
