@@ -1504,10 +1504,10 @@ body.theme-light .cf-home {
 
 /* ==========================================================================
    Photo heroes (home + every service page)
-   One consistent identity: the FBSU campus photo under a deep-teal shade,
-   light text, glass panels, and a soft fade into the page background.
-   The hero always reads as "dark" in both themes, so it re-scopes the colour
-   tokens locally; every component inside it adapts automatically.
+   One consistent identity: the FBSU campus photo under an atmospheric shade,
+   glass panels, and a soft fade into the page background.
+   Re-scopes the colour tokens locally for dark mode (default) and light mode
+   (body.theme-light) so every component inside adapts automatically.
    ========================================================================== */
 body {
   --page-fade: #081211;
@@ -1535,12 +1535,29 @@ body.theme-light {
   border-bottom: none;
 }
 
-.service-hero-banner.cf-photo-hero,
-body.theme-light .service-hero-banner.cf-photo-hero {
+body.theme-light .cf-photo-hero {
+  --text-main: #0f172a;
+  --text-strong: #0f172a;
+  --text-muted: #334155;
+  --text-dim: #475569;
+  --gold-text: #946812;
+  --accent-text: #0d7a6d;
+  --bg-card: rgba(255, 255, 255, 0.86);
+  --border-subtle: rgba(17, 110, 99, 0.16);
+  --surface-soft-2: rgba(15, 23, 42, 0.06);
+
+  background: #eef4f3;
+}
+
+.service-hero-banner.cf-photo-hero {
   background: #06201d;
   padding: clamp(2rem, 4vw, 3rem) 0 clamp(2.25rem, 4vw, 3.25rem);
   margin-bottom: 0;
   border-bottom: none;
+}
+
+body.theme-light .service-hero-banner.cf-photo-hero {
+  background: #eef4f3;
 }
 
 .cf-photo-hero__media {
@@ -1552,6 +1569,11 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   background-position: center 40%;
   transform: scale(1.04);
   animation: cfHeroDrift 26s ease-in-out infinite alternate;
+}
+
+body.theme-light .cf-photo-hero__media {
+  opacity: 0.42;
+  filter: saturate(0.95) contrast(0.95);
 }
 
 /* RTL (default): text sits on the right, so the shade is deepest on the right */
@@ -1592,6 +1614,41 @@ body.theme-light .service-hero-banner.cf-photo-hero {
     );
 }
 
+body.theme-light .cf-photo-hero__shade {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(247, 250, 249, 0.35) 0%,
+      transparent 35%,
+      transparent 70%,
+      var(--page-fade) 100%
+    ),
+    linear-gradient(
+      to left,
+      rgba(247, 250, 249, 0.95) 0%,
+      rgba(242, 247, 246, 0.84) 44%,
+      rgba(232, 242, 240, 0.48) 100%
+    );
+}
+
+[dir='ltr'] body.theme-light .cf-photo-hero__shade,
+body.theme-light [dir='ltr'] .cf-photo-hero__shade {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(247, 250, 249, 0.35) 0%,
+      transparent 35%,
+      transparent 70%,
+      var(--page-fade) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(247, 250, 249, 0.95) 0%,
+      rgba(242, 247, 246, 0.84) 44%,
+      rgba(232, 242, 240, 0.48) 100%
+    );
+}
+
 .cf-photo-hero__inner {
   position: relative;
 }
@@ -1615,6 +1672,13 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   -webkit-backdrop-filter: blur(6px);
 }
 
+body.theme-light .cf-hero-tag,
+body.theme-light .cf-photo-hero .service-hero-tag {
+  color: #8c620f;
+  background: rgba(215, 162, 55, 0.14);
+  border-color: rgba(181, 131, 34, 0.34);
+}
+
 .cf-hero-title,
 .cf-photo-hero .service-hero-title {
   color: #fff;
@@ -1622,6 +1686,12 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   line-height: 1.25;
   letter-spacing: -0.015em;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+body.theme-light .cf-hero-title,
+body.theme-light .cf-photo-hero .service-hero-title {
+  color: #0f172a;
+  text-shadow: none;
 }
 
 .cf-photo-hero .service-hero-title {
@@ -1687,6 +1757,20 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   border-color: rgba(255, 255, 255, 0.35);
 }
 
+body.theme-light .cf-hero-btn--ghost,
+body.theme-light .cf-photo-hero .btn-outline {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(17, 110, 99, 0.28);
+}
+
+body.theme-light .cf-hero-btn--ghost:hover,
+body.theme-light .cf-photo-hero .btn-outline:hover {
+  background: #ffffff;
+  border-color: var(--fbsu-primary);
+  color: var(--fbsu-primary);
+}
+
 /* Home hero layout */
 .cf-photo-hero--home {
   padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(4.5rem, 8vw, 6rem);
@@ -1710,6 +1794,12 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   -webkit-backdrop-filter: blur(14px) saturate(140%);
 }
 
+body.theme-light .cf-hero-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(17, 110, 99, 0.16);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
 .cf-hero-panel__head {
   display: flex;
   align-items: center;
@@ -1720,12 +1810,20 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+body.theme-light .cf-hero-panel__head {
+  border-bottom-color: rgba(15, 23, 42, 0.1);
+}
+
 .cf-hero-panel__title {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
   font-weight: 800;
   color: #fff;
+}
+
+body.theme-light .cf-hero-panel__title {
+  color: #0f172a;
 }
 
 .cf-live-dot {
@@ -1739,6 +1837,11 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   color: #6ee7b7;
   background: rgba(16, 185, 129, 0.14);
   border: 1px solid rgba(16, 185, 129, 0.35);
+}
+body.theme-light .cf-live-dot {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
 }
 .cf-live-dot > span {
   width: 7px;
@@ -1764,6 +1867,10 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--accent-text);
 }
+body.theme-light .cf-hero-stat {
+  background: rgba(241, 245, 249, 0.8);
+  border-color: rgba(15, 23, 42, 0.08);
+}
 .cf-hero-stat strong {
   margin-top: var(--sp-1);
   font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
@@ -1771,6 +1878,9 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   line-height: 1.1;
   color: #fff;
   font-variant-numeric: tabular-nums;
+}
+body.theme-light .cf-hero-stat strong {
+  color: #0f172a;
 }
 .cf-hero-stat span {
   font-size: var(--fs-xs);
@@ -1780,6 +1890,10 @@ body.theme-light .service-hero-banner.cf-photo-hero {
 .cf-hero-stat--ok,
 .cf-hero-stat--ok strong {
   color: #6ee7b7;
+}
+body.theme-light .cf-hero-stat--ok,
+body.theme-light .cf-hero-stat--ok strong {
+  color: #047857;
 }
 .cf-hero-stat--gold {
   color: var(--gold-text);
@@ -1799,12 +1913,18 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   color: #fff;
   font-variant-numeric: tabular-nums;
 }
+body.theme-light .cf-hero-meter__row strong {
+  color: #0f172a;
+}
 .cf-hero-meter__track {
   display: block;
   height: 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
+}
+body.theme-light .cf-hero-meter__track {
+  background: rgba(15, 23, 42, 0.1);
 }
 .cf-hero-meter__fill {
   display: block;
@@ -1825,11 +1945,23 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+body.theme-light .cf-photo-hero .service-stat-card {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(17, 110, 99, 0.16);
+  border-inline-start: 3px solid var(--gold-text);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
 .cf-photo-hero .service-stat-icon-wrap {
   background: rgba(255, 255, 255, 0.1);
 }
+body.theme-light .cf-photo-hero .service-stat-icon-wrap {
+  background: rgba(17, 110, 99, 0.08);
+}
 .cf-photo-hero .service-stat-value {
   color: #fff;
+}
+body.theme-light .cf-photo-hero .service-stat-value {
+  color: #0f172a;
 }
 .cf-photo-hero .service-stat-label {
   color: var(--text-dim);
@@ -1905,6 +2037,16 @@ body.theme-light .service-hero-banner.cf-photo-hero {
       180deg,
       rgba(4, 22, 19, 0.82) 0%,
       rgba(5, 30, 26, 0.78) 65%,
+      var(--page-fade) 100%
+    );
+  }
+  body.theme-light .cf-photo-hero__shade,
+  [dir='ltr'] body.theme-light .cf-photo-hero__shade,
+  body.theme-light [dir='ltr'] .cf-photo-hero__shade {
+    background: linear-gradient(
+      180deg,
+      rgba(247, 250, 249, 0.92) 0%,
+      rgba(242, 247, 246, 0.86) 65%,
       var(--page-fade) 100%
     );
   }
@@ -1987,6 +2129,9 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   font-weight: 600;
   color: var(--text-muted);
 }
+body.theme-light .cf-hero-points {
+  border-top-color: rgba(15, 23, 42, 0.12);
+}
 .cf-hero-points li {
   display: inline-flex;
   align-items: center;
@@ -2023,12 +2168,20 @@ body.theme-light .service-hero-banner.cf-photo-hero {
   background: rgba(245, 158, 11, 0.14);
   border-color: rgba(245, 158, 11, 0.4);
 }
+body.theme-light .cf-live-dot.is-off {
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(217, 119, 6, 0.35);
+}
 .cf-live-dot.is-off > span {
   background: #f59e0b;
   animation: none;
 }
 .cf-live-dot.is-loading > span {
   background: rgba(255, 255, 255, 0.6);
+}
+body.theme-light .cf-live-dot.is-loading > span {
+  background: rgba(15, 23, 42, 0.45);
 }
 
 .cf-hero-panel__link {
@@ -2052,6 +2205,15 @@ body.theme-light .service-hero-banner.cf-photo-hero {
 .cf-hero-panel__link:hover {
   background: rgba(255, 255, 255, 0.14);
   border-color: rgba(255, 255, 255, 0.3);
+}
+body.theme-light .cf-hero-panel__link {
+  color: #0f172a;
+  background: rgba(17, 110, 99, 0.08);
+  border-color: rgba(17, 110, 99, 0.22);
+}
+body.theme-light .cf-hero-panel__link:hover {
+  background: rgba(17, 110, 99, 0.15);
+  border-color: rgba(17, 110, 99, 0.38);
 }
 
 /* --- Services section ---------------------------------------------------- */
