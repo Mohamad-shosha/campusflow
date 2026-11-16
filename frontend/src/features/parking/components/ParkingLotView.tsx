@@ -496,7 +496,7 @@ export const ParkingLotView: FC<ParkingLotViewProps> = ({
                         isAvail
                           ? 'Available'
                           : isOcc
-                            ? `Occupied: ${spot.occupant || 'Reserved'}`
+                            ? `Occupied: ${spot.occupantEn || spot.occupant || 'Reserved'}`
                             : isFlx
                               ? 'AI Flex'
                               : 'Faculty'

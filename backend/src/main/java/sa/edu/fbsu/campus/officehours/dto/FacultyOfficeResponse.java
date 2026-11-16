@@ -19,6 +19,7 @@ public record FacultyOfficeResponse(
         String collegeAr,
         String collegeEn,
         String officeLocation,
+        String officeLocationEn,
         String badgeAr,
         String badgeEn,
         String avatarColor,
@@ -27,6 +28,7 @@ public record FacultyOfficeResponse(
         String nextAvailableAr,
         String nextAvailableEn,
         List<String> coursesSupervised,
+        List<String> coursesSupervisedEn,
         List<OfficeHourSlotDto> timeSlots
 ) {
     public static FacultyOfficeResponse fromEntity(FacultyOfficeProfile p, List<OfficeHourSlot> slots) {
@@ -43,6 +45,7 @@ public record FacultyOfficeResponse(
                 p.getCollegeAr(),
                 p.getCollegeEn(),
                 p.getOfficeLocation(),
+                p.getOfficeLocationEn(),
                 p.getBadgeAr(),
                 p.getBadgeEn(),
                 p.getAvatarColor(),
@@ -51,6 +54,7 @@ public record FacultyOfficeResponse(
                 nextAvailable(slots, true),
                 nextAvailable(slots, false),
                 p.getCoursesList(),
+                p.getCoursesListEn(),
                 slots.stream().map(OfficeHourSlotDto::fromEntity).toList()
         );
     }

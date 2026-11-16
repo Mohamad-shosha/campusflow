@@ -263,7 +263,7 @@ public class OfficeHoursService {
 
     private FacultyOfficeProfile createDefaultFacultyProfile(User faculty) {
         String code = "fac-" + faculty.getUniversityNumber().toLowerCase();
-        return profileRepository.save(new FacultyOfficeProfile(
+        FacultyOfficeProfile profile = new FacultyOfficeProfile(
                 faculty.getUniversityId(),
                 code,
                 faculty,
@@ -281,7 +281,9 @@ public class OfficeHoursService {
                 "Available this week",
                 List.of("الإرشاد الأكاديمي", "مناقشة المقررات"),
                 99
-        ));
+        );
+        profile.setEnglish("College building - Academic office", List.of("Academic advising", "Course discussions"));
+        return profileRepository.save(profile);
     }
 
     private FacultyOfficeProfile findProfileByIdOrCode(String idOrCode) {

@@ -189,7 +189,8 @@ public class BookingService {
                 spot.setPlateDigits(vehicle.getPlate().getDigits());
             }
         }
-        spot.setTimeLeftText("محجوز (" + durationHours.stripTrailingZeros().toPlainString() + " س)");
+        String hoursText = durationHours.stripTrailingZeros().toPlainString();
+        spot.setTimeLeft("محجوز (" + hoursText + " س)", "Reserved (" + hoursText + "h)");
         spot.setSessionEndsAt(endTime);
         spotRepository.save(spot);
 
@@ -268,7 +269,7 @@ public class BookingService {
             spot.setVehicleModel(null);
             spot.setPlateLettersAr(null);
             spot.setPlateDigits(null);
-            spot.setTimeLeftText(null);
+            spot.setTimeLeft(null, null);
             spot.setSessionEndsAt(null);
             spotRepository.save(spot);
         }

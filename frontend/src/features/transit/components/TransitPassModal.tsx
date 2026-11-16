@@ -89,7 +89,7 @@ export const TransitPassModal: FC<TransitPassModalProps> = ({ isOpen, pass, isAr
               <div className="flex items-center justify-between text-xs">
                 <span className="text-gray-400">{isAr ? 'الراكب الجامعي:' : 'Passenger:'}</span>
                 <span className="font-bold text-white">
-                  {pass.userName} ({pass.userUniversityNumber})
+                  {isAr ? pass.userName : pass.userNameEn || pass.userName} ({pass.userUniversityNumber})
                 </span>
               </div>
 

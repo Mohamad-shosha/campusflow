@@ -26,6 +26,10 @@ import {
   INITIAL_TUTORING_SESSIONS,
 } from '../data/campusData';
 
+/** Room equipment lines in the UI language (English list falls back to Arabic). */
+const roomSpecs = (room: { specs?: string[] | undefined; specsEn?: string[] | undefined }, isAr: boolean) =>
+  (isAr ? room.specs : room.specsEn?.length ? room.specsEn : room.specs) ?? [];
+
 export interface CampusShowcaseHubProps {
   isAr: boolean;
   onNavigate: (tab: string) => void;
@@ -220,16 +224,16 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     <div className="lectures-scope-title">
                       <Cpu size={14} color="var(--fbsu-gold)" />
                       <span>
-                        {room.specs && room.specs[0]
-                          ? room.specs[0]
+                        {roomSpecs(room, isAr)[0]
+                          ? roomSpecs(room, isAr)[0]
                           : isAr
                             ? 'تجهيزات الحوسبة المتقدمة'
                             : 'Hardware Specifications'}
                       </span>
                     </div>
                     <div className="lectures-scope-desc">
-                      {room.specs && room.specs[1]
-                        ? room.specs[1]
+                      {roomSpecs(room, isAr)[1]
+                        ? roomSpecs(room, isAr)[1]
                         : isAr
                           ? 'اتصال مباشر بشبكة الألياف الضوئية الفائقة 40Gbps وحوسبة سحابية متقدمة.'
                           : 'Direct 40Gbps HPC cluster connection and cloud computing.'}
@@ -330,7 +334,9 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                   >
                     <Users size={13} color="var(--fbsu-primary)" />
                     <span>
-                      {isAr ? `السعة الاستيعابية: ${room.capacity}` : `Capacity: ${room.capacity}`}
+                      {isAr
+                        ? `السعة الاستيعابية: ${room.capacity}`
+                        : `Capacity: ${room.capacityEn || room.capacity}`}
                     </span>
                   </div>
 
@@ -537,7 +543,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                       <MapPin size={14} color="var(--text-dim)" />
                       <span>
-                        {faculty.office ||
+                        {(isAr ? faculty.office : faculty.officeEn || faculty.office) ||
                           (isAr ? 'مكتب العمادة - مبنى الإدارة' : 'Dean Office - Admin Bldg')}
                       </span>
                     </div>

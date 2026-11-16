@@ -169,7 +169,7 @@ public class ParkingLifecycleService {
                     spot.setPlateDigits(b.getVehicle().getPlate().getDigits());
                 }
             }
-            spot.setTimeLeftText("محجوز");
+            spot.setTimeLeft("محجوز", "Reserved");
             spot.setSessionEndsAt(b.getEndTime());
             spotRepository.save(spot);
             return;
@@ -180,7 +180,7 @@ public class ParkingLifecycleService {
         if (assignee.isPresent()) {
             spot.setStatus(SpotStatus.FACULTY_ASSIGNED);
             setOccupant(spot, assignee.get());
-            spot.setTimeLeftText(null);
+            spot.setTimeLeft(null, null);
             spot.setSessionEndsAt(null);
             spotRepository.save(spot);
             return;
@@ -193,7 +193,7 @@ public class ParkingLifecycleService {
         spot.setVehicleModel(null);
         spot.setPlateLettersAr(null);
         spot.setPlateDigits(null);
-        spot.setTimeLeftText(null);
+        spot.setTimeLeft(null, null);
         spot.setSessionEndsAt(null);
         spotRepository.save(spot);
     }

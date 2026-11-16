@@ -66,7 +66,7 @@ public class ParkingAdminService {
             spot.setVehicleModel(null);
             spot.setPlateLettersAr(null);
             spot.setPlateDigits(null);
-            spot.setTimeLeftText(null);
+            spot.setTimeLeft(null, null);
             spot.setSessionEndsAt(null);
         }
 
@@ -194,6 +194,7 @@ public class ParkingAdminService {
                 s.getPlateLettersAr(),
                 s.getPlateDigits(),
                 s.getTimeLeftText(),
+                s.getTimeLeftTextEn(),
                 s.getSessionEndsAt()
         );
     }

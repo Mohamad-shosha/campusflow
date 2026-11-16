@@ -252,7 +252,8 @@ public class FlexShareService {
         spot.setCurrentOccupantId(claimer.getId());
         spot.setOccupantNameAr(claimer.getFullNameAr());
         spot.setOccupantNameEn(claimer.getFullNameEn());
-        spot.setTimeLeftText("تبادل مرن حتى " + HH_MM.format(offer.getEndTime()));
+        String until = HH_MM.format(offer.getEndTime());
+        spot.setTimeLeft("تبادل مرن حتى " + until, "Flex share until " + until);
         spotRepository.save(spot);
 
         FlexOffer updated = flexOfferRepository.save(offer);

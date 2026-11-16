@@ -210,7 +210,9 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
               style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}
             >
               <span style={{ color: 'var(--text-muted)' }}>{isAr ? 'المكتب:' : 'Office:'}</span>
-              <strong style={{ color: 'var(--text-main)' }}>{faculty.office}</strong>
+              <strong style={{ color: 'var(--text-main)' }}>
+                {isAr ? faculty.office : faculty.officeEn || faculty.office}
+              </strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--text-muted)' }}>
@@ -235,7 +237,7 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
                     type="button"
                     className={`time-slot-btn ${slot.available ? '' : 'disabled'} ${isSelected ? 'active' : ''}`}
                     disabled={!slot.available || isSubmitting}
-                    title={slot.bookedNote || ''}
+                    title={slot.bookedNote ? (isAr ? 'محجوز' : 'Booked') : ''}
                     onClick={() => {
                       soundFX.playClick();
                       setSelectedSlot(slotKey(slot));

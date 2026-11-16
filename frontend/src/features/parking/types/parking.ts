@@ -21,6 +21,7 @@ export interface ParkingSpotResponse {
   plateLettersAr?: string | null;
   plateDigits?: string | null;
   timeLeftText?: string | null;
+  timeLeftTextEn?: string | null;
   sessionEndsAt?: string | null;
 }
 
@@ -231,10 +232,13 @@ export function mapBackendSpotToUi(backendSpot: ParkingSpotResponse) {
     collegeEn: backendSpot.zoneNameEn,
     status: uiStatus,
     occupant: backendSpot.occupantNameAr || null,
+    occupantEn: backendSpot.occupantNameEn || backendSpot.occupantNameAr || null,
     car: backendSpot.vehicleModel || null,
     plate: plateStr,
     timeLeft: backendSpot.timeLeftText || null,
+    timeLeftEn: backendSpot.timeLeftTextEn || backendSpot.timeLeftText || null,
     distance: `${backendSpot.distanceMeters} م`,
+    distanceEn: `${backendSpot.distanceMeters} m`,
     isFlexEligible: backendSpot.flexEligible,
     isFaculty,
     isEV,

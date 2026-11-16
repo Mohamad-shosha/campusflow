@@ -52,6 +52,7 @@ export interface FacultyMember {
   college: string;
   collegeEn?: string | undefined;
   office: string;
+  officeEn?: string | undefined;
   email: string;
   badge: string;
   badgeEn?: string | undefined;
@@ -61,6 +62,7 @@ export interface FacultyMember {
   nextAvailable: string;
   nextAvailableEn?: string | undefined;
   coursesSupervised: string[];
+  coursesSupervisedEn?: string[] | undefined;
   timeSlots: TimeSlot[];
 }
 

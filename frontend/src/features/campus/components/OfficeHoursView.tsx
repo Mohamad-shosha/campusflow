@@ -138,7 +138,7 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                     </div>
                     <div className="faculty-office-location">
                       <MapPin size={13} color="var(--fbsu-primary)" />
-                      <span>{f.office}</span>
+                      <span>{isAr ? f.office : f.officeEn || f.office}</span>
                     </div>
                   </div>
                 </div>
@@ -155,7 +155,7 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                   {isAr ? 'المقررات والمجالات المتاحة للنقاش:' : 'Supervised Topics & Courses:'}
                 </div>
                 <div className="faculty-subjects-tag-list">
-                  {f.coursesSupervised.map((subj, idx) => (
+                  {(isAr ? f.coursesSupervised : f.coursesSupervisedEn || f.coursesSupervised).map((subj, idx) => (
                     <span key={idx} className="faculty-subject-chip">
                       {subj}
                     </span>
@@ -179,7 +179,7 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                         key={slot.id || `${slot.time}-${sIdx}`}
                         className={`time-slot-btn ${slot.available ? '' : 'disabled'}`}
                         disabled={!slot.available}
-                        title={slot.bookedNote || ''}
+                        title={slot.bookedNote ? (isAr ? 'محجوز' : 'Booked') : ''}
                         onClick={() => handleOpenModal(f, slotKey(slot))}
                         type="button"
                       >

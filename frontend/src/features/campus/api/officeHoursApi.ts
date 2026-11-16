@@ -25,6 +25,7 @@ export interface FacultyOfficeDto {
   collegeAr: string;
   collegeEn: string;
   officeLocation: string;
+  officeLocationEn?: string;
   badgeAr: string;
   badgeEn: string;
   avatarColor: string;
@@ -33,6 +34,7 @@ export interface FacultyOfficeDto {
   nextAvailableAr: string;
   nextAvailableEn: string;
   coursesSupervised: string[];
+  coursesSupervisedEn?: string[];
   timeSlots: OfficeHourSlotDto[];
 }
 
@@ -81,6 +83,7 @@ export function mapFacultyDtoToUi(dto: FacultyOfficeDto): FacultyMember {
     college: dto.collegeAr,
     collegeEn: dto.collegeEn,
     office: dto.officeLocation,
+    officeEn: dto.officeLocationEn || dto.officeLocation,
     email: dto.email,
     badge: dto.badgeAr,
     badgeEn: dto.badgeEn,
@@ -90,6 +93,7 @@ export function mapFacultyDtoToUi(dto: FacultyOfficeDto): FacultyMember {
     nextAvailable: dto.nextAvailableAr,
     nextAvailableEn: dto.nextAvailableEn,
     coursesSupervised: dto.coursesSupervised ?? [],
+    coursesSupervisedEn: dto.coursesSupervisedEn ?? dto.coursesSupervised ?? [],
     timeSlots: (dto.timeSlots ?? []).map(mapSlotDtoToUi),
   };
 }

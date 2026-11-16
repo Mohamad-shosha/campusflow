@@ -33,6 +33,28 @@ import {
   matchesRoomQuery,
 } from '../utils/roomTaxonomy';
 
+const fmtTime = (iso: string, isAr: boolean) =>
+  new Date(iso).toLocaleTimeString(isAr ? 'ar-SA' : 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Riyadh',
+  });
+
+/** Booking window in the UI language, from the real start/end instants (labels are a fallback). */
+const bookingWindow = (
+  b: {
+    startTime?: string | undefined;
+    endTime?: string | undefined;
+    timeSlot?: string | undefined;
+    startLabel?: string | undefined;
+    endLabel?: string | undefined;
+  },
+  isAr: boolean
+) =>
+  b.startTime && b.endTime
+    ? `${fmtTime(b.startTime, isAr)} - ${fmtTime(b.endTime, isAr)}`
+    : b.timeSlot || [b.startLabel, b.endLabel].filter(Boolean).join(' - ');
+
 export interface StudyRoomsViewProps {
   rooms: StudyRoom[];
   /** True while the initial rooms request is in flight */
@@ -375,16 +397,13 @@ export const StudyRoomsView: FC<StudyRoomsViewProps> = ({
               </div>
             )}
             <div className="room-timer-meta">
-              <span>
-                {room.activeBooking.timeSlot ||
-                  [room.activeBooking.startLabel, room.activeBooking.endLabel]
-                    .filter(Boolean)
-                    .join(' - ')}
-              </span>
+              <span>{bookingWindow(room.activeBooking, isAr)}</span>
               <span className="room-timer-team">
                 {room.activeBooking.teamMembers && room.activeBooking.teamMembers.length > 0
                   ? room.activeBooking.teamMembers.join(' • ')
-                  : room.activeBooking.teamLead}
+                  : isAr
+                    ? room.activeBooking.teamLead
+                    : room.activeBooking.teamLeadEn || room.activeBooking.teamLead}
               </span>
             </div>
           </div>

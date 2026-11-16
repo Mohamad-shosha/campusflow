@@ -153,6 +153,7 @@ public class ParkingService {
                 showOccupant ? s.getPlateLettersAr() : null,
                 showOccupant ? s.getPlateDigits() : null,
                 s.getTimeLeftText(),
+                s.getTimeLeftTextEn(),
                 s.getSessionEndsAt()
         );
     }

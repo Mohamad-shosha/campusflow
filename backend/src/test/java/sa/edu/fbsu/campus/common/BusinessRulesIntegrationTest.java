@@ -273,6 +273,10 @@ class BusinessRulesIntegrationTest extends AbstractPostgresIntegrationTest {
         UUID bookingId = UUID.fromString(objectMapper.readTree(json).path("id").asText());
         UUID spotId = UUID.fromString(spot.path("id").asText());
         assertThat(spotRepository.findById(spotId).orElseThrow().getStatus().name()).isNotEqualTo("AVAILABLE");
+        // The bay status line is stored in both languages
+        var reserved = spotRepository.findById(spotId).orElseThrow();
+        assertThat(reserved.getTimeLeftText()).isEqualTo("محجوز (0.5 س)");
+        assertThat(reserved.getTimeLeftTextEn()).isEqualTo("Reserved (0.5h)");
 
         // Nothing has ended yet: the booking stays live
         lifecycleService.expireEnded(Instant.now());
@@ -384,5 +388,19 @@ class BusinessRulesIntegrationTest extends AbstractPostgresIntegrationTest {
                 .andExpect(status().isNotFound());
         mockMvc.perform(post("/api/v1/rooms/bookings/" + bookingId + "/release").header("Authorization", "Bearer " + student))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Bilingual data: office location and supervised courses have English versions")
+    void officeProfilesAreBilingual() throws Exception {
+        JsonNode dean = null;
+        for (JsonNode f : getJson("/api/v1/office-hours/faculty")) {
+            if ("drMezher".equals(f.path("profileCode").asText())) { dean = f; break; }
+        }
+        assertThat(dean).as("seeded dean profile").isNotNull();
+        assertThat(dean.path("officeLocation").asText()).startsWith("جناح العميد");
+        assertThat(dean.path("officeLocationEn").asText()).startsWith("Dean's suite");
+        assertThat(dean.path("coursesSupervisedEn").size()).isEqualTo(dean.path("coursesSupervised").size());
+        assertThat(dean.path("coursesSupervisedEn").get(0).asText()).matches("[ -~]+"); // plain ASCII English
     }
 }

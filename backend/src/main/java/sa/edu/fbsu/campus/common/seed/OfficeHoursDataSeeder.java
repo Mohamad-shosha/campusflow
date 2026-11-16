@@ -157,6 +157,7 @@ public class OfficeHoursDataSeeder implements CommandLineRunner {
             seedSlot(uniId, p3, baseDay, 13, 45, 15, "01:45 م", "01:45 PM", true, null);
         }
 
+        applyEnglishToDemoProfiles();
         refreshStaleDemoSlots(uniId, baseDay);
 
         log.info("--- [OfficeHoursDataSeeder] Initialized faculty office-hour profiles and windows ---");
@@ -201,5 +202,27 @@ public class OfficeHoursDataSeeder implements CommandLineRunner {
         slotRepository.save(new OfficeHourSlot(
                 uniId, profile, start, end, labelAr, labelEn, durationMins, available, note
         ));
+    }
+
+    /** English office location and courses for the demo profiles (also fills rows seeded before V21). */
+    private static final java.util.Map<String, java.util.Map.Entry<String, List<String>>> DEMO_ENGLISH = java.util.Map.of(
+            "drRaghad", java.util.Map.entry("Chairperson's office - Computing building C-105", List.of(
+                    "Logic Design", "Computer Architecture", "Graduation project supervision",
+                    "Academic advising and course equivalency")),
+            "drMezher", java.util.Map.entry("Dean's suite - Academic Administration building C-201", List.of(
+                    "AI and advanced computing initiatives", "Research ideas and major graduation projects",
+                    "Academic affairs and study plans", "Student partnerships and hackathons")),
+            "doctor", java.util.Map.entry("Engineering building - Office A-114", List.of(
+                    "Software engineering and systems development", "Databases and information systems",
+                    "Graduation project judging committee"))
+    );
+
+    private void applyEnglishToDemoProfiles() {
+        DEMO_ENGLISH.forEach((code, english) -> profileRepository.findAll().stream()
+                .filter(p -> code.equals(p.getProfileCode()) && !p.hasEnglish())
+                .forEach(p -> {
+                    p.setEnglish(english.getKey(), english.getValue());
+                    profileRepository.save(p);
+                }));
     }
 }

@@ -76,7 +76,10 @@ The worst issues were **business-logic flaws in the wallet** that let any logged
 
 | E10 (UX) | The archived `legacy/` pages overflowed horizontally: header at 1280px (`index`/`app`), section nav and token grid at 360px (`showcase`), deck controls at 360px (`presentation`, whose slide counter also rendered reversed in RTL). | Fixed; no horizontal overflow at 360/414/768/1024/1100/1280/1366/1440/1920. |
 
-**Known, not fixed here:** several backend data fields exist only in Arabic (tutoring titles/locations, office location, bay status strings), so they show in Arabic in English mode; fixing needs bilingual data fields.
+| E11 (UX) | System data showed in Arabic in English mode: bay status line, office location and supervised courses, booked-slot tooltip, transit pass holder name, room booking times, bay distance unit; English occupant names/room specs/capacity were ignored by the UI. | Bilingual columns `parking_spot.time_left_text_en` (`V20`, backfilled) and `faculty_office_profile.office_location_en` / `supervised_courses_en` (`V21`); all writers set both languages; UI picks by language with Arabic fallback. English-mode sweep: Arabic strings on the parking map 37 → 3, office hours 18 → 4. |
+| E12 (Logic) | `DevSeeder` re-applied demo occupants and status lines to existing bays on every restart, overwriting live bookings, claims and freed bays. | Demo bay data is applied only when a bay is created; existing bays only receive the missing English status line. |
+
+**By design, left in the author's language:** text users type themselves (tutoring descriptions and locations, room booking purpose and team members, vehicle models) and Saudi plate letters.
 
 ## Configuration & headers
 
@@ -101,8 +104,8 @@ The worst issues were **business-logic flaws in the wallet** that let any logged
 
 All results below are against **real PostgreSQL** (Testcontainers) and the **running Docker stack** (`docker compose up --build`).
 
-- Backend `mvn test`: **176/176** pass.
-- Frontend: `vitest` **133/133**, `eslint` clean, `tsc` clean, `vite build` OK.
+- Backend `mvn test`: **177/177** pass.
+- Frontend: `vitest` **136/136**, `eslint` clean, `tsc` clean, `vite build` OK.
 - Live API end-to-end script (through nginx, 113 checks): auth lockout/refresh reuse, wallet idempotency, tuition replay + IDOR, exact charge/refund for parking, gate 401/403, flex ownership rule (stranger 403, offer longer than the booking 400, shared bay not bookable, assigned faculty bay shareable by its owner only and restored on cancel), flex reward once, room/tutoring/office-hours/transit rules, notifications, vehicles, admin suspension + audit, analytics redaction, malformed input → **121/121 pass**.
 - Browser QA (Chrome, 248 page views in the first pass plus 3 re-verification rounds: anonymous/student/faculty/security/admin × AR/EN × light/dark × 1280/360): 0 console errors, 0 CSP violations, 0 unexpected API errors, 0 broken images; interactive flows (top-up, book/cancel with exact refund, tuition, room, tutoring, office hours, transit pass, notifications, vehicles, ALPR gate, admin tabs) all work. Share screen after M7 (20 checks: no-booking student, student with a 2.5 h booking in AR/light/1280 and EN/dark/360, assigned faculty): only owned bays listed, 3 h/4 h breaks disabled past the booking end, offer is exactly 120 min, cancel returns the bay to RESERVED.
 - New tests: `AuthRateLimiterTest`, `WalletServiceTest`, `TuitionServiceTest`, `AuthControllerIntegrationTest`, `GateControllerIntegrationTest`, `AnalyticsControllerIntegrationTest`, `BusinessRulesIntegrationTest` (past bookings, transit itinerary, malformed requests, booking expiry, orphaned bays, cross-tenant admin), `FlexShareControllerIntegrationTest` (booking holder, stranger, assigned faculty), `FacultyOfficeResponseTest`, `GateDecisionTitleTest`, `AlprGateView.test.tsx`, `BookOfficeHoursModal.test.tsx`.
