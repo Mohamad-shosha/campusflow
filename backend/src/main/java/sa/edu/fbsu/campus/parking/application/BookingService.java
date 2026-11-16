@@ -13,6 +13,8 @@ import sa.edu.fbsu.campus.identity.domain.Vehicle;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.identity.infra.VehicleRepository;
 import sa.edu.fbsu.campus.parking.domain.BookingStatus;
+import sa.edu.fbsu.campus.parking.domain.FlexOffer;
+import sa.edu.fbsu.campus.parking.domain.FlexOfferStatus;
 import sa.edu.fbsu.campus.parking.domain.ParkingBooking;
 import sa.edu.fbsu.campus.parking.domain.ParkingSpot;
 import sa.edu.fbsu.campus.parking.domain.ParkingTariff;
@@ -20,6 +22,7 @@ import sa.edu.fbsu.campus.parking.domain.SpotStatus;
 import sa.edu.fbsu.campus.parking.dto.BookingResponse;
 import sa.edu.fbsu.campus.parking.dto.CreateBookingRequest;
 import sa.edu.fbsu.campus.parking.dto.DigitalPassResponse;
+import sa.edu.fbsu.campus.parking.infra.FlexOfferRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingBookingRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
 import sa.edu.fbsu.campus.parking.infra.SpotAssignmentRepository;
@@ -48,6 +51,8 @@ public class BookingService {
     private final WalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
     private final SpotAssignmentRepository spotAssignmentRepository;
+    private final FlexOfferRepository flexOfferRepository;
+    private final ParkingLifecycleService lifecycleService;
 
     public BookingService(
             ParkingBookingRepository bookingRepository,
@@ -57,9 +62,13 @@ public class BookingService {
             VehicleRepository vehicleRepository,
             WalletService walletService,
             ApplicationEventPublisher eventPublisher,
-            SpotAssignmentRepository spotAssignmentRepository
+            SpotAssignmentRepository spotAssignmentRepository,
+            FlexOfferRepository flexOfferRepository,
+            ParkingLifecycleService lifecycleService
     ) {
         this.spotAssignmentRepository = spotAssignmentRepository;
+        this.flexOfferRepository = flexOfferRepository;
+        this.lifecycleService = lifecycleService;
         this.bookingRepository = bookingRepository;
         this.spotRepository = spotRepository;
         this.tariffResolver = tariffResolver;
@@ -241,6 +250,25 @@ public class BookingService {
             throw new IllegalStateException("Only CONFIRMED bookings can be cancelled. Current status: " + booking.getStatus());
         }
 
+        // A bay shared on Flex-Share belongs to the peer who claimed it until the offer ends. Refunding
+        // the booking then would let the owner keep the cashback and get the parking fee back
+        // (cashback farming with an accomplice). An unclaimed offer simply ends with the booking.
+        List<FlexOffer> liveOffers = flexOfferRepository.findBySpotIdAndOffererIdAndStatusIn(
+                booking.getSpot().getId(), userId, java.util.Set.of(FlexOfferStatus.AVAILABLE, FlexOfferStatus.CLAIMED));
+        for (FlexOffer offer : liveOffers) {
+            if (offer.getStatus() == FlexOfferStatus.CLAIMED) {
+                throw new IllegalStateException("Your bay " + booking.getSpot().getBayCode()
+                        + " is in use by a peer through Flex-Share until "
+                        + java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+                                .withZone(ParkingLifecycleService.CAMPUS_ZONE).format(offer.getEndTime())
+                        + ", so this booking can no longer be cancelled or refunded.");
+            }
+        }
+        for (FlexOffer offer : liveOffers) {
+            offer.cancel();
+            flexOfferRepository.save(offer);
+        }
+
         booking.cancel();
         ParkingBooking updated = bookingRepository.save(booking);
         log.info("Cancelled booking {} by user {} (Reason: {})", booking.getId(), userId, cancelReason != null ? cancelReason : "N/A");
@@ -259,20 +287,9 @@ public class BookingService {
             log.info("Refunded {} SAR to user {} for cancelled booking {}", booking.getTotalAmount(), userId, booking.getId());
         }
 
-        // Release spot back to AVAILABLE and clear occupant metadata
-        ParkingSpot spot = booking.getSpot();
-        if (spot.getStatus() == SpotStatus.RESERVED) {
-            spot.setStatus(SpotStatus.AVAILABLE);
-            spot.setCurrentOccupantId(null);
-            spot.setOccupantNameAr(null);
-            spot.setOccupantNameEn(null);
-            spot.setVehicleModel(null);
-            spot.setPlateLettersAr(null);
-            spot.setPlateDigits(null);
-            spot.setTimeLeft(null, null);
-            spot.setSessionEndsAt(null);
-            spotRepository.save(spot);
-        }
+        // Hand the bay to whoever owns it now (another live booking, its assigned faculty member) or free it.
+        bookingRepository.flush();
+        lifecycleService.settle(booking.getSpot(), Instant.now());
 
         eventPublisher.publishEvent(new ParkingBookingEvent(
                 userId,

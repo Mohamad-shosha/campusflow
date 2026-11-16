@@ -47,14 +47,16 @@ export const BookRoomModal: FC<BookRoomModalProps> = ({
       setErrorMessage(null);
       setIsSuccess(false);
       setIsSubmitting(false);
-      // Pre-fill time with current hour if possible
-      const now = new Date();
-      const startMinutes = now.getMinutes() < 30 ? '00' : '30';
-      const endMinutes = now.getMinutes() < 30 ? '30' : '00';
-      const endHour = now.getMinutes() < 30 ? now.getHours() : (now.getHours() + 1) % 24;
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      setTimeFrom(`${pad(now.getHours())}:${startMinutes}`);
-      setTimeTo(`${pad(endHour)}:${endMinutes}`);
+      // Pre-fill a 30-minute session starting now (rounded down to 5 minutes). Rounding down to
+      // the half hour could start up to 29 minutes in the past, which the server rejects.
+      const start = new Date();
+      start.setSeconds(0, 0);
+      start.setMinutes(Math.floor(start.getMinutes() / 5) * 5);
+      const end = new Date(start.getTime() + 30 * 60 * 1000);
+      const hhmm = (d: Date) =>
+        `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+      setTimeFrom(hhmm(start));
+      setTimeTo(hhmm(end));
     }
   }, [isOpen, room]);
 

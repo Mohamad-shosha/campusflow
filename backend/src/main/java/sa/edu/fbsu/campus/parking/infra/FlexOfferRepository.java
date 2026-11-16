@@ -75,4 +75,7 @@ public interface FlexOfferRepository extends JpaRepository<FlexOffer, UUID> {
     boolean existsBySpotIdAndStatusInAndEndTimeAfter(UUID spotId, Collection<FlexOfferStatus> statuses, java.time.Instant cutoff);
 
     boolean existsBySpotId(UUID spotId);
+
+    /** A user's live (unclaimed or claimed) offers on one bay. */
+    List<FlexOffer> findBySpotIdAndOffererIdAndStatusIn(UUID spotId, UUID offererId, Collection<FlexOfferStatus> statuses);
 }

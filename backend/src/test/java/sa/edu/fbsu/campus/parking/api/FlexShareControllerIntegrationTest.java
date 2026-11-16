@@ -127,6 +127,7 @@ class FlexShareControllerIntegrationTest extends AbstractPostgresIntegrationTest
 
         ParkingSpot spot = availableStandardSpot();
         JsonNode booking = book(owner, spot, 2);
+        String bookingId = booking.get("id").asText();
         BigDecimal fee = new BigDecimal(booking.get("totalAmount").asText());
 
         // The bay is listed as shareable for the owner, capped at the booking's end
@@ -163,6 +164,11 @@ class FlexShareControllerIntegrationTest extends AbstractPostgresIntegrationTest
                 .andExpect(jsonPath("$.status").value("CLAIMED"))
                 .andExpect(jsonPath("$.rewardPaid").value(true));
         mockMvc.perform(post("/api/v1/parking/flex/offers/" + offerId + "/claim").header("Authorization", "Bearer " + peer))
+                .andExpect(status().isBadRequest());
+        assertThat(balance(owner)).isEqualByComparingTo(new BigDecimal("100").subtract(fee).add(CASHBACK));
+
+        // While the peer holds the bay, the owner cannot cancel for a refund (cashback farming)
+        mockMvc.perform(post("/api/v1/parking/bookings/" + bookingId + "/cancel").header("Authorization", "Bearer " + owner))
                 .andExpect(status().isBadRequest());
         assertThat(balance(owner)).isEqualByComparingTo(new BigDecimal("100").subtract(fee).add(CASHBACK));
 
@@ -224,5 +230,25 @@ class FlexShareControllerIntegrationTest extends AbstractPostgresIntegrationTest
         ParkingSpot restored = spotRepository.findById(bay19).orElseThrow();
         assertThat(restored.getStatus()).isEqualTo(SpotStatus.FACULTY_ASSIGNED);
         assertThat(restored.getOccupantNameEn()).isEqualTo("Dr. Abdullah Al-Ghamdi");
+    }
+
+    @Test
+    @DisplayName("Cancelling a booking whose bay is offered but not claimed also withdraws the offer and refunds in full")
+    void cancellingBookingWithdrawsUnclaimedOffer() throws Exception {
+        String owner = newStudent();
+        topUp(owner, 50);
+        ParkingSpot spot = availableStandardSpot();
+        String bookingId = book(owner, spot, 2).get("id").asText();
+        String offerId = objectMapper.readTree(offer(owner, spot.getId(), 60, 201).getResponse().getContentAsString())
+                .get("id").asText();
+
+        mockMvc.perform(post("/api/v1/parking/bookings/" + bookingId + "/cancel").header("Authorization", "Bearer " + owner))
+                .andExpect(status().isOk());
+
+        assertThat(balance(owner)).isEqualByComparingTo("50");
+        assertThat(spotRepository.findById(spot.getId()).orElseThrow().getStatus()).isEqualTo(SpotStatus.AVAILABLE);
+        String peer = newStudent();
+        mockMvc.perform(post("/api/v1/parking/flex/offers/" + offerId + "/claim").header("Authorization", "Bearer " + peer))
+                .andExpect(status().isBadRequest());
     }
 }
