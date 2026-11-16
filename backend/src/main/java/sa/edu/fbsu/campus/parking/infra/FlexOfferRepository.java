@@ -68,5 +68,11 @@ public interface FlexOfferRepository extends JpaRepository<FlexOffer, UUID> {
             WHERE o.id = :offerId
             """)
     Optional<FlexOffer> findDetailedById(@Param("offerId") UUID offerId);
-}
 
+    /** Offers whose window has ended but are still AVAILABLE/CLAIMED (lifecycle expiry). */
+    List<FlexOffer> findByStatusInAndEndTimeBefore(Collection<FlexOfferStatus> statuses, java.time.Instant cutoff);
+
+    boolean existsBySpotIdAndStatusInAndEndTimeAfter(UUID spotId, Collection<FlexOfferStatus> statuses, java.time.Instant cutoff);
+
+    boolean existsBySpotId(UUID spotId);
+}

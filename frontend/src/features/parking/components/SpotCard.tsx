@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { RefreshCw, Zap, ShieldCheck, UserCheck, Clock, Star, Car } from 'lucide-react';
-import type { ParkingSpot } from '../data/parkingData';
+import { localizedSpotText, type ParkingSpot } from '../data/parkingData';
 import { CarSvg } from './CarSvg';
 import { getCarVisualTheme } from '../utils/carTheme';
 import { soundFX } from '../../../shared/utils/sound';
@@ -22,6 +22,7 @@ export interface SpotCardProps {
  * - Full-width rounded bottom action button (Reserve / Details / AI Flex)
  */
 export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = false, onClick }) => {
+  const text = localizedSpotText(spot, isAr);
   const isOccupied =
     spot.status === 'occupied' ||
     spot.status === 'reserved' ||
@@ -40,13 +41,13 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
     statusClass = 'occupied';
     badgeText = isAr ? 'مشغول' : 'Occupied';
     statusColor = 'var(--status-occupied)';
-    subInfo = spot.timeLeft || (isAr ? 'حتى نهاية المحاضرة' : 'Until class end');
+    subInfo = text.timeLeft || (isAr ? 'حتى نهاية المحاضرة' : 'Until class end');
     sensorGlowColor = '#ef4444';
   } else if (spot.status === 'reserved') {
     statusClass = 'occupied';
     badgeText = isAr ? 'محجوز' : 'Reserved';
     statusColor = 'var(--status-occupied)';
-    subInfo = spot.timeLeft || (isAr ? 'محجوز مسبقاً' : 'Reserved');
+    subInfo = text.timeLeft || (isAr ? 'محجوز مسبقاً' : 'Reserved');
     sensorGlowColor = '#ef4444';
   } else if (isFlex) {
     statusClass = 'flex-share';
@@ -244,18 +245,18 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
               {spot.plate && <span className="meta-plate-code">{spot.plate}</span>}
             </div>
             <div className="meta-driver-row">
-              {spot.occupant ? (
+              {text.occupant ? (
                 <div className="meta-occupant-wrap">
                   <UserCheck size={11} color="var(--text-dim)" />
-                  <span className="driver-name">{spot.occupant}</span>
+                  <span className="driver-name">{text.occupant}</span>
                 </div>
               ) : (
                 <span className="driver-name">{subInfo}</span>
               )}
-              {spot.timeLeft && (
+              {text.timeLeft && (
                 <span className="time-remaining-chip">
                   <Clock size={10} />
-                  <span>{spot.timeLeft}</span>
+                  <span>{text.timeLeft}</span>
                 </span>
               )}
             </div>
@@ -272,7 +273,7 @@ export const SpotCard: FC<SpotCardProps> = ({ spot, isAr, isCurrentUserSpot = fa
               <div className="meta-occupant-wrap">
                 <UserCheck size={11} color="var(--text-dim)" />
                 <span className="driver-name">
-                  {spot.occupant || (isAr ? 'طالب في بريك' : 'Student on break')}
+                  {text.occupant || (isAr ? 'طالب في بريك' : 'Student on break')}
                 </span>
               </div>
               <span className="reward-chip">{isAr ? '+5.75 ر.س' : '+5.75 SAR'}</span>

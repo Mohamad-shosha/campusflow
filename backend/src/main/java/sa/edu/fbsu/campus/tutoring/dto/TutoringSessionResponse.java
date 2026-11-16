@@ -88,5 +88,27 @@ public record TutoringSessionResponse(
                 s.getCreatedAt()
         );
     }
-}
 
+    /**
+     * Sessions are listed publicly, so the enrolled-student roster is personal data. The tutor and
+     * staff see everyone; any other viewer only sees their own entry (enough for "already enrolled").
+     */
+    public TutoringSessionResponse visibleTo(UUID viewerUserId, String viewerUniversityNumber, boolean staff) {
+        if (staff || (viewerUserId != null && viewerUserId.equals(tutorUserId))) {
+            return this;
+        }
+        List<String> names = new java.util.ArrayList<>();
+        List<String> numbers = new java.util.ArrayList<>();
+        for (int i = 0; i < enrolledStudentNumbers.size(); i++) {
+            if (viewerUniversityNumber != null && viewerUniversityNumber.equals(enrolledStudentNumbers.get(i))) {
+                numbers.add(enrolledStudentNumbers.get(i));
+                if (i < enrolledStudents.size()) names.add(enrolledStudents.get(i));
+            }
+        }
+        return new TutoringSessionResponse(id, sessionCode, tutorUserId, null, tutorNameAr, tutorNameEn,
+                tutorRoleAr, tutorRoleEn, tutorAvatarColor, courseCode, courseNameAr, courseNameEn,
+                coveredLectures, coveredScope, category, hourlyRate, durationHours, totalPrice, currency,
+                scheduleText, location, maxCapacity, enrolledCount, rating, reviewsCount, status,
+                List.copyOf(names), List.copyOf(numbers), createdAt);
+    }
+}

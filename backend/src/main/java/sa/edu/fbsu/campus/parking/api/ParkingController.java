@@ -47,7 +47,7 @@ public class ParkingController {
             @RequestParam(name = "status", required = false) SpotStatus status,
             @AuthenticationPrincipal UserPrincipal principal) {
         UUID uniId = resolveUniversityId(principal);
-        return ResponseEntity.ok(parkingService.getSpots(uniId, zone, status));
+        return ResponseEntity.ok(parkingService.getSpots(uniId, zone, status, principal));
     }
 
     @GetMapping("/spots/{bayNumber}")
@@ -56,7 +56,7 @@ public class ParkingController {
             @PathVariable int bayNumber,
             @AuthenticationPrincipal UserPrincipal principal) {
         UUID uniId = resolveUniversityId(principal);
-        return ResponseEntity.ok(parkingService.getSpotByBay(uniId, bayNumber));
+        return ResponseEntity.ok(parkingService.getSpotByBay(uniId, bayNumber, principal));
     }
 
     @GetMapping("/summary")

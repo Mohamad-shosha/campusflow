@@ -21,6 +21,7 @@ export interface ParkingSpotResponse {
   plateLettersAr?: string | null;
   plateDigits?: string | null;
   timeLeftText?: string | null;
+  timeLeftTextEn?: string | null;
   sessionEndsAt?: string | null;
 }
 
@@ -99,6 +100,18 @@ export interface DigitalPassResponse {
   endTime: string;
   qrToken: string;
   status: string;
+}
+
+/** A bay the current user may offer on Flex-Share (their live booking or assigned faculty bay). */
+export interface ShareableSpotResponse {
+  spotId: string;
+  bayNumber: number;
+  zoneCode: string;
+  zoneNameAr: string;
+  zoneNameEn: string;
+  source: 'BOOKING' | 'ASSIGNMENT';
+  /** Latest time an offer may end (the booking's end); null for an assigned faculty bay. */
+  availableUntil: string | null;
 }
 
 export interface FlexOfferResponse {
@@ -219,10 +232,13 @@ export function mapBackendSpotToUi(backendSpot: ParkingSpotResponse) {
     collegeEn: backendSpot.zoneNameEn,
     status: uiStatus,
     occupant: backendSpot.occupantNameAr || null,
+    occupantEn: backendSpot.occupantNameEn || backendSpot.occupantNameAr || null,
     car: backendSpot.vehicleModel || null,
     plate: plateStr,
     timeLeft: backendSpot.timeLeftText || null,
+    timeLeftEn: backendSpot.timeLeftTextEn || backendSpot.timeLeftText || null,
     distance: `${backendSpot.distanceMeters} م`,
+    distanceEn: `${backendSpot.distanceMeters} m`,
     isFlexEligible: backendSpot.flexEligible,
     isFaculty,
     isEV,

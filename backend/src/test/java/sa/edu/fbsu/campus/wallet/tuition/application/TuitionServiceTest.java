@@ -196,4 +196,15 @@ class TuitionServiceTest {
         assertThat(invoices.get(0).invoiceNumber()).isEqualTo("INV-2026-CCIS-001");
         assertThat(invoices.get(0).totalAmount()).isEqualByComparingTo("1200.00");
     }
+
+    @Test
+    @DisplayName("Invoice details are only returned to the invoice owner (no IDOR)")
+    void testInvoiceDetailsHiddenFromOtherStudents() {
+        when(invoiceRepository.findById(invoice.getId())).thenReturn(Optional.of(invoice));
+
+        assertThat(tuitionService.getInvoiceDetails(student.getId(), invoice.getId()).invoiceNumber())
+                .isEqualTo("INV-2026-CCIS-001");
+        assertThatThrownBy(() -> tuitionService.getInvoiceDetails(UUID.randomUUID(), invoice.getId()))
+                .isInstanceOf(sa.edu.fbsu.campus.common.error.ResourceNotFoundException.class);
+    }
 }

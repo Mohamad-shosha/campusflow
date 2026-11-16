@@ -64,7 +64,9 @@ public class UserAdminService {
             String reason,
             UserPrincipal actor
     ) {
+        // Admins may only manage users of their own university; other tenants look like "not found".
         User user = userRepository.findById(targetUserId)
+                .filter(u -> universityId.equals(u.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + targetUserId));
 
         if (actor != null && actor.getUserId().equals(targetUserId) && newStatus != UserStatus.ACTIVE) {
@@ -96,7 +98,9 @@ public class UserAdminService {
             Set<Role> newRoles,
             UserPrincipal actor
     ) {
+        // Admins may only manage users of their own university; other tenants look like "not found".
         User user = userRepository.findById(targetUserId)
+                .filter(u -> universityId.equals(u.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + targetUserId));
 
         if (actor != null && actor.getUserId().equals(targetUserId) && !newRoles.contains(Role.CAMPUS_ADMIN)) {

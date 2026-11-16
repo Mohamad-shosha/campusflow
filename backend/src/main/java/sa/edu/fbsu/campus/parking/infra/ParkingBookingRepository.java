@@ -55,4 +55,31 @@ public interface ParkingBookingRepository extends JpaRepository<ParkingBooking, 
             WHERE b.id = :bookingId
             """)
     Optional<ParkingBooking> findDetailedById(@Param("bookingId") UUID bookingId);
+
+    /** Bookings whose window has ended but are still CONFIRMED/ACTIVE (lifecycle expiry). */
+    List<ParkingBooking> findByStatusInAndEndTimeBefore(Collection<BookingStatus> statuses, Instant cutoff);
+
+    boolean existsBySpotIdAndStatusInAndEndTimeAfter(UUID spotId, Collection<BookingStatus> statuses, Instant cutoff);
+
+    boolean existsBySpotId(UUID spotId);
+
+    /** The user's bookings that are still live (not ended), with spot and zone loaded. */
+    @Query("""
+            SELECT b FROM ParkingBooking b
+            JOIN FETCH b.spot s
+            JOIN FETCH s.zone z
+            WHERE b.user.id = :userId
+            AND b.status IN :statuses
+            AND b.endTime > :now
+            ORDER BY b.startTime ASC
+            """)
+    List<ParkingBooking> findLiveByUserId(
+            @Param("userId") UUID userId,
+            @Param("statuses") Collection<BookingStatus> statuses,
+            @Param("now") Instant now
+    );
+
+    /** The earliest live booking on a bay (the one that currently owns it). */
+    Optional<ParkingBooking> findFirstBySpotIdAndStatusInAndEndTimeAfterOrderByStartTimeAsc(
+            UUID spotId, Collection<BookingStatus> statuses, Instant cutoff);
 }

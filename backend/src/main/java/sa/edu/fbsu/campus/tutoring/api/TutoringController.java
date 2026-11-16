@@ -38,17 +38,27 @@ public class TutoringController {
     @GetMapping("/sessions")
     @Operation(summary = "List available peer tutoring sessions with optional category filtering")
     public ResponseEntity<List<TutoringSessionResponse>> listSessions(
+            @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam(required = false) String category
     ) {
-        return ResponseEntity.ok(tutoringService.listSessions(category));
+        return ResponseEntity.ok(tutoringService.listSessions(category).stream()
+                .map(r -> redact(r, principal))
+                .toList());
     }
 
     @GetMapping("/sessions/{idOrCode}")
     @Operation(summary = "Get detailed peer tutoring session by UUID or session code")
     public ResponseEntity<TutoringSessionResponse> getSession(
+            @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable String idOrCode
     ) {
-        return ResponseEntity.ok(tutoringService.getSession(idOrCode));
+        return ResponseEntity.ok(redact(tutoringService.getSession(idOrCode), principal));
+    }
+
+    private static TutoringSessionResponse redact(TutoringSessionResponse r, UserPrincipal principal) {
+        return principal == null
+                ? r.visibleTo(null, null, false)
+                : r.visibleTo(principal.getUserId(), principal.getUniversityNumber(), UserPrincipal.isStaff(principal));
     }
 
     @PostMapping("/sessions")

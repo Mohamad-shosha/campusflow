@@ -75,15 +75,24 @@ class DevSeederTest extends AbstractPostgresIntegrationTest {
 
         var spot1 = parkingSpotRepository.findByUniversityIdAndBayNumber(fbsu.getId(), 1).orElse(null);
         assertThat(spot1).isNotNull();
-        assertThat(spot1.getOccupantNameAr()).isEqualTo("إياد الحربي");
         assertThat(spot1.isFlexEligible()).isTrue();
 
         var spot26 = parkingSpotRepository.findByUniversityIdAndBayNumber(fbsu.getId(), 26).orElse(null);
         assertThat(spot26).isNotNull();
         assertThat(spot26.getSpotType()).isEqualTo(sa.edu.fbsu.campus.parking.domain.SpotType.EV_CHARGING);
 
-        // 6. Test idempotency: running again should not throw any exceptions
+        // 6. Idempotency: running again must not throw, and must not put demo data back on a bay
+        // whose state changed since (it used to reset occupants of booked/claimed/freed bays).
+        spot1.setStatus(sa.edu.fbsu.campus.parking.domain.SpotStatus.AVAILABLE);
+        spot1.setOccupantNameAr(null);
+        spot1.setOccupantNameEn(null);
+        spot1.setTimeLeft(null, null);
+        parkingSpotRepository.save(spot1);
         assertDoesNotThrow(() -> devSeeder.run());
+        var after = parkingSpotRepository.findByUniversityIdAndBayNumber(fbsu.getId(), 1).orElseThrow();
+        assertThat(after.getStatus()).isEqualTo(sa.edu.fbsu.campus.parking.domain.SpotStatus.AVAILABLE);
+        assertThat(after.getOccupantNameAr()).isNull();
+        assertThat(after.getTimeLeftText()).isNull();
     }
 }
 

@@ -101,6 +101,7 @@ public class RoomsAdminService {
     @Transactional
     public StudyRoomResponse updateRoom(UUID universityId, UUID roomId, UpdateRoomRequest request, UserPrincipal actor) {
         StudyRoom room = roomRepository.findByIdForUpdate(roomId)
+                .filter(r -> universityId.equals(r.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Study room not found with id: " + roomId));
 
         if (request.nameAr() != null && !request.nameAr().isBlank()) room.setNameAr(request.nameAr().trim());
@@ -143,6 +144,7 @@ public class RoomsAdminService {
             UserPrincipal actor
     ) {
         StudyRoom room = roomRepository.findByIdForUpdate(roomId)
+                .filter(r -> universityId.equals(r.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Study room not found with id: " + roomId));
 
         RoomStatus oldStatus = room.getStatus();

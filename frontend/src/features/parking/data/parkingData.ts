@@ -7,14 +7,26 @@ export interface ParkingSpot {
   status:
     'available' | 'occupied' | 'flex' | 'flex-share' | 'reserved' | 'faculty' | 'faculty-spot';
   occupant: string | null;
+  occupantEn?: string | null;
   car: string | null;
   plate: string | null;
   timeLeft: string | null;
+  timeLeftEn?: string | null;
   distance: string;
+  distanceEn?: string;
   isFlexEligible?: boolean;
   isFaculty?: boolean;
   isEV?: boolean;
   isAccessible?: boolean;
+}
+
+/** Occupant, status line and distance of a bay in the UI language (English falls back to Arabic). */
+export function localizedSpotText(spot: ParkingSpot, isAr: boolean) {
+  return {
+    occupant: isAr ? spot.occupant : spot.occupantEn || spot.occupant,
+    timeLeft: isAr ? spot.timeLeft : spot.timeLeftEn || spot.timeLeft,
+    distance: isAr ? spot.distance : spot.distanceEn || spot.distance,
+  };
 }
 
 export interface SimulatorStage {

@@ -4,6 +4,7 @@ import type { FacultyMember } from '../data/campusData';
 import { BookOfficeHoursModal } from './BookOfficeHoursModal';
 import { soundFX } from '../../../shared/utils/sound';
 import type { ResourceStatus } from '../../../shared/types/resource';
+import { slotDayLabel, slotKey, upcomingSlots } from '../utils/officeHourSlots';
 
 export interface OfficeHoursViewProps {
   facultyList: FacultyMember[];
@@ -137,7 +138,7 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                     </div>
                     <div className="faculty-office-location">
                       <MapPin size={13} color="var(--fbsu-primary)" />
-                      <span>{f.office}</span>
+                      <span>{isAr ? f.office : f.officeEn || f.office}</span>
                     </div>
                   </div>
                 </div>
@@ -154,11 +155,13 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                   {isAr ? 'المقررات والمجالات المتاحة للنقاش:' : 'Supervised Topics & Courses:'}
                 </div>
                 <div className="faculty-subjects-tag-list">
-                  {f.coursesSupervised.map((subj, idx) => (
-                    <span key={idx} className="faculty-subject-chip">
-                      {subj}
-                    </span>
-                  ))}
+                  {(isAr ? f.coursesSupervised : f.coursesSupervisedEn || f.coursesSupervised).map(
+                    (subj, idx) => (
+                      <span key={idx} className="faculty-subject-chip">
+                        {subj}
+                      </span>
+                    )
+                  )}
                 </div>
 
                 {/* Slots container */}
@@ -173,15 +176,26 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                   </div>
 
                   <div className="time-slots-picker-grid">
-                    {f.timeSlots.map((slot, sIdx) => (
+                    {upcomingSlots(f.timeSlots).map((slot, sIdx) => (
                       <button
                         key={slot.id || `${slot.time}-${sIdx}`}
                         className={`time-slot-btn ${slot.available ? '' : 'disabled'}`}
                         disabled={!slot.available}
-                        title={slot.bookedNote || ''}
-                        onClick={() => handleOpenModal(f, slot.time)}
+                        title={slot.bookedNote ? (isAr ? 'محجوز' : 'Booked') : ''}
+                        onClick={() => handleOpenModal(f, slotKey(slot))}
                         type="button"
                       >
+                        {slot.startTime && (
+                          <div
+                            style={{
+                              fontSize: '0.65rem',
+                              color: 'var(--text-muted)',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {slotDayLabel(slot, isAr)}
+                          </div>
+                        )}
                         <div>{isAr ? slot.time : slot.timeEn || slot.time}</div>
                         <div
                           style={{

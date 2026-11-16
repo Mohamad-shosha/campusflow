@@ -14,6 +14,8 @@ import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingTariffRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingZoneRepository;
 
+import sa.edu.fbsu.campus.common.security.UserPrincipal;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -64,6 +66,14 @@ public class ParkingService {
     }
 
     public List<ParkingSpotResponse> getSpots(UUID universityId, String zoneCode, SpotStatus status) {
+        return getSpots(universityId, zoneCode, status, null);
+    }
+
+    /**
+     * Spot listing is public. Occupant identity (id, name, car model, plate) is only included for
+     * the occupant themself and for gate staff; everyone else just sees that the bay is taken.
+     */
+    public List<ParkingSpotResponse> getSpots(UUID universityId, String zoneCode, SpotStatus status, UserPrincipal viewer) {
         List<ParkingSpot> spots;
         if (zoneCode != null && !zoneCode.isBlank()) {
             spots = spotRepository.findAllWithZoneByUniversityIdAndZoneCode(universityId, zoneCode.toUpperCase());
@@ -75,13 +85,17 @@ public class ParkingService {
             spots = spots.stream().filter(s -> s.getStatus() == status).toList();
         }
 
-        return spots.stream().map(this::toSpotResponse).toList();
+        return spots.stream().map(sp -> toSpotResponse(sp, viewer)).toList();
     }
 
     public ParkingSpotResponse getSpotByBay(UUID universityId, int bayNumber) {
+        return getSpotByBay(universityId, bayNumber, null);
+    }
+
+    public ParkingSpotResponse getSpotByBay(UUID universityId, int bayNumber, UserPrincipal viewer) {
         ParkingSpot spot = spotRepository.findByUniversityIdAndBayNumber(universityId, bayNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot bay #" + bayNumber + " not found"));
-        return toSpotResponse(spot);
+        return toSpotResponse(spot, viewer);
     }
 
     public ParkingSummaryResponse getSummary(UUID universityId) {
@@ -118,7 +132,10 @@ public class ParkingService {
                 )).toList();
     }
 
-    private ParkingSpotResponse toSpotResponse(ParkingSpot s) {
+    private ParkingSpotResponse toSpotResponse(ParkingSpot s, UserPrincipal viewer) {
+        boolean showOccupant = UserPrincipal.isStaff(viewer)
+                || (viewer != null && s.getCurrentOccupantId() != null
+                    && s.getCurrentOccupantId().equals(viewer.getUserId()));
         return new ParkingSpotResponse(
                 s.getId(),
                 s.getBayNumber(),
@@ -129,13 +146,14 @@ public class ParkingService {
                 s.getStatus(),
                 s.getDistanceMeters(),
                 s.isFlexEligible(),
-                s.getCurrentOccupantId(),
-                s.getOccupantNameAr(),
-                s.getOccupantNameEn(),
-                s.getVehicleModel(),
-                s.getPlateLettersAr(),
-                s.getPlateDigits(),
+                showOccupant ? s.getCurrentOccupantId() : null,
+                showOccupant ? s.getOccupantNameAr() : null,
+                showOccupant ? s.getOccupantNameEn() : null,
+                showOccupant ? s.getVehicleModel() : null,
+                showOccupant ? s.getPlateLettersAr() : null,
+                showOccupant ? s.getPlateDigits() : null,
                 s.getTimeLeftText(),
+                s.getTimeLeftTextEn(),
                 s.getSessionEndsAt()
         );
     }

@@ -34,6 +34,9 @@ public class FacultyOfficeProfile extends BaseTenantEntity {
     @Column(name = "office_location", nullable = false, length = 200)
     private String officeLocation;
 
+    @Column(name = "office_location_en", length = 200)
+    private String officeLocationEn;
+
     @Column(name = "badge_ar", nullable = false, length = 80)
     private String badgeAr;
 
@@ -57,6 +60,9 @@ public class FacultyOfficeProfile extends BaseTenantEntity {
 
     @Column(name = "supervised_courses", nullable = false, length = 1000)
     private String supervisedCourses;
+
+    @Column(name = "supervised_courses_en", length = 1000)
+    private String supervisedCoursesEn;
 
     @Column(name = "display_order", nullable = false)
     private int displayOrder = 1;
@@ -130,6 +136,21 @@ public class FacultyOfficeProfile extends BaseTenantEntity {
         return officeLocation;
     }
 
+    /** English office location; falls back to the Arabic text when no translation is stored. */
+    public String getOfficeLocationEn() {
+        return officeLocationEn != null && !officeLocationEn.isBlank() ? officeLocationEn : officeLocation;
+    }
+
+    public boolean hasEnglish() {
+        return officeLocationEn != null && supervisedCoursesEn != null;
+    }
+
+    /** Stores the English office location and supervised courses (same order as the Arabic list). */
+    public void setEnglish(String officeLocationEn, List<String> coursesEn) {
+        this.officeLocationEn = officeLocationEn;
+        this.supervisedCoursesEn = coursesEn == null ? null : String.join("|", coursesEn);
+    }
+
     public String getBadgeAr() {
         return badgeAr;
     }
@@ -159,10 +180,19 @@ public class FacultyOfficeProfile extends BaseTenantEntity {
     }
 
     public List<String> getCoursesList() {
-        if (supervisedCourses == null || supervisedCourses.isBlank()) {
+        return split(supervisedCourses);
+    }
+
+    /** English supervised courses; falls back to the Arabic list when no translation is stored. */
+    public List<String> getCoursesListEn() {
+        return supervisedCoursesEn == null || supervisedCoursesEn.isBlank() ? getCoursesList() : split(supervisedCoursesEn);
+    }
+
+    private static List<String> split(String joined) {
+        if (joined == null || joined.isBlank()) {
             return List.of();
         }
-        return Arrays.stream(supervisedCourses.split("\\|"))
+        return Arrays.stream(joined.split("\\|"))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();

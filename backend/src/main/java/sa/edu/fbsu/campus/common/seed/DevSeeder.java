@@ -439,6 +439,28 @@ public class DevSeeder implements CommandLineRunner {
         seedSpot(universityId, zone, bayNumber, type, status, distance, isFlex, occupantAr, occupantEn, car, plateLetters, plateDigits, timeLeft);
     }
 
+    /** English for the demo bay status lines seeded above (bays carry both languages). */
+    private static final java.util.Map<String, String> DEMO_TIME_LEFT_EN = java.util.Map.ofEntries(
+            java.util.Map.entry("45 د", "45m"),
+            java.util.Map.entry("3 س", "3h"),
+            java.util.Map.entry("1 س 15 د", "1h 15m"),
+            java.util.Map.entry("1 س 45 د", "1h 45m"),
+            java.util.Map.entry("2 س 10 د", "2h 10m"),
+            java.util.Map.entry("بريك بعد 15 د", "Break in 15m"),
+            java.util.Map.entry("متاح للتبادل: 1 س 50 د", "Flex available: 1h 50m"),
+            java.util.Map.entry("متاح للتبادل: 2 س 15 د", "Flex available: 2h 15m"),
+            java.util.Map.entry("شحن 65% - متبقي 35 د", "Charging 65% - 35m left"),
+            java.util.Map.entry("شحن 84% - متبقي 20 د", "Charging 84% - 20m left"),
+            java.util.Map.entry("شحن 92% - متبقي 12 د", "Charging 92% - 12m left"),
+            java.util.Map.entry("محاضرة حتى 12:00 ظ", "Lecture until 12:00 PM"),
+            java.util.Map.entry("محاضرة حتى 01:30 م", "Lecture until 01:30 PM"),
+            java.util.Map.entry("محاضرة حتى 02:00 م", "Lecture until 02:00 PM"),
+            java.util.Map.entry("معمل حتى 01:00 م", "Lab until 01:00 PM"),
+            java.util.Map.entry("محجوز يوم كامل", "Reserved all day"),
+            java.util.Map.entry("اجتماع مجلس الكلية", "College council meeting"),
+            java.util.Map.entry("اجتماع عمادة القبول", "Admissions deanship meeting")
+    );
+
     private void seedSpot(
             UUID universityId,
             ParkingZone zone,
@@ -453,14 +475,25 @@ public class DevSeeder implements CommandLineRunner {
             String plateLetters,
             String plateDigits,
             String timeLeft) {
-        ParkingSpot s = parkingSpotRepository.findByUniversityIdAndBayNumber(universityId, bayNumber)
-                .orElseGet(() -> new ParkingSpot(universityId, zone, bayNumber, type, status, distance, isFlex));
+        var existing = parkingSpotRepository.findByUniversityIdAndBayNumber(universityId, bayNumber);
+        if (existing.isPresent()) {
+            // Never overwrite a live bay with demo data on restart (that used to put demo occupants
+            // back on bays that had since been booked, claimed or freed). Only add the English
+            // status line to untouched demo bays seeded before it existed.
+            ParkingSpot s = existing.get();
+            if (timeLeft != null && timeLeft.equals(s.getTimeLeftText()) && s.getTimeLeftTextEn() == null) {
+                s.setTimeLeft(timeLeft, DEMO_TIME_LEFT_EN.getOrDefault(timeLeft, timeLeft));
+                parkingSpotRepository.save(s);
+            }
+            return;
+        }
+        ParkingSpot s = new ParkingSpot(universityId, zone, bayNumber, type, status, distance, isFlex);
         if (occupantAr != null) s.setOccupantNameAr(occupantAr);
         if (occupantEn != null) s.setOccupantNameEn(occupantEn);
         if (car != null) s.setVehicleModel(car);
         if (plateLetters != null) s.setPlateLettersAr(plateLetters);
         if (plateDigits != null) s.setPlateDigits(plateDigits);
-        if (timeLeft != null) s.setTimeLeftText(timeLeft);
+        if (timeLeft != null) s.setTimeLeft(timeLeft, DEMO_TIME_LEFT_EN.getOrDefault(timeLeft, timeLeft));
         if (isFlex) s.setFlexEligible(true);
         parkingSpotRepository.save(s);
     }

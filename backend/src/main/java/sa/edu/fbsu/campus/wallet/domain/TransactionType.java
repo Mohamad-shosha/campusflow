@@ -6,5 +6,7 @@ public enum TransactionType {
     PEER_TRANSFER,
     PARKING_FEE,
     REFUND,
+    /** Flex-Share cashback credited to the member who shared a bay */
+    PARKING_REWARD,
     CAMPUS_PURCHASE
 }

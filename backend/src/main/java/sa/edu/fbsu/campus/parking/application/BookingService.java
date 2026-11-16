@@ -22,6 +22,7 @@ import sa.edu.fbsu.campus.parking.dto.CreateBookingRequest;
 import sa.edu.fbsu.campus.parking.dto.DigitalPassResponse;
 import sa.edu.fbsu.campus.parking.infra.ParkingBookingRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
+import sa.edu.fbsu.campus.parking.infra.SpotAssignmentRepository;
 
 import sa.edu.fbsu.campus.wallet.application.WalletService;
 import sa.edu.fbsu.campus.wallet.domain.TransactionType;
@@ -46,6 +47,7 @@ public class BookingService {
     private final VehicleRepository vehicleRepository;
     private final WalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
+    private final SpotAssignmentRepository spotAssignmentRepository;
 
     public BookingService(
             ParkingBookingRepository bookingRepository,
@@ -54,8 +56,10 @@ public class BookingService {
             UserRepository userRepository,
             VehicleRepository vehicleRepository,
             WalletService walletService,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            SpotAssignmentRepository spotAssignmentRepository
     ) {
+        this.spotAssignmentRepository = spotAssignmentRepository;
         this.bookingRepository = bookingRepository;
         this.spotRepository = spotRepository;
         this.tariffResolver = tariffResolver;
@@ -74,6 +78,7 @@ public class BookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Campus user not found: " + userId));
 
         ParkingSpot spot = spotRepository.findByIdForUpdate(request.spotId())
+                .filter(sp -> user.getUniversityId().equals(sp.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot not found: " + request.spotId()));
 
         if (spot.getStatus() == SpotStatus.OCCUPIED || spot.getStatus() == SpotStatus.RESERVED) {
@@ -83,6 +88,19 @@ public class BookingService {
         if (spot.getStatus() == SpotStatus.FACULTY_ASSIGNED && user.getUserType() != UserType.FACULTY) {
             throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is restricted to faculty members.");
         }
+
+        // A shared bay is taken through a Flex-Share claim (which pays the owner), not a booking.
+        if (spot.getStatus() == SpotStatus.FLEX_SHARE) {
+            throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is offered on Flex-Share; claim the offer instead.");
+        }
+
+        // A bay assigned to a faculty member belongs to that member only.
+        spotAssignmentRepository.findBySpotIdAndActiveTrue(spot.getId())
+                .filter(a -> ParkingLifecycleService.isCurrent(a, Instant.now()))
+                .filter(a -> !a.getUserId().equals(userId))
+                .ifPresent(a -> {
+                    throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is assigned to another faculty member.");
+                });
 
         // Resolve vehicle (requested or primary user vehicle)
         Vehicle vehicle = null;
@@ -97,7 +115,11 @@ public class BookingService {
         }
 
         // Calculate time window
-        Instant startTime = request.startTime() != null ? request.startTime() : Instant.now();
+        Instant now = Instant.now();
+        Instant startTime = request.startTime() != null ? request.startTime() : now;
+        if (startTime.isBefore(now.minus(Duration.ofMinutes(15)))) {
+            throw new IllegalArgumentException("Booking start time cannot be in the past.");
+        }
         BigDecimal durationHours = request.durationHours().setScale(1, RoundingMode.HALF_UP);
         long durationMinutes = (long) (durationHours.doubleValue() * 60);
         Instant endTime = startTime.plus(Duration.ofMinutes(durationMinutes));
@@ -118,8 +140,9 @@ public class BookingService {
                 ? calculatedTotal.min(dailyCap)
                 : calculatedTotal;
 
-        // Atomic wallet debit when autoDebitWallet is enabled (true by default)
-        if (Boolean.TRUE.equals(request.autoDebitWallet()) && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
+        // Always charge the wallet. The client-supplied autoDebitWallet flag is ignored: honouring
+        // false let a caller book for free and then cancel for a full "refund" of money never paid.
+        if (totalAmount.compareTo(BigDecimal.ZERO) > 0) {
             String desc = "Parking reservation: Bay " + spot.getBayCode() + " (" + durationHours.stripTrailingZeros().toPlainString() + "h)";
             walletService.debit(
                     userId,
@@ -166,7 +189,8 @@ public class BookingService {
                 spot.setPlateDigits(vehicle.getPlate().getDigits());
             }
         }
-        spot.setTimeLeftText("محجوز (" + durationHours.stripTrailingZeros().toPlainString() + " س)");
+        String hoursText = durationHours.stripTrailingZeros().toPlainString();
+        spot.setTimeLeft("محجوز (" + hoursText + " س)", "Reserved (" + hoursText + "h)");
         spot.setSessionEndsAt(endTime);
         spotRepository.save(spot);
 
@@ -245,7 +269,7 @@ public class BookingService {
             spot.setVehicleModel(null);
             spot.setPlateLettersAr(null);
             spot.setPlateDigits(null);
-            spot.setTimeLeftText(null);
+            spot.setTimeLeft(null, null);
             spot.setSessionEndsAt(null);
             spotRepository.save(spot);
         }

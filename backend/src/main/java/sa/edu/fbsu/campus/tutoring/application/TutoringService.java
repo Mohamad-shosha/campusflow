@@ -29,6 +29,8 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static sa.edu.fbsu.campus.common.domain.TenantGuard.requireSameTenant;
+
 @Service
 public class TutoringService {
 
@@ -108,7 +110,8 @@ public class TutoringService {
         User student = userRepository.findById(studentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student user not found: " + studentUserId));
 
-        TutoringSession session = findSessionByIdOrCode(idOrCode);
+        TutoringSession session = requireSameTenant(findSessionByIdOrCode(idOrCode), student,
+                "Tutoring session not found: " + idOrCode);
 
         if (session.getTutor().getId().equals(studentUserId)) {
             throw new IllegalArgumentException("Tutors cannot submit reviews for their own tutoring sessions.");

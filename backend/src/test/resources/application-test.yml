@@ -24,3 +24,10 @@ app:
       secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       access-token-expiration-minutes: 15
       refresh-token-expiration-days: 7
+    # Tests register many accounts and try bad passwords from one IP (rate limiter has its own unit test)
+    rate-limit:
+      register:
+        max-per-ip: 100000
+      login:
+        max-failures-per-ip: 100000
+        max-failures-per-account: 100000

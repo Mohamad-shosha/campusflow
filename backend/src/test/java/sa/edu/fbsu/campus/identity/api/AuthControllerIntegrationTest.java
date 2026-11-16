@@ -15,6 +15,7 @@ import sa.edu.fbsu.campus.identity.domain.UserType;
 import sa.edu.fbsu.campus.identity.dto.LoginRequest;
 import sa.edu.fbsu.campus.identity.dto.RefreshTokenRequest;
 import sa.edu.fbsu.campus.identity.dto.RegisterRequest;
+import sa.edu.fbsu.campus.identity.infra.RefreshTokenRepository;
 import sa.edu.fbsu.campus.infra.UniversityRepository;
 
 import java.util.UUID;
@@ -36,6 +37,9 @@ class AuthControllerIntegrationTest extends AbstractPostgresIntegrationTest {
 
     @Autowired
     private UniversityRepository universityRepository;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Test
     @DisplayName("Complete Auth Flow: Register -> Login -> Access Me -> RBAC Check -> Refresh -> Logout")
@@ -120,10 +124,19 @@ class AuthControllerIntegrationTest extends AbstractPostgresIntegrationTest {
         String newRefreshToken = refreshJson.get("refreshToken").asText();
         assertThat(newRefreshToken).isNotEqualTo(refreshToken);
 
+        // Refresh tokens are stored hashed: the raw value must not be found in the database
+        assertThat(refreshTokenRepository.findByTokenHash(newRefreshToken)).isEmpty();
+
         // 7. Old refresh token cannot be reused
         mockMvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshReq)))
+                .andExpect(status().isUnauthorized());
+
+        // 7b. Reuse of a rotated token revokes the whole session family, including the newest token
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new RefreshTokenRequest(newRefreshToken))))
                 .andExpect(status().isUnauthorized());
 
         // 8. Logout

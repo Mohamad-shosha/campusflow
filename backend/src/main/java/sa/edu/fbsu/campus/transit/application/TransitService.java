@@ -81,6 +81,7 @@ public class TransitService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
         TransitRoute route = routeRepository.findById(request.routeId())
+                .filter(r -> user.getUniversityId().equals(r.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Transit route not found: " + request.routeId()));
 
         if (route.getStatus() == TransitRouteStatus.INACTIVE) {
@@ -93,10 +94,21 @@ public class TransitService {
         TransitStop dropoff = stopRepository.findById(request.dropoffStopId())
                 .orElseThrow(() -> new ResourceNotFoundException("Dropoff stop not found: " + request.dropoffStopId()));
 
+        if (!pickup.getRoute().getId().equals(route.getId()) || !dropoff.getRoute().getId().equals(route.getId())) {
+            throw new IllegalArgumentException("Pickup and dropoff stops must belong to the selected route.");
+        }
+        if (pickup.getStopOrder() >= dropoff.getStopOrder()) {
+            throw new IllegalArgumentException("Dropoff stop must come after the pickup stop on this route.");
+        }
+
         ShuttleBus shuttle = null;
         if (request.shuttleId() != null) {
-            shuttle = shuttleRepository.findById(request.shuttleId()).orElse(null);
-            if (shuttle != null && shuttle.getStatus() == ShuttleStatus.OUT_OF_SERVICE) {
+            shuttle = shuttleRepository.findById(request.shuttleId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Shuttle not found: " + request.shuttleId()));
+            if (shuttle.getCurrentRoute() == null || !shuttle.getCurrentRoute().getId().equals(route.getId())) {
+                throw new IllegalArgumentException("Selected shuttle does not run on this route.");
+            }
+            if (shuttle.getStatus() == ShuttleStatus.OUT_OF_SERVICE) {
                 throw new IllegalStateException("Selected shuttle is out of service: " + shuttle.getBusNumber());
             }
         }

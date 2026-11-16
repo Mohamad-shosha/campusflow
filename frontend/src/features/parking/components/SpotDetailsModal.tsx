@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 import { X, Zap, AlertCircle, Loader2 } from 'lucide-react';
-import type { ParkingSpot } from '../data/parkingData';
+import { localizedSpotText, type ParkingSpot } from '../data/parkingData';
 
 export interface SpotDetailsModalProps {
   isOpen: boolean;
@@ -22,6 +22,8 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
   bookingError = null,
 }) => {
   if (!isOpen || !spot) return null;
+
+  const text = localizedSpotText(spot, isAr);
 
   const isAvailable = spot.status === 'available';
   const isFlex = spot.status === 'flex' || spot.status === 'flex-share';
@@ -68,8 +70,8 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
             </h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               {isAr
-                ? `المسافة حتى مدخل الكلية: ${spot.distance}`
-                : `Distance to campus entrance: ${spot.distance}`}
+                ? `المسافة حتى مدخل الكلية: ${text.distance}`
+                : `Distance to campus entrance: ${text.distance}`}
             </span>
           </div>
 
@@ -114,7 +116,7 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
                 {isAr ? 'الحالة الحالية:' : 'Current Status:'}
               </span>
               <strong style={{ color: 'var(--text-main)' }}>
-                {spot.occupant || (isAr ? 'شاغر وجاهز للاستخدام' : 'Vacant & Ready')}
+                {text.occupant || (isAr ? 'شاغر وجاهز للاستخدام' : 'Vacant & Ready')}
               </strong>
             </div>
 
@@ -141,7 +143,7 @@ export const SpotDetailsModal: FC<SpotDetailsModalProps> = ({
                 {isAr ? 'الوقت المتبقي:' : 'Time Left:'}
               </span>
               <strong style={{ color: 'var(--gold-text)' }}>
-                {spot.timeLeft || (isAr ? 'متاح فوري' : 'Instant Availability')}
+                {text.timeLeft || (isAr ? 'متاح فوري' : 'Instant Availability')}
               </strong>
             </div>
           </div>

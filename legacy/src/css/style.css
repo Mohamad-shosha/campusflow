@@ -1842,6 +1842,20 @@ body.theme-light .footer-bottom {
    ========================================================================== */
 
 /* Tablet & Smaller Screens (< 1024px) */
+/* Between the desktop and the stacked layout the two header groups do not fit on one line
+   (the action cluster used to spill past the left edge at 1280px). Show the showcase link as an
+   icon and let the cluster wrap onto a second row instead of overflowing. */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .header-compact-container {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .showcase-nav-btn span {
+    display: none;
+  }
+}
+
 @media (max-width: 1024px) {
   .header-compact-container {
     flex-direction: column;

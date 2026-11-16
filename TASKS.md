@@ -10,11 +10,11 @@
 
 - **إجمالي المهام المخططة:** 53 تاسك
 - **المنجز بالكامل (Done):** 44 تاسك ✅
-- **قيد العمل حالياً (In Progress):** 0 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 9 تاسك 📋
+- **قيد العمل حالياً (In Progress):** 1 تاسك ⏳
+- **المتبقي للبدء (Backlog):** 8 تاسك 📋
 - **نسبة الإنجاز الإجمالية للمشروع:** **83%**
 
-
+> 📌 **التاسك الشغالين عليه دلوقتي:** **`P8-01` — Security review (OWASP ASVS, dependency scan, headers)** (الفرع: `test/P8-01-security-review`)
 
 | Phase | الاسم | إجمالي | منجز (Done) ✅ | قيد التنفيذ ⏳ | متبقي 📋 |
 |---|---|---|---|---|---|
@@ -26,9 +26,9 @@
 | P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 7 | 0 | 0 |
 | P7 | Notifications, Admin, Analytics | 6 | 6 | 0 | 0 |
-| P8 | Hardening & QA | 5 | 0 | 0 | 5 |
+| P8 | Hardening & QA | 5 | 0 | 1 | 4 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **44** | **0** | **9** |
+| **الإجمالي** | | **53** | **44** | **1** | **8** |
 
 ---
 
@@ -545,10 +545,10 @@
 
 ### P8-01 — Security review (OWASP ASVS, dependency scan, headers)
 - **ماذا سيعمل:** مراجعة أمنية شاملة وإصلاح الثغرات.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ⏳ In Progress (جاري العمل)
 - **Dependencies:** P7-06
-- **Git Branch:** `test/P8-01-security-review` · **Pull Request:** —
-- **الملفات المتوقعة:** `security config`، `docs/security-review.md`
+- **Git Branch:** `test/P8-01-security-review` · **Pull Request:** PR (test/P8-01-security-review)
+- **الملفات المتوقعة:** `security config`، `docs/security/security-review.md`، `frontend/security-headers.conf`
 - **Implementation Steps:** 1) ASVS checklist 2) Dependency scan 3) Headers/CORS 4) اختبارات اختراق أساسية
 - **Acceptance Criteria:** لا ثغرات High/Critical مفتوحة
 - **Testing Requirements:** Security tests · Dependency scan

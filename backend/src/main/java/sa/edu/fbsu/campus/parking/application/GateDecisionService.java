@@ -122,8 +122,8 @@ public class GateDecisionService {
 
                     return GateDecisionResponse.granted(
                             "FACULTY_PERMIT",
-                            "أهلاً وسهلاً د. " + driver.getFullNameAr() + " — موقفك المخصص: " + spot.getBayCode(),
-                            "Welcome Dr. " + driver.getFullNameEn() + " — Reserved Bay: " + spot.getBayCode(),
+                            "أهلاً وسهلاً " + titledAr(driver.getFullNameAr()) + " — موقفك المخصص: " + spot.getBayCode(),
+                            "Welcome " + titledEn(driver.getFullNameEn()) + " — Reserved Bay: " + spot.getBayCode(),
                             spot.getBayNumber(),
                             spot.getBayCode(),
                             spot.getZone().getCode(),
@@ -143,8 +143,8 @@ public class GateDecisionService {
 
             return GateDecisionResponse.granted(
                     "FACULTY_PERMIT",
-                    "أهلاً وسهلاً د. " + driver.getFullNameAr() + " — تصريح أعضاء هيئة التدريس سارٍ (المنطقة C)",
-                    "Welcome Dr. " + driver.getFullNameEn() + " — Faculty Permit Active (Zone C)",
+                    "أهلاً وسهلاً " + titledAr(driver.getFullNameAr()) + " — تصريح أعضاء هيئة التدريس سارٍ (المنطقة C)",
+                    "Welcome " + titledEn(driver.getFullNameEn()) + " — Faculty Permit Active (Zone C)",
                     null,
                     "ZONE-C",
                     "ZONE-C",
@@ -277,5 +277,16 @@ public class GateDecisionService {
                     true
             ));
         }
+    }
+
+    /** Prefix the faculty title unless the stored name already carries it. */
+    static String titledAr(String name) {
+        String n = name == null ? "" : name.trim();
+        return n.startsWith("د.") || n.startsWith("د ") || n.startsWith("دكتور") ? n : "د. " + n;
+    }
+
+    static String titledEn(String name) {
+        String n = name == null ? "" : name.trim();
+        return n.regionMatches(true, 0, "Dr.", 0, 3) || n.regionMatches(true, 0, "Dr ", 0, 3) ? n : "Dr. " + n;
     }
 }

@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static sa.edu.fbsu.campus.common.domain.TenantGuard.requireSameTenant;
+
 @Service
 public class TutoringBookingService {
 
@@ -68,7 +70,8 @@ public class TutoringBookingService {
         User student = userRepository.findById(studentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student user not found: " + studentUserId));
 
-        TutoringSession session = lockSessionByIdOrCode(sessionIdOrCode);
+        TutoringSession session = requireSameTenant(lockSessionByIdOrCode(sessionIdOrCode), student,
+                "Tutoring session not found: " + sessionIdOrCode);
 
         String explicitKey = (request != null && request.idempotencyKey() != null && !request.idempotencyKey().isBlank())
                 ? request.idempotencyKey().trim()

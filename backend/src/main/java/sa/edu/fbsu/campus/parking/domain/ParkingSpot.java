@@ -52,6 +52,9 @@ public class ParkingSpot extends BaseTenantEntity {
     @Column(name = "time_left_text", length = 100)
     private String timeLeftText;
 
+    @Column(name = "time_left_text_en", length = 100)
+    private String timeLeftTextEn;
+
     @Column(name = "session_ends_at")
     private Instant sessionEndsAt;
 
@@ -177,6 +180,16 @@ public class ParkingSpot extends BaseTenantEntity {
 
     public void setTimeLeftText(String timeLeftText) {
         this.timeLeftText = timeLeftText;
+    }
+
+    public String getTimeLeftTextEn() {
+        return timeLeftTextEn;
+    }
+
+    /** Sets the bay status line in both languages (either may be null to clear it). */
+    public void setTimeLeft(String arabic, String english) {
+        this.timeLeftText = arabic;
+        this.timeLeftTextEn = english;
     }
 
     public Instant getSessionEndsAt() {

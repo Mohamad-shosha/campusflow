@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import confetti from 'canvas-confetti';
+import { confetti } from '../../../shared/utils/confetti';
 import { X, Camera, RotateCcw } from 'lucide-react';
 import { QR } from '../../../shared/components/QR';
 import { soundFX } from '../../../shared/utils/sound';
@@ -81,7 +81,7 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
         <div className="digital-pass-card">
           <div className="pass-header">
             <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--fbsu-gold)', fontWeight: 800 }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--gold-text)', fontWeight: 800 }}>
                 FBSU SMART PASS
               </div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>
@@ -99,7 +99,7 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
               style={{
                 fontSize: '2.5rem',
                 fontWeight: 900,
-                color: 'var(--fbsu-gold)',
+                color: 'var(--gold-text)',
                 lineHeight: 1.2,
               }}
             >
@@ -130,7 +130,7 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
               <span
                 style={{
                   fontSize: '0.8rem',
-                  color: 'var(--fbsu-gold)',
+                  color: 'var(--gold-text)',
                   letterSpacing: '1px',
                   fontFamily: 'var(--font-mono, monospace)',
                   fontWeight: 700,
@@ -167,7 +167,7 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
               <span style={{ color: 'var(--text-muted)', display: 'block' }}>
                 {isAr ? 'لوحة المركبة:' : 'Vehicle Plate:'}
               </span>
-              <strong style={{ color: 'var(--fbsu-gold)' }}>{passData.plate}</strong>
+              <strong style={{ color: 'var(--gold-text)' }}>{passData.plate}</strong>
             </div>
             <div>
               <span style={{ color: 'var(--text-muted)', display: 'block' }}>
@@ -188,7 +188,7 @@ export const DigitalPassModal: FC<DigitalPassModalProps> = ({
                 <span style={{ color: 'var(--text-muted)' }}>
                   {isAr ? 'المبلغ المخصوم من المحفظة:' : 'Wallet Deduction:'}
                 </span>
-                <strong style={{ color: 'var(--fbsu-gold)' }}>
+                <strong style={{ color: 'var(--gold-text)' }}>
                   {Number(passData.totalAmount).toFixed(2)} {isAr ? 'ر.س' : 'SAR'}
                 </strong>
               </div>

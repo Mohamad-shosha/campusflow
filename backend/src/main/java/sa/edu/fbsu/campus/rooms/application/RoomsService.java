@@ -30,6 +30,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static sa.edu.fbsu.campus.common.domain.TenantGuard.requireSameTenant;
+
 @Service
 public class RoomsService {
 
@@ -95,7 +97,8 @@ public class RoomsService {
         User actor = userRepository.findById(actorUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + actorUserId));
 
-        StudyRoom room = findRoomByIdOrCodeForUpdate(idOrCode);
+        StudyRoom room = requireSameTenant(findRoomByIdOrCodeForUpdate(idOrCode), actor,
+                "Study room not found: " + idOrCode);
 
         if (room.getStatus() == RoomStatus.MAINTENANCE) {
             throw new IllegalStateException("Study room is currently under maintenance and cannot be booked.");
@@ -107,6 +110,10 @@ public class RoomsService {
 
         if (!request.endTime().isAfter(request.startTime())) {
             throw new IllegalArgumentException("End time must be strictly after start time.");
+        }
+
+        if (request.startTime().isBefore(Instant.now().minus(Duration.ofMinutes(15)))) {
+            throw new IllegalArgumentException("Booking start time cannot be in the past.");
         }
 
         long durationMins = Duration.between(request.startTime(), request.endTime()).toMinutes();
@@ -185,6 +192,7 @@ public class RoomsService {
 
         RoomBooking booking = bookingRepository.findDetailedByIdForUpdate(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room booking not found: " + bookingId));
+        requireSameTenant(booking, actor, "Room booking not found: " + bookingId);
 
         boolean isAllowed = actor.hasRole(Role.CAMPUS_ADMIN)
                 || booking.getLeader().getId().equals(actorUserId);
@@ -246,6 +254,7 @@ public class RoomsService {
 
         RoomBooking booking = bookingRepository.findDetailedByIdForUpdate(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room booking not found: " + bookingId));
+        requireSameTenant(booking, actor, "Room booking not found: " + bookingId);
 
         boolean isAllowed = actor.hasRole(Role.CAMPUS_ADMIN)
                 || booking.getLeader().getId().equals(actorUserId);

@@ -9,7 +9,7 @@ vi.mock('canvas-confetti', () => ({
 
 vi.mock('../api/parkingApi', () => ({
   parkingApi: {
-    getSpots: vi.fn(),
+    getShareableSpots: vi.fn(),
     getFlexOffers: vi.fn(),
     createFlexOffer: vi.fn(),
     claimFlexOffer: vi.fn(),
@@ -27,24 +27,17 @@ describe('ShareSpotView Component', () => {
     walletBalance: 150.0,
   };
 
+  // The user's own live booking on bay 1, ending in 2.5 hours
+  const bookingEnd = new Date(Date.now() + 150 * 60000).toISOString();
   const mockSpots = [
     {
-      id: 'spot-uuid-1',
+      spotId: 'spot-uuid-1',
       bayNumber: 1,
-      bayCode: 'FBSU-BAY-001',
       zoneCode: 'ZONE_A',
       zoneNameAr: 'مواقف الطلاب أ',
       zoneNameEn: 'Zone A',
-      status: 'OCCUPIED' as const,
-      type: 'STANDARD' as const,
-      spotType: 'STANDARD' as const,
-      distanceMeters: 45,
-      hourlyRateSar: 5.75,
-      isAccessible: false,
-      hasEvCharger: false,
-      isShaded: true,
-      flexEligible: true,
-      activeBookingId: null,
+      source: 'BOOKING' as const,
+      availableUntil: bookingEnd,
     },
   ];
 
@@ -69,7 +62,7 @@ describe('ShareSpotView Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(parkingApi.getSpots).mockResolvedValue(mockSpots);
+    vi.mocked(parkingApi.getShareableSpots).mockResolvedValue(mockSpots);
     vi.mocked(parkingApi.getFlexOffers).mockResolvedValue(mockOffers);
     vi.mocked(parkingApi.getTariffs).mockResolvedValue([
       {
@@ -101,7 +94,7 @@ describe('ShareSpotView Component', () => {
       expect(screen.getByTestId('flex-reward-amount')).toHaveTextContent('5.75 ر.س');
     });
 
-    fireEvent.click(screen.getByTestId('break-option-4'));
+    fireEvent.click(screen.getByTestId('break-option-1'));
     expect(screen.getByTestId('flex-reward-amount')).toHaveTextContent('5.75 ر.س');
   });
 
@@ -112,8 +105,18 @@ describe('ShareSpotView Component', () => {
     expect(screen.getByTestId('flex-reward-amount')).toHaveTextContent('—');
   });
 
-  it('requires an explicit bay selection and never submits a placeholder spot id', async () => {
-    render(<ShareSpotView isAr={true} currentUser={{ ...mockUser, primarySpot: 99 }} />);
+  it('requires an explicit bay selection when the user owns several bays', async () => {
+    vi.mocked(parkingApi.getShareableSpots).mockResolvedValue([
+      ...mockSpots,
+      {
+        ...mockSpots[0]!,
+        spotId: 'spot-uuid-2',
+        bayNumber: 19,
+        source: 'ASSIGNMENT' as const,
+        availableUntil: null,
+      },
+    ]);
+    render(<ShareSpotView isAr={true} currentUser={mockUser} />);
     await waitFor(() => {
       expect(screen.getByTestId('spot-select')).toBeInTheDocument();
     });
@@ -154,9 +157,9 @@ describe('ShareSpotView Component', () => {
     await waitFor(() => {
       expect(parkingApi.createFlexOffer).toHaveBeenCalledWith({
         spotId: 'spot-uuid-1',
-        durationMinutes: 180,
+        durationMinutes: 120,
       });
-      expect(handleShareConfirmed).toHaveBeenCalledWith(3, 5.75);
+      expect(handleShareConfirmed).toHaveBeenCalledWith(2, 5.75);
       expect(screen.getByTestId('flex-share-success-banner')).toBeInTheDocument();
     });
   });
@@ -194,5 +197,25 @@ describe('ShareSpotView Component', () => {
       expect(parkingApi.claimFlexOffer).toHaveBeenCalledWith('offer-uuid-1');
       expect(screen.getByTestId('claim-success-banner')).toBeInTheDocument();
     });
+  });
+
+  it('only offers break lengths that end before the booking does', async () => {
+    render(<ShareSpotView isAr={false} currentUser={mockUser} />);
+    await waitFor(() => expect(screen.getByTestId('shareable-spot-hint')).toBeInTheDocument());
+
+    expect(screen.getByTestId('shareable-spot-hint')).toHaveTextContent('Can be shared until');
+    expect(screen.getByTestId('break-option-2')).toHaveAttribute('aria-disabled', 'false');
+    expect(screen.getByTestId('break-option-3')).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByTestId('break-option-4')).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByTestId('break-option-3')).not.toHaveClass('selected');
+  });
+
+  it('explains that a bay must be booked first when the user has nothing to share', async () => {
+    vi.mocked(parkingApi.getShareableSpots).mockResolvedValue([]);
+    render(<ShareSpotView isAr={false} currentUser={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByTestId('spot-select-unavailable')).toHaveTextContent('Book a bay first')
+    );
+    expect(screen.getByTestId('activate-flex-share-btn')).toBeDisabled();
   });
 });

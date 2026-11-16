@@ -62,6 +62,7 @@ import '../styles/main.css';
 import '../styles/rooms-hub.css';
 import '../styles/transit-utilities.css';
 import '../styles/design-system.css';
+import { userRoleLabel } from '../shared/utils/roleLabel';
 
 export interface AppContentProps {
   initialTab?: string | undefined;
@@ -102,6 +103,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
 
   const { isAr } = useAppPreferences();
   const { user, isAuthenticated, logout } = useAuth();
+  const isGateStaff =
+    user?.roles?.some(r => r === 'SECURITY_OFFICER' || r === 'CAMPUS_ADMIN') ?? false;
 
   // Fetch live notifications and unread count from backend
   const fetchNotifications = useCallback(async () => {
@@ -295,18 +298,14 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
     });
   };
 
+  const roleLabel = user ? userRoleLabel(user.roles, user.userType) : null;
   const currentUser: AppUser = user
     ? {
         id: user.universityNumber,
         name: user.fullNameAr,
         nameEn: user.fullNameEn,
-        role:
-          user.userType === 'FACULTY'
-            ? 'عضو هيئة تدريس'
-            : user.userType === 'STAFF'
-              ? 'إداري'
-              : 'طالب',
-        roleEn: user.roles[0] || user.userType || 'STUDENT',
+        role: roleLabel!.ar,
+        roleEn: roleLabel!.en,
         walletBalance: liveBalance,
         avatarColor: '#116E63',
       }
@@ -841,12 +840,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         {/* Tab 4: Gate ALPR (Dedicated Gate Service Portal) */}
         {activeTab === 'gate' && (
           <>
-            <AlprGateView
-              isAr={isAr}
-              canViewGateHistory={
-                user?.roles?.some(r => r === 'SECURITY_OFFICER' || r === 'CAMPUS_ADMIN') ?? false
-              }
-            />
+            <AlprGateView isAr={isAr} canViewGateHistory={isGateStaff} canScan={isGateStaff} />
             <ServiceExplainerSections service="gate" isAr={isAr} onNavigate={setActiveTab} />
           </>
         )}
@@ -858,8 +852,8 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               isAr={isAr}
               currentUser={{
                 id: currentUser.id,
-                name: currentUser.name,
-                role: currentUser.role,
+                name: isAr ? currentUser.name : currentUser.nameEn || currentUser.name,
+                role: isAr ? currentUser.role : currentUser.roleEn || currentUser.role,
                 userType: user?.userType,
                 primarySpot: userAssignedBay,
                 walletBalance: currentUser.walletBalance,
@@ -884,6 +878,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
               currentUser={{
                 id: currentUser.id,
                 name: currentUser.name,
+                displayName: isAr ? currentUser.name : currentUser.nameEn || currentUser.name,
                 role: currentUser.role,
                 walletBalance: currentUser.walletBalance,
               }}

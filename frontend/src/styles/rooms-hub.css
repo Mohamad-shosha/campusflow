@@ -771,3 +771,11 @@
   color: #fbbf24;
   border-color: rgba(245, 158, 11, 0.35);
 }
+
+/* Light theme: the neon pill text is unreadable on pale tints (WCAG AA) */
+body.theme-light .room-slot-pill--available {
+  color: #047857;
+}
+body.theme-light .room-slot-pill--booked {
+  color: #92400e;
+}

@@ -264,7 +264,7 @@ Every technology listed below is actively utilized in the production repository:
 | Tier | Technology | Version | Engineering Role & Selection Rationale |
 | :--- | :--- | :---: | :--- |
 | **Backend Runtime** | Java OpenJDK | 21 LTS | High-throughput virtual threads (Project Loom), pattern matching, and memory efficiency. |
-| **Backend Framework** | Spring Boot | 3.3.4 | Modular Monolith architecture, enterprise dependency injection, and production actuators. |
+| **Backend Framework** | Spring Boot | 3.5.16 | Modular Monolith architecture, enterprise dependency injection, and production actuators. |
 | **Security & Auth** | Spring Security / JJWT | 6.3 / 0.12.6 | Stateless JWT authorization (15-min access + 7-day rotating refresh tokens) with BCrypt-12. |
 | **Database Engine** | PostgreSQL | 15 Alpine | ACID transactions, `NUMERIC(12,2)` monetary math, and `tstzrange` exclusion constraints. |
 | **Database Migrations** | Flyway | 10.10.0 | Version-controlled, reproducible SQL database migrations (`V1` through `V14`). |

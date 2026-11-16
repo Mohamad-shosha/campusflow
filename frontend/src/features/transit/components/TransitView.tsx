@@ -470,7 +470,7 @@ export const TransitView: FC<TransitViewProps> = ({ isAr = true, onRequireAuth }
                             className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold"
                             style={{
                               backgroundColor: `${shuttle.routeColor || '#10B981'}20`,
-                              color: shuttle.routeColor || '#10B981',
+                              color: 'var(--text-main)',
                               borderColor: `${shuttle.routeColor || '#10B981'}40`,
                               borderWidth: 1,
                             }}

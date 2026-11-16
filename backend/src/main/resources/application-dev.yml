@@ -3,6 +3,20 @@ spring:
     activate:
       on-profile: dev
 
+management:
+  endpoint:
+    health:
+      show-details: always
+
+# Local development and integration tests register many accounts from one IP.
+app:
+  security:
+    rate-limit:
+      register:
+        max-per-ip: 100000
+      login:
+        max-failures-per-ip: 100000
+
 logging:
   level:
     sa.edu.fbsu.campus: DEBUG

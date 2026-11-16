@@ -23,6 +23,7 @@ public record ParkingSpotResponse(
         String plateLettersAr,
         String plateDigits,
         String timeLeftText,
+        String timeLeftTextEn,
         Instant sessionEndsAt
 ) {}
 

@@ -65,6 +65,23 @@ public class UserPrincipal implements UserDetails {
         return new UserPrincipal(userId, universityId, universityNumber, "", true, auths);
     }
 
+    /** True when the principal holds any of the given roles (names without the ROLE_ prefix). */
+    public boolean hasAnyRole(String... roles) {
+        for (GrantedAuthority authority : getAuthorities()) {
+            for (String role : roles) {
+                if (("ROLE_" + role).equals(authority.getAuthority())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** Null-safe check used by public endpoints that hide personal data from non-staff viewers. */
+    public static boolean isStaff(UserPrincipal principal) {
+        return principal != null && principal.hasAnyRole("CAMPUS_ADMIN", "SECURITY_OFFICER");
+    }
+
     public UUID getUserId() {
         return userId;
     }

@@ -23,8 +23,9 @@ public record OfficeHourSlotDto(
                 s.getTimeLabelAr(),
                 s.getTimeLabelEn(),
                 s.getDurationMinutes(),
-                s.isAvailable(),
-                s.getBookedNote()
+                s.isAvailable() && s.getStartTime() != null && s.getStartTime().isAfter(java.time.Instant.now()),
+                // Slots are listed publicly: never expose which student booked (older rows stored the name).
+                s.getBookedNote() != null ? "محجوز" : null
         );
     }
 }

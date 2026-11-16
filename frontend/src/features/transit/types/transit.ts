@@ -65,6 +65,7 @@ export interface TransitPass {
   passCode: string;
   qrToken: string;
   userName: string;
+  userNameEn?: string;
   userUniversityNumber: string;
   routeId: string;
   routeCode: string;

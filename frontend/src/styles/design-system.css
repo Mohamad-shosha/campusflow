@@ -925,7 +925,7 @@ body.theme-light .uni-ribbon {
   white-space: nowrap;
 }
 .cf-wallet-pill:hover {
-  border-color: var(--fbsu-gold);
+  border-color: var(--gold-text);
 }
 
 .cf-user-btn {
@@ -961,6 +961,13 @@ body.theme-light .uni-ribbon {
 .cf-user-role {
   color: var(--text-dim);
   font-weight: 600;
+  white-space: nowrap;
+}
+.cf-user-name {
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cf-signin-btn {
@@ -1023,6 +1030,10 @@ body.theme-light .uni-ribbon {
   .cf-brand__tag {
     display: none;
   }
+}
+
+/* With the full desktop nav visible, the role label does not fit next to it */
+@media (max-width: 1720px) {
   .cf-user-role {
     display: none;
   }
@@ -1101,7 +1112,7 @@ body.theme-light .uni-ribbon {
   font-size: var(--fs-xs) !important;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--fbsu-gold) !important;
+  color: var(--gold-text) !important;
   margin-bottom: var(--sp-3) !important;
 }
 
@@ -1124,7 +1135,7 @@ body.theme-light .uni-ribbon {
 }
 .main-footer .cf-footer__links a:hover,
 .main-footer .cf-footer__links button:hover {
-  color: var(--fbsu-gold) !important;
+  color: var(--gold-text) !important;
 }
 
 .main-footer .cf-footer__contact p {

@@ -48,7 +48,7 @@ describe('AlprGateView Component', () => {
       scannedPlate: 'س ع د 7700',
     });
 
-    render(<AlprGateView isAr={true} />);
+    render(<AlprGateView isAr={true} canScan={true} />);
 
     const facultyBtn = screen.getByTestId('preset-faculty-btn');
     fireEvent.click(facultyBtn);
@@ -82,7 +82,7 @@ describe('AlprGateView Component', () => {
       scannedPlate: 'ق و ل 9999',
     });
 
-    render(<AlprGateView isAr={true} />);
+    render(<AlprGateView isAr={true} canScan={true} />);
 
     const unregBtn = screen.getByTestId('preset-unregistered-btn');
     fireEvent.click(unregBtn);
@@ -102,6 +102,15 @@ describe('AlprGateView Component', () => {
       expect(screen.getByText('تم رفض الدخول - الحاجز مغلق')).toBeInTheDocument();
       expect(screen.getByText('UNREGISTERED_VEHICLE')).toBeInTheDocument();
     });
+  });
+
+  it('disables scanning for callers without gate staff role and never calls the scan API', () => {
+    render(<AlprGateView isAr={true} />);
+    const scanBtn = screen.getByTestId('trigger-gate-scan-btn');
+    expect(scanBtn).toBeDisabled();
+    expect(screen.getByTestId('gate-scan-restricted')).toBeInTheDocument();
+    fireEvent.click(scanBtn);
+    expect(parkingApi.scanGate).not.toHaveBeenCalled();
   });
 
   it('shows restricted notice when caller lacks officer/admin role and never fetches /gate/events', () => {
