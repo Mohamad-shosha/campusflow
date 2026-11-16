@@ -1,12 +1,32 @@
 # ==============================================================================
-# Production runtime image using Eclipse Temurin JRE 21
+# Stage 1: build the executable JAR from source, so the image can never ship a
+# stale jar left over in target/ (P8-01 finding).
+# ==============================================================================
+FROM eclipse-temurin:21-jdk AS build
+
+WORKDIR /build
+
+# Resolve dependencies first so they are cached between source-only changes
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
+# Strip Windows line endings from the wrapper script when built from a Windows checkout
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw && ./mvnw -q -B dependency:go-offline
+
+COPY src src
+RUN ./mvnw -q -B package -DskipTests && cp target/fbsu-campus-backend-*.jar /build/app.jar
+
+# ==============================================================================
+# Stage 2: minimal runtime image running as an unprivileged user
 # ==============================================================================
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copy compiled executable fat JAR
-COPY target/fbsu-campus-backend-*.jar app.jar
+RUN groupadd --system app && useradd --system --gid app --no-create-home app
+
+COPY --from=build --chown=app:app /build/app.jar app.jar
+
+USER app
 
 EXPOSE 8080
 

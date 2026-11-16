@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import confetti from 'canvas-confetti';
+import { confetti } from '../../../shared/utils/confetti';
 import { X, Bus, CheckCircle2, MapPin, Clock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { QR } from '../../../shared/components/QR';
 import { soundFX } from '../../../shared/utils/sound';

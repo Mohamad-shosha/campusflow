@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import sa.edu.fbsu.campus.common.security.TooManyRequestsException;
 
 import java.net.URI;
 import java.time.Instant;
@@ -81,6 +82,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
 
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ProblemDetail> handleTooManyRequests(TooManyRequestsException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.TOO_MANY_REQUESTS,
+                "محاولات كثيرة جداً. يرجى المحاولة لاحقاً. / Too many attempts. Please try again later."
+        );
+        problemDetail.setTitle("Too Many Requests");
+        problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/too-many-requests"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", String.valueOf(ex.getRetryAfterSeconds()))
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(DuplicateTransactionException.class)
+    public ResponseEntity<ProblemDetail> handleDuplicateTransaction(DuplicateTransactionException ex) {
+        log.warn("Rejected replayed idempotency key: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problemDetail.setTitle("Duplicate Transaction");
+        problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/duplicate-transaction"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
+    }
+
     @ExceptionHandler(TariffNotConfiguredException.class)
     public ResponseEntity<ProblemDetail> handleTariffNotConfigured(TariffNotConfiguredException ex) {
         log.error("Parking tariff missing for user type {}: pricing request rejected", ex.getUserType());
@@ -128,8 +153,38 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
+    /** Malformed JSON, wrong value types, missing or mistyped parameters: client errors, not 500s. */
+    @ExceptionHandler({
+            org.springframework.http.converter.HttpMessageNotReadableException.class,
+            org.springframework.beans.TypeMismatchException.class,
+            org.springframework.web.bind.MissingServletRequestParameterException.class,
+            org.springframework.web.bind.MissingPathVariableException.class
+    })
+    public ResponseEntity<ProblemDetail> handleMalformedRequest(Exception ex) {
+        log.debug("Rejected malformed request: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Malformed request: the body or parameters could not be read."
+        );
+        problemDetail.setTitle("Bad Request");
+        problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/bad-request"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGenericException(Exception ex) {
+        // Spring MVC exceptions (405 method not allowed, 415 unsupported media type, 406, ...)
+        // carry their own status; keep it instead of turning them into 500s.
+        if (ex instanceof org.springframework.web.ErrorResponse errorResponse
+                && errorResponse.getStatusCode().is4xxClientError()) {
+            HttpStatus status = HttpStatus.valueOf(errorResponse.getStatusCode().value());
+            ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, status.getReasonPhrase());
+            problemDetail.setTitle(status.getReasonPhrase());
+            problemDetail.setType(URI.create("https://fbsu.edu.sa/errors/" + status.value()));
+            problemDetail.setProperty("timestamp", Instant.now());
+            return ResponseEntity.status(status).headers(errorResponse.getHeaders()).body(problemDetail);
+        }
         log.error("Unhandled exception caught in GlobalExceptionHandler: ", ex);
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,

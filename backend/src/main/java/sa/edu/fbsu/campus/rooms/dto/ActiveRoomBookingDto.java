@@ -47,5 +47,13 @@ public record ActiveRoomBookingDto(
                 b.getStatus().name()
         );
     }
-}
 
+    /** Rooms are listed publicly: hide who booked from anyone but the leader and staff. */
+    public ActiveRoomBookingDto visibleTo(UUID viewerUserId, boolean staff) {
+        if (staff || (viewerUserId != null && viewerUserId.equals(leaderUserId))) {
+            return this;
+        }
+        return new ActiveRoomBookingDto(bookingId, leaderUserId, null, null, null, List.of(), purpose,
+                startTime, endTime, startLabel, endLabel, totalMinutes, remainingMinutes, extendedCount, status);
+    }
+}

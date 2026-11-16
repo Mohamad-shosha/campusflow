@@ -53,6 +53,7 @@ public class ParkingAdminService {
             UserPrincipal actor
     ) {
         ParkingSpot spot = spotRepository.findByIdForUpdate(spotId)
+                .filter(sp -> universityId.equals(sp.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot not found with id: " + spotId));
 
         SpotStatus oldStatus = spot.getStatus();
@@ -94,6 +95,7 @@ public class ParkingAdminService {
             UserPrincipal actor
     ) {
         ParkingSpot spot = spotRepository.findByIdForUpdate(spotId)
+                .filter(sp -> universityId.equals(sp.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot not found with id: " + spotId));
 
         SpotType oldType = spot.getSpotType();

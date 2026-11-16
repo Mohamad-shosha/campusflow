@@ -248,7 +248,7 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
                 style={{
                   fontSize: '1.35rem',
                   fontWeight: 800,
-                  color: 'var(--fbsu-gold)',
+                  color: 'var(--gold-text)',
                   marginTop: '0.25rem',
                 }}
               >
@@ -415,7 +415,8 @@ export const AnalyticsView: FC<AnalyticsViewProps> = ({ isAr }) => {
                     }}
                   >
                     <span>{pt.time}</span>
-                    <span style={{ color: pt.color }}>{pt.load}%</span>
+                    {/* Status colour stays on the bar below; text must stay readable in light theme */}
+                    <span style={{ color: 'var(--text-strong)' }}>{pt.load}%</span>
                   </div>
                   <div
                     style={{

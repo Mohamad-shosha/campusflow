@@ -66,8 +66,10 @@ public class TuitionService {
     }
 
     @Transactional(readOnly = true)
-    public TuitionInvoiceResponse getInvoiceDetails(UUID invoiceId) {
+    public TuitionInvoiceResponse getInvoiceDetails(UUID studentId, UUID invoiceId) {
+        // Another student's invoice is reported as not found so ids cannot be probed.
         TuitionInvoice invoice = invoiceRepository.findById(invoiceId)
+                .filter(i -> i.getStudent().getId().equals(studentId))
                 .orElseThrow(() -> new ResourceNotFoundException("Tuition invoice not found: " + invoiceId));
         return TuitionInvoiceResponse.fromEntity(invoice);
     }
@@ -153,8 +155,9 @@ public class TuitionService {
     }
 
     @Transactional(readOnly = true)
-    public TuitionReceiptResponse getReceiptDetails(UUID receiptId) {
+    public TuitionReceiptResponse getReceiptDetails(UUID payerId, UUID receiptId) {
         TuitionReceipt receipt = receiptRepository.findById(receiptId)
+                .filter(r -> r.getPayer().getId().equals(payerId))
                 .orElseThrow(() -> new ResourceNotFoundException("Tuition receipt not found: " + receiptId));
         return TuitionReceiptResponse.fromEntity(receipt);
     }

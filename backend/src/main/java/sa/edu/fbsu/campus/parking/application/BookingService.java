@@ -74,6 +74,7 @@ public class BookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Campus user not found: " + userId));
 
         ParkingSpot spot = spotRepository.findByIdForUpdate(request.spotId())
+                .filter(sp -> user.getUniversityId().equals(sp.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot not found: " + request.spotId()));
 
         if (spot.getStatus() == SpotStatus.OCCUPIED || spot.getStatus() == SpotStatus.RESERVED) {
@@ -97,7 +98,11 @@ public class BookingService {
         }
 
         // Calculate time window
-        Instant startTime = request.startTime() != null ? request.startTime() : Instant.now();
+        Instant now = Instant.now();
+        Instant startTime = request.startTime() != null ? request.startTime() : now;
+        if (startTime.isBefore(now.minus(Duration.ofMinutes(15)))) {
+            throw new IllegalArgumentException("Booking start time cannot be in the past.");
+        }
         BigDecimal durationHours = request.durationHours().setScale(1, RoundingMode.HALF_UP);
         long durationMinutes = (long) (durationHours.doubleValue() * 60);
         Instant endTime = startTime.plus(Duration.ofMinutes(durationMinutes));
@@ -118,8 +123,9 @@ public class BookingService {
                 ? calculatedTotal.min(dailyCap)
                 : calculatedTotal;
 
-        // Atomic wallet debit when autoDebitWallet is enabled (true by default)
-        if (Boolean.TRUE.equals(request.autoDebitWallet()) && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
+        // Always charge the wallet. The client-supplied autoDebitWallet flag is ignored: honouring
+        // false let a caller book for free and then cancel for a full "refund" of money never paid.
+        if (totalAmount.compareTo(BigDecimal.ZERO) > 0) {
             String desc = "Parking reservation: Bay " + spot.getBayCode() + " (" + durationHours.stripTrailingZeros().toPlainString() + "h)";
             walletService.debit(
                     userId,

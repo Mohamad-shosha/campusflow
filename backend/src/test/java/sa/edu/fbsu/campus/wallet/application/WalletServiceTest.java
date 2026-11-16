@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import sa.edu.fbsu.campus.common.error.DuplicateTransactionException;
+import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.identity.domain.User;
 import sa.edu.fbsu.campus.identity.domain.UserType;
 import sa.edu.fbsu.campus.identity.infra.UserRepository;
@@ -71,7 +73,7 @@ class WalletServiceTest {
     @Test
     @DisplayName("topUp should credit wallet and record ledger entry when idempotency key is fresh")
     void testTopUpSuccess() {
-        when(ledgerEntryRepository.existsByIdempotencyKey("idem-topup-01")).thenReturn(false);
+        when(ledgerEntryRepository.findByIdempotencyKey("idem-topup-01")).thenReturn(Optional.empty());
         when(walletRepository.findByUserIdForUpdate(sender.getId())).thenReturn(Optional.of(senderWallet));
         when(walletRepository.save(any(Wallet.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -83,9 +85,11 @@ class WalletServiceTest {
     }
 
     @Test
-    @DisplayName("topUp should return current wallet without double-credit if idempotency key exists")
+    @DisplayName("topUp should return current wallet without double-credit if the same user retries a key")
     void testTopUpIdempotent() {
-        when(ledgerEntryRepository.existsByIdempotencyKey("idem-duplicate")).thenReturn(true);
+        LedgerEntry previous = new LedgerEntry(senderWallet, TransactionType.TOP_UP, TransactionDirection.CREDIT,
+                new BigDecimal("100.00"), new BigDecimal("500.00"), "idem-duplicate", "MADA", "Earlier");
+        when(ledgerEntryRepository.findByIdempotencyKey("idem-duplicate")).thenReturn(Optional.of(previous));
         when(walletRepository.findByUserId(sender.getId())).thenReturn(Optional.of(senderWallet));
 
         TopUpRequest req = new TopUpRequest(new BigDecimal("100.00"), "idem-duplicate", "MADA", "Duplicate");
@@ -100,7 +104,8 @@ class WalletServiceTest {
     @DisplayName("transfer should move funds atomically between sender and recipient")
     void testTransferSuccess() {
         when(ledgerEntryRepository.existsByIdempotencyKey("idem-trans-01")).thenReturn(false);
-        when(userRepository.findByUniversityNumber("202410102")).thenReturn(Optional.of(recipient));
+        when(userRepository.findById(sender.getId())).thenReturn(Optional.of(sender));
+        when(userRepository.findByUniversityIdAndUniversityNumber(universityId, "202410102")).thenReturn(Optional.of(recipient));
 
         when(walletRepository.findByUserIdForUpdate(sender.getId())).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findByUserIdForUpdate(recipient.getId())).thenReturn(Optional.of(recipientWallet));
@@ -122,7 +127,8 @@ class WalletServiceTest {
     @DisplayName("transfer should fail when sender has insufficient balance")
     void testTransferInsufficientBalance() {
         when(ledgerEntryRepository.existsByIdempotencyKey("idem-fail")).thenReturn(false);
-        when(userRepository.findByUniversityNumber("202410102")).thenReturn(Optional.of(recipient));
+        when(userRepository.findById(sender.getId())).thenReturn(Optional.of(sender));
+        when(userRepository.findByUniversityIdAndUniversityNumber(universityId, "202410102")).thenReturn(Optional.of(recipient));
         when(walletRepository.findByUserIdForUpdate(sender.getId())).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findByUserIdForUpdate(recipient.getId())).thenReturn(Optional.of(recipientWallet));
         when(walletRepository.findByUserId(sender.getId())).thenReturn(Optional.of(senderWallet));
@@ -139,12 +145,54 @@ class WalletServiceTest {
     @DisplayName("transfer should reject self-transfer")
     void testTransferSelfTransfer() {
         when(ledgerEntryRepository.existsByIdempotencyKey("idem-self")).thenReturn(false);
-        when(userRepository.findByUniversityNumber("202410101")).thenReturn(Optional.of(sender));
+        when(userRepository.findById(sender.getId())).thenReturn(Optional.of(sender));
+        when(userRepository.findByUniversityIdAndUniversityNumber(universityId, "202410101")).thenReturn(Optional.of(sender));
 
         TransferRequest req = new TransferRequest("202410101", new BigDecimal("50.00"), "idem-self", "To self");
 
         assertThatThrownBy(() -> walletService.transfer(sender.getId(), req))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Cannot transfer funds to your own wallet");
+    }
+
+    @Test
+    @DisplayName("topUp rejects an idempotency key that belongs to another user's ledger")
+    void testTopUpRejectsForeignKey() {
+        LedgerEntry foreign = new LedgerEntry(recipientWallet, TransactionType.TOP_UP, TransactionDirection.CREDIT,
+                new BigDecimal("10.00"), new BigDecimal("110.00"), "idem-foreign", "MADA", "Other user");
+        when(ledgerEntryRepository.findByIdempotencyKey("idem-foreign")).thenReturn(Optional.of(foreign));
+
+        TopUpRequest req = new TopUpRequest(new BigDecimal("50.00"), "idem-foreign", "MADA", "Replay");
+
+        assertThatThrownBy(() -> walletService.topUp(sender.getId(), req))
+                .isInstanceOf(DuplicateTransactionException.class);
+        verify(ledgerEntryRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("debit fails loudly on a replayed key so callers cannot apply side effects without a charge")
+    void testDebitRejectsReplayedKey() {
+        when(ledgerEntryRepository.existsByIdempotencyKey("idem-used")).thenReturn(true);
+
+        assertThatThrownBy(() -> walletService.debit(sender.getId(), new BigDecimal("1000.00"),
+                TransactionType.TUITION_PAYMENT, "idem-used", "INV-1", "Tuition"))
+                .isInstanceOf(DuplicateTransactionException.class);
+        verify(walletRepository, never()).findByUserIdForUpdate(any());
+        verify(ledgerEntryRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("transfer does not find recipients outside the sender's university")
+    void testTransferRejectsCrossTenantRecipient() {
+        when(ledgerEntryRepository.existsByIdempotencyKey(any())).thenReturn(false);
+        when(userRepository.findById(sender.getId())).thenReturn(Optional.of(sender));
+        when(userRepository.findByUniversityIdAndUniversityNumber(universityId, "other@uni.edu.sa")).thenReturn(Optional.empty());
+        User outsider = new User(UUID.randomUUID(), "999", "other@uni.edu.sa", "pass", "خارجي", "Outsider", UserType.STUDENT);
+        when(userRepository.findByEmail("other@uni.edu.sa")).thenReturn(Optional.of(outsider));
+
+        TransferRequest req = new TransferRequest("other@uni.edu.sa", new BigDecimal("5.00"), "idem-x", "Cross");
+
+        assertThatThrownBy(() -> walletService.transfer(sender.getId(), req))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 }

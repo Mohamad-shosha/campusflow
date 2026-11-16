@@ -3,6 +3,7 @@ import { X, Calendar, UserCheck, AlertCircle, LogIn } from 'lucide-react';
 import type { FacultyMember } from '../data/campusData';
 import { officeHoursApi } from '../api/officeHoursApi';
 import { soundFX } from '../../../shared/utils/sound';
+import { slotDayLabel, slotKey, upcomingSlots } from '../utils/officeHourSlots';
 
 export interface BookOfficeHoursModalProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
   onConfirm,
 }) => {
   const [selectedSlot, setSelectedSlot] = useState<string>('');
-  const [topic, setTopic] = useState<string>('مناقشة مشروع التخرج واستفسار التصميم المنطقي');
+  const [topic, setTopic] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
@@ -46,19 +47,26 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
       setErrorMessage(null);
       setIsSuccess(false);
       setIsSubmitting(false);
-      if (initialSlotTime) {
-        setSelectedSlot(initialSlotTime);
-      } else {
-        setSelectedSlot(faculty.timeSlots.find(s => s.available)?.time ?? '');
-      }
+      setTopic(
+        isAr
+          ? 'مناقشة مشروع التخرج واستفسار التصميم المنطقي'
+          : 'Graduation project discussion and course questions'
+      );
+      const open = upcomingSlots(faculty.timeSlots).filter(s => s.available);
+      // initialSlotTime carries a slot key (id); fall back to the first open slot with that label
+      const initial =
+        open.find(s => slotKey(s) === initialSlotTime) ??
+        open.find(s => s.time === initialSlotTime) ??
+        open[0];
+      setSelectedSlot(initial ? slotKey(initial) : '');
     }
-  }, [isOpen, faculty, initialSlotTime]);
+  }, [isOpen, faculty, initialSlotTime, isAr]);
 
   if (!isOpen || !faculty) return null;
 
-  const activeSlotTime = selectedSlot || faculty.timeSlots.find(s => s.available)?.time || '';
-  const activeSlotObj = faculty.timeSlots.find(s => s.time === activeSlotTime);
-  const hasAvailableSlots = faculty.timeSlots.some(s => s.available);
+  const visibleSlots = upcomingSlots(faculty.timeSlots);
+  const activeSlotObj = visibleSlots.find(s => slotKey(s) === selectedSlot && s.available);
+  const hasAvailableSlots = visibleSlots.some(s => s.available);
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -219,8 +227,8 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
               {isAr ? 'اختر الفترة الزمنية المتاحة:' : 'Select Available Slot:'}
             </label>
             <div className="time-slots-picker-grid">
-              {faculty.timeSlots.map((slot, idx) => {
-                const isSelected = activeSlotTime === slot.time && slot.available;
+              {visibleSlots.map((slot, idx) => {
+                const isSelected = slotKey(slot) === selectedSlot && slot.available;
                 return (
                   <button
                     key={slot.id || `${slot.time}-${idx}`}
@@ -230,7 +238,7 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
                     title={slot.bookedNote || ''}
                     onClick={() => {
                       soundFX.playClick();
-                      setSelectedSlot(slot.time);
+                      setSelectedSlot(slotKey(slot));
                     }}
                     style={
                       isSelected
@@ -242,6 +250,11 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
                         : {}
                     }
                   >
+                    {slot.startTime && (
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                        {slotDayLabel(slot, isAr)}
+                      </div>
+                    )}
                     <div style={{ fontWeight: 800 }}>
                       {isAr ? slot.time : slot.timeEn || slot.time}
                     </div>

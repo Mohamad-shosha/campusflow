@@ -52,7 +52,9 @@ public class SecurityConfig {
                                 "/api/v1/auth/refresh",
                                 "/api/v1/health-check",
                                 "/api/v1/health-check/**",
-                                "/actuator/**",
+                                "/actuator/health",
+                                "/actuator/health/**",
+                                "/actuator/info",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
@@ -60,8 +62,13 @@ public class SecurityConfig {
                         ).permitAll()
                         // Gate history exposes license plates: restricted, and must precede the public GET /parking/** rule
                         .requestMatchers(HttpMethod.GET, "/api/v1/parking/gate/events").hasAnyRole("SECURITY_OFFICER", "CAMPUS_ADMIN")
+                        // Other actuator endpoints (metrics) reveal internals: admin only
+                        .requestMatchers("/actuator/**").hasRole("CAMPUS_ADMIN")
+                        // Institutional revenue figures: admin only, must precede the public GET /analytics/** rule
+                        .requestMatchers("/api/v1/analytics/financial/**").hasRole("CAMPUS_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/parking/**", "/api/v1/tutoring/**", "/api/v1/office-hours/**", "/api/v1/rooms/**", "/api/v1/transit/**", "/api/v1/analytics/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/parking/gate/scan").permitAll()
+                        // A scan reveals the driver's identity and activates bookings: gate staff only
+                        .requestMatchers(HttpMethod.POST, "/api/v1/parking/gate/scan").hasAnyRole("SECURITY_OFFICER", "CAMPUS_ADMIN")
                         .requestMatchers("/api/v1/admin/**").hasRole("CAMPUS_ADMIN")
                         .anyRequest().authenticated()
                 )

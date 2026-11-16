@@ -10,7 +10,7 @@ import {
   Sparkles,
   User,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { confetti } from '../../../shared/utils/confetti';
 import { soundFX } from '../../../shared/utils/sound';
 import { parkingApi } from '../api/parkingApi';
 import type { FlexOfferResponse, ParkingSpotResponse } from '../types/parking';

@@ -109,6 +109,10 @@ public class RoomsService {
             throw new IllegalArgumentException("End time must be strictly after start time.");
         }
 
+        if (request.startTime().isBefore(Instant.now().minus(Duration.ofMinutes(15)))) {
+            throw new IllegalArgumentException("Booking start time cannot be in the past.");
+        }
+
         long durationMins = Duration.between(request.startTime(), request.endTime()).toMinutes();
         if (durationMins < 5 || durationMins > 180) {
             throw new IllegalArgumentException("Booking duration must be between 5 minutes and 3 hours (180 minutes).");

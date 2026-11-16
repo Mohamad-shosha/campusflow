@@ -19,6 +19,8 @@ export interface AlprGateViewProps {
   isAr: boolean;
   /** True when caller holds SECURITY_OFFICER or CAMPUS_ADMIN role */
   canViewGateHistory?: boolean | undefined;
+  /** Scanning reveals the driver's identity, so the backend allows it for gate staff only. */
+  canScan?: boolean | undefined;
 }
 
 interface ScanLogEntry {
@@ -31,7 +33,11 @@ interface ScanLogEntry {
   reason: string;
 }
 
-export const AlprGateView: FC<AlprGateViewProps> = ({ isAr, canViewGateHistory = false }) => {
+export const AlprGateView: FC<AlprGateViewProps> = ({
+  isAr,
+  canViewGateHistory = false,
+  canScan = false,
+}) => {
   const [selectedPlate, setSelectedPlate] = useState<string>('س ع د 7700');
   const [customLetters, setCustomLetters] = useState<string>('');
   const [customDigits, setCustomDigits] = useState<string>('');
@@ -117,6 +123,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr, canViewGateHistory =
   const { letters, lettersEn, numbers } = parsePlate(selectedPlate);
 
   const handleScan = async () => {
+    if (!canScan) return;
     soundFX.playScan();
     setIsScanning(true);
     setLastDecision(null);
@@ -583,7 +590,7 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr, canViewGateHistory =
               <button
                 className="btn-primary"
                 onClick={handleScan}
-                disabled={isScanning}
+                disabled={isScanning || !canScan}
                 style={{ width: '100%', justifyContent: 'center' }}
                 type="button"
                 data-testid="trigger-gate-scan-btn"
@@ -599,6 +606,21 @@ export const AlprGateView: FC<AlprGateViewProps> = ({ isAr, canViewGateHistory =
                       : 'Scan & Validate Plate'}
                 </span>
               </button>
+              {!canScan && (
+                <p
+                  data-testid="gate-scan-restricted"
+                  style={{
+                    margin: '0.6rem 0 0',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-muted)',
+                    textAlign: 'center',
+                  }}
+                >
+                  {isAr
+                    ? 'مسح اللوحات متاح لموظفي أمن البوابات ومشرفي الحرم فقط.'
+                    : 'Plate scanning is available to gate security staff and campus admins only.'}
+                </p>
+              )}
             </div>
           </div>
 

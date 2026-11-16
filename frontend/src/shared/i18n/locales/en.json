@@ -27,6 +27,8 @@
     "location": "Fahad Bin Sultan University - Tabuk",
     "officialBadge": "Official Smart Campus Gateway",
     "flexActive": "Flex Active: {{count}} spots open",
+    "flexActive_one": "Flex Active: {{count}} spot open",
+    "flexActive_other": "Flex Active: {{count}} spots open",
     "term": "Academic Term 1448H"
   },
   "nav": {

@@ -429,9 +429,10 @@ export const tasks = [
 
   // ---------------- P8 ----------------
   T('P8-01', 'Security review (OWASP ASVS, dependency scan, headers)', {
+    status: 'In Progress', pr: 'PR (test/P8-01-security-review)',
     pri: 'High', cx: 'L', deps: ['P7-06'], branch: 'test/P8-01-security-review',
     goal: 'مراجعة أمنية شاملة وإصلاح الثغرات.',
-    files: ['security config', 'docs/security-review.md'],
+    files: ['security config', 'docs/security/security-review.md', 'frontend/security-headers.conf'],
     steps: ['ASVS checklist', 'Dependency scan', 'Headers/CORS', 'اختبارات اختراق أساسية'],
     accept: ['لا ثغرات High/Critical مفتوحة'],
     tests: ['Security tests', 'Dependency scan'], blockedBy: [],

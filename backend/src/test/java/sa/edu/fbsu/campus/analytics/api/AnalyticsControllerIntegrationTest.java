@@ -8,6 +8,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import sa.edu.fbsu.campus.common.AbstractPostgresIntegrationTest;
+import sa.edu.fbsu.campus.common.security.JwtService;
+import sa.edu.fbsu.campus.identity.domain.Role;
+import sa.edu.fbsu.campus.identity.domain.UserType;
+
+import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,6 +25,15 @@ public class AnalyticsControllerIntegrationTest extends AbstractPostgresIntegrat
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JwtService jwtService;
+
+    private String bearer(Role role) {
+        return "Bearer " + jwtService.generateAccessToken(UUID.randomUUID(),
+                UUID.fromString("00000000-0000-0000-0000-000000000001"), "T-" + role, Set.of(role),
+                UserType.STAFF, "ar");
+    }
 
     @Test
     @DisplayName("Summary exposes only measured metrics; unmeasured KPIs are null, not hardcoded")
@@ -32,11 +47,33 @@ public class AnalyticsControllerIntegrationTest extends AbstractPostgresIntegrat
                 .andExpect(jsonPath("$.totalSpots", greaterThanOrEqualTo(0)))
                 .andExpect(jsonPath("$.flexSharesActive", greaterThanOrEqualTo(0)))
                 .andExpect(jsonPath("$.totalGatePassages", greaterThanOrEqualTo(0)))
-                .andExpect(jsonPath("$.totalLedgerRevenue", notNullValue()))
+                // Revenue figures are admin-only and stripped for anonymous callers
+                .andExpect(jsonPath("$.totalLedgerRevenue").value(nullValue()))
                 .andExpect(jsonPath("$.hourlyLoad", notNullValue()))
                 .andExpect(jsonPath("$.zoneStats", notNullValue()))
                 .andExpect(jsonPath("$.roomsUtilization.totalRooms", greaterThanOrEqualTo(0)))
+                .andExpect(jsonPath("$.revenueBreakdown").value(nullValue()));
+    }
+
+    @Test
+    @DisplayName("Campus admins get the summary including revenue figures")
+    void testGetSummaryAsAdminIncludesRevenue() throws Exception {
+        mockMvc.perform(get("/api/v1/analytics/summary")
+                        .header("Authorization", bearer(Role.CAMPUS_ADMIN))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalLedgerRevenue", notNullValue()))
                 .andExpect(jsonPath("$.revenueBreakdown.totalCampusVolume", notNullValue()));
+    }
+
+    @Test
+    @DisplayName("Revenue breakdown is rejected for anonymous callers and students")
+    void testRevenueBreakdownRequiresAdmin() throws Exception {
+        mockMvc.perform(get("/api/v1/analytics/financial/revenue-breakdown"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/v1/analytics/financial/revenue-breakdown")
+                        .header("Authorization", bearer(Role.STUDENT)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -53,6 +90,7 @@ public class AnalyticsControllerIntegrationTest extends AbstractPostgresIntegrat
     @DisplayName("Get financial revenue breakdown across parking, tuition, and tutoring")
     void testGetRevenueBreakdown() throws Exception {
         mockMvc.perform(get("/api/v1/analytics/financial/revenue-breakdown")
+                        .header("Authorization", bearer(Role.CAMPUS_ADMIN))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.netParkingRevenue", notNullValue()))

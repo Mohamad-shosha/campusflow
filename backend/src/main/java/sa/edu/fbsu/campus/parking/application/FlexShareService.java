@@ -66,6 +66,7 @@ public class FlexShareService {
                 .orElseThrow(() -> new ResourceNotFoundException("Campus user not found: " + offererId));
 
         ParkingSpot spot = spotRepository.findById(request.spotId())
+                .filter(sp -> offerer.getUniversityId().equals(sp.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot not found: " + request.spotId()));
 
         if (flexOfferRepository.existsBySpotIdAndStatusIn(spot.getId(), Set.of(FlexOfferStatus.AVAILABLE, FlexOfferStatus.CLAIMED))) {
@@ -122,6 +123,7 @@ public class FlexShareService {
                 .orElseThrow(() -> new ResourceNotFoundException("Claimer user not found: " + claimerId));
 
         FlexOffer offer = flexOfferRepository.findDetailedById(offerId)
+                .filter(o -> claimer.getUniversityId().equals(o.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Flex-Share offer not found: " + offerId));
 
         offer.claim(claimer);
@@ -130,9 +132,10 @@ public class FlexShareService {
         if (!offer.isRewardPaid() && offer.getRewardAmount().compareTo(BigDecimal.ZERO) > 0) {
             String rewardIdempotencyKey = "FLEX-REWARD-" + offer.getId();
             String desc = "Flex-Share cashback reward: Bay " + offer.getSpot().getBayCode() + " claimed by peer";
-            walletService.refund(
+            walletService.credit(
                     offer.getOfferer().getId(),
                     offer.getRewardAmount(),
+                    sa.edu.fbsu.campus.wallet.domain.TransactionType.PARKING_REWARD,
                     rewardIdempotencyKey,
                     offer.getSpot().getBayCode(),
                     desc
@@ -155,7 +158,8 @@ public class FlexShareService {
         spot.setCurrentOccupantId(claimer.getId());
         spot.setOccupantNameAr(claimer.getFullNameAr());
         spot.setOccupantNameEn(claimer.getFullNameEn());
-        spot.setTimeLeftText("تبادل مرن ينتهي " + offer.getEndTime());
+        spot.setTimeLeftText("تبادل مرن حتى " + java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+                .withZone(java.time.ZoneId.of("Asia/Riyadh")).format(offer.getEndTime()));
         spotRepository.save(spot);
 
         FlexOffer updated = flexOfferRepository.save(offer);

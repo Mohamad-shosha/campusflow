@@ -51,8 +51,10 @@ export const LedgerTable: FC<LedgerTableProps> = ({
       case 'PARKING_FEE':
         return { labelAr: 'رسوم مواقف', labelEn: 'Parking Fee', variant: 'occupied' };
       case 'PARKING_REWARD':
-      case 'REFUND':
         return { labelAr: 'مكافأة مشاركة موقف', labelEn: 'Parking Reward', variant: 'available' };
+      case 'REFUND':
+        // Covers booking-cancellation refunds and Flex-Share cashback; the description says which
+        return { labelAr: 'استرداد / رصيد مُضاف', labelEn: 'Refund / Credit', variant: 'available' };
       case 'CAMPUS_PURCHASE':
       case 'CAFETERIA_PURCHASE':
         return { labelAr: 'مشتريات كافتيريا', labelEn: 'Cafeteria', variant: 'neutral' };

@@ -61,5 +61,14 @@ public record StudyRoomResponse(
                 room.getRequirementNoteEn()
         );
     }
-}
 
+    public StudyRoomResponse visibleTo(UUID viewerUserId, boolean staff) {
+        if (activeBooking == null) {
+            return this;
+        }
+        return new StudyRoomResponse(id, roomCode, nameAr, nameEn, buildingAr, buildingEn, capacityAr, capacityEn,
+                typeBadgeAr, typeBadgeEn, status, specsAr, specsEn, availableFromAr, availableFromEn,
+                activeBooking.visibleTo(viewerUserId, staff), utilizationPercent, scheduleSlots,
+                requirementNoteAr, requirementNoteEn);
+    }
+}

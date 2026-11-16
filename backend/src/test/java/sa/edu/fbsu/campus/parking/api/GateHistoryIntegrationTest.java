@@ -84,13 +84,14 @@ class GateHistoryIntegrationTest extends AbstractPostgresIntegrationTest {
     void adminSeesRecordedScans() throws Exception {
         ensureUniversity();
         String digits = String.valueOf(1000 + (int) (Math.random() * 8999));
+        String admin = adminToken();
         mockMvc.perform(post("/api/v1/parking/gate/scan")
+                        .header("Authorization", "Bearer " + admin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new GateScanRequest("ق و ل", digits, "MAIN_GATE_IN"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.decision").value("DENIED"));
 
-        String admin = adminToken();
         mockMvc.perform(get("/api/v1/parking/gate/events")
                         .param("decision", "denied")
                         .param("size", "5")

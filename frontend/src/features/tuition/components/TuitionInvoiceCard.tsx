@@ -156,7 +156,7 @@ export const TuitionInvoiceCard: FC<TuitionInvoiceCardProps> = ({
           <strong
             style={{
               fontSize: '1.15rem',
-              color: isFullyPaid ? '#10b981' : 'var(--fbsu-gold)',
+              color: isFullyPaid ? 'var(--status-available)' : 'var(--gold-text)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >

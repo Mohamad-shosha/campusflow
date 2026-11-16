@@ -5,7 +5,7 @@ export interface TutoringSessionDto {
   id: string;
   sessionCode: string;
   tutorUserId: string;
-  tutorUniversityNumber: string;
+  tutorUniversityNumber: string | null;
   tutorNameAr: string;
   tutorNameEn: string;
   tutorRoleAr: string;
@@ -73,7 +73,8 @@ export function mapTutoringDtoToUi(dto: TutoringSessionDto): TutoringSession {
   return {
     id: dto.sessionCode || dto.id,
     backendId: dto.id,
-    tutorId: dto.tutorUniversityNumber,
+    // Null for viewers other than the tutor (the backend redacts it).
+    tutorId: dto.tutorUniversityNumber ?? '',
     tutorName: dto.tutorNameAr,
     tutorNameEn: dto.tutorNameEn,
     tutorRole: dto.tutorRoleAr,

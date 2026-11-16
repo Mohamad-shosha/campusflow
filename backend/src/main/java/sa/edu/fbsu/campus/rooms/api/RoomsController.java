@@ -29,14 +29,20 @@ public class RoomsController {
 
     @GetMapping
     @Operation(summary = "List all campus study rooms and specialized labs with current booking status")
-    public ResponseEntity<List<StudyRoomResponse>> listRooms() {
-        return ResponseEntity.ok(roomsService.listRooms());
+    public ResponseEntity<List<StudyRoomResponse>> listRooms(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(roomsService.listRooms().stream().map(r -> redact(r, principal)).toList());
     }
 
     @GetMapping("/{idOrCode}")
     @Operation(summary = "Get detailed information and active session for a specific study room")
-    public ResponseEntity<StudyRoomResponse> getRoom(@PathVariable String idOrCode) {
-        return ResponseEntity.ok(roomsService.getRoom(idOrCode));
+    public ResponseEntity<StudyRoomResponse> getRoom(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable String idOrCode) {
+        return ResponseEntity.ok(redact(roomsService.getRoom(idOrCode), principal));
+    }
+
+    private static StudyRoomResponse redact(StudyRoomResponse r, UserPrincipal principal) {
+        return r.visibleTo(principal != null ? principal.getUserId() : null, UserPrincipal.isStaff(principal));
     }
 
     @PostMapping("/{idOrCode}/book")

@@ -100,6 +100,10 @@ public class OfficeHoursService {
             throw new AccessDeniedException("Faculty members may only manage their own office-hour windows.");
         }
 
+        if (!request.startTime().isAfter(Instant.now())) {
+            throw new IllegalArgumentException("Office-hour windows must start in the future.");
+        }
+
         Instant endTime = request.startTime().plus(Duration.ofMinutes(request.durationMinutes()));
         String labelEn = (request.timeLabelEn() != null && !request.timeLabelEn().isBlank())
                 ? request.timeLabelEn().trim()
@@ -160,6 +164,10 @@ public class OfficeHoursService {
             throw new IllegalStateException("Selected office-hour slot is already booked.");
         }
 
+        if (!slot.getStartTime().isAfter(Instant.now())) {
+            throw new IllegalStateException("This office-hour slot has already started or passed.");
+        }
+
         OfficeHourAppointment saved = appointmentRepository.saveAndFlush(new OfficeHourAppointment(
                 student.getUniversityId(),
                 slot.getProfile(),
@@ -171,7 +179,7 @@ public class OfficeHoursService {
         ));
 
         slot.setAvailable(false);
-        slot.setBookedNote("محجوز - " + student.getFullNameAr());
+        slot.setBookedNote("محجوز");
         slotRepository.saveAndFlush(slot);
 
         List<OfficeHourSlot> updatedSlots = slotRepository.findByProfileIdOrderByStartTimeAsc(slot.getProfile().getId());

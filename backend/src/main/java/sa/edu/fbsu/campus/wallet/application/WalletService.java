@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sa.edu.fbsu.campus.common.error.DuplicateTransactionException;
 import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.common.events.WalletTransactionEvent;
 import sa.edu.fbsu.campus.identity.domain.User;
@@ -66,7 +67,13 @@ public class WalletService {
         BigDecimal amount = request.amount().setScale(2, RoundingMode.HALF_UP);
 
         // 1. Idempotency Check
-        if (ledgerEntryRepository.existsByIdempotencyKey(request.idempotencyKey())) {
+        // A retried top-up by the same user is harmless (no follow-on side effects), so it returns the
+        // current state. A key that belongs to another user's ledger is rejected.
+        var existing = ledgerEntryRepository.findByIdempotencyKey(request.idempotencyKey());
+        if (existing.isPresent()) {
+            if (!existing.get().getWallet().getUser().getId().equals(userId)) {
+                throw new DuplicateTransactionException("Idempotency key has already been used.");
+            }
             log.warn("Idempotency key '{}' already processed for top-up. Returning existing wallet state.", request.idempotencyKey());
             return getWalletResponse(userId);
         }
@@ -126,10 +133,9 @@ public class WalletService {
         BigDecimal debitAmount = amount.setScale(2, RoundingMode.HALF_UP);
 
         // 1. Idempotency Check
-        if (ledgerEntryRepository.existsByIdempotencyKey(idempotencyKey)) {
-            log.warn("Idempotency key '{}' already processed for debit. Returning current wallet state.", idempotencyKey);
-            return getWalletResponse(userId);
-        }
+        // Callers apply their own side effects after this call (mark an invoice paid, save an
+        // enrollment), so a replayed key must fail loudly instead of returning as if it succeeded.
+        rejectUsedKey(idempotencyKey);
 
         // 2. Lock wallet row for update
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
@@ -166,15 +172,27 @@ public class WalletService {
             String referenceId,
             String description
     ) {
+        return credit(userId, amount, TransactionType.REFUND, idempotencyKey, referenceId, description);
+    }
+
+    /** Credits the wallet with an explicit ledger type (REFUND, PARKING_REWARD, ...). */
+    @Transactional
+    public WalletResponse credit(
+            UUID userId,
+            BigDecimal amount,
+            TransactionType type,
+            String idempotencyKey,
+            String referenceId,
+            String description
+    ) {
         Objects.requireNonNull(amount, "Refund amount cannot be null");
         Objects.requireNonNull(idempotencyKey, "IdempotencyKey cannot be null");
 
         BigDecimal refundAmount = amount.setScale(2, RoundingMode.HALF_UP);
 
-        if (ledgerEntryRepository.existsByIdempotencyKey(idempotencyKey)) {
-            log.warn("Idempotency key '{}' already processed for refund. Returning current wallet state.", idempotencyKey);
-            return getWalletResponse(userId);
-        }
+        // Callers apply their own side effects after this call (mark an invoice paid, save an
+        // enrollment), so a replayed key must fail loudly instead of returning as if it succeeded.
+        rejectUsedKey(idempotencyKey);
 
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
                 .orElseGet(() -> getOrCreateWallet(userId));
@@ -184,7 +202,7 @@ public class WalletService {
 
         LedgerEntry entry = new LedgerEntry(
                 savedWallet,
-                TransactionType.REFUND,
+                type,
                 TransactionDirection.CREDIT,
                 refundAmount,
                 savedWallet.getBalance(),
@@ -206,15 +224,19 @@ public class WalletService {
         BigDecimal amount = request.amount().setScale(2, RoundingMode.HALF_UP);
 
         // 1. Idempotency Check
-        if (ledgerEntryRepository.existsByIdempotencyKey(request.idempotencyKey())) {
-            log.warn("Idempotency key '{}' already processed for transfer. Returning sender wallet state.", request.idempotencyKey());
-            return getWalletResponse(senderUserId);
-        }
+        // Callers apply their own side effects after this call (mark an invoice paid, save an
+        // enrollment), so a replayed key must fail loudly instead of returning as if it succeeded.
+        rejectUsedKey(request.idempotencyKey());
 
         // 2. Find recipient user
         String recipientIden = request.recipientIdentifier().trim();
-        User recipient = userRepository.findByUniversityNumber(recipientIden)
-                .or(() -> userRepository.findByEmail(recipientIden))
+        UUID senderUniversityId = userRepository.findById(senderUserId)
+                .map(User::getUniversityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Sender not found: " + senderUserId));
+        // Transfers stay inside the sender's university.
+        User recipient = userRepository.findByUniversityIdAndUniversityNumber(senderUniversityId, recipientIden)
+                .or(() -> userRepository.findByEmail(recipientIden.toLowerCase())
+                        .filter(u -> senderUniversityId.equals(u.getUniversityId())))
                 .orElseThrow(() -> new ResourceNotFoundException("Recipient member not found: " + recipientIden));
 
         if (recipient.getId().equals(senderUserId)) {
@@ -298,5 +320,12 @@ public class WalletService {
         Wallet wallet = getOrCreateWallet(userId);
         return ledgerEntryRepository.findByWalletIdOrderByCreatedAtDesc(wallet.getId(), pageable)
                 .map(LedgerEntryResponse::fromEntity);
+    }
+
+    private void rejectUsedKey(String idempotencyKey) {
+        if (ledgerEntryRepository.existsByIdempotencyKey(idempotencyKey)
+                || ledgerEntryRepository.existsByIdempotencyKey(idempotencyKey + "-recv")) {
+            throw new DuplicateTransactionException("Idempotency key has already been used.");
+        }
     }
 }

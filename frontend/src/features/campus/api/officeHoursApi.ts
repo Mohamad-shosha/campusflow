@@ -58,6 +58,7 @@ export interface OfficeHourAppointmentDto {
 export function mapSlotDtoToUi(dto: OfficeHourSlotDto): TimeSlot {
   return {
     id: dto.id,
+    startTime: dto.startTime,
     time: dto.timeLabelAr,
     timeEn: dto.timeLabelEn || dto.timeLabelAr,
     duration: `${dto.durationMinutes} دقيقة`,

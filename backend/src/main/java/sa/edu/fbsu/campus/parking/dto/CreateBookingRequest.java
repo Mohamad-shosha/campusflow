@@ -26,6 +26,7 @@ public record CreateBookingRequest(
 
         Instant endTime,
 
+        /** Deprecated and ignored by the server: bookings are always charged to the wallet. */
         Boolean autoDebitWallet,
 
         @NotBlank(message = "Idempotency key is required")

@@ -13,8 +13,14 @@ import sa.edu.fbsu.campus.identity.infra.UserRepository;
 import sa.edu.fbsu.campus.identity.infra.VehicleRepository;
 import sa.edu.fbsu.campus.infra.UniversityRepository;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +35,11 @@ public class AuthService {
     private final UniversityRepository universityRepository;
     private final PasswordService passwordService;
     private final JwtService jwtService;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    /** Hash compared against when the user does not exist, so response time does not reveal accounts. */
+    private volatile String dummyPasswordHash;
 
     public AuthService(
             UserRepository userRepository,
@@ -147,6 +158,7 @@ public class AuthService {
                 : userRepository.findByUniversityIdAndUniversityNumber(university.getId(), identifier);
 
         if (userOpt.isEmpty()) {
+            passwordService.matches(req.password(), dummyHash());
             throw new BadCredentialsException("اسم المستخدم أو كلمة المرور غير صحيحة");
         }
 
@@ -194,10 +206,18 @@ public class AuthService {
         return AuthResponse.of(accessToken, refreshTokenRaw, jwtService.getAccessTokenExpirationSeconds(), userDto);
     }
 
+    // Revocations made while rejecting a token must be committed, not rolled back with the exception.
+    @Transactional(noRollbackFor = BadCredentialsException.class)
     public AuthResponse refreshToken(RefreshTokenRequest req) {
-        RefreshToken token = refreshTokenRepository.findByTokenHash(req.refreshToken())
+        RefreshToken token = refreshTokenRepository.findByTokenHash(sha256(req.refreshToken()))
                 .orElseThrow(() -> new BadCredentialsException("رمز التجديد (Refresh Token) غير صالح"));
 
+        if (token.isRevoked()) {
+            // A rotated-out token being presented again means it was stolen or replayed:
+            // revoke the whole session family for this user (OWASP refresh-token reuse detection).
+            logout(token.getUserId());
+            throw new BadCredentialsException("رمز التجديد تم إبطاله أو انتهت صلاحيته");
+        }
         if (!token.isActive()) {
             throw new BadCredentialsException("رمز التجديد تم إبطاله أو انتهت صلاحيته");
         }
@@ -205,13 +225,18 @@ public class AuthService {
         User user = userRepository.findById(token.getUserId())
                 .orElseThrow(() -> new BadCredentialsException("المستخدم غير موجود"));
 
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            logout(user.getId());
+            throw new BadCredentialsException("الحساب غير نشط حالياً");
+        }
+
         // Rotate token
-        String newRefreshTokenRaw = UUID.randomUUID().toString();
-        token.revoke(newRefreshTokenRaw);
+        String newRefreshTokenRaw = newRawToken();
+        token.revoke(sha256(newRefreshTokenRaw));
         refreshTokenRepository.save(token);
 
         Instant expiresAt = Instant.now().plus(jwtService.getRefreshTokenExpirationDays(), ChronoUnit.DAYS);
-        RefreshToken newRefreshToken = new RefreshToken(user.getId(), newRefreshTokenRaw, expiresAt);
+        RefreshToken newRefreshToken = new RefreshToken(user.getId(), sha256(newRefreshTokenRaw), expiresAt);
         refreshTokenRepository.save(newRefreshToken);
 
         String accessToken = jwtService.generateAccessToken(
@@ -255,10 +280,35 @@ public class AuthService {
     }
 
     private String generateAndStoreRefreshToken(UUID userId) {
-        String rawToken = UUID.randomUUID().toString();
+        String rawToken = newRawToken();
         Instant expiresAt = Instant.now().plus(jwtService.getRefreshTokenExpirationDays(), ChronoUnit.DAYS);
-        RefreshToken entity = new RefreshToken(userId, rawToken, expiresAt);
+        // Only the SHA-256 of the token is stored, so a database leak does not hand out live sessions.
+        RefreshToken entity = new RefreshToken(userId, sha256(rawToken), expiresAt);
         refreshTokenRepository.save(entity);
         return rawToken;
+    }
+
+    private static String newRawToken() {
+        byte[] bytes = new byte[32];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    static String sha256(String raw) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(raw.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
+    }
+
+    private String dummyHash() {
+        String hash = dummyPasswordHash;
+        if (hash == null) {
+            hash = passwordService.hash(UUID.randomUUID().toString());
+            dummyPasswordHash = hash;
+        }
+        return hash;
     }
 }

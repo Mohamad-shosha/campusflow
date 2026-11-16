@@ -4,6 +4,7 @@ import type { FacultyMember } from '../data/campusData';
 import { BookOfficeHoursModal } from './BookOfficeHoursModal';
 import { soundFX } from '../../../shared/utils/sound';
 import type { ResourceStatus } from '../../../shared/types/resource';
+import { slotDayLabel, slotKey, upcomingSlots } from '../utils/officeHourSlots';
 
 export interface OfficeHoursViewProps {
   facultyList: FacultyMember[];
@@ -173,15 +174,20 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                   </div>
 
                   <div className="time-slots-picker-grid">
-                    {f.timeSlots.map((slot, sIdx) => (
+                    {upcomingSlots(f.timeSlots).map((slot, sIdx) => (
                       <button
                         key={slot.id || `${slot.time}-${sIdx}`}
                         className={`time-slot-btn ${slot.available ? '' : 'disabled'}`}
                         disabled={!slot.available}
                         title={slot.bookedNote || ''}
-                        onClick={() => handleOpenModal(f, slot.time)}
+                        onClick={() => handleOpenModal(f, slotKey(slot))}
                         type="button"
                       >
+                        {slot.startTime && (
+                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                            {slotDayLabel(slot, isAr)}
+                          </div>
+                        )}
                         <div>{isAr ? slot.time : slot.timeEn || slot.time}</div>
                         <div
                           style={{

@@ -229,7 +229,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
                     : '1px solid var(--border-color)',
                 background:
                   paymentMode === 'FULL' ? 'rgba(215, 162, 55, 0.18)' : 'var(--surface-soft)',
-                color: paymentMode === 'FULL' ? 'var(--fbsu-gold)' : 'var(--text-main)',
+                color: paymentMode === 'FULL' ? 'var(--gold-text)' : 'var(--text-main)',
                 fontWeight: 700,
                 fontSize: '0.82rem',
                 cursor: 'pointer',
@@ -256,7 +256,7 @@ export const PayTuitionModal: FC<PayTuitionModalProps> = ({
                     : '1px solid var(--border-color)',
                 background:
                   paymentMode === 'CUSTOM' ? 'rgba(215, 162, 55, 0.18)' : 'var(--surface-soft)',
-                color: paymentMode === 'CUSTOM' ? 'var(--fbsu-gold)' : 'var(--text-main)',
+                color: paymentMode === 'CUSTOM' ? 'var(--gold-text)' : 'var(--text-main)',
                 fontWeight: 700,
                 fontSize: '0.82rem',
                 cursor: 'pointer',

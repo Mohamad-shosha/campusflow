@@ -39,8 +39,9 @@ public class TuitionController {
     @GetMapping("/invoices/{invoiceId}")
     @Operation(summary = "Get Invoice Details", description = "Retrieve specific tuition invoice line items, amounts, and remaining balance")
     public ResponseEntity<TuitionInvoiceResponse> getInvoiceDetails(
+            @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Invoice UUID identifier") @PathVariable UUID invoiceId) {
-        TuitionInvoiceResponse invoice = tuitionService.getInvoiceDetails(invoiceId);
+        TuitionInvoiceResponse invoice = tuitionService.getInvoiceDetails(principal.getUserId(), invoiceId);
         return ResponseEntity.ok(invoice);
     }
 
@@ -63,8 +64,9 @@ public class TuitionController {
     @GetMapping("/receipts/{receiptId}")
     @Operation(summary = "Get Receipt Details", description = "Retrieve detailed receipt including verification code, ledger transaction reference, and paid breakdown")
     public ResponseEntity<TuitionReceiptResponse> getReceiptDetails(
+            @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Receipt UUID identifier") @PathVariable UUID receiptId) {
-        TuitionReceiptResponse receipt = tuitionService.getReceiptDetails(receiptId);
+        TuitionReceiptResponse receipt = tuitionService.getReceiptDetails(principal.getUserId(), receiptId);
         return ResponseEntity.ok(receipt);
     }
 }

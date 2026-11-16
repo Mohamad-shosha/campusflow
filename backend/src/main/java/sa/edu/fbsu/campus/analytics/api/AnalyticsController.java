@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +35,16 @@ public class AnalyticsController {
     @GetMapping("/summary")
     @Operation(summary = "Get Analytics Summary", description = "Spot, zone, flex-offer, gate-passage, rooms utilization and financial breakdown computed from database records. Unmeasured metrics are null.")
     public ResponseEntity<AnalyticsSummaryResponse> getSummary(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(analyticsService.getSummary(resolveUniId(principal)));
+        AnalyticsSummaryResponse summary = analyticsService.getSummary(resolveUniId(principal));
+        if (!isCampusAdmin(principal)) {
+            // Operational stats stay public; institutional revenue figures are admin-only.
+            summary = new AnalyticsSummaryResponse(
+                    summary.netCapacityGainPercent(), summary.timeSavedMinutes(), summary.satisfactionRatePercent(),
+                    summary.totalSpots(), summary.availableSpots(), summary.occupiedSpots(),
+                    summary.flexSharesActive(), summary.totalGatePassages(),
+                    null, summary.hourlyLoad(), summary.zoneStats(), summary.roomsUtilization(), null);
+        }
+        return ResponseEntity.ok(summary);
     }
 
     @GetMapping("/hourly-load")
@@ -56,9 +66,15 @@ public class AnalyticsController {
     }
 
     @GetMapping("/financial/revenue-breakdown")
+    @PreAuthorize("hasRole('CAMPUS_ADMIN')")
     @Operation(summary = "Get Financial Revenue Breakdown", description = "Returns campus financial volume across parking fees, tuition payments, and peer tutoring enrollments")
     public ResponseEntity<RevenueBreakdownStat> getRevenueBreakdown(@AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(analyticsService.getRevenueBreakdown(resolveUniId(principal)));
+    }
+
+    private static boolean isCampusAdmin(UserPrincipal principal) {
+        return principal != null && principal.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_CAMPUS_ADMIN".equals(a.getAuthority()));
     }
 
     private static UUID resolveUniId(UserPrincipal principal) {

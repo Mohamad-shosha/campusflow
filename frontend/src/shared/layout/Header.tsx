@@ -371,7 +371,7 @@ export const Header: FC<HeaderProps> = ({
                   {initials(displayName)}
                 </span>
                 <span className="cf-user-name">{displayName.split(' ')[0]}</span>
-                <span className="cf-user-role">· {displayRole.split(' ')[0]}</span>
+                <span className="cf-user-role">· {displayRole}</span>
               </button>
               {onLogout && (
                 <button

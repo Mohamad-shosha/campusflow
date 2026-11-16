@@ -19,6 +19,13 @@ management:
     health:
       show-details: when-authorized
 
+# API docs are not published in production (they map every endpoint for an attacker).
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 fbsu:
   seed:
     demo-data: false

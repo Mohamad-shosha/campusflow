@@ -7,17 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sa.edu.fbsu.campus.common.error.ResourceNotFoundException;
 import sa.edu.fbsu.campus.common.security.UserPrincipal;
-import sa.edu.fbsu.campus.domain.University;
-import sa.edu.fbsu.campus.infra.UniversityRepository;
 import sa.edu.fbsu.campus.parking.application.GateDecisionService;
 import sa.edu.fbsu.campus.parking.application.GateHistoryService;
 import sa.edu.fbsu.campus.parking.dto.GateDecisionResponse;
 import sa.edu.fbsu.campus.parking.dto.GateEventPageResponse;
 import sa.edu.fbsu.campus.parking.dto.GateScanRequest;
 
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/parking/gate")
@@ -26,15 +22,12 @@ public class GateController {
 
     private final GateDecisionService gateDecisionService;
     private final GateHistoryService gateHistoryService;
-    private final UniversityRepository universityRepository;
 
     public GateController(
             GateDecisionService gateDecisionService,
-            GateHistoryService gateHistoryService,
-            UniversityRepository universityRepository) {
+            GateHistoryService gateHistoryService) {
         this.gateDecisionService = gateDecisionService;
         this.gateHistoryService = gateHistoryService;
-        this.universityRepository = universityRepository;
     }
 
     @GetMapping("/events")
@@ -51,17 +44,12 @@ public class GateController {
     }
 
     @PostMapping("/scan")
+    @PreAuthorize("hasAnyRole('SECURITY_OFFICER', 'CAMPUS_ADMIN')")
     @Operation(summary = "Evaluate vehicle license plate at barrier entrance and decide whether to open barrier")
     public ResponseEntity<GateDecisionResponse> scanPlate(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody GateScanRequest request) {
-        UUID uniId = principal != null && principal.getUniversityId() != null
-                ? principal.getUniversityId()
-                : universityRepository.findByCode("FBSU")
-                .map(University::getId)
-                .orElseThrow(() -> new ResourceNotFoundException("FBSU university tenant not configured"));
-
-        return ResponseEntity.ok(gateDecisionService.evaluateScan(uniId, request));
+        return ResponseEntity.ok(gateDecisionService.evaluateScan(principal.getUniversityId(), request));
     }
 }
 

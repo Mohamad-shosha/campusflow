@@ -55,4 +55,11 @@ public interface ParkingBookingRepository extends JpaRepository<ParkingBooking, 
             WHERE b.id = :bookingId
             """)
     Optional<ParkingBooking> findDetailedById(@Param("bookingId") UUID bookingId);
+
+    /** Bookings whose window has ended but are still CONFIRMED/ACTIVE (lifecycle expiry). */
+    List<ParkingBooking> findByStatusInAndEndTimeBefore(Collection<BookingStatus> statuses, Instant cutoff);
+
+    boolean existsBySpotIdAndStatusInAndEndTimeAfter(UUID spotId, Collection<BookingStatus> statuses, Instant cutoff);
+
+    boolean existsBySpotId(UUID spotId);
 }

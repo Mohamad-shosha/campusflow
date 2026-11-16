@@ -142,6 +142,8 @@ body.theme-light {
   --footer-heading: #ffffff;
   --success-text: #047857;
   --danger-text: #dc2626;
+  /* Status green used as text needs a darker shade on light surfaces (WCAG AA) */
+  --status-available: #047857;
   --brand-card-gradient: linear-gradient(135deg, rgba(17, 110, 99, 0.14) 0%, #ffffff 100%);
 
   background-image:
@@ -1161,7 +1163,7 @@ body.theme-light .persona-badge-box {
 
 .sim-step-btn.current {
   background: var(--fbsu-primary-light);
-  border-color: var(--fbsu-gold);
+  border-color: var(--gold-text);
   box-shadow: 0 0 20px rgba(215, 162, 55, 0.2);
   transform: translateY(-2px);
 }
@@ -1567,14 +1569,14 @@ body.theme-light .campus-road-header {
 
 .radar-bay-node:hover {
   transform: translateY(-3px) scale(1.12);
-  border-color: var(--fbsu-gold);
+  border-color: var(--gold-text);
   background: rgba(215, 162, 55, 0.15);
   box-shadow: var(--shadow-sm);
   z-index: 10;
 }
 
 .radar-bay-node.highlighted {
-  border-color: var(--fbsu-gold);
+  border-color: var(--gold-text);
   background: rgba(215, 162, 55, 0.25);
   box-shadow: 0 0 14px rgba(215, 162, 55, 0.8);
   transform: scale(1.12);
@@ -1675,7 +1677,7 @@ body.theme-light .campus-road-header {
 }
 
 .parking-quick-search:focus-within {
-  border-color: var(--fbsu-gold);
+  border-color: var(--gold-text);
   box-shadow: 0 0 12px rgba(215, 162, 55, 0.25);
 }
 
@@ -1924,7 +1926,7 @@ body.theme-light .campus-road-header {
 
 .sector-arrow-btn:hover {
   background: rgba(16, 185, 129, 0.2);
-  border-color: var(--fbsu-gold);
+  border-color: var(--gold-text);
   transform: translateY(-1px);
 }
 
@@ -1971,7 +1973,7 @@ body.theme-light .campus-road-header {
 }
 
 .spot-card-highlighted .parking-spot-card {
-  border-color: var(--fbsu-gold) !important;
+  border-color: var(--gold-text) !important;
   animation: spotPulseGlow 1.2s ease-out 3;
   transform: translateY(-4px) scale(1.02);
 }
@@ -2411,7 +2413,8 @@ body.theme-light .status-chip {
   border-radius: 12px;
   padding: 0.12rem 0.45rem;
   font-size: 0.62rem;
-  color: var(--text-main);
+  /* The pill is always dark, so its text must stay light in both themes */
+  color: #f1f5f9;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -5046,4 +5049,9 @@ body.theme-light .step-card-num {
   .footer-grid > div:first-child {
     grid-column: 1 / -1;
   }
+}
+
+/* Light theme: status pill keeps its coloured border/tint, text uses a readable shade */
+body.theme-light .card-status-pill {
+  color: var(--text-strong) !important;
 }

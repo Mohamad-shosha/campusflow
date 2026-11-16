@@ -184,7 +184,7 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
             border:
               activeTab === 'INVOICES' ? '1px solid var(--fbsu-gold)' : '1px solid transparent',
             background: activeTab === 'INVOICES' ? 'rgba(215, 162, 55, 0.15)' : 'transparent',
-            color: activeTab === 'INVOICES' ? 'var(--fbsu-gold)' : 'var(--text-secondary)',
+            color: activeTab === 'INVOICES' ? 'var(--gold-text)' : 'var(--text-secondary)',
             fontWeight: 800,
             fontSize: '0.9rem',
             cursor: 'pointer',
@@ -208,7 +208,7 @@ export const TuitionPage: FC<TuitionPageProps> = ({ onBalanceUpdate, onOpenTopUp
             border:
               activeTab === 'RECEIPTS' ? '1px solid var(--fbsu-gold)' : '1px solid transparent',
             background: activeTab === 'RECEIPTS' ? 'rgba(215, 162, 55, 0.15)' : 'transparent',
-            color: activeTab === 'RECEIPTS' ? 'var(--fbsu-gold)' : 'var(--text-secondary)',
+            color: activeTab === 'RECEIPTS' ? 'var(--gold-text)' : 'var(--text-secondary)',
             fontWeight: 800,
             fontSize: '0.9rem',
             cursor: 'pointer',

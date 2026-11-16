@@ -38,7 +38,10 @@ export interface TutoringViewProps {
   isAuthenticated?: boolean | undefined;
   currentUser: {
     id: string;
+    /** Arabic full name as stored by the backend (used to match enrollments) */
     name: string;
+    /** Name in the current UI language */
+    displayName?: string | undefined;
     role: string;
     walletBalance: number;
   };
@@ -238,7 +241,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
           </div>
 
           <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-            {isAr ? 'المستخدم الحالي:' : 'Current User:'} <strong>{currentUser.name}</strong> (
+            {isAr ? 'المستخدم الحالي:' : 'Current User:'} <strong>{currentUser.displayName ?? currentUser.name}</strong> (
             {currentUser.walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'})
           </div>
         </div>
@@ -400,8 +403,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
                   <Users size={13} color="var(--fbsu-primary)" />
                   <span>
                     {isAr
-                      ? `المسجلون حالياً: ${s.enrolledStudents.length}${s.maxCapacity ? ` / ${s.maxCapacity}` : ''}`
-                      : `Enrolled: ${s.enrolledStudents.length}${s.maxCapacity ? ` / ${s.maxCapacity}` : ''}`}
+                      ? `المسجلون حالياً: ${s.enrolledCount ?? s.enrolledStudents.length}${s.maxCapacity ? ` / ${s.maxCapacity}` : ''}`
+                      : `Enrolled: ${s.enrolledCount ?? s.enrolledStudents.length}${s.maxCapacity ? ` / ${s.maxCapacity}` : ''}`}
                   </span>
                 </div>
 

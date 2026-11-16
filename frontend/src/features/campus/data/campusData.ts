@@ -30,6 +30,8 @@ export interface TutoringSession {
 
 export interface TimeSlot {
   id?: string | undefined;
+  /** ISO start instant from the backend; used to tell same-time slots on different days apart */
+  startTime?: string | undefined;
   time: string;
   timeEn?: string | undefined;
   duration: string;

@@ -162,7 +162,7 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     <div className="tutor-rate-badge">
                       <span
                         className="tutor-rate-num"
-                        style={{ color: isAvailable ? '#10b981' : '#f59e0b', fontSize: '1.1rem' }}
+                        style={{ color: isAvailable ? 'var(--status-available)' : '#f59e0b', fontSize: '1.1rem' }}
                       >
                         {statusNum}
                       </span>
@@ -776,8 +776,8 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                   <Users size={13} color="var(--fbsu-primary)" />
                   <span>
                     {isAr
-                      ? `المسجلون حالياً: ${session.enrolledStudents.length} / ${session.maxCapacity || 10}`
-                      : `Enrolled: ${session.enrolledStudents.length} / ${session.maxCapacity || 10}`}
+                      ? `المسجلون حالياً: ${session.enrolledCount ?? session.enrolledStudents.length} / ${session.maxCapacity || 10}`
+                      : `Enrolled: ${session.enrolledCount ?? session.enrolledStudents.length} / ${session.maxCapacity || 10}`}
                   </span>
                 </div>
 
