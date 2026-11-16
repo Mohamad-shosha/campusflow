@@ -108,7 +108,13 @@ describe('ShareSpotView Component', () => {
   it('requires an explicit bay selection when the user owns several bays', async () => {
     vi.mocked(parkingApi.getShareableSpots).mockResolvedValue([
       ...mockSpots,
-      { ...mockSpots[0]!, spotId: 'spot-uuid-2', bayNumber: 19, source: 'ASSIGNMENT' as const, availableUntil: null },
+      {
+        ...mockSpots[0]!,
+        spotId: 'spot-uuid-2',
+        bayNumber: 19,
+        source: 'ASSIGNMENT' as const,
+        availableUntil: null,
+      },
     ]);
     render(<ShareSpotView isAr={true} currentUser={mockUser} />);
     await waitFor(() => {

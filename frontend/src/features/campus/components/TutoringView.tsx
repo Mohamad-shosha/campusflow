@@ -241,7 +241,8 @@ export const TutoringView: FC<TutoringViewProps> = ({
           </div>
 
           <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-            {isAr ? 'المستخدم الحالي:' : 'Current User:'} <strong>{currentUser.displayName ?? currentUser.name}</strong> (
+            {isAr ? 'المستخدم الحالي:' : 'Current User:'}{' '}
+            <strong>{currentUser.displayName ?? currentUser.name}</strong> (
             {currentUser.walletBalance.toFixed(2)} {isAr ? 'ر.س' : 'SAR'})
           </div>
         </div>

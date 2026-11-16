@@ -840,11 +840,7 @@ const AppContent: FC<AppContentProps> = ({ initialTab = 'map' }) => {
         {/* Tab 4: Gate ALPR (Dedicated Gate Service Portal) */}
         {activeTab === 'gate' && (
           <>
-            <AlprGateView
-              isAr={isAr}
-              canViewGateHistory={isGateStaff}
-              canScan={isGateStaff}
-            />
+            <AlprGateView isAr={isAr} canViewGateHistory={isGateStaff} canScan={isGateStaff} />
             <ServiceExplainerSections service="gate" isAr={isAr} onNavigate={setActiveTab} />
           </>
         )}

@@ -27,8 +27,10 @@ import {
 } from '../data/campusData';
 
 /** Room equipment lines in the UI language (English list falls back to Arabic). */
-const roomSpecs = (room: { specs?: string[] | undefined; specsEn?: string[] | undefined }, isAr: boolean) =>
-  (isAr ? room.specs : room.specsEn?.length ? room.specsEn : room.specs) ?? [];
+const roomSpecs = (
+  room: { specs?: string[] | undefined; specsEn?: string[] | undefined },
+  isAr: boolean
+) => (isAr ? room.specs : room.specsEn?.length ? room.specsEn : room.specs) ?? [];
 
 export interface CampusShowcaseHubProps {
   isAr: boolean;
@@ -166,7 +168,10 @@ export const CampusShowcaseHub: FC<CampusShowcaseHubProps> = ({
                     <div className="tutor-rate-badge">
                       <span
                         className="tutor-rate-num"
-                        style={{ color: isAvailable ? 'var(--status-available)' : '#f59e0b', fontSize: '1.1rem' }}
+                        style={{
+                          color: isAvailable ? 'var(--status-available)' : '#f59e0b',
+                          fontSize: '1.1rem',
+                        }}
                       >
                         {statusNum}
                       </span>

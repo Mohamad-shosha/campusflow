@@ -155,11 +155,13 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                   {isAr ? 'المقررات والمجالات المتاحة للنقاش:' : 'Supervised Topics & Courses:'}
                 </div>
                 <div className="faculty-subjects-tag-list">
-                  {(isAr ? f.coursesSupervised : f.coursesSupervisedEn || f.coursesSupervised).map((subj, idx) => (
-                    <span key={idx} className="faculty-subject-chip">
-                      {subj}
-                    </span>
-                  ))}
+                  {(isAr ? f.coursesSupervised : f.coursesSupervisedEn || f.coursesSupervised).map(
+                    (subj, idx) => (
+                      <span key={idx} className="faculty-subject-chip">
+                        {subj}
+                      </span>
+                    )
+                  )}
                 </div>
 
                 {/* Slots container */}
@@ -184,7 +186,13 @@ export const OfficeHoursView: FC<OfficeHoursViewProps> = ({
                         type="button"
                       >
                         {slot.startTime && (
-                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                          <div
+                            style={{
+                              fontSize: '0.65rem',
+                              color: 'var(--text-muted)',
+                              fontWeight: 700,
+                            }}
+                          >
                             {slotDayLabel(slot, isAr)}
                           </div>
                         )}

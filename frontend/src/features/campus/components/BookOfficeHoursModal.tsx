@@ -253,7 +253,9 @@ export const BookOfficeHoursModal: FC<BookOfficeHoursModalProps> = ({
                     }
                   >
                     {slot.startTime && (
-                      <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                      <div
+                        style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700 }}
+                      >
                         {slotDayLabel(slot, isAr)}
                       </div>
                     )}

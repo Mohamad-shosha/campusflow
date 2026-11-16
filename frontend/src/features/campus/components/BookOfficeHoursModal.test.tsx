@@ -35,9 +35,30 @@ const faculty: FacultyMember = {
   coursesSupervised: [],
   timeSlots: [
     // Same clock label on three different days: one past, two upcoming
-    { id: 'past', startTime: day(-3, 8), time: '11:00 ص', timeEn: '11:00 AM', duration: '15', available: true },
-    { id: 'tomorrow', startTime: day(1, 8), time: '11:00 ص', timeEn: '11:00 AM', duration: '15', available: true },
-    { id: 'later', startTime: day(2, 8), time: '11:00 ص', timeEn: '11:00 AM', duration: '15', available: true },
+    {
+      id: 'past',
+      startTime: day(-3, 8),
+      time: '11:00 ص',
+      timeEn: '11:00 AM',
+      duration: '15',
+      available: true,
+    },
+    {
+      id: 'tomorrow',
+      startTime: day(1, 8),
+      time: '11:00 ص',
+      timeEn: '11:00 AM',
+      duration: '15',
+      available: true,
+    },
+    {
+      id: 'later',
+      startTime: day(2, 8),
+      time: '11:00 ص',
+      timeEn: '11:00 AM',
+      duration: '15',
+      available: true,
+    },
   ],
 };
 

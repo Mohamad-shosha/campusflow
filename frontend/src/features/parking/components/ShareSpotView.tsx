@@ -18,7 +18,13 @@ import type { FlexOfferResponse, ShareableSpotResponse } from '../types/parking'
 const BREAK_OPTIONS = [
   { hours: 1, ar: '1 ساعة', en: '1 Hour', subAr: 'بريك قصير', subEn: 'Short Break' },
   { hours: 2, ar: '2 ساعتان', en: '2 Hours', subAr: 'بريك متوسط', subEn: 'Medium Break' },
-  { hours: 3, ar: '3 ساعات', en: '3 Hours', subAr: 'نموذج البريك المعتاد', subEn: 'Standard Break' },
+  {
+    hours: 3,
+    ar: '3 ساعات',
+    en: '3 Hours',
+    subAr: 'نموذج البريك المعتاد',
+    subEn: 'Standard Break',
+  },
   { hours: 4, ar: '4 ساعات', en: '4 Hours', subAr: 'بريك طويل', subEn: 'Long Break' },
 ];
 
@@ -27,7 +33,10 @@ const minutesLeft = (spot: ShareableSpotResponse | undefined, now: number): numb
   spot?.availableUntil ? Math.floor((Date.parse(spot.availableUntil) - now) / 60000) : null;
 
 const formatTime = (iso: string, isAr: boolean): string =>
-  new Date(iso).toLocaleTimeString(isAr ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+  new Date(iso).toLocaleTimeString(isAr ? 'ar-SA' : 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
 export interface ShareSpotViewProps {
   isAr: boolean;
