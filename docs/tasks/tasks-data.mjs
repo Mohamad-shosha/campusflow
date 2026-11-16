@@ -429,7 +429,7 @@ export const tasks = [
 
   // ---------------- P8 ----------------
   T('P8-01', 'Security review (OWASP ASVS, dependency scan, headers)', {
-    status: 'In Progress', pr: 'PR (test/P8-01-security-review)',
+    status: 'Done', pr: 'PR #53 (test/P8-01-security-review)',
     pri: 'High', cx: 'L', deps: ['P7-06'], branch: 'test/P8-01-security-review',
     goal: 'مراجعة أمنية شاملة وإصلاح الثغرات.',
     files: ['security config', 'docs/security/security-review.md', 'frontend/security-headers.conf'],
@@ -438,6 +438,7 @@ export const tasks = [
     tests: ['Security tests', 'Dependency scan'], blockedBy: [],
   }),
   T('P8-02', 'Full E2E suite (Playwright) AR/EN, dark/light', {
+    status: 'In Progress', pr: 'PR (test/P8-02-e2e-suite)',
     pri: 'High', cx: 'L', deps: ['P7-06'], branch: 'test/P8-02-e2e-suite',
     goal: 'اختبارات End-to-End لكل الرحلات الأساسية بالعربي والإنجليزي والثيمين.',
     files: ['frontend/e2e/**'],

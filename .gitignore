@@ -32,6 +32,9 @@ docs/tasks/html/
 
 backend/target/
 frontend/dist/
+# Playwright end-to-end output (P8-02)
+frontend/e2e-results/
+frontend/e2e-report/
 
 # Secrets and environment files
 .env

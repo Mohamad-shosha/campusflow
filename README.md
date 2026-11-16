@@ -634,10 +634,17 @@ npm --prefix frontend run lint
 
 # 4. Run Backend ArchUnit & Integration Tests (Maven)
 cd backend && ./mvnw test
+
+# 5. Run the end-to-end suite (Playwright) against the running Docker stack
+docker compose up -d --build --wait
+npx --prefix frontend playwright install chromium   # first time only
+npm --prefix frontend run e2e                        # E2E_BASE_URL overrides http://localhost
+npm --prefix frontend run e2e:report                 # open the last HTML report (CI runs)
 ```
 
 ### Testing Capabilities:
-* **Frontend Vitest Suite:** 21 test files containing 64 unit and integration tests verifying modal flows, wallet balance calculations, booking wizards, Saudi license plate parsing, and RTL direction toggles.
+* **Frontend Vitest Suite:** 34 test files containing 136 unit and integration tests verifying modal flows, wallet balance calculations, booking wizards, Saudi license plate parsing, and RTL direction toggles.
+* **End-to-End Suite (Playwright, `frontend/e2e/`):** real-browser user journeys through nginx, the Spring Boot API and PostgreSQL, each in Arabic/light and English/dark: every page on desktop and a 360px phone (no console errors, no horizontal scroll, no broken values), sign-in/sign-out, wallet top-up and tuition payment with exact amounts, parking booking and full refund, Flex-Share offer, claim and cashback (and the ownership rules), study rooms, tutoring, office hours, shuttle passes, and role rules for students, security officers, faculty and admins. Every test registers its own users, so runs are independent; it runs in CI after the Docker smoke test.
 * **ArchUnit Architecture Governance:** Compile-time assertions verifying that business modules do not directly access another module's internal repositories or entities without going through public application services.
 * **Database Isolation Tests:** Testcontainers PostgreSQL integration tests verifying that concurrent parking and study room reservations cannot produce overlapping temporal ranges.
 

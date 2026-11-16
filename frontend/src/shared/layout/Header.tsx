@@ -202,6 +202,7 @@ export const Header: FC<HeaderProps> = ({
         onClick={() => go(leaf.id)}
         aria-current={isLeafActive(leaf) ? 'page' : undefined}
         data-testid={inMobile ? undefined : leaf.testId}
+        data-nav={leaf.id}
       >
         <span className="cf-menu__icon">
           <Icon size={16} />
@@ -289,6 +290,7 @@ export const Header: FC<HeaderProps> = ({
                   className={`cf-nav__link ${isGroupActive(group) ? 'is-active' : ''}`}
                   aria-expanded={isOpen}
                   aria-haspopup="true"
+                  data-nav-group={group.id}
                   onClick={e => {
                     e.stopPropagation();
                     setOpenGroup(isOpen ? null : group.id);
@@ -310,6 +312,7 @@ export const Header: FC<HeaderProps> = ({
               className={`cf-nav__link ${activeTab === 'analytics' ? 'is-active' : ''}`}
               onClick={() => go('analytics')}
               aria-current={activeTab === 'analytics' ? 'page' : undefined}
+              data-nav="analytics"
             >
               <BarChart3 size={16} />
               <span>{t('nav.analytics')}</span>
