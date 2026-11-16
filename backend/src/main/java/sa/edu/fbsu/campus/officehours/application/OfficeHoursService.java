@@ -31,6 +31,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static sa.edu.fbsu.campus.common.domain.TenantGuard.requireSameTenant;
+
 @Service
 public class OfficeHoursService {
 
@@ -89,7 +91,8 @@ public class OfficeHoursService {
 
         FacultyOfficeProfile profile;
         if (request.profileIdOrCode() != null && !request.profileIdOrCode().isBlank()) {
-            profile = findProfileByIdOrCode(request.profileIdOrCode());
+            profile = requireSameTenant(findProfileByIdOrCode(request.profileIdOrCode()), actor,
+                    "Faculty office profile not found: " + request.profileIdOrCode());
         } else {
             profile = profileRepository.findByFacultyUserId(actorUserId)
                     .orElseGet(() -> createDefaultFacultyProfile(actor));
@@ -134,6 +137,7 @@ public class OfficeHoursService {
 
         OfficeHourSlot slot = slotRepository.findByIdForUpdate(slotId)
                 .orElseThrow(() -> new ResourceNotFoundException("Office-hour slot not found: " + slotId));
+        requireSameTenant(slot, actor, "Office-hour slot not found: " + slotId);
 
         boolean isAdmin = actor.hasRole(Role.CAMPUS_ADMIN);
         if (!isAdmin && !slot.getProfile().getFaculty().getId().equals(actorUserId)) {
@@ -155,6 +159,7 @@ public class OfficeHoursService {
 
         OfficeHourSlot slot = slotRepository.findByIdForUpdate(request.slotId())
                 .orElseThrow(() -> new ResourceNotFoundException("Office-hour slot not found: " + request.slotId()));
+        requireSameTenant(slot, student, "Office-hour slot not found: " + request.slotId());
 
         if (slot.getProfile().getFaculty().getId().equals(studentUserId)) {
             throw new IllegalArgumentException("Faculty members cannot book their own office-hour slots.");
@@ -219,6 +224,7 @@ public class OfficeHoursService {
 
         OfficeHourAppointment appt = appointmentRepository.findDetailedByIdForUpdate(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found: " + appointmentId));
+        requireSameTenant(appt, actor, "Appointment not found: " + appointmentId);
 
         boolean allowed = actor.hasRole(Role.CAMPUS_ADMIN)
                 || appt.getStudent().getId().equals(actorUserId)

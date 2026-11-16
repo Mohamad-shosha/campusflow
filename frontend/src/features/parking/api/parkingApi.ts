@@ -8,6 +8,7 @@ import type {
   BookingResponse,
   DigitalPassResponse,
   FlexOfferResponse,
+  ShareableSpotResponse,
   CreateFlexOfferRequest,
   GateScanRequest,
   GateDecisionResponse,
@@ -69,6 +70,11 @@ export const parkingApi = {
   // Flex Share
   getFlexOffers: async (): Promise<FlexOfferResponse[]> => {
     const response = await apiClient.get<FlexOfferResponse[]>('/parking/flex/offers');
+    return response.data;
+  },
+
+  getShareableSpots: async (): Promise<ShareableSpotResponse[]> => {
+    const response = await apiClient.get<ShareableSpotResponse[]>('/parking/flex/shareable-spots');
     return response.data;
   },
 

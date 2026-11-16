@@ -145,6 +145,8 @@
     }
 
     .slide-counter {
+      direction: ltr; /* "01 / 14" must not be reordered by the RTL page */
+      unicode-bidi: isolate;
       font-family: var(--font-mono);
       font-size: 13px;
       font-weight: 800;
@@ -480,6 +482,7 @@
     /* RESPONSIVE QUERIES */
     @media (max-width: 900px) {
       .deck-title span.hide-mobile { display: none; }
+      .ctrl-btn .hide-mobile { display: none; }
       .grid-split-2, .grid-split-2-rev, .grid-3-col {
         grid-template-columns: 1fr;
       }
@@ -498,6 +501,16 @@
       .slide-title {
         font-size: 17px;
       }
+    }
+    /* Phones: the three header groups did not fit in 360px and widened the page.
+       Keep the logo, slide controls and icon-only actions on one row. */
+    @media (max-width: 600px) {
+      .deck-top-bar { padding: 0 10px; gap: 8px; }
+      .deck-title { display: none; }
+      .deck-action-links { gap: 6px; }
+      .ctrl-btn { padding-inline: 8px; }
+      .ctrl-btn.gold span { display: none; }
+      .slide-counter { white-space: nowrap; padding: 4px 8px; }
     }
   </style>
 </head>

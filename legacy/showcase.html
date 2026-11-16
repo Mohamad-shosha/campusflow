@@ -138,6 +138,8 @@
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
       flex: 1;
+      min-width: 0; /* let the strip scroll inside its row instead of widening the page on mobile */
+      max-width: 100%;
     }
     .figma-nav-links::-webkit-scrollbar { display: none; }
 
@@ -445,7 +447,7 @@
 
     .token-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
       gap: 6px 12px;
     }
 
@@ -456,6 +458,7 @@
       font-family: var(--font-mono);
       font-size: 10px;
       gap: 6px;
+      min-width: 0; /* long token values are ellipsized instead of widening the page on phones */
     }
 
     .token-name {
@@ -473,6 +476,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
     }
 
     /* BUTTONS & UI */
@@ -1024,7 +1028,7 @@
         grid-template-columns: repeat(3, 1fr) !important;
       }
       .token-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: minmax(0, 1fr) !important;
       }
     }
 

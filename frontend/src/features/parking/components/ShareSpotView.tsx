@@ -13,7 +13,21 @@ import {
 import { confetti } from '../../../shared/utils/confetti';
 import { soundFX } from '../../../shared/utils/sound';
 import { parkingApi } from '../api/parkingApi';
-import type { FlexOfferResponse, ParkingSpotResponse } from '../types/parking';
+import type { FlexOfferResponse, ShareableSpotResponse } from '../types/parking';
+
+const BREAK_OPTIONS = [
+  { hours: 1, ar: '1 ساعة', en: '1 Hour', subAr: 'بريك قصير', subEn: 'Short Break' },
+  { hours: 2, ar: '2 ساعتان', en: '2 Hours', subAr: 'بريك متوسط', subEn: 'Medium Break' },
+  { hours: 3, ar: '3 ساعات', en: '3 Hours', subAr: 'نموذج البريك المعتاد', subEn: 'Standard Break' },
+  { hours: 4, ar: '4 ساعات', en: '4 Hours', subAr: 'بريك طويل', subEn: 'Long Break' },
+];
+
+/** Minutes left until the bay must be handed back (booking end), or null when unlimited. */
+const minutesLeft = (spot: ShareableSpotResponse | undefined, now: number): number | null =>
+  spot?.availableUntil ? Math.floor((Date.parse(spot.availableUntil) - now) / 60000) : null;
+
+const formatTime = (iso: string, isAr: boolean): string =>
+  new Date(iso).toLocaleTimeString(isAr ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
 
 export interface ShareSpotViewProps {
   isAr: boolean;
@@ -39,13 +53,13 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
   onRefreshSpots,
 }) => {
   const [activeTab, setActiveTab] = useState<'share' | 'browse'>('share');
-  const [breakHours, setBreakHours] = useState<number>(3);
+  const [requestedHours, setBreakHours] = useState<number>(3);
   const [isShared, setIsShared] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [shareError, setShareError] = useState<string | null>(null);
 
-  // Available spots and selected spot for offering
-  const [allSpots, setAllSpots] = useState<ParkingSpotResponse[]>([]);
+  // Bays this user may share (own live booking or assigned faculty bay) and the selected one
+  const [allSpots, setAllSpots] = useState<ShareableSpotResponse[]>([]);
   const [selectedSpotId, setSelectedSpotId] = useState<string>('');
 
   // Live offers from backend
@@ -59,8 +73,19 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
   // (see FlexShareService). It does not scale with the break duration.
   const [flexCashback, setFlexCashback] = useState<number | null>(null);
   const [lastOfferReward, setLastOfferReward] = useState<number | null>(null);
+  const [sharedHours, setSharedHours] = useState<number>(0);
   const [spotsLoadError, setSpotsLoadError] = useState<boolean>(false);
   const [offersLoadError, setOffersLoadError] = useState<boolean>(false);
+
+  // A booked bay can only be shared until the booking ends; assigned faculty bays have no cap.
+  // The chosen break is shortened to the longest option that still fits the booking.
+  const selectedSpot = allSpots.find(s => s.spotId === selectedSpotId);
+  const remaining = minutesLeft(selectedSpot, Date.now());
+  const fitsBooking = (hours: number) => remaining === null || hours * 60 <= remaining;
+  const canShareSelected = !!selectedSpot && fitsBooking(1);
+  const breakHours = fitsBooking(requestedHours)
+    ? requestedHours
+    : ([...BREAK_OPTIONS].reverse().find(o => fitsBooking(o.hours))?.hours ?? requestedHours);
 
   // Load spots and offers on mount
   useEffect(() => {
@@ -82,17 +107,13 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
 
   const loadSpots = async () => {
     try {
-      const spots = await parkingApi.getSpots();
+      // Only bays the user owns right now can be shared (enforced by the backend as well)
+      const spots = await parkingApi.getShareableSpots();
       setAllSpots(spots);
       setSpotsLoadError(false);
-      // Pre-select only the user's own assigned bay; otherwise the user must choose explicitly
-      const matchingSpot =
-        currentUser.primarySpot !== undefined
-          ? spots.find(s => s.bayNumber === currentUser.primarySpot)
-          : undefined;
-      if (matchingSpot) {
-        setSelectedSpotId(matchingSpot.id);
-      }
+      // With a single shareable bay there is nothing to choose; otherwise the user picks explicitly
+      const only = spots.length === 1 ? spots[0] : undefined;
+      setSelectedSpotId(only ? only.spotId : '');
     } catch {
       setSpotsLoadError(true);
     }
@@ -115,7 +136,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
     setShareError(null);
 
     // A real, explicitly selected bay is required. Never submit a placeholder id.
-    const targetSpot = allSpots.find(s => s.id === selectedSpotId);
+    const targetSpot = allSpots.find(s => s.spotId === selectedSpotId);
     if (!targetSpot) {
       soundFX.playError();
       setShareError(
@@ -130,7 +151,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
 
     try {
       const created = await parkingApi.createFlexOffer({
-        spotId: targetSpot.id,
+        spotId: targetSpot.spotId,
         durationMinutes: breakHours * 60,
       });
       const reward = Number(created?.rewardAmount ?? created?.rewardAmountSar ?? 0);
@@ -143,10 +164,12 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
         // confetti is cosmetic; ignore failures
       }
 
+      setSharedHours(breakHours);
       setIsShared(true);
       onShareConfirmed?.(breakHours, reward);
       onRefreshSpots?.();
       loadOffers();
+      loadSpots();
     } catch (err: unknown) {
       soundFX.playError();
       const errorObj = err as {
@@ -371,7 +394,7 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                         {isAr ? 'اختر الموقف...' : 'Select a bay...'}
                       </option>
                       {allSpots.map(s => (
-                        <option key={s.id} value={s.id}>
+                        <option key={s.spotId} value={s.spotId}>
                           {isAr
                             ? `موقف رقم #${s.bayNumber} (${s.zoneNameAr})`
                             : `Bay #${s.bayNumber} (${s.zoneCode})`}
@@ -388,11 +411,25 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                           ? 'تعذر تحميل المواقف'
                           : 'Could not load bays'
                         : isAr
-                          ? 'لا توجد مواقف متاحة'
-                          : 'No bays available'}
+                          ? 'لا يوجد لديك موقف لمشاركته — احجز موقفاً أولاً'
+                          : 'You have no bay to share yet. Book a bay first.'}
                     </strong>
                   )}
                 </div>
+                {selectedSpot && (
+                  <div
+                    style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.35rem' }}
+                    data-testid="shareable-spot-hint"
+                  >
+                    {selectedSpot.availableUntil
+                      ? isAr
+                        ? `من حجزك الحالي — يمكن مشاركته حتى ${formatTime(selectedSpot.availableUntil, true)}`
+                        : `From your booking. Can be shared until ${formatTime(selectedSpot.availableUntil, false)}`
+                      : isAr
+                        ? 'موقفك المخصص كعضو هيئة تدريس'
+                        : 'Your assigned faculty bay'}
+                  </div>
+                )}
               </div>
 
               <div style={{ textAlign: 'start' }}>
@@ -439,60 +476,36 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 </span>
               </label>
               <div className="break-hours-grid">
-                <div
-                  className={`pattern-option ${breakHours === 1 ? 'selected' : ''}`}
-                  onClick={() => {
-                    soundFX.playClick();
-                    setBreakHours(1);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  data-testid="break-option-1"
-                >
-                  <h5>{isAr ? '1 ساعة' : '1 Hour'}</h5>
-                  <span>{isAr ? 'بريك قصير' : 'Short Break'}</span>
-                </div>
-                <div
-                  className={`pattern-option ${breakHours === 2 ? 'selected' : ''}`}
-                  onClick={() => {
-                    soundFX.playClick();
-                    setBreakHours(2);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  data-testid="break-option-2"
-                >
-                  <h5>{isAr ? '2 ساعتان' : '2 Hours'}</h5>
-                  <span>{isAr ? 'بريك متوسط' : 'Medium Break'}</span>
-                </div>
-                <div
-                  className={`pattern-option ${breakHours === 3 ? 'selected' : ''}`}
-                  onClick={() => {
-                    soundFX.playClick();
-                    setBreakHours(3);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  data-testid="break-option-3"
-                >
-                  <h5>{isAr ? '3 ساعات' : '3 Hours'}</h5>
-                  <span style={{ color: 'var(--gold-text)' }}>
-                    {isAr ? 'نموذج البريك المعتاد' : 'Standard Break'}
-                  </span>
-                </div>
-                <div
-                  className={`pattern-option ${breakHours === 4 ? 'selected' : ''}`}
-                  onClick={() => {
-                    soundFX.playClick();
-                    setBreakHours(4);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  data-testid="break-option-4"
-                >
-                  <h5>{isAr ? '4 ساعات' : '4 Hours'}</h5>
-                  <span>{isAr ? 'بريك طويل' : 'Long Break'}</span>
-                </div>
+                {BREAK_OPTIONS.map(option => {
+                  const allowed = fitsBooking(option.hours);
+                  return (
+                    <div
+                      key={option.hours}
+                      className={`pattern-option ${breakHours === option.hours ? 'selected' : ''}`}
+                      onClick={() => {
+                        if (!allowed) return;
+                        soundFX.playClick();
+                        setBreakHours(option.hours);
+                      }}
+                      role="button"
+                      tabIndex={allowed ? 0 : -1}
+                      aria-disabled={!allowed}
+                      style={allowed ? undefined : { opacity: 0.4, cursor: 'not-allowed' }}
+                      data-testid={`break-option-${option.hours}`}
+                    >
+                      <h5>{isAr ? option.ar : option.en}</h5>
+                      <span style={option.hours === 3 ? { color: 'var(--gold-text)' } : undefined}>
+                        {allowed
+                          ? isAr
+                            ? option.subAr
+                            : option.subEn
+                          : isAr
+                            ? 'بعد انتهاء حجزك'
+                            : 'Past your booking'}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -591,8 +604,8 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
                 </div>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', opacity: 0.9 }}>
                   {isAr
-                    ? `أصبح الموقف متاحاً لزملائك لمدة ${breakHours} ساعات.${lastOfferReward !== null ? ` ستُضاف ${lastOfferReward.toFixed(2)} ر.س لمحفظتك عند حجزه.` : ''}`
-                    : `Bay shared for ${breakHours} hours.${lastOfferReward !== null ? ` ${lastOfferReward.toFixed(2)} SAR will be credited when it is claimed.` : ''}`}
+                    ? `أصبح الموقف متاحاً لزملائك لمدة ${sharedHours} ساعات.${lastOfferReward !== null ? ` ستُضاف ${lastOfferReward.toFixed(2)} ر.س لمحفظتك عند حجزه.` : ''}`
+                    : `Bay shared for ${sharedHours} hours.${lastOfferReward !== null ? ` ${lastOfferReward.toFixed(2)} SAR will be credited when it is claimed.` : ''}`}
                 </p>
                 <button
                   type="button"
@@ -618,14 +631,14 @@ export const ShareSpotView: FC<ShareSpotViewProps> = ({
               <button
                 className="btn-gold"
                 onClick={handleActivate}
-                disabled={isSubmitting || !selectedSpotId}
+                disabled={isSubmitting || !canShareSelected}
                 style={{
                   width: '100%',
                   justifyContent: 'center',
                   padding: '1rem',
                   fontSize: '1rem',
-                  opacity: isSubmitting || !selectedSpotId ? 0.6 : 1,
-                  cursor: isSubmitting || !selectedSpotId ? 'not-allowed' : 'pointer',
+                  opacity: isSubmitting || !canShareSelected ? 0.6 : 1,
+                  cursor: isSubmitting || !canShareSelected ? 'not-allowed' : 'pointer',
                 }}
                 type="button"
                 data-testid="activate-flex-share-btn"

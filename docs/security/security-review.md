@@ -9,7 +9,7 @@
 |---|---|---|---|
 | Critical | 4 | 4 | 0 |
 | High | 9 | 7 | 2 (accepted / follow-up, see below) |
-| Medium | 8 | 6 | 2 |
+| Medium | 8 | 8 | 0 |
 | Low | 3 | 1 | 2 |
 
 The worst issues were **business-logic flaws in the wallet** that let any logged-in user pay tuition, enrol in tutoring, or book parking without being charged, and mint wallet balance from nothing.
@@ -49,8 +49,8 @@ The worst issues were **business-logic flaws in the wallet** that let any logged
 | M4 | Public office-hour slots showed which student booked (`bookedNote`). | Fixed: shows "محجوز" only (also for old rows). |
 | M5 | Public rooms list showed booking leader and team members. | Fixed: only the leader and staff. |
 | M6 | Public revenue figures in `/analytics/summary` and `/analytics/financial/**`. | Fixed: financial endpoint admin-only; summary strips revenue for non-admins. |
-| **M7 (open)** | Flex-Share: a user can offer a spot they do not hold and farm cashback with an accomplice. Cross-tenant part fixed. | Needs a product rule for who may share a spot (booking holder / assigned faculty). |
-| **M8 (open)** | Admin overrides in rooms/office-hours (`hasRole(CAMPUS_ADMIN)`) are not tenant-scoped. | Low impact with one tenant; fix with M7. |
+| M7 | Flex-Share: a user could offer a spot they do not hold and farm cashback with an accomplice. | Fixed (rule approved by the product owner): only the holder of a live booking on the bay, for a window inside that booking, or the faculty member the bay is currently assigned to (`spot_assignment`) may share it; others get 403. A shared bay cannot be booked directly (must be claimed, so the owner is paid). Another faculty member's assigned bay cannot be booked. When an offer ends or is cancelled the bay goes back to its owner (booking holder or assigned faculty) instead of becoming free. New `GET /parking/flex/shareable-spots`; the Share screen lists only those bays and only break lengths that end before the booking does. |
+| M8 | Admin overrides in rooms/office-hours (`hasRole(CAMPUS_ADMIN)`) were not tenant-scoped. | Fixed: `TenantGuard.requireSameTenant` on room booking/extend/release, office-hour slot create/delete/book, appointment cancel, tutoring booking and review. A record from another university returns 404, for admins too. |
 
 ### Low
 
@@ -74,7 +74,9 @@ The worst issues were **business-logic flaws in the wallet** that let any logged
 | E9 (Low) | Flex-Share cashback was recorded as `REFUND`, so wallets showed rewards as refunds. | New ledger type `PARKING_REWARD` (migration `V19`); refunds keep `REFUND`. |
 | E6 (UX) | Header showed raw role enums (`CAMPUS_ADMIN`) and overflowed at 1280px for admin/security; car-model labels invisible in light theme; refunds labelled "Parking Reward"; "Dr. Dr." gate greeting; raw ISO timestamp in Flex bay status; stale hard-coded "next available" text; low light-theme contrast for status green/gold text. | All fixed. |
 
-**Known, not fixed here:** several backend data fields exist only in Arabic (tutoring titles/locations, office location, bay status strings, occupant names), so they show in Arabic in English mode; fixing needs bilingual data fields. The archived `legacy/` showcase pages overflow on mobile.
+| E10 (UX) | The archived `legacy/` pages overflowed horizontally: header at 1280px (`index`/`app`), section nav and token grid at 360px (`showcase`), deck controls at 360px (`presentation`, whose slide counter also rendered reversed in RTL). | Fixed; no horizontal overflow at 360/414/768/1024/1100/1280/1366/1440/1920. |
+
+**Known, not fixed here:** several backend data fields exist only in Arabic (tutoring titles/locations, office location, bay status strings), so they show in Arabic in English mode; fixing needs bilingual data fields.
 
 ## Configuration & headers
 
@@ -99,8 +101,8 @@ The worst issues were **business-logic flaws in the wallet** that let any logged
 
 All results below are against **real PostgreSQL** (Testcontainers) and the **running Docker stack** (`docker compose up --build`).
 
-- Backend `mvn test`: **173/173** pass.
-- Frontend: `vitest` **131/131**, `eslint` clean, `tsc` clean, `vite build` OK.
-- Live API end-to-end script (through nginx, 113 checks): auth lockout/refresh reuse, wallet idempotency, tuition replay + IDOR, exact charge/refund for parking, gate 401/403, flex reward once, room/tutoring/office-hours/transit rules, notifications, vehicles, admin suspension + audit, analytics redaction, malformed input → **113/113 pass**.
-- Browser QA (Chrome, 248 page views in the first pass plus 3 re-verification rounds: anonymous/student/faculty/security/admin × AR/EN × light/dark × 1280/360): 0 console errors, 0 CSP violations, 0 unexpected API errors, 0 broken images; interactive flows (top-up, book/cancel with exact refund, tuition, room, tutoring, office hours, transit pass, notifications, vehicles, ALPR gate, admin tabs) all work.
-- New tests: `AuthRateLimiterTest`, `WalletServiceTest`, `TuitionServiceTest`, `AuthControllerIntegrationTest`, `GateControllerIntegrationTest`, `AnalyticsControllerIntegrationTest`, `BusinessRulesIntegrationTest` (past bookings, transit itinerary, malformed requests, booking expiry, orphaned bays), `FacultyOfficeResponseTest`, `GateDecisionTitleTest`, `AlprGateView.test.tsx`, `BookOfficeHoursModal.test.tsx`.
+- Backend `mvn test`: **176/176** pass.
+- Frontend: `vitest` **133/133**, `eslint` clean, `tsc` clean, `vite build` OK.
+- Live API end-to-end script (through nginx, 113 checks): auth lockout/refresh reuse, wallet idempotency, tuition replay + IDOR, exact charge/refund for parking, gate 401/403, flex ownership rule (stranger 403, offer longer than the booking 400, shared bay not bookable, assigned faculty bay shareable by its owner only and restored on cancel), flex reward once, room/tutoring/office-hours/transit rules, notifications, vehicles, admin suspension + audit, analytics redaction, malformed input → **121/121 pass**.
+- Browser QA (Chrome, 248 page views in the first pass plus 3 re-verification rounds: anonymous/student/faculty/security/admin × AR/EN × light/dark × 1280/360): 0 console errors, 0 CSP violations, 0 unexpected API errors, 0 broken images; interactive flows (top-up, book/cancel with exact refund, tuition, room, tutoring, office hours, transit pass, notifications, vehicles, ALPR gate, admin tabs) all work. Share screen after M7 (20 checks: no-booking student, student with a 2.5 h booking in AR/light/1280 and EN/dark/360, assigned faculty): only owned bays listed, 3 h/4 h breaks disabled past the booking end, offer is exactly 120 min, cancel returns the bay to RESERVED.
+- New tests: `AuthRateLimiterTest`, `WalletServiceTest`, `TuitionServiceTest`, `AuthControllerIntegrationTest`, `GateControllerIntegrationTest`, `AnalyticsControllerIntegrationTest`, `BusinessRulesIntegrationTest` (past bookings, transit itinerary, malformed requests, booking expiry, orphaned bays, cross-tenant admin), `FlexShareControllerIntegrationTest` (booking holder, stranger, assigned faculty), `FacultyOfficeResponseTest`, `GateDecisionTitleTest`, `AlprGateView.test.tsx`, `BookOfficeHoursModal.test.tsx`.

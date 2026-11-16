@@ -22,6 +22,7 @@ import sa.edu.fbsu.campus.parking.dto.CreateBookingRequest;
 import sa.edu.fbsu.campus.parking.dto.DigitalPassResponse;
 import sa.edu.fbsu.campus.parking.infra.ParkingBookingRepository;
 import sa.edu.fbsu.campus.parking.infra.ParkingSpotRepository;
+import sa.edu.fbsu.campus.parking.infra.SpotAssignmentRepository;
 
 import sa.edu.fbsu.campus.wallet.application.WalletService;
 import sa.edu.fbsu.campus.wallet.domain.TransactionType;
@@ -46,6 +47,7 @@ public class BookingService {
     private final VehicleRepository vehicleRepository;
     private final WalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
+    private final SpotAssignmentRepository spotAssignmentRepository;
 
     public BookingService(
             ParkingBookingRepository bookingRepository,
@@ -54,8 +56,10 @@ public class BookingService {
             UserRepository userRepository,
             VehicleRepository vehicleRepository,
             WalletService walletService,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            SpotAssignmentRepository spotAssignmentRepository
     ) {
+        this.spotAssignmentRepository = spotAssignmentRepository;
         this.bookingRepository = bookingRepository;
         this.spotRepository = spotRepository;
         this.tariffResolver = tariffResolver;
@@ -84,6 +88,19 @@ public class BookingService {
         if (spot.getStatus() == SpotStatus.FACULTY_ASSIGNED && user.getUserType() != UserType.FACULTY) {
             throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is restricted to faculty members.");
         }
+
+        // A shared bay is taken through a Flex-Share claim (which pays the owner), not a booking.
+        if (spot.getStatus() == SpotStatus.FLEX_SHARE) {
+            throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is offered on Flex-Share; claim the offer instead.");
+        }
+
+        // A bay assigned to a faculty member belongs to that member only.
+        spotAssignmentRepository.findBySpotIdAndActiveTrue(spot.getId())
+                .filter(a -> ParkingLifecycleService.isCurrent(a, Instant.now()))
+                .filter(a -> !a.getUserId().equals(userId))
+                .ifPresent(a -> {
+                    throw new IllegalStateException("Parking spot " + spot.getBayCode() + " is assigned to another faculty member.");
+                });
 
         // Resolve vehicle (requested or primary user vehicle)
         Vehicle vehicle = null;

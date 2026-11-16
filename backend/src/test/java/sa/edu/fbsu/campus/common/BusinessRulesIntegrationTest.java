@@ -9,7 +9,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import sa.edu.fbsu.campus.domain.University;
+import sa.edu.fbsu.campus.identity.domain.Role;
 import sa.edu.fbsu.campus.identity.domain.UserType;
+import sa.edu.fbsu.campus.identity.infra.UserRepository;
+import sa.edu.fbsu.campus.infra.UniversityRepository;
 import sa.edu.fbsu.campus.identity.dto.LoginRequest;
 import sa.edu.fbsu.campus.identity.dto.RegisterRequest;
 import sa.edu.fbsu.campus.officehours.domain.FacultyOfficeProfile;
@@ -27,6 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,6 +64,12 @@ class BusinessRulesIntegrationTest extends AbstractPostgresIntegrationTest {
 
     @Autowired
     private ParkingSpotRepository spotRepository;
+
+    @Autowired
+    private UniversityRepository universityRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private String token(String path, Object body) throws Exception {
         String json = mockMvc.perform(post(path)
@@ -309,5 +320,69 @@ class BusinessRulesIntegrationTest extends AbstractPostgresIntegrationTest {
         // The scheduled entry point must work on its own (it once failed outside a transaction)
         lifecycleService.scheduledExpiry();
         assertThat(spotRepository.findById(spotId).orElseThrow().getStatus().name()).isEqualTo("AVAILABLE");
+    }
+
+    /** A campus admin of a second university (tenant), for isolation checks. */
+    private String otherTenantAdmin() throws Exception {
+        if (!universityRepository.existsByCode("OTU")) {
+            universityRepository.save(new University("OTU", "جامعة أخرى", "Other University"));
+        }
+        String s = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        String email = "otu-admin-" + s + "@otu.edu.sa";
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new RegisterRequest(
+                                "OTU", "OT-" + s, email, "OtherP@ss2026!", "مدير", "Admin", UserType.STAFF,
+                                "0533" + s.substring(0, 6), "ع ب د", String.valueOf(1000 + Math.abs(s.hashCode() % 8999)),
+                                "Car", "White"))))
+                .andExpect(status().isCreated());
+        var user = userRepository.findByEmail(email).orElseThrow();
+        user.addRole(Role.CAMPUS_ADMIN);
+        userRepository.save(user);
+        return token("/api/v1/auth/login", new LoginRequest("OTU", email, "OtherP@ss2026!"));
+    }
+
+    @Test
+    @DisplayName("Tenant isolation: another university's admin cannot release FBSU room bookings or delete FBSU office hours")
+    void adminOverridesStopAtTheirOwnUniversity() throws Exception {
+        String otuAdmin = otherTenantAdmin();
+
+        // FBSU office-hour window: invisible (404) to the other tenant's admin and left intact
+        JsonNode slot = null;
+        for (JsonNode f : getJson("/api/v1/office-hours/faculty")) {
+            for (JsonNode t : f.path("timeSlots")) {
+                if (t.path("available").asBoolean()) { slot = t; break; }
+            }
+            if (slot != null) break;
+        }
+        assertThat(slot).as("an open FBSU office-hour window").isNotNull();
+        UUID slotId = UUID.fromString(slot.path("id").asText());
+        mockMvc.perform(delete("/api/v1/office-hours/slots/" + slotId).header("Authorization", "Bearer " + otuAdmin))
+                .andExpect(status().isNotFound());
+        assertThat(slotRepository.findById(slotId)).isPresent();
+
+        // FBSU room booking: the other tenant's admin cannot release it; its leader can
+        String student = newStudent();
+        JsonNode room = null;
+        for (JsonNode r : getJson("/api/v1/rooms")) {
+            if ("AVAILABLE".equals(r.path("status").asText())) { room = r; break; }
+        }
+        assertThat(room).isNotNull();
+        Instant start = Instant.now();
+        String json = mockMvc.perform(post("/api/v1/rooms/" + room.path("roomCode").asText() + "/book")
+                        .header("Authorization", "Bearer " + student)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "startTime", start.toString(), "endTime", start.plus(1, ChronoUnit.HOURS).toString(),
+                                "purpose", "tenant isolation"))))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn().getResponse().getContentAsString();
+        String bookingId = objectMapper.readTree(json).path("activeBooking").path("bookingId").asText();
+        assertThat(bookingId).isNotBlank();
+
+        mockMvc.perform(post("/api/v1/rooms/bookings/" + bookingId + "/release").header("Authorization", "Bearer " + otuAdmin))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(post("/api/v1/rooms/bookings/" + bookingId + "/release").header("Authorization", "Bearer " + student))
+                .andExpect(status().isOk());
     }
 }

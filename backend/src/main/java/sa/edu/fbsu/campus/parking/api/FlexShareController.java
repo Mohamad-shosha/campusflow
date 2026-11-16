@@ -15,6 +15,7 @@ import sa.edu.fbsu.campus.infra.UniversityRepository;
 import sa.edu.fbsu.campus.parking.application.FlexShareService;
 import sa.edu.fbsu.campus.parking.dto.CreateFlexOfferRequest;
 import sa.edu.fbsu.campus.parking.dto.FlexOfferResponse;
+import sa.edu.fbsu.campus.parking.dto.ShareableSpotResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -71,6 +72,14 @@ public class FlexShareController {
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID offerId) {
         return ResponseEntity.ok(flexShareService.cancelOffer(principal.getUserId(), offerId));
+    }
+
+    @GetMapping("/shareable-spots")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Bays the authenticated user may offer: live bookings they hold and their assigned faculty bay")
+    public ResponseEntity<List<ShareableSpotResponse>> getShareableSpots(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(flexShareService.getShareableSpots(principal.getUserId()));
     }
 
     @GetMapping("/my-offers")
