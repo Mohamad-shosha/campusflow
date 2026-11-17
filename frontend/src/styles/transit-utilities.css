@@ -757,3 +757,14 @@ body.theme-light .transit-scope {
     animation: none;
   }
 }
+
+/* Boarding pass dialog: centred when it fits, scrollable when it is taller than the screen
+   (on a laptop the top of the pass used to be cut off with no way to reach it). */
+.transit-scope .transit-pass-overlay {
+  overflow-y: auto;
+  z-index: 1200; /* above the sticky site header, like the other dialogs */
+}
+.transit-scope .transit-pass-card {
+  margin: auto;
+  flex-shrink: 0;
+}

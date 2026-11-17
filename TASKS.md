@@ -9,12 +9,12 @@
 ## 📊 لوحة المتابعة المباشرة (Live Project Dashboard)
 
 - **إجمالي المهام المخططة:** 53 تاسك
-- **المنجز بالكامل (Done):** 44 تاسك ✅
+- **المنجز بالكامل (Done):** 45 تاسك ✅
 - **قيد العمل حالياً (In Progress):** 1 تاسك ⏳
-- **المتبقي للبدء (Backlog):** 8 تاسك 📋
-- **نسبة الإنجاز الإجمالية للمشروع:** **83%**
+- **المتبقي للبدء (Backlog):** 7 تاسك 📋
+- **نسبة الإنجاز الإجمالية للمشروع:** **85%**
 
-> 📌 **التاسك الشغالين عليه دلوقتي:** **`P8-01` — Security review (OWASP ASVS, dependency scan, headers)** (الفرع: `test/P8-01-security-review`)
+> 📌 **التاسك الشغالين عليه دلوقتي:** **`P8-02` — Full E2E suite (Playwright) AR/EN, dark/light** (الفرع: `test/P8-02-e2e-suite`)
 
 | Phase | الاسم | إجمالي | منجز (Done) ✅ | قيد التنفيذ ⏳ | متبقي 📋 |
 |---|---|---|---|---|---|
@@ -26,9 +26,9 @@
 | P5 | Parking | 9 | 9 | 0 | 0 |
 | P6 | Campus Services | 7 | 7 | 0 | 0 |
 | P7 | Notifications, Admin, Analytics | 6 | 6 | 0 | 0 |
-| P8 | Hardening & QA | 5 | 0 | 1 | 4 |
+| P8 | Hardening & QA | 5 | 1 | 1 | 3 |
 | P9 | Release & Operations | 4 | 0 | 0 | 4 |
-| **الإجمالي** | | **53** | **44** | **1** | **8** |
+| **الإجمالي** | | **53** | **45** | **1** | **7** |
 
 ---
 
@@ -545,9 +545,9 @@
 
 ### P8-01 — Security review (OWASP ASVS, dependency scan, headers)
 - **ماذا سيعمل:** مراجعة أمنية شاملة وإصلاح الثغرات.
-- **Priority:** High · **Complexity:** L · **Status:** ⏳ In Progress (جاري العمل)
+- **Priority:** High · **Complexity:** L · **Status:** ✅ Done
 - **Dependencies:** P7-06
-- **Git Branch:** `test/P8-01-security-review` · **Pull Request:** PR (test/P8-01-security-review)
+- **Git Branch:** `test/P8-01-security-review` · **Pull Request:** PR #53 (test/P8-01-security-review)
 - **الملفات المتوقعة:** `security config`، `docs/security/security-review.md`، `frontend/security-headers.conf`
 - **Implementation Steps:** 1) ASVS checklist 2) Dependency scan 3) Headers/CORS 4) اختبارات اختراق أساسية
 - **Acceptance Criteria:** لا ثغرات High/Critical مفتوحة
@@ -556,9 +556,9 @@
 
 ### P8-02 — Full E2E suite (Playwright) AR/EN, dark/light
 - **ماذا سيعمل:** اختبارات End-to-End لكل الرحلات الأساسية بالعربي والإنجليزي والثيمين.
-- **Priority:** High · **Complexity:** L · **Status:** Backlog
+- **Priority:** High · **Complexity:** L · **Status:** ⏳ In Progress (جاري العمل)
 - **Dependencies:** P7-06
-- **Git Branch:** `test/P8-02-e2e-suite` · **Pull Request:** —
+- **Git Branch:** `test/P8-02-e2e-suite` · **Pull Request:** PR (test/P8-02-e2e-suite)
 - **الملفات المتوقعة:** `frontend/e2e/**`
 - **Implementation Steps:** 1) Fixtures 2) Flows 3) CI integration
 - **Acceptance Criteria:** كل الرحلات الأساسية خضراء

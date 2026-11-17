@@ -424,6 +424,7 @@ export const TutoringView: FC<TutoringViewProps> = ({
               <div style={{ display: 'grid', gap: '0.5rem' }}>
                 <button
                   className="btn-gold book-tutoring-btn"
+                  data-testid={`book-tutoring-btn-${s.id}`}
                   onClick={() => {
                     soundFX.playClick();
                     setSelectedSession(s);

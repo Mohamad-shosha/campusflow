@@ -1,4 +1,5 @@
 import { FC, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { confetti } from '../../../shared/utils/confetti';
 import { X, Bus, CheckCircle2, MapPin, Clock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { QR } from '../../../shared/components/QR';
@@ -30,17 +31,20 @@ export const TransitPassModal: FC<TransitPassModalProps> = ({ isOpen, pass, isAr
 
   if (!isOpen || !pass) return null;
 
-  return (
+  // Rendered on <body>: inside the page a transformed ancestor turned `position: fixed` into
+  // positioning relative to that ancestor, so the pass was clipped instead of covering the screen.
+  return createPortal(
     <div className="transit-scope">
       <div
+        data-testid="transit-pass-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="transit-pass-title"
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+        className="transit-pass-overlay fixed inset-0 z-50 flex p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
       >
         <div
-          className="relative w-full max-w-md overflow-hidden rounded-3xl border border-emerald-500/30 bg-[#071513] text-white shadow-2xl shadow-emerald-950/60"
+          className="transit-pass-card relative w-full max-w-md overflow-hidden rounded-3xl border border-emerald-500/30 bg-[#071513] text-white shadow-2xl shadow-emerald-950/60"
           onClick={e => e.stopPropagation()}
         >
           {/* Top Header Glow */}
@@ -174,6 +178,7 @@ export const TransitPassModal: FC<TransitPassModalProps> = ({ isOpen, pass, isAr
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

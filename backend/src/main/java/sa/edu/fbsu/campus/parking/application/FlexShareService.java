@@ -87,10 +87,6 @@ public class FlexShareService {
                 .filter(sp -> offerer.getUniversityId().equals(sp.getUniversityId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Parking spot not found: " + request.spotId()));
 
-        if (flexOfferRepository.existsBySpotIdAndStatusIn(spot.getId(), Set.of(FlexOfferStatus.AVAILABLE, FlexOfferStatus.CLAIMED))) {
-            throw new IllegalStateException("An active Flex-Share offer already exists for spot " + spot.getBayCode());
-        }
-
         Instant now = Instant.now();
         Instant startTime = request.startTime() != null ? request.startTime() : now;
         if (startTime.isBefore(now.minus(Duration.ofMinutes(15)))) {
@@ -98,6 +94,10 @@ public class FlexShareService {
         }
         Instant endTime = startTime.plus(Duration.ofMinutes(request.durationMinutes()));
         requireRightToShare(offerer, spot, startTime, endTime, now);
+        // Checked after the ownership rule, so a non-owner always gets 403 and learns nothing about the bay.
+        if (flexOfferRepository.existsBySpotIdAndStatusIn(spot.getId(), LIVE_OFFER)) {
+            throw new IllegalStateException("An active Flex-Share offer already exists for spot " + spot.getBayCode());
+        }
 
         // Reward strictly from the offerer's active tariff; no hardcoded fallback amount.
         // flex_cashback_rate is NOT NULL in the schema; zero means "no cashback".
